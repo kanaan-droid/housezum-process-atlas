@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZum — Home Buying Process Atlas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a14;--surface:#11111d;--border:rgba(148,163,184,0.07);--text:#e2e8f0;--muted:#94a3b8;--dim:#64748b;--blue:#3b82f6;--blue-light:#60a5fa;--violet:#7c3aed;--violet-light:#a78bfa;--amber:#f59e0b;--amber-light:#fbbf24;--green:#10b981;--green-light:#34d399;--red:#ef4444;--red-light:#f87171}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ── Top Nav ── */
+.top-bar{position:sticky;top:0;z-index:100;background:rgba(10,10,20,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 24px}
+.top-inner{max-width:1500px;margin:0 auto;display:flex;align-items:center;gap:20px;height:56px}
+.logo{font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--violet),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;flex-shrink:0}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;flex:1}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:8px 14px;font-size:12px;font-weight:500;color:var(--dim);border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .15s;border:1px solid transparent;user-select:none}
+.tab:hover{color:var(--muted);background:rgba(148,163,184,0.05)}
+.tab.active{color:var(--text);background:rgba(124,58,237,0.12);border-color:rgba(124,58,237,0.2)}
+.tab .tab-dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* ── Content Panels ── */
+.panel{display:none;animation:fadeIn .25s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Shared Styles ── */
+.page-header{text-align:center;padding:48px 40px 28px;position:relative}
+.page-header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100px;height:2px;background:linear-gradient(90deg,transparent,var(--violet),transparent)}
+.page-header h1{font-size:36px;font-weight:700;color:#f1f5f9;margin-bottom:6px}
+.page-header .sub{color:var(--muted);font-size:14px}
+.badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 14px;border-radius:5px;margin-bottom:12px}
+.badge.ba{background:rgba(59,130,246,0.15);color:var(--blue-light);border:1px solid rgba(59,130,246,0.25)}
+.badge.bb{background:rgba(124,58,237,0.15);color:var(--violet-light);border:1px solid rgba(124,58,237,0.25)}
+.badge.bc{background:rgba(245,158,11,0.15);color:var(--amber-light);border:1px solid rgba(245,158,11,0.25)}
+.badge.bd{background:rgba(16,185,129,0.15);color:var(--green-light);border:1px solid rgba(16,185,129,0.25)}
+.wrap{max-width:1500px;margin:0 auto;padding:0 24px 80px}
+
+/* ── Stats ── */
+.stats{display:flex;justify-content:center;gap:48px;padding:24px 40px;flex-wrap:wrap}
+.stat-v{font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--violet),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-l{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.legend{display:flex;justify-content:center;gap:24px;padding:8px 40px 28px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.legend i{width:9px;height:9px;border-radius:2px;display:inline-block}
+
+/* ── Phase Groups (Overview) ── */
+.phase{margin-bottom:36px}
+.ph{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.pt{font-size:18px;font-weight:600}.pdur{font-size:12px;color:var(--dim);margin-left:auto}
+.row{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
+.card{min-width:250px;max-width:300px;flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;scroll-snap-align:start;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.35)}
+.ch{padding:12px 16px 8px;display:flex;align-items:center;gap:10px}
+.cn{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.cn.ca{background:rgba(59,130,246,0.18);color:var(--blue-light)}
+.cn.cb{background:rgba(124,58,237,0.18);color:var(--violet-light)}
+.cn.cc{background:rgba(245,158,11,0.18);color:var(--amber-light)}
+.cn.cd{background:rgba(16,185,129,0.18);color:var(--green-light)}
+.ct{font-size:13px;font-weight:600;line-height:1.3}
+.cb-body{padding:0 16px 12px}
+.cd-desc{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:8px}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.tag{font-size:9.5px;padding:2px 6px;border-radius:3px}
+.tag-a{background:rgba(59,130,246,0.1);color:var(--blue-light);border:1px solid rgba(59,130,246,0.12)}
+.tag-d{background:rgba(124,58,237,0.1);color:var(--violet-light);border:1px solid rgba(124,58,237,0.12)}
+.tag-t{background:rgba(148,163,184,0.06);color:var(--muted);border:1px solid rgba(148,163,184,0.1)}
+.pain{font-size:10.5px;color:var(--red-light);padding:6px 9px;background:rgba(239,68,68,0.05);border-radius:6px;border-left:3px solid rgba(239,68,68,0.3);margin-bottom:6px;line-height:1.4}
+.hz{font-size:10.5px;color:var(--green-light);padding:6px 9px;background:rgba(16,185,129,0.05);border-radius:6px;border-left:3px solid rgba(16,185,129,0.3);line-height:1.4}
+.pain-big{border-left-color:var(--red);background:rgba(239,68,68,0.08)}
+.hz-big{border-left-color:var(--violet);background:rgba(124,58,237,0.06);color:var(--violet-light)}
+.ms{text-align:center;margin:8px 0 32px}
+.ms-line{height:1px;background:linear-gradient(90deg,transparent,rgba(124,58,237,0.25),transparent);margin-bottom:8px}
+.ms-label{display:inline-block;padding:5px 16px;background:var(--bg);border:1px solid rgba(124,58,237,0.2);border-radius:16px;font-size:10px;font-weight:600;color:var(--violet-light);letter-spacing:.3px}
+
+/* ── Swimlane Grids ── */
+.swim-container{max-width:1500px;margin:0 auto;padding:32px 20px 60px;overflow-x:auto}
+.swim-grid{display:grid;gap:0}
+.sch{padding:12px 8px;text-align:center;border-bottom:2px solid rgba(148,163,184,0.12)}
+.sch .sn{font-size:10px;color:var(--muted);font-weight:700}
+.sch .st{font-size:12px;font-weight:600;color:#f1f5f9;margin-top:2px}
+.sch .sd{font-size:9.5px;color:var(--dim);margin-top:1px}
+.sch-a{background:rgba(59,130,246,0.04);border-bottom-color:rgba(59,130,246,0.2)}
+.sch-a .sn{color:var(--blue-light)}
+.sch-b{background:rgba(124,58,237,0.04);border-bottom-color:rgba(124,58,237,0.2)}
+.sch-b .sn{color:var(--violet-light)}
+.sch-c{background:rgba(245,158,11,0.04);border-bottom-color:rgba(245,158,11,0.2)}
+.sch-c .sn{color:var(--amber-light)}
+.sch-d{background:rgba(16,185,129,0.04);border-bottom-color:rgba(16,185,129,0.2)}
+.sch-d .sn{color:var(--green-light)}
+.sch-danger{background:rgba(239,68,68,0.05);border-bottom-color:rgba(239,68,68,0.3)}
+.sch-danger .sn{color:var(--red-light)}
+.lh{padding:0 8px;display:flex;align-items:center;font-size:10.5px;font-weight:600;border-right:2px solid rgba(148,163,184,0.05)}
+.lh.l-ba{color:var(--blue-light);background:rgba(59,130,246,0.02)}
+.lh.l-sa{color:var(--violet-light);background:rgba(124,58,237,0.02)}
+.lh.l-buy{color:var(--amber-light);background:rgba(245,158,11,0.02)}
+.lh.l-sell{color:var(--red-light);background:rgba(239,68,68,0.02)}
+.lh.l-tp{color:var(--green-light);background:rgba(16,185,129,0.02)}
+.sc{min-height:80px;padding:6px;border-bottom:1px solid rgba(148,163,184,0.03);border-right:1px solid rgba(148,163,184,0.03);display:flex;flex-direction:column;gap:4px;justify-content:center}
+.sc-danger{background:rgba(239,68,68,0.02)}
+.a{font-size:9.5px;padding:4px 7px;border-radius:4px;line-height:1.35}
+.a-ba{background:rgba(59,130,246,0.08);color:#93c5fd;border:1px solid rgba(59,130,246,0.1)}
+.a-sa{background:rgba(124,58,237,0.08);color:#c4b5fd;border:1px solid rgba(124,58,237,0.1)}
+.a-buy{background:rgba(245,158,11,0.08);color:#fde68a;border:1px solid rgba(245,158,11,0.1)}
+.a-sell{background:rgba(239,68,68,0.08);color:#fca5a5;border:1px solid rgba(239,68,68,0.1)}
+.a-tp{background:rgba(16,185,129,0.08);color:#6ee7b7;border:1px solid rgba(16,185,129,0.1)}
+.doc{font-size:9px;padding:3px 6px;border-radius:3px;background:rgba(124,58,237,0.1);color:#c4b5fd;border:1px solid rgba(124,58,237,0.15);display:inline-flex;align-items:center;gap:2px}
+.doc::before{content:'📄';font-size:8px}
+.hzm{font-size:9px;padding:3px 6px;border-radius:3px;background:rgba(16,185,129,0.08);color:var(--green-light);border:1px solid rgba(16,185,129,0.15);display:inline-flex;align-items:center;gap:2px}
+.hzm::before{content:'✦'}
+.hzm-killer{background:rgba(124,58,237,0.1);color:var(--violet-light);border-color:rgba(124,58,237,0.2);font-weight:600}
+.deadline{font-size:9px;padding:3px 6px;border-radius:3px;background:rgba(239,68,68,0.1);color:var(--red-light);border:1px solid rgba(239,68,68,0.15);display:inline-flex;align-items:center;gap:2px}
+.deadline::before{content:'⏰'}
+.warn{font-size:9px;padding:3px 6px;border-radius:3px;background:rgba(239,68,68,0.06);color:var(--red-light);border:1px solid rgba(239,68,68,0.12);display:inline-flex;align-items:center;gap:2px}
+.warn::before{content:'⚠'}
+.inactive{opacity:0.15;font-size:9px;color:var(--dim);text-align:center;font-style:italic;padding:4px}
+
+/* ── Doc Flow Cards ── */
+.flow-section{max-width:1500px;margin:36px auto 0;padding:0 20px}
+.flow-section h2{font-size:18px;font-weight:600;margin-bottom:14px;padding-left:4px}
+.flow-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.fc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;overflow:hidden}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.fc-a::before{background:linear-gradient(90deg,var(--blue),var(--blue-light))}
+.fc-b::before{background:linear-gradient(90deg,var(--violet),var(--violet-light))}
+.fc-c::before{background:linear-gradient(90deg,var(--amber),var(--amber-light))}
+.fc-d::before{background:linear-gradient(90deg,var(--green),var(--green-light))}
+.fc-danger::before{background:linear-gradient(90deg,var(--red),var(--red-light))}
+.fc-title{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.fc-step{font-size:9px;padding:2px 5px;border-radius:3px;background:rgba(124,58,237,0.12);color:var(--violet-light)}
+.fc-row{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:10px;flex-wrap:wrap}
+.fc-from{color:var(--muted);min-width:65px}
+.fc-arrow{color:#475569}
+.fc-to{color:var(--text)}
+.fc-doc{color:#c4b5fd;font-weight:500}
+
+/* ── Timeline Bar ── */
+.tl-section{max-width:1500px;margin:0 auto;padding:0 20px}
+.tl-bar{display:flex;align-items:stretch;height:50px;border-radius:8px;overflow:hidden}
+.tl-seg{display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:600}
+.tl-labels{display:flex;font-size:9px;color:var(--dim)}
+.tl-labels div{text-align:center}
+
+/* ── Alert Bar ── */
+.alert-bar{max-width:1500px;margin:20px auto 0;padding:0 20px}
+.alert{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);border-radius:8px;padding:12px 18px;font-size:12px;color:#fca5a5}
+.alert strong{color:var(--red-light)}
+
+/* ── Journey Map Styles ── */
+.persona-badge-j{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:8px 16px;margin-bottom:16px}
+.persona-badge-ba{background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25)}
+.persona-badge-sa{background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25)}
+.persona-icon-j{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
+.persona-icon-ba{background:linear-gradient(135deg,var(--blue),var(--violet))}
+.persona-icon-sa{background:linear-gradient(135deg,var(--violet),var(--violet-light))}
+.persona-name-j{font-size:12px;font-weight:700}
+.persona-role-j{font-size:9px;color:var(--muted)}
+.pd-grid{max-width:1500px;margin:20px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.pd-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px}
+.pd-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.pd-value{font-size:12px;color:var(--text);line-height:1.5}
+
+/* ── Curve ── */
+.curve-wrap{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 16px 16px;overflow-x:auto;margin-top:20px}
+.curve-canvas{position:relative;min-width:1000px;height:300px}
+.y-axis{position:absolute;left:0;top:0;bottom:44px;width:46px;display:flex;flex-direction:column;justify-content:space-between;font-size:9px;color:var(--dim);text-align:right;padding-right:6px}
+.grid-cv{position:absolute;left:52px;right:0;top:0;bottom:44px}
+.grid-cv-line{position:absolute;left:0;right:0;height:1px;background:rgba(148,163,184,0.04)}
+.grid-cv-line.mid{background:rgba(148,163,184,0.1)}
+.curve-svg{position:absolute;left:52px;right:0;top:0;bottom:44px}
+.step-labels-cv{position:absolute;left:52px;right:0;bottom:0;height:44px;display:flex}
+.sl-cv{flex:1;text-align:center;font-size:8px;display:flex;flex-direction:column;justify-content:center;gap:1px}
+.sl-cv .num{color:var(--dim)}
+.sl-cv .name{color:var(--muted);font-family:'DM Sans',sans-serif;font-size:8px}
+.dp{position:absolute;width:11px;height:11px;border-radius:50%;transform:translate(-50%,-50%);cursor:pointer;z-index:2;transition:transform .15s}
+.dp:hover{transform:translate(-50%,-50%) scale(1.5)}
+.dp .tt{display:none;position:absolute;bottom:18px;left:50%;transform:translateX(-50%);background:#1a1a2e;border:1px solid rgba(148,163,184,0.15);border-radius:7px;padding:8px 12px;white-space:nowrap;font-size:10px;z-index:10;min-width:160px}
+.dp:hover .tt{display:block}
+.tt-title{font-weight:600;color:#f1f5f9;margin-bottom:3px}
+.tt-emo{font-size:9px;margin-bottom:2px}
+.tt-feel{font-size:9px;color:var(--muted)}
+
+/* ── Journey Tables ── */
+.journey-section{max-width:1500px;margin:28px auto 0;padding:0 24px 60px;overflow-x:auto}
+.jt{min-width:1000px;border-collapse:collapse;width:100%}
+.jt th{text-align:left;padding:8px 6px;font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid rgba(148,163,184,0.08)}
+.jt td{padding:6px;border-bottom:1px solid rgba(148,163,184,0.03);vertical-align:top}
+.jt-rl{font-size:10px;font-weight:600;color:var(--muted);min-width:90px;position:sticky;left:0;background:var(--bg);z-index:1}
+.jt-phase{text-align:center;padding:6px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.jt-pa{background:rgba(59,130,246,0.06);color:var(--blue-light);border-bottom:2px solid rgba(59,130,246,0.12)}
+.jt-pb{background:rgba(124,58,237,0.06);color:var(--violet-light);border-bottom:2px solid rgba(124,58,237,0.12)}
+.jt-pc{background:rgba(245,158,11,0.06);color:var(--amber-light);border-bottom:2px solid rgba(245,158,11,0.12)}
+.jt-pd{background:rgba(16,185,129,0.06);color:var(--green-light);border-bottom:2px solid rgba(16,185,129,0.12)}
+.jt-pre{background:rgba(124,58,237,0.06);color:var(--violet-light);border-bottom:2px solid rgba(124,58,237,0.12)}
+.jt-due{background:rgba(239,68,68,0.06);color:var(--red-light);border-bottom:2px solid rgba(239,68,68,0.12)}
+.jcell{font-size:9.5px;line-height:1.45;padding:3px 5px;border-radius:3px}
+.jc-action{color:#93c5fd}
+.jc-action-sa{color:#c4b5fd}
+.jc-think{color:#fde68a;font-style:italic}
+.jc-pain{color:var(--red-light);background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.08);border-radius:4px;padding:4px 6px}
+.jc-hmw{color:var(--green-light);background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.08);border-radius:4px;padding:4px 6px}
+.jc-opp{color:var(--violet-light);background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.08);border-radius:4px;padding:4px 6px}
+.jc-na{color:#475569;font-style:italic;text-align:center}
+.emo{display:inline-block;padding:2px 5px;border-radius:3px;font-size:8px;font-weight:600}
+.emo-h{background:rgba(16,185,129,0.15);color:var(--green-light)}
+.emo-m{background:rgba(245,158,11,0.15);color:var(--amber-light)}
+.emo-l{background:rgba(239,68,68,0.15);color:var(--red-light)}
+.emo-vl{background:rgba(239,68,68,0.25);color:var(--red)}
+
+/* ── Post-Close Timeline ── */
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:16px}
+.pc-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.pc-time{font-size:10px;color:var(--green-light);font-weight:600;margin-bottom:4px}
+.pc-action{font-size:11px;margin-bottom:3px}
+.pc-detail{font-size:9px;color:var(--dim)}
+.celebrate{text-align:center;padding:32px 20px 16px}
+.celebrate h2{font-size:24px;font-weight:700;background:linear-gradient(135deg,var(--green-light),var(--blue-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.celebrate p{color:var(--muted);font-size:13px;max-width:550px;margin:6px auto 0}
+
+/* ── Note box ── */
+.note-box{background:rgba(124,58,237,0.05);border:1px solid rgba(124,58,237,0.12);border-radius:8px;padding:12px 18px;font-size:12px;color:#c4b5fd;line-height:1.5;max-width:1500px;margin:20px auto 0}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  .top-inner{flex-wrap:wrap;height:auto;padding:8px 0}
+  .tabs{order:2;width:100%}
+  .page-header h1{font-size:26px}
+  .pd-grid{grid-template-columns:repeat(2,1fr)}
+  .stats{gap:20px}
+}
+@media(max-width:600px){
+  .pd-grid{grid-template-columns:1fr}
+  .card{min-width:220px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ TOP NAV ════════════════ -->
+<div class="top-bar">
+<div class="top-inner">
+  <div class="logo">HouseZum Process Atlas</div>
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-panel="overview"><span class="tab-dot" style="background:linear-gradient(135deg,var(--violet),var(--blue))"></span>Overview</div>
+    <div class="tab" data-panel="phase-a"><span class="tab-dot" style="background:var(--blue)"></span>Phase A</div>
+    <div class="tab" data-panel="phase-b"><span class="tab-dot" style="background:var(--violet)"></span>Phase B</div>
+    <div class="tab" data-panel="phase-c"><span class="tab-dot" style="background:var(--amber)"></span>Phase C</div>
+    <div class="tab" data-panel="phase-d"><span class="tab-dot" style="background:var(--green)"></span>Phase D</div>
+    <div class="tab" data-panel="journey-ba"><span class="tab-dot" style="background:var(--blue)"></span>Journey: Buyer Agent</div>
+    <div class="tab" data-panel="journey-sa"><span class="tab-dot" style="background:var(--violet)"></span>Journey: Seller Agent</div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════ 1. OVERVIEW ════════════════ -->
+<div class="panel active" id="overview">
+<div class="page-header">
+  <h1>Home Buying Process Overview</h1>
+  <p class="sub">15 Steps from Lead to Close — California Baseline (~90% Universal)</p>
+</div>
+<div class="stats">
+  <div style="text-align:center"><div class="stat-v">15</div><div class="stat-l">Steps</div></div>
+  <div style="text-align:center"><div class="stat-v">11</div><div class="stat-l">Actors</div></div>
+  <div style="text-align:center"><div class="stat-v">24</div><div class="stat-l">Documents</div></div>
+  <div style="text-align:center"><div class="stat-v">45–90</div><div class="stat-l">Days Avg</div></div>
+</div>
+<div class="legend">
+  <span><i style="background:var(--blue)"></i>Discovery</span>
+  <span><i style="background:var(--violet)"></i>Offer & Contract</span>
+  <span><i style="background:var(--amber)"></i>Due Diligence</span>
+  <span><i style="background:var(--green)"></i>Closing</span>
+  <span><i style="background:var(--red)"></i>Pain Point</span>
+  <span><i style="background:var(--green-light)"></i>HouseZum</span>
+</div>
+<div class="wrap">
+<!-- Phase A -->
+<div class="phase"><div class="ph"><span class="badge ba mono">Phase A</span><span class="pt">Discovery</span><span class="pdur mono">Days to months</span></div>
+<div class="row">
+<div class="card"><div class="ch"><div class="cn ca mono">01</div><div class="ct">Lead Qualification</div></div><div class="cb-body"><div class="cd-desc">Agent qualifies buyer: needs, budget, timeline, financing. Signs agency disclosure.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Buyer</span><span class="tag tag-a mono">Lender</span><span class="tag tag-t mono">1–3 days</span></div><div class="pain">⚠ Notes lost after consultation. No structured preference capture.</div><div class="hz">✦ AI intake form + voice-to-text. Structured preferences.</div></div></div>
+<div class="card"><div class="ch"><div class="cn ca mono">02</div><div class="ct">Property Search & Matching</div></div><div class="cb-body"><div class="cd-desc">Search MLS, curate shortlist, share with buyer. Iterative feedback refines search.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Buyer</span><span class="tag tag-t mono">Days–weeks</span></div><div class="pain">⚠ Only basic MLS data. Must call seller agent for details.</div><div class="hz">✦ Smart Matching + augmented listings from seller agents.</div></div></div>
+<div class="card"><div class="ch"><div class="cn ca mono">03</div><div class="ct">Showings & Tours</div></div><div class="cb-body"><div class="cd-desc">Schedule viewings, attend with buyer, capture feedback. Rate hot/warm/cold.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Buyer</span><span class="tag tag-a mono">Seller Agent</span><span class="tag tag-t mono">1–4 weeks</span></div><div class="pain">⚠ Feedback verbal, forgotten. No centralized showing history.</div><div class="hz">✦ Voice feedback capture. Structured showing log.</div></div></div>
+</div></div>
+<div class="ms"><div class="ms-line"></div><div class="ms-label mono">~90% OF LEADS DROP OFF BEFORE THIS POINT</div></div>
+<!-- Phase B -->
+<div class="phase"><div class="ph"><span class="badge bb mono">Phase B</span><span class="pt">Offer & Contract</span><span class="pdur mono">3–14 days</span></div>
+<div class="row">
+<div class="card"><div class="ch"><div class="cn cb mono">04</div><div class="ct">Buyer Preparation</div></div><div class="cb-body"><div class="cd-desc">Pull comps, analyze market value, discuss strategy, confirm financing.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Lender</span><span class="tag tag-t mono">1–2 days</span></div><div class="pain">⚠ CMA time-consuming. No data-driven offer guidance.</div><div class="hz">✦ AI CMA report + offer price range.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cb mono">05</div><div class="ct">Offer Submission</div></div><div class="cb-body"><div class="cd-desc">Draft 16+ page RPA. Include contingencies, EMD, pre-approval. Submit.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Seller Agent</span><span class="tag tag-d mono">RPA</span><span class="tag tag-t mono">1 day</span></div><div class="pain">⚠ Complex legal form. Manual fill. Easy errors.</div><div class="hz">✦ AI pre-fill + compliance check.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cb mono">06</div><div class="ct">Negotiation</div></div><div class="cb-body"><div class="cd-desc">Counter-offers exchanged. Track terms across rounds. Deadline pressure.</div><div class="tags"><span class="tag tag-a mono">Both Agents</span><span class="tag tag-a mono">Buyer</span><span class="tag tag-a mono">Seller</span><span class="tag tag-t mono">1–7 days</span></div><div class="pain">⚠ Terms scattered across emails. Hard to compare.</div><div class="hz">✦ Visual counter-offer history with diffs.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cb mono">07</div><div class="ct">Contract Execution</div></div><div class="cb-body"><div class="cd-desc">Mutual acceptance. Escrow opens. EMD delivered. Day 1.</div><div class="tags"><span class="tag tag-a mono">Both Agents</span><span class="tag tag-a mono">Escrow</span><span class="tag tag-a mono">Title</span><span class="tag tag-t mono">1 day</span></div><div class="pain">⚠ All deadlines count from here. Manual calculation.</div><div class="hz">✦ Auto deadline calendar. Doc exchange channel.</div></div></div>
+</div></div>
+<div class="ms"><div class="ms-line"></div><div class="ms-label mono">⚡ UNDER CONTRACT — ALL DEADLINES START TICKING</div></div>
+<!-- Phase C -->
+<div class="phase"><div class="ph"><span class="badge bc mono">Phase C</span><span class="pt">Due Diligence</span><span class="pdur mono">17–30 days</span></div>
+<div class="row">
+<div class="card"><div class="ch"><div class="cn cc mono">08</div><div class="ct">Property Inspection</div></div><div class="cb-body"><div class="cd-desc">Hire inspector. 2–4hr inspection. 30–100pg report. Decide next steps.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Inspector</span><span class="tag tag-d mono">Inspection Report</span><span class="tag tag-t mono">Day 7–17</span></div><div class="pain">⚠ Massive PDF. Can't tell critical vs. cosmetic.</div><div class="hz">✦ AI Inspection Analyzer.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cc mono">09</div><div class="ct">Appraisal</div></div><div class="cb-body"><div class="cd-desc">Lender orders appraisal. Low = renegotiate or cover gap.</div><div class="tags"><span class="tag tag-a mono">Lender</span><span class="tag tag-a mono">Appraiser</span><span class="tag tag-d mono">Appraisal Report</span><span class="tag tag-t mono">Day 7–21</span></div><div class="pain">⚠ Zero control. Low appraisal can kill deal.</div><div class="hz">✦ Market data predicts range.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cc mono">10</div><div class="ct">Insurance & Title</div></div><div class="cb-body"><div class="cd-desc">Insurance secured. Title search completed. CC&Rs reviewed.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Title</span><span class="tag tag-a mono">Insurance</span><span class="tag tag-t mono">Concurrent</span></div><div class="pain">⚠ Delayed insurance. Late title issues.</div><div class="hz">✦ AI reminders. CC&R summary.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cc mono">11</div><div class="ct">Loan Processing</div></div><div class="cb-body"><div class="cd-desc">Full underwriting. Verify financials. Clear to close.</div><div class="tags"><span class="tag tag-a mono">Lender</span><span class="tag tag-a mono">Buyer</span><span class="tag tag-d mono">Closing Disclosure</span><span class="tag tag-t mono">Day 21–30</span></div><div class="pain">⚠ #1 cause of delayed closings. No visibility.</div><div class="hz">✦ Loan milestone tracker.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cc mono">12</div><div class="ct">Contingency Removal</div></div><div class="cb-body"><div class="cd-desc">Remove contingencies as satisfied. Miss deadline = cancellation risk.</div><div class="tags"><span class="tag tag-a mono">Both Agents</span><span class="tag tag-d mono">CR / NBP</span><span class="tag tag-t mono">Day 17–21</span></div><div class="pain pain-big">⚠ #1 DEAL KILLER — Missed deadlines destroy deals.</div><div class="hz hz-big">✦ KILLER FEATURE: Auto countdown + alerts + CR forms.</div></div></div>
+</div></div>
+<div class="ms"><div class="ms-line"></div><div class="ms-label mono">✅ ALL CONTINGENCIES REMOVED — DEPOSIT AT RISK</div></div>
+<!-- Phase D -->
+<div class="phase"><div class="ph"><span class="badge bd mono">Phase D</span><span class="pt">Closing</span><span class="pdur mono">3–7 days</span></div>
+<div class="row">
+<div class="card"><div class="ch"><div class="cn cd mono">13</div><div class="ct">Final Walkthrough</div></div><div class="cb-body"><div class="cd-desc">Verify condition, repairs done, fixtures present.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Buyer</span><span class="tag tag-t mono">1–5 days before</span></div><div class="pain">⚠ No checklist. Rushed.</div><div class="hz">✦ AI checklist from inspection.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cd mono">14</div><div class="ct">Closing Day</div></div><div class="cb-body"><div class="cd-desc">Sign docs. Wire funds. Deed recorded. Keys handed over.</div><div class="tags"><span class="tag tag-a mono">All Parties</span><span class="tag tag-d mono">Deed, CD</span><span class="tag tag-t mono">1 day</span></div><div class="pain">⚠ Wire fraud risk. 100+ pages.</div><div class="hz">✦ Wire fraud alerts. Doc summaries.</div></div></div>
+<div class="card"><div class="ch"><div class="cn cd mono">15</div><div class="ct">Post-Close</div></div><div class="cb-body"><div class="cd-desc">Welcome package, vendor recs, follow-up 30/90/365 days.</div><div class="tags"><span class="tag tag-a mono">Buyer Agent</span><span class="tag tag-a mono">Buyer</span><span class="tag tag-t mono">1–30 days</span></div><div class="pain">⚠ Agents forget follow-up.</div><div class="hz">✦ Auto follow-up + review requests.</div></div></div>
+</div></div>
+</div>
+</div>
+
+<!-- ════════════════ 2. PHASE A ════════════════ -->
+<div class="panel" id="phase-a">
+<div class="page-header"><div class="badge ba mono">Phase A</div><h1>Discovery</h1><p class="sub">Lead Qualification → Property Search → Showings & Tours · Duration: Days to Months</p></div>
+<div class="swim-container">
+<div class="swim-grid" style="grid-template-columns:130px repeat(3,1fr);min-width:900px">
+  <div style="border-bottom:2px solid rgba(148,163,184,0.06)"></div>
+  <div class="sch sch-a"><div class="sn mono">STEP 01</div><div class="st">Lead Qualification</div><div class="sd mono">1–3 days</div></div>
+  <div class="sch sch-a"><div class="sn mono">STEP 02</div><div class="st">Property Search</div><div class="sd mono">Days–weeks</div></div>
+  <div class="sch sch-a"><div class="sn mono">STEP 03</div><div class="st">Showings & Tours</div><div class="sd mono">1–4 weeks</div></div>
+  <div class="lh l-ba">Buyer Agent</div>
+  <div class="sc"><div class="a a-ba">Consultation: needs, budget, timeline</div><div class="a a-ba">Sign agency disclosure & buyer rep</div><div class="a a-ba">Recommend pre-approval</div><div class="doc">Agency Disclosure</div><div class="hzm">AI voice intake</div></div>
+  <div class="sc"><div class="a a-ba">Search MLS for matches</div><div class="a a-ba">Curate shortlist of 5–15</div><div class="a a-ba">Share listings, collect feedback</div><div class="a a-ba">Refine based on feedback</div><div class="hzm">AI Smart Matching</div></div>
+  <div class="sc"><div class="a a-ba">Schedule with seller agents</div><div class="a a-ba">Attend, point out features</div><div class="a a-ba">Capture feedback immediately</div><div class="a a-ba">Rate: hot/warm/cold</div><div class="hzm">Voice feedback</div></div>
+  <div class="lh l-sa">Seller Agent</div>
+  <div class="sc"><div class="inactive">Not involved</div></div>
+  <div class="sc"><div class="a a-sa">Respond to inquiries</div><div class="a a-sa">Share additional details</div><div class="hzm">Augmented listing</div></div>
+  <div class="sc"><div class="a a-sa">Coordinate showing access</div><div class="a a-sa">Report feedback to seller</div></div>
+  <div class="lh l-buy">Buyer</div>
+  <div class="sc"><div class="a a-buy">Share preferences & budget</div><div class="a a-buy">Sign disclosures</div></div>
+  <div class="sc"><div class="a a-buy">Review curated listings</div><div class="a a-buy">Provide feedback</div></div>
+  <div class="sc"><div class="a a-buy">Attend showings</div><div class="a a-buy">Signal offer readiness</div></div>
+  <div class="lh l-tp">Third Parties</div>
+  <div class="sc"><div class="a a-tp">Lender: Pre-approval letter</div><div class="doc">Pre-Approval</div></div>
+  <div class="sc"><div class="a a-tp">MLS: Listing data</div></div>
+  <div class="sc"><div class="a a-tp">Showing Service: Appointments</div></div>
+</div>
+</div>
+<div class="flow-section"><h2>Document Flow — Phase A</h2>
+<div class="flow-cards">
+<div class="fc fc-a"><div class="fc-title"><span class="fc-step mono">Step 1</span>Lead Qualification</div><div class="fc-row"><span class="fc-from">Agent</span><span class="fc-arrow">→</span><span class="fc-to">Buyer signs</span><span class="fc-doc">Agency Disclosure</span></div><div class="fc-row"><span class="fc-from">Lender</span><span class="fc-arrow">→</span><span class="fc-to">Agent</span><span class="fc-doc">Pre-Approval Letter</span></div></div>
+<div class="fc fc-a"><div class="fc-title"><span class="fc-step mono">Step 2</span>Property Search</div><div class="fc-row"><span class="fc-from">MLS</span><span class="fc-arrow">→</span><span class="fc-to">Agent</span><span class="fc-doc">Listing Data</span></div><div class="fc-row"><span class="fc-from">Agent</span><span class="fc-arrow">→</span><span class="fc-to">Buyer</span><span class="fc-doc">Property Shortlist</span></div></div>
+<div class="fc fc-a"><div class="fc-title"><span class="fc-step mono">Step 3</span>Showings</div><div class="fc-row"><span class="fc-from">Seller Agent</span><span class="fc-arrow">→</span><span class="fc-to">Agent</span><span class="fc-doc">Showing Confirmation</span></div><div class="fc-row"><span class="fc-from">Agent</span><span class="fc-arrow">→</span><span class="fc-to">Internal</span><span class="fc-doc">Feedback Log</span></div></div>
+</div></div>
+</div>
+
+<!-- ════════════════ 3. PHASE B ════════════════ -->
+<div class="panel" id="phase-b">
+<div class="page-header"><div class="badge bb mono">Phase B</div><h1>Offer & Contract</h1><p class="sub">Buyer Prep → Offer → Negotiation → Contract Execution · Duration: 3–14 Days</p></div>
+<div class="swim-container">
+<div class="swim-grid" style="grid-template-columns:130px repeat(4,1fr);min-width:1100px">
+  <div style="border-bottom:2px solid rgba(148,163,184,0.06)"></div>
+  <div class="sch sch-b"><div class="sn mono">STEP 04</div><div class="st">Buyer Prep</div><div class="sd mono">1–2 days</div></div>
+  <div class="sch sch-b"><div class="sn mono">STEP 05</div><div class="st">Offer</div><div class="sd mono">1 day</div></div>
+  <div class="sch sch-b"><div class="sn mono">STEP 06</div><div class="st">Negotiation</div><div class="sd mono">1–7 days</div></div>
+  <div class="sch sch-b"><div class="sn mono">STEP 07</div><div class="st">Contract</div><div class="sd mono">1 day</div></div>
+  <div class="lh l-ba">Buyer Agent</div>
+  <div class="sc"><div class="a a-ba">Pull comps (CMA)</div><div class="a a-ba">Analyze vs market</div><div class="a a-ba">Discuss strategy</div><div class="hzm">AI CMA</div></div>
+  <div class="sc"><div class="a a-ba">Draft RPA (16+ pages)</div><div class="a a-ba">Assemble package</div><div class="a a-ba">Submit to seller agent</div><div class="doc">RPA</div><div class="hzm">AI pre-fill + compliance</div></div>
+  <div class="sc"><div class="a a-ba">Present counters to buyer</div><div class="a a-ba">Draft buyer counter</div><div class="doc">BCO Form</div><div class="hzm">Visual diff tracking</div></div>
+  <div class="sc"><div class="a a-ba">Confirm all terms</div><div class="a a-ba">Verify EMD to escrow</div><div class="hzm">Auto deadline calendar</div></div>
+  <div class="lh l-sa">Seller Agent</div>
+  <div class="sc"><div class="a a-sa">Provide seller disclosures</div><div class="doc">Disclosures</div></div>
+  <div class="sc"><div class="a a-sa">Receive & present offer</div></div>
+  <div class="sc"><div class="a a-sa">Draft seller counter</div><div class="a a-sa">Manage multiple offers</div><div class="doc">SCO</div></div>
+  <div class="sc"><div class="a a-sa">Confirm acceptance</div><div class="a a-sa">Open escrow</div><div class="doc">Escrow Instructions</div></div>
+  <div class="lh l-buy">Buyer</div>
+  <div class="sc"><div class="a a-buy">Confirm budget</div><div class="a a-buy">Get pre-approval update</div></div>
+  <div class="sc"><div class="a a-buy">Review & sign RPA</div><div class="doc">Proof of Funds</div></div>
+  <div class="sc"><div class="a a-buy">Review counter terms</div><div class="a a-buy">Accept/reject/counter</div></div>
+  <div class="sc"><div class="a a-buy">Sign final RPA</div><div class="a a-buy">Wire EMD (3 biz days)</div></div>
+  <div class="lh l-sell">Seller</div>
+  <div class="sc"><div class="inactive">Not involved</div></div>
+  <div class="sc"><div class="a a-sell">Review offer</div></div>
+  <div class="sc"><div class="a a-sell">Approve terms</div></div>
+  <div class="sc"><div class="a a-sell">Sign executed RPA</div></div>
+  <div class="lh l-tp">Third Parties</div>
+  <div class="sc"><div class="a a-tp">Lender: Update pre-approval</div></div>
+  <div class="sc"><div class="inactive">Standing by</div></div>
+  <div class="sc"><div class="inactive">Standing by</div></div>
+  <div class="sc"><div class="a a-tp">Escrow: Open file</div><div class="a a-tp">Title: Begin search</div></div>
+</div>
+</div>
+<div class="flow-section"><h2>Document Flow — Phase B</h2>
+<div class="flow-cards">
+<div class="fc fc-b"><div class="fc-title"><span class="fc-step mono">Step 4</span>Prep</div><div class="fc-row"><span class="fc-from">Agent</span><span class="fc-arrow">→</span><span class="fc-to">Buyer</span><span class="fc-doc">CMA Report</span></div></div>
+<div class="fc fc-b"><div class="fc-title"><span class="fc-step mono">Step 5</span>Offer Package</div><div class="fc-row"><span class="fc-from">Buyer Agent</span><span class="fc-arrow">→</span><span class="fc-to">Seller Agent</span><span class="fc-doc">RPA + Pre-Approval + POF</span></div></div>
+<div class="fc fc-b"><div class="fc-title"><span class="fc-step mono">Step 6</span>Negotiation</div><div class="fc-row"><span class="fc-from">Seller Agent</span><span class="fc-arrow">↔</span><span class="fc-to">Buyer Agent</span><span class="fc-doc">SCO ↔ BCO</span></div></div>
+<div class="fc fc-b"><div class="fc-title"><span class="fc-step mono">Step 7</span>Execution</div><div class="fc-row"><span class="fc-from">Both</span><span class="fc-arrow">→</span><span class="fc-to">Escrow</span><span class="fc-doc">Executed RPA + EMD</span></div><div class="fc-row"><span class="fc-from">Title</span><span class="fc-arrow">→</span><span class="fc-to">Both</span><span class="fc-doc">Prelim Title Report</span></div></div>
+</div></div>
+</div>
+
+<!-- ════════════════ 4. PHASE C ════════════════ -->
+<div class="panel" id="phase-c">
+<div class="page-header"><div class="badge bc mono">Phase C</div><h1>Due Diligence <span style="color:var(--red-light)">— The Danger Zone</span></h1><p class="sub">Inspection → Appraisal → Insurance & Title → Loan → Contingency Removal · 17–30 Days</p></div>
+<div class="alert-bar"><div class="alert">⚠️ <strong>Step 12 (Contingency Removal) is the #1 deal killer.</strong> Missed deadlines give sellers the right to cancel. HouseZum's deadline tracker creates the most value here.</div></div>
+<div class="tl-section" style="margin-top:20px">
+<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px;padding-left:4px">DEADLINE TIMELINE</div>
+<div class="tl-bar">
+  <div class="tl-seg mono" style="flex:7;background:rgba(59,130,246,0.12);color:var(--blue-light)"><span>Inspection</span></div>
+  <div class="tl-seg mono" style="flex:10;background:rgba(245,158,11,0.12);color:var(--amber-light);border-left:2px solid var(--bg)"><span>Appraisal</span></div>
+  <div class="tl-seg mono" style="flex:4;background:rgba(239,68,68,0.12);color:var(--red-light);border-left:2px solid var(--bg)"><span>Loan ✓</span></div>
+  <div class="tl-seg mono" style="flex:3;background:rgba(16,185,129,0.12);color:var(--green-light);border-left:2px solid var(--bg)"><span>Prep</span></div>
+  <div class="tl-seg mono" style="flex:6;background:rgba(124,58,237,0.12);color:var(--violet-light);border-left:2px solid var(--bg)"><span>CLOSE</span></div>
+</div>
+<div class="tl-labels mono" style="margin-top:2px"><div style="flex:7">Day 0–7</div><div style="flex:10">Day 7–17</div><div style="flex:4">Day 17–21</div><div style="flex:3">Day 21–27</div><div style="flex:6">Day 27–30</div></div>
+</div>
+<div class="swim-container">
+<div class="swim-grid" style="grid-template-columns:120px repeat(5,1fr);min-width:1200px">
+  <div style="border-bottom:2px solid rgba(148,163,184,0.06)"></div>
+  <div class="sch sch-c"><div class="sn mono">STEP 08</div><div class="st">Inspection</div><div class="sd mono">Day 7–17</div></div>
+  <div class="sch sch-c"><div class="sn mono">STEP 09</div><div class="st">Appraisal</div><div class="sd mono">Day 7–21</div></div>
+  <div class="sch sch-c"><div class="sn mono">STEP 10</div><div class="st">Ins & Title</div><div class="sd mono">Concurrent</div></div>
+  <div class="sch sch-c"><div class="sn mono">STEP 11</div><div class="st">Loan</div><div class="sd mono">Day 21–30</div></div>
+  <div class="sch sch-danger"><div class="sn mono">STEP 12</div><div class="st">Contingency ⚠️</div><div class="sd mono">Day 17–21</div></div>
+  <div class="lh l-ba">Buyer Agent</div>
+  <div class="sc"><div class="a a-ba">Recommend inspectors</div><div class="a a-ba">Attend 2–4hr inspection</div><div class="a a-ba">Review report with buyer</div><div class="doc">Repair Request</div><div class="hzm">AI Inspection Analyzer</div></div>
+  <div class="sc"><div class="a a-ba">Monitor scheduling</div><div class="a a-ba">Review report</div><div class="a a-ba">Strategize if low</div><div class="hzm">AI range prediction</div></div>
+  <div class="sc"><div class="a a-ba">Guide insurance</div><div class="a a-ba">Review title report</div><div class="a a-ba">Review CC&Rs</div><div class="hzm">CC&R summary</div></div>
+  <div class="sc"><div class="a a-ba">Chase lender status</div><div class="a a-ba">Ensure buyer provides docs</div><div class="hzm">Loan tracker</div></div>
+  <div class="sc sc-danger"><div class="a a-ba">Track ALL deadlines</div><div class="a a-ba">Submit removals</div><div class="doc">CR Form</div><div class="deadline">Day 17: Inspection</div><div class="deadline">Day 21: Loan</div><div class="hzm hzm-killer">KILLER: Auto countdown</div></div>
+  <div class="lh l-sa">Seller Agent</div>
+  <div class="sc"><div class="a a-sa">Coordinate access</div><div class="a a-sa">Respond to repairs</div></div>
+  <div class="sc"><div class="a a-sa">Coordinate access</div><div class="a a-sa">Provide comps</div></div>
+  <div class="sc"><div class="a a-sa">Provide HOA docs</div></div>
+  <div class="sc"><div class="inactive">Waiting</div></div>
+  <div class="sc sc-danger"><div class="a a-sa">Monitor removals</div><div class="a a-sa">Issue NBP if late</div><div class="doc">Notice to Perform</div></div>
+  <div class="lh l-buy">Buyer</div>
+  <div class="sc"><div class="a a-buy">Select inspector, attend</div><div class="a a-buy">Decide: accept/repair/cancel</div></div>
+  <div class="sc"><div class="a a-buy">Decide if low: renegotiate/cover/cancel</div></div>
+  <div class="sc"><div class="a a-buy">Shop insurance</div><div class="doc">Insurance Binder</div></div>
+  <div class="sc"><div class="a a-buy">Provide all docs to lender</div><div class="a a-buy">Review Closing Disclosure</div></div>
+  <div class="sc sc-danger"><div class="a a-buy">Sign CR forms</div></div>
+  <div class="lh l-tp">Third Parties</div>
+  <div class="sc"><div class="a a-tp">Inspector: Full report</div><div class="doc">Inspection (30–100pg)</div></div>
+  <div class="sc"><div class="a a-tp">Appraiser: Value determination</div><div class="doc">Appraisal Report</div></div>
+  <div class="sc"><div class="a a-tp">Title: Complete search</div><div class="a a-tp">NHD: Hazard report</div><div class="doc">Title + NHD</div></div>
+  <div class="sc"><div class="a a-tp">Underwriter: Full review</div><div class="a a-tp">Lender: Clear to close</div><div class="doc">Clear to Close</div></div>
+  <div class="sc sc-danger"><div class="inactive">Ball in buyer's court</div></div>
+</div>
+</div>
+<div class="flow-section"><h2>Document Flow — Phase C</h2>
+<div class="flow-cards">
+<div class="fc fc-c"><div class="fc-title"><span class="fc-step mono">08</span>Inspection</div><div class="fc-row"><span class="fc-from">Inspector</span><span class="fc-arrow">→</span><span class="fc-to">Agent</span><span class="fc-doc">Inspection Report</span></div><div class="fc-row"><span class="fc-from">Agent</span><span class="fc-arrow">→</span><span class="fc-to">Seller Agent</span><span class="fc-doc">Repair Request</span></div></div>
+<div class="fc fc-c"><div class="fc-title"><span class="fc-step mono">09</span>Appraisal</div><div class="fc-row"><span class="fc-from">Appraiser</span><span class="fc-arrow">→</span><span class="fc-to">Lender</span><span class="fc-doc">Appraisal Report</span></div></div>
+<div class="fc fc-c"><div class="fc-title"><span class="fc-step mono">10</span>Insurance & Title</div><div class="fc-row"><span class="fc-from">Title</span><span class="fc-arrow">→</span><span class="fc-to">Both</span><span class="fc-doc">Title Report</span></div><div class="fc-row"><span class="fc-from">Insurance</span><span class="fc-arrow">→</span><span class="fc-to">Lender</span><span class="fc-doc">Binder</span></div></div>
+<div class="fc fc-c"><div class="fc-title"><span class="fc-step mono">11</span>Loan</div><div class="fc-row"><span class="fc-from">Lender</span><span class="fc-arrow">→</span><span class="fc-to">Buyer</span><span class="fc-doc">Closing Disclosure</span></div></div>
+<div class="fc fc-danger"><div class="fc-title"><span class="fc-step mono" style="background:rgba(239,68,68,0.15);color:var(--red-light)">12</span>Contingency ⚠️</div><div class="fc-row"><span class="fc-from">Buyer Agent</span><span class="fc-arrow">→</span><span class="fc-to">Seller Agent</span><span class="fc-doc">CR Form (each)</span></div><div class="fc-row"><span class="fc-from">Seller Agent</span><span class="fc-arrow">→</span><span class="fc-to">Buyer Agent</span><span class="fc-doc">NBP (if late)</span></div></div>
+</div></div>
+</div>
+
+<!-- ════════════════ 5. PHASE D ════════════════ -->
+<div class="panel" id="phase-d">
+<div class="page-header"><div class="badge bd mono">Phase D</div><h1>Closing 🎉</h1><p class="sub">Final Walkthrough → Closing Day → Post-Close · 3–7 Days + Follow-Up</p></div>
+<div class="swim-container">
+<div class="swim-grid" style="grid-template-columns:130px repeat(3,1fr);min-width:900px">
+  <div style="border-bottom:2px solid rgba(148,163,184,0.06)"></div>
+  <div class="sch sch-d"><div class="sn mono">STEP 13</div><div class="st">Final Walkthrough</div><div class="sd mono">1–5 days before</div></div>
+  <div class="sch sch-d"><div class="sn mono">STEP 14</div><div class="st">Closing Day</div><div class="sd mono">1 day</div></div>
+  <div class="sch sch-d"><div class="sn mono">STEP 15</div><div class="st">Post-Close</div><div class="sd mono">1–30+ days</div></div>
+  <div class="lh l-ba">Buyer Agent</div>
+  <div class="sc"><div class="a a-ba">Walk every room</div><div class="a a-ba">Verify repairs</div><div class="a a-ba">Test systems</div><div class="hzm">AI checklist</div></div>
+  <div class="sc"><div class="a a-ba">Attend closing</div><div class="a a-ba">Review settlement</div><div class="a a-ba">Hand over keys</div><div class="hzm">Status tracker</div></div>
+  <div class="sc"><div class="a a-ba">Send congrats</div><div class="a a-ba">Follow up 30/90/365</div><div class="a a-ba">Request reviews</div><div class="hzm">Auto follow-up</div></div>
+  <div class="lh l-sa">Seller Agent</div>
+  <div class="sc"><div class="a a-sa">Coordinate access</div><div class="a a-sa">Provide repair receipts</div></div>
+  <div class="sc"><div class="a a-sa">Attend / available</div><div class="a a-sa">Facilitate handover</div></div>
+  <div class="sc"><div class="a a-sa">Follow up with seller</div><div class="a a-sa">Request review</div></div>
+  <div class="lh l-buy">Buyer</div>
+  <div class="sc"><div class="a a-buy">Attend, test everything</div></div>
+  <div class="sc"><div class="a a-buy">Wire funds</div><div class="warn">Wire fraud: verify by phone!</div><div class="a a-buy">Sign 100+ pages</div><div class="a a-buy">Receive keys 🔑</div></div>
+  <div class="sc"><div class="a a-buy">Move in!</div><div class="a a-buy">Leave review</div></div>
+  <div class="lh l-sell">Seller</div>
+  <div class="sc"><div class="a a-sell">Vacate & clean</div><div class="a a-sell">Leave keys/codes</div></div>
+  <div class="sc"><div class="a a-sell">Sign docs</div><div class="a a-sell">Receive proceeds</div></div>
+  <div class="sc"><div class="a a-sell">Confirm proceeds</div></div>
+  <div class="lh l-tp">Third Parties</div>
+  <div class="sc"><div class="inactive">Standing by</div></div>
+  <div class="sc"><div class="a a-tp">Escrow: Verify funds</div><div class="a a-tp">Title: Record deed</div><div class="a a-tp">Lender: Fund loan</div><div class="a a-tp">Escrow: Disburse</div><div class="doc">Grant Deed</div></div>
+  <div class="sc"><div class="a a-tp">County: Mail deed (4–8 wks)</div><div class="a a-tp">Lender: Set up servicing</div></div>
+</div>
+</div>
+<div class="celebrate"><h2>🎉 Transaction Complete!</h2><p>Keys handed over. Deal archived. Post-close follow-up builds the referral pipeline.</p></div>
+<div class="wrap" style="padding-top:16px">
+<h2 style="font-size:18px;font-weight:600;margin-bottom:12px">Post-Close Follow-Up Timeline</h2>
+<div class="pc-grid">
+<div class="pc-card"><div class="pc-time mono">Day 1</div><div class="pc-action">Congratulations</div><div class="pc-detail">Welcome package + vendor list</div></div>
+<div class="pc-card"><div class="pc-time mono">Day 7</div><div class="pc-action">Check-in call</div><div class="pc-detail">"How's the move going?"</div></div>
+<div class="pc-card"><div class="pc-time mono">Day 30</div><div class="pc-action">Satisfaction check</div><div class="pc-detail">Request review</div></div>
+<div class="pc-card"><div class="pc-time mono">Day 90</div><div class="pc-action">Referral request</div><div class="pc-detail">"Know anyone?"</div></div>
+<div class="pc-card"><div class="pc-time mono">Day 365</div><div class="pc-action">Anniversary</div><div class="pc-detail">Home value update</div></div>
+</div>
+</div>
+</div>
+
+<!-- ════════════════ 6. BUYER AGENT JOURNEY ════════════════ -->
+<div class="panel" id="journey-ba">
+<div class="page-header">
+  <div class="persona-badge-j persona-badge-ba"><div class="persona-icon-j persona-icon-ba">👔</div><div><div class="persona-name-j" style="color:var(--blue-light)">Buyer Agent</div><div class="persona-role-j">Primary HouseZum Persona</div></div></div>
+  <h1>User Journey Map</h1>
+  <p class="sub">Complete emotional journey from first contact through closing, with pain points and How Might We opportunities.</p>
+</div>
+<div class="pd-grid">
+  <div class="pd-card"><div class="pd-label mono">Goals</div><div class="pd-value">Close deals faster, never miss deadlines, look professional, earn referrals</div></div>
+  <div class="pd-card"><div class="pd-label mono">Frustrations</div><div class="pd-value">Too many tools, scattered info, deadline anxiety, paperwork overhead</div></div>
+  <div class="pd-card"><div class="pd-label mono">Tools Today</div><div class="pd-value">MLS, email, text, DocuSign, Google Cal, spreadsheets, paper forms</div></div>
+  <div class="pd-card"><div class="pd-label mono">Success Metric</div><div class="pd-value">Deals/year, avg days to close, client satisfaction, referral rate</div></div>
+</div>
+<div class="wrap" style="padding-top:24px">
+<h2 style="font-size:18px;font-weight:600;margin-bottom:4px">Emotional Journey</h2>
+<p style="font-size:12px;color:var(--dim);margin-bottom:0">Hover the dots for details at each step</p>
+<div class="curve-wrap">
+<div class="curve-canvas">
+  <div class="y-axis mono"><span>😊 High</span><span></span><span>😐 Mid</span><span></span><span>😫 Low</span></div>
+  <div class="grid-cv"><div class="grid-cv-line" style="top:0%"></div><div class="grid-cv-line" style="top:25%"></div><div class="grid-cv-line mid" style="top:50%"></div><div class="grid-cv-line" style="top:75%"></div><div class="grid-cv-line" style="top:100%"></div></div>
+  <svg class="curve-svg" viewBox="0 0 1140 260" preserveAspectRatio="none" style="width:calc(100% - 52px);height:calc(100% - 44px)">
+    <defs><linearGradient id="bg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3b82f6" stop-opacity=".08"/><stop offset="20%" stop-color="#7c3aed" stop-opacity=".08"/><stop offset="55%" stop-color="#f59e0b" stop-opacity=".08"/><stop offset="75%" stop-color="#ef4444" stop-opacity=".12"/><stop offset="100%" stop-color="#10b981" stop-opacity=".08"/></linearGradient><linearGradient id="ls1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#3b82f6"/><stop offset="20%" stop-color="#7c3aed"/><stop offset="55%" stop-color="#f59e0b"/><stop offset="75%" stop-color="#ef4444"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs>
+    <path d="M0,130 C38,108 57,90 76,78 C95,68 114,63 152,78 C190,95 209,108 228,90 C247,74 266,65 304,52 C342,40 361,45 380,58 C399,72 418,100 456,130 C475,146 494,158 532,180 C551,190 570,176 608,158 C627,148 646,142 684,188 C703,215 722,234 760,225 C798,216 817,158 836,140 C855,124 874,117 912,90 C950,64 969,50 988,40 C1007,34 1026,36 1064,18 C1083,10 1102,16 1140,27" fill="url(#bg1)" stroke="none"/>
+    <path d="M0,130 C38,108 57,90 76,78 C95,68 114,63 152,78 C190,95 209,108 228,90 C247,74 266,65 304,52 C342,40 361,45 380,58 C399,72 418,100 456,130 C475,146 494,158 532,180 C551,190 570,176 608,158 C627,148 646,142 684,188 C703,215 722,234 760,225 C798,216 817,158 836,140 C855,124 874,117 912,90 C950,64 969,50 988,40 C1007,34 1026,36 1064,18 C1083,10 1102,16 1140,27" fill="none" stroke="url(#ls1)" stroke-width="2.5"/>
+  </svg>
+  <div class="dp" style="left:calc(52px + 5%);top:28%;background:var(--blue)"><div class="tt"><div class="tt-title">01: Lead Qualification</div><div class="tt-emo"><span class="emo emo-m">6/10</span> Optimistic</div><div class="tt-feel">"New lead, could be a deal!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 11%);top:33%;background:var(--blue)"><div class="tt"><div class="tt-title">02: Property Search</div><div class="tt-emo"><span class="emo emo-m">5.5/10</span> Grinding</div><div class="tt-feel">"Searching, limited feedback tools"</div></div></div>
+  <div class="dp" style="left:calc(52px + 17%);top:26%;background:var(--blue)"><div class="tt"><div class="tt-title">03: Showings</div><div class="tt-emo"><span class="emo emo-m">6.5/10</span> Engaged</div><div class="tt-feel">"Buyer is excited!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 26%);top:20%;background:var(--violet)"><div class="tt"><div class="tt-title">04: Buyer Prep</div><div class="tt-emo"><span class="emo emo-h">7/10</span> Focused</div><div class="tt-feel">"Found THE property"</div></div></div>
+  <div class="dp" style="left:calc(52px + 33%);top:14%;background:var(--violet)"><div class="tt"><div class="tt-title">05: Offer Submission</div><div class="tt-emo"><span class="emo emo-h">8/10</span> Excited</div><div class="tt-feel">"Offer is in! Fingers crossed"</div></div></div>
+  <div class="dp" style="left:calc(52px + 40%);top:44%;background:var(--violet)"><div class="tt"><div class="tt-title">06: Negotiation</div><div class="tt-emo"><span class="emo emo-m">5/10</span> Stressed</div><div class="tt-feel">"Counters flying. Pressure."</div></div></div>
+  <div class="dp" style="left:calc(52px + 47%);top:10%;background:var(--violet-light)"><div class="tt"><div class="tt-title">07: Contract ⭐</div><div class="tt-emo"><span class="emo emo-h">8.5/10</span> Relief</div><div class="tt-feel">"UNDER CONTRACT!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 54%);top:54%;background:var(--amber)"><div class="tt"><div class="tt-title">08: Inspection</div><div class="tt-emo"><span class="emo emo-l">4.5/10</span> Anxious</div><div class="tt-feel">"What will they find?"</div></div></div>
+  <div class="dp" style="left:calc(52px + 61%);top:62%;background:var(--amber)"><div class="tt"><div class="tt-title">09: Appraisal</div><div class="tt-emo"><span class="emo emo-l">4/10</span> Powerless</div><div class="tt-feel">"Zero control. Just hoping."</div></div></div>
+  <div class="dp" style="left:calc(52px + 68%);top:48%;background:var(--amber)"><div class="tt"><div class="tt-title">10: Insurance & Title</div><div class="tt-emo"><span class="emo emo-m">5/10</span> Tedious</div><div class="tt-feel">"Admin grind"</div></div></div>
+  <div class="dp" style="left:calc(52px + 75%);top:75%;background:var(--red)"><div class="tt"><div class="tt-title">11: Loan Processing ⚠️</div><div class="tt-emo"><span class="emo emo-vl">3/10</span> Frustrated</div><div class="tt-feel">"No lender visibility!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 82%);top:82%;background:var(--red)"><div class="tt"><div class="tt-title">12: Contingency 🚨</div><div class="tt-emo"><span class="emo emo-vl">2.5/10</span> PEAK STRESS</div><div class="tt-feel">"Miss one = deal dies"</div></div></div>
+  <div class="dp" style="left:calc(52px + 87%);top:30%;background:var(--green)"><div class="tt"><div class="tt-title">13: Walkthrough</div><div class="tt-emo"><span class="emo emo-m">6/10</span> Cautious</div><div class="tt-feel">"Almost there..."</div></div></div>
+  <div class="dp" style="left:calc(52px + 93%);top:7%;background:var(--green)"><div class="tt"><div class="tt-title">14: Closing ⭐</div><div class="tt-emo"><span class="emo emo-h">9.5/10</span> ELATION</div><div class="tt-feel">"WE DID IT!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 98%);top:18%;background:var(--green)"><div class="tt"><div class="tt-title">15: Post-Close</div><div class="tt-emo"><span class="emo emo-h">7/10</span> Satisfied</div><div class="tt-feel">"Nurture for referrals"</div></div></div>
+  <div class="step-labels-cv mono">
+    <div class="sl-cv"><span class="num">01</span><span class="name">Lead</span></div><div class="sl-cv"><span class="num">02</span><span class="name">Search</span></div><div class="sl-cv"><span class="num">03</span><span class="name">Show</span></div><div class="sl-cv"><span class="num">04</span><span class="name">Prep</span></div><div class="sl-cv"><span class="num">05</span><span class="name">Offer</span></div><div class="sl-cv"><span class="num">06</span><span class="name">Nego</span></div><div class="sl-cv"><span class="num">07</span><span class="name">Contract</span></div><div class="sl-cv"><span class="num">08</span><span class="name">Inspect</span></div><div class="sl-cv"><span class="num">09</span><span class="name">Appraise</span></div><div class="sl-cv"><span class="num">10</span><span class="name">Ins/Title</span></div><div class="sl-cv"><span class="num">11</span><span class="name">Loan</span></div><div class="sl-cv"><span class="num">12</span><span class="name">CR⚠️</span></div><div class="sl-cv"><span class="num">13</span><span class="name">Walk</span></div><div class="sl-cv"><span class="num">14</span><span class="name">Close</span></div><div class="sl-cv"><span class="num">15</span><span class="name">Post</span></div>
+  </div>
+</div>
+</div>
+</div>
+<div class="journey-section"><h2 style="font-size:18px;font-weight:600;margin-bottom:12px">Journey Detail</h2>
+<table class="jt">
+<thead><tr><th></th><th colspan="3" class="jt-pa">A: Discovery</th><th colspan="4" class="jt-pb">B: Offer & Contract</th><th colspan="5" class="jt-pc">C: Due Diligence</th><th colspan="3" class="jt-pd">D: Closing</th></tr>
+<tr><th></th><th>01</th><th>02</th><th>03</th><th>04</th><th>05</th><th>06</th><th>07</th><th>08</th><th>09</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th></tr></thead>
+<tbody>
+<tr><td class="jt-rl">😊 Emotion</td><td><span class="emo emo-m">6</span></td><td><span class="emo emo-m">5.5</span></td><td><span class="emo emo-m">6.5</span></td><td><span class="emo emo-h">7</span></td><td><span class="emo emo-h">8</span></td><td><span class="emo emo-m">5</span></td><td><span class="emo emo-h">8.5</span></td><td><span class="emo emo-l">4.5</span></td><td><span class="emo emo-l">4</span></td><td><span class="emo emo-m">5</span></td><td><span class="emo emo-vl">3</span></td><td><span class="emo emo-vl">2.5</span></td><td><span class="emo emo-m">6</span></td><td><span class="emo emo-h">9.5</span></td><td><span class="emo emo-h">7</span></td></tr>
+<tr><td class="jt-rl">🎯 Doing</td><td><div class="jcell jc-action">Consultation, capture prefs</div></td><td><div class="jcell jc-action">Search MLS, curate, share</div></td><td><div class="jcell jc-action">Schedule, attend, capture</div></td><td><div class="jcell jc-action">Pull comps, strategize</div></td><td><div class="jcell jc-action">Draft RPA, submit</div></td><td><div class="jcell jc-action">Present counters, advise</div></td><td><div class="jcell jc-action">Confirm, open escrow</div></td><td><div class="jcell jc-action">Hire inspector, review 100pg</div></td><td><div class="jcell jc-action">Monitor, wait</div></td><td><div class="jcell jc-action">Guide insurance, review title</div></td><td><div class="jcell jc-action">Chase lender</div></td><td><div class="jcell jc-action">Track deadlines, submit CR</div></td><td><div class="jcell jc-action">Walk property, verify</div></td><td><div class="jcell jc-action">Attend, hand keys</div></td><td><div class="jcell jc-action">Follow up, reviews</div></td></tr>
+<tr><td class="jt-rl">💭 Thinking</td><td><div class="jcell jc-think">"Is this lead serious?"</div></td><td><div class="jcell jc-think">"Am I missing properties?"</div></td><td><div class="jcell jc-think">"Which will they love?"</div></td><td><div class="jcell jc-think">"What's the right price?"</div></td><td><div class="jcell jc-think">"Did I fill it correctly?"</div></td><td><div class="jcell jc-think">"What's our walk-away?"</div></td><td><div class="jcell jc-think">"Now real work begins"</div></td><td><div class="jcell jc-think">"What if major issues?"</div></td><td><div class="jcell jc-think">"Please come in at value"</div></td><td><div class="jcell jc-think">"Is buyer procrastinating?"</div></td><td><div class="jcell jc-think">"WHY so slow?!"</div></td><td><div class="jcell jc-think">"Did I miss anything?!"</div></td><td><div class="jcell jc-think">"Please be fine"</div></td><td><div class="jcell jc-think">"WE DID IT!"</div></td><td><div class="jcell jc-think">"Already on next deal"</div></td></tr>
+<tr><td class="jt-rl">⚠️ Pain</td><td><div class="jcell jc-pain">Notes lost. No structure.</div></td><td><div class="jcell jc-pain">Manual MLS. Basic data only.</div></td><td><div class="jcell jc-pain">Feedback forgotten.</div></td><td><div class="jcell jc-pain">CMA slow. No guidance.</div></td><td><div class="jcell jc-pain">16+ pages. Error prone.</div></td><td><div class="jcell jc-pain">Terms scattered in email.</div></td><td><div class="jcell jc-pain">Manual deadline calc.</div></td><td><div class="jcell jc-pain">100pg. Critical vs cosmetic?</div></td><td><div class="jcell jc-pain">Zero control.</div></td><td><div class="jcell jc-pain">Admin grind.</div></td><td><div class="jcell jc-pain">#1 delay cause. No visibility.</div></td><td><div class="jcell jc-pain" style="background:rgba(239,68,68,0.08)">#1 DEAL KILLER.</div></td><td><div class="jcell jc-pain">No checklist.</div></td><td><div class="jcell jc-pain">Wire fraud. 100+ pages.</div></td><td><div class="jcell jc-pain">Forget to follow up.</div></td></tr>
+<tr><td class="jt-rl">💡 HMW</td><td><div class="jcell jc-hmw">Capture prefs as structured data?</div></td><td><div class="jcell jc-hmw">Auto-match from prefs?</div></td><td><div class="jcell jc-hmw">Voice capture + searchable log?</div></td><td><div class="jcell jc-hmw">Auto CMA + price range?</div></td><td><div class="jcell jc-hmw">Pre-fill + compliance check?</div></td><td><div class="jcell jc-hmw">Visual diffs + AI flags?</div></td><td><div class="jcell jc-hmw">Auto deadlines + doc channel?</div></td><td><div class="jcell jc-hmw">AI analyze by severity?</div></td><td><div class="jcell jc-hmw">Predict range + strategies?</div></td><td><div class="jcell jc-hmw">Auto-remind + CC&R extract?</div></td><td><div class="jcell jc-hmw">Loan milestone visibility?</div></td><td><div class="jcell jc-hmw">Auto countdown + CR gen?</div></td><td><div class="jcell jc-hmw">Checklist from inspection?</div></td><td><div class="jcell jc-hmw">Wire fraud protection?</div></td><td><div class="jcell jc-hmw">Auto follow-up sequences?</div></td></tr>
+<tr><td class="jt-rl">✦ HouseZum</td><td><div class="jcell jc-opp">AI voice intake</div></td><td><div class="jcell jc-opp">Smart Matching</div></td><td><div class="jcell jc-opp">Voice + showing log</div></td><td><div class="jcell jc-opp">AI CMA report</div></td><td><div class="jcell jc-opp">AI pre-fill RPA</div></td><td><div class="jcell jc-opp">Counter-offer diffs</div></td><td><div class="jcell jc-opp">Deadline calendar</div></td><td><div class="jcell jc-opp">Inspection Analyzer</div></td><td><div class="jcell jc-opp">Range prediction</div></td><td><div class="jcell jc-opp">Auto reminders</div></td><td><div class="jcell jc-opp">Loan tracker</div></td><td><div class="jcell jc-opp" style="background:rgba(124,58,237,0.08)">⭐ KILLER FEATURE</div></td><td><div class="jcell jc-opp">AI checklist</div></td><td><div class="jcell jc-opp">Wire alerts</div></td><td><div class="jcell jc-opp">Auto follow-up</div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- ════════════════ 7. SELLER AGENT JOURNEY ════════════════ -->
+<div class="panel" id="journey-sa">
+<div class="page-header">
+  <div class="persona-badge-j persona-badge-sa"><div class="persona-icon-j persona-icon-sa">🏠</div><div><div class="persona-name-j" style="color:var(--violet-light)">Seller Agent</div><div class="persona-role-j">Primary HouseZum Persona</div></div></div>
+  <h1>User Journey Map</h1>
+  <p class="sub">The seller agent's parallel journey — from listing enrichment through closing.</p>
+</div>
+<div class="pd-grid">
+  <div class="pd-card"><div class="pd-label mono">Goals</div><div class="pd-value">Sell at best price, minimize days on market, attract buyer agents</div></div>
+  <div class="pd-card"><div class="pd-label mono">Frustrations</div><div class="pd-value">Same questions from every BA, managing showings, chasing buyers</div></div>
+  <div class="pd-card"><div class="pd-label mono">Key Difference</div><div class="pd-value">DATA CREATOR — enriches listing. HouseZum's viral hook.</div></div>
+  <div class="pd-card"><div class="pd-label mono">Success Metric</div><div class="pd-value">Sale price vs list, days on market, smooth close, seller satisfaction</div></div>
+</div>
+<div class="wrap" style="padding:20px 24px 0">
+<div class="note-box">💡 <strong>Seller agent journey differs</strong> — not active during Steps 1–2. Begins with listing enrichment (pre-Step 1). Peaks when offers arrive, dips during inspection/repair negotiations.</div>
+</div>
+<div class="wrap" style="padding-top:24px">
+<h2 style="font-size:18px;font-weight:600;margin-bottom:4px">Emotional Journey</h2>
+<p style="font-size:12px;color:var(--dim);margin-bottom:0">Hover dots for details</p>
+<div class="curve-wrap">
+<div class="curve-canvas" style="min-width:900px;height:280px">
+  <div class="y-axis mono"><span>😊 High</span><span></span><span>😐 Mid</span><span></span><span>😫 Low</span></div>
+  <div class="grid-cv"><div class="grid-cv-line" style="top:0%"></div><div class="grid-cv-line" style="top:25%"></div><div class="grid-cv-line mid" style="top:50%"></div><div class="grid-cv-line" style="top:75%"></div><div class="grid-cv-line" style="top:100%"></div></div>
+  <svg class="curve-svg" viewBox="0 0 940 236" preserveAspectRatio="none" style="width:calc(100% - 52px);height:calc(100% - 44px)">
+    <defs><linearGradient id="bg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c3aed" stop-opacity=".08"/><stop offset="35%" stop-color="#f59e0b" stop-opacity=".08"/><stop offset="65%" stop-color="#ef4444" stop-opacity=".1"/><stop offset="100%" stop-color="#10b981" stop-opacity=".08"/></linearGradient><linearGradient id="ls2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c3aed"/><stop offset="35%" stop-color="#f59e0b"/><stop offset="65%" stop-color="#ef4444"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs>
+    <path d="M0,70 C47,56 70,42 94,30 C117,20 141,16 164,22 C188,28 211,52 235,70 C258,88 282,114 305,118 C329,122 352,105 376,88 C399,72 423,56 446,44 C470,34 493,30 517,44 C540,56 564,78 587,105 C611,130 634,152 658,162 C681,168 705,150 728,122 C752,96 775,60 799,40 C822,22 846,14 869,10 C893,8 916,14 940,22" fill="url(#bg2)" stroke="none"/>
+    <path d="M0,70 C47,56 70,42 94,30 C117,20 141,16 164,22 C188,28 211,52 235,70 C258,88 282,114 305,118 C329,122 352,105 376,88 C399,72 423,56 446,44 C470,34 493,30 517,44 C540,56 564,78 587,105 C611,130 634,152 658,162 C681,168 705,150 728,122 C752,96 775,60 799,40 C822,22 846,14 869,10 C893,8 916,14 940,22" fill="none" stroke="url(#ls2)" stroke-width="2.5"/>
+  </svg>
+  <div class="dp" style="left:calc(52px + 5%);top:18%;background:var(--violet)"><div class="tt"><div class="tt-title">Pre: Listing Creation</div><div class="tt-emo"><span class="emo emo-h">7.5/10</span> Productive</div><div class="tt-feel">"Building the best listing"</div></div></div>
+  <div class="dp" style="left:calc(52px + 14%);top:10%;background:var(--violet)"><div class="tt"><div class="tt-title">Pre: Marketing</div><div class="tt-emo"><span class="emo emo-h">8/10</span> Confident</div><div class="tt-feel">"Listing is live and great!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 25%);top:28%;background:var(--amber)"><div class="tt"><div class="tt-title">03: Managing Showings</div><div class="tt-emo"><span class="emo emo-m">6.5/10</span> Busy</div><div class="tt-feel">"Hectic but good sign"</div></div></div>
+  <div class="dp" style="left:calc(52px + 37%);top:8%;background:var(--amber)"><div class="tt"><div class="tt-title">05: Receiving Offers ⭐</div><div class="tt-emo"><span class="emo emo-h">8.5/10</span> Excited</div><div class="tt-feel">"Offers coming in!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 45%);top:32%;background:var(--amber)"><div class="tt"><div class="tt-title">06: Negotiation</div><div class="tt-emo"><span class="emo emo-m">6/10</span> Strategic</div><div class="tt-feel">"Managing expectations"</div></div></div>
+  <div class="dp" style="left:calc(52px + 52%);top:16%;background:var(--violet-light)"><div class="tt"><div class="tt-title">07: Contract</div><div class="tt-emo"><span class="emo emo-h">7.5/10</span> Relieved</div><div class="tt-feel">"Under contract!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 62%);top:56%;background:var(--red)"><div class="tt"><div class="tt-title">08: Inspection Response ⚠️</div><div class="tt-emo"><span class="emo emo-l">4/10</span> Defensive</div><div class="tt-feel">"How much will repairs cost?"</div></div></div>
+  <div class="dp" style="left:calc(52px + 72%);top:48%;background:var(--red)"><div class="tt"><div class="tt-title">09-11: Waiting</div><div class="tt-emo"><span class="emo emo-m">5/10</span> Impatient</div><div class="tt-feel">"Out of my hands"</div></div></div>
+  <div class="dp" style="left:calc(52px + 80%);top:68%;background:var(--red)"><div class="tt"><div class="tt-title">12: Monitoring CR</div><div class="tt-emo"><span class="emo emo-vl">3.5/10</span> Frustrated</div><div class="tt-feel">"Issue NBP?"</div></div></div>
+  <div class="dp" style="left:calc(52px + 90%);top:6%;background:var(--green)"><div class="tt"><div class="tt-title">13-14: Closing ⭐</div><div class="tt-emo"><span class="emo emo-h">9/10</span> Triumphant</div><div class="tt-feel">"SOLD!"</div></div></div>
+  <div class="dp" style="left:calc(52px + 97%);top:20%;background:var(--green)"><div class="tt"><div class="tt-title">15: Post-Close</div><div class="tt-emo"><span class="emo emo-h">7/10</span> Satisfied</div><div class="tt-feel">"On to the next listing"</div></div></div>
+  <div class="step-labels-cv mono">
+    <div class="sl-cv"><span class="num">PRE</span><span class="name">Create</span></div><div class="sl-cv"><span class="num">PRE</span><span class="name">Market</span></div><div class="sl-cv"><span class="num">03</span><span class="name">Show</span></div><div class="sl-cv"><span class="num">05</span><span class="name">Offers</span></div><div class="sl-cv"><span class="num">06</span><span class="name">Nego</span></div><div class="sl-cv"><span class="num">07</span><span class="name">Contract</span></div><div class="sl-cv"><span class="num">08</span><span class="name">Inspect</span></div><div class="sl-cv"><span class="num">09-11</span><span class="name">Wait</span></div><div class="sl-cv"><span class="num">12</span><span class="name">CR⚠️</span></div><div class="sl-cv"><span class="num">14</span><span class="name">Close</span></div><div class="sl-cv"><span class="num">15</span><span class="name">Post</span></div>
+  </div>
+</div>
+</div>
+</div>
+<div class="journey-section"><h2 style="font-size:18px;font-weight:600;margin-bottom:12px">Journey Detail</h2>
+<table class="jt">
+<thead><tr><th></th><th colspan="2" class="jt-pre">Pre-Transaction</th><th colspan="3" class="jt-pb">Active Deal</th><th colspan="3" class="jt-due">Due Diligence</th><th colspan="2" class="jt-pd">Closing</th></tr>
+<tr><th style="min-width:90px"></th><th>Enrich</th><th>Market</th><th>Show</th><th>Offers</th><th>Contract</th><th>Inspect</th><th>Wait</th><th>CR</th><th>Close</th><th>Post</th></tr></thead>
+<tbody>
+<tr><td class="jt-rl">😊 Emotion</td><td><span class="emo emo-h">7.5</span></td><td><span class="emo emo-h">8</span></td><td><span class="emo emo-m">6.5</span></td><td><span class="emo emo-h">8.5</span></td><td><span class="emo emo-h">7.5</span></td><td><span class="emo emo-l">4</span></td><td><span class="emo emo-m">5</span></td><td><span class="emo emo-vl">3.5</span></td><td><span class="emo emo-h">9</span></td><td><span class="emo emo-h">7</span></td></tr>
+<tr><td class="jt-rl">🎯 Doing</td><td><div class="jcell jc-action-sa">Enter rooms, features, systems, photos, disclosures</div></td><td><div class="jcell jc-action-sa">Post MLS, share augmented listing, manage inquiries</div></td><td><div class="jcell jc-action-sa">Coordinate access, report feedback</div></td><td><div class="jcell jc-action-sa">Present offers, advise, counter</div></td><td><div class="jcell jc-action-sa">Confirm, open escrow</div></td><td><div class="jcell jc-action-sa">Coordinate access, negotiate repairs</div></td><td><div class="jcell jc-action-sa">Wait for appraisal & loan</div></td><td><div class="jcell jc-action-sa">Monitor CRs, issue NBP</div></td><td><div class="jcell jc-action-sa">Ensure vacated, attend closing</div></td><td><div class="jcell jc-action-sa">Follow up, reviews</div></td></tr>
+<tr><td class="jt-rl">💭 Thinking</td><td><div class="jcell jc-think">"More detail = fewer questions"</div></td><td><div class="jcell jc-think">"How to reach right BAs?"</div></td><td><div class="jcell jc-think">"Same questions again"</div></td><td><div class="jcell jc-think">"Best offer? Not just price"</div></td><td><div class="jcell jc-think">"Manage seller expectations"</div></td><td><div class="jcell jc-think">"Repair request overblown"</div></td><td><div class="jcell jc-think">"Will financing fall through?"</div></td><td><div class="jcell jc-think">"Why no CR yet?"</div></td><td><div class="jcell jc-think">"FINALLY done"</div></td><td><div class="jcell jc-think">"Good for referrals"</div></td></tr>
+<tr><td class="jt-rl">⚠️ Pain</td><td><div class="jcell jc-pain">Tedious data entry. Scattered docs.</div></td><td><div class="jcell jc-pain">Same questions from every BA. No rich data sharing.</div></td><td><div class="jcell jc-pain">Scheduling chaos across listings.</div></td><td><div class="jcell jc-pain">Multi-offer comparison manual.</div></td><td><div class="jcell jc-pain">Deadline tracking starts.</div></td><td><div class="jcell jc-pain">Adversarial repair negotiation.</div></td><td><div class="jcell jc-pain">No loan visibility.</div></td><td><div class="jcell jc-pain">NBP decision tension.</div></td><td><div class="jcell jc-pain">Wire delays. Last-minute issues.</div></td><td><div class="jcell jc-pain">Too busy for follow-up.</div></td></tr>
+<tr><td class="jt-rl">💡 HMW</td><td><div class="jcell jc-hmw">Make enrichment fast not tedious?</div></td><td><div class="jcell jc-hmw">Share rich data once, reach all BAs?</div></td><td><div class="jcell jc-hmw">Central scheduling + auto FAQ?</div></td><td><div class="jcell jc-hmw">Side-by-side offer comparison?</div></td><td><div class="jcell jc-hmw">Auto-track + doc exchange?</div></td><td><div class="jcell jc-hmw">Data-backed repair estimates?</div></td><td><div class="jcell jc-hmw">Shared deal progress view?</div></td><td><div class="jcell jc-hmw">Auto NBP + shared deadlines?</div></td><td><div class="jcell jc-hmw">Real-time closing status?</div></td><td><div class="jcell jc-hmw">Auto follow-up + reviews?</div></td></tr>
+<tr><td class="jt-rl">✦ HouseZum</td><td><div class="jcell jc-opp" style="background:rgba(124,58,237,0.08)">⭐ CORE: Structured property data. The viral hook.</div></td><td><div class="jcell jc-opp" style="background:rgba(124,58,237,0.08)">⭐ Augmented listing sharing. Network effect.</div></td><td><div class="jcell jc-opp">Showing scheduler + FAQ auto</div></td><td><div class="jcell jc-opp">Offer comparison dashboard</div></td><td><div class="jcell jc-opp">Shared deadline calendar</div></td><td><div class="jcell jc-opp">AI repair cost estimates</div></td><td><div class="jcell jc-opp">Deal progress visibility</div></td><td><div class="jcell jc-opp">Auto NBP. Shared deadlines.</div></td><td><div class="jcell jc-opp">Real-time tracker</div></td><td><div class="jcell jc-opp">Auto follow-up</div></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- ════════════════ TAB LOGIC ════════════════ -->
+<script>
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.panel).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
