@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0a14;--surface:#11111d;--border:rgba(148,163,184,0.07);--text:#e2e8f0;--muted:#94a3b8;--dim:#64748b;--blue:#3b82f6;--blue-light:#60a5fa;--violet:#7c3aed;--violet-light:#a78bfa;--amber:#f59e0b;--amber-light:#fbbf24;--green:#10b981;--green-light:#34d399;--red:#ef4444;--red-light:#f87171}
+:root{--bg:#f8f9fb;--surface:#ffffff;--border:rgba(0,0,0,0.08);--text:#1e293b;--muted:#64748b;--dim:#94a3b8;--blue:#3b82f6;--blue-light:#60a5fa;--violet:#7c3aed;--violet-light:#a78bfa;--amber:#f59e0b;--amber-light:#fbbf24;--green:#10b981;--green-light:#34d399;--red:#ef4444;--red-light:#f87171}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .mono{font-family:'JetBrains Mono',monospace}
 
@@ -19,7 +19,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tabs::-webkit-scrollbar{display:none}
 .tab{padding:8px 14px;font-size:12px;font-weight:500;color:var(--dim);border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .15s;border:1px solid transparent;user-select:none}
 .tab:hover{color:var(--muted);background:rgba(148,163,184,0.05)}
-.tab.active{color:var(--text);background:rgba(124,58,237,0.12);border-color:rgba(124,58,237,0.2)}
+.tab.active{color:var(--text);background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.15)}
 .tab .tab-dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
 
 /* ── Content Panels ── */
@@ -111,7 +111,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .doc::before{content:'📄';font-size:8px}
 .hzm{font-size:9px;padding:3px 6px;border-radius:3px;background:rgba(16,185,129,0.08);color:var(--green-light);border:1px solid rgba(16,185,129,0.15);display:inline-flex;align-items:center;gap:2px}
 .hzm::before{content:'✦'}
-.hzm-killer{background:rgba(124,58,237,0.1);color:var(--violet-light);border-color:rgba(124,58,237,0.2);font-weight:600}
+.hzm-killer{background:rgba(124,58,237,0.1);color:var(--violet-light);border-color:rgba(124,58,237,0.15);font-weight:600}
 .deadline{font-size:9px;padding:3px 6px;border-radius:3px;background:rgba(239,68,68,0.1);color:var(--red-light);border:1px solid rgba(239,68,68,0.15);display:inline-flex;align-items:center;gap:2px}
 .deadline::before{content:'⏰'}
 .warn{font-size:9px;padding:3px 6px;border-radius:3px;background:rgba(239,68,68,0.06);color:var(--red-light);border:1px solid rgba(239,68,68,0.12);display:inline-flex;align-items:center;gap:2px}
@@ -130,7 +130,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .fc-d::before{background:linear-gradient(90deg,var(--green),var(--green-light))}
 .fc-danger::before{background:linear-gradient(90deg,var(--red),var(--red-light))}
 .fc-title{font-size:12px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.fc-step{font-size:9px;padding:2px 5px;border-radius:3px;background:rgba(124,58,237,0.12);color:var(--violet-light)}
+.fc-step{font-size:9px;padding:2px 5px;border-radius:3px;background:rgba(124,58,237,0.08);color:var(--violet-light)}
 .fc-row{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:10px;flex-wrap:wrap}
 .fc-from{color:var(--muted);min-width:65px}
 .fc-arrow{color:#475569}
@@ -405,7 +405,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="tl-seg mono" style="flex:10;background:rgba(245,158,11,0.12);color:var(--amber-light);border-left:2px solid var(--bg)"><span>Appraisal</span></div>
   <div class="tl-seg mono" style="flex:4;background:rgba(239,68,68,0.12);color:var(--red-light);border-left:2px solid var(--bg)"><span>Loan ✓</span></div>
   <div class="tl-seg mono" style="flex:3;background:rgba(16,185,129,0.12);color:var(--green-light);border-left:2px solid var(--bg)"><span>Prep</span></div>
-  <div class="tl-seg mono" style="flex:6;background:rgba(124,58,237,0.12);color:var(--violet-light);border-left:2px solid var(--bg)"><span>CLOSE</span></div>
+  <div class="tl-seg mono" style="flex:6;background:rgba(124,58,237,0.08);color:var(--violet-light);border-left:2px solid var(--bg)"><span>CLOSE</span></div>
 </div>
 <div class="tl-labels mono" style="margin-top:2px"><div style="flex:7">Day 0–7</div><div style="flex:10">Day 7–17</div><div style="flex:4">Day 17–21</div><div style="flex:3">Day 21–27</div><div style="flex:6">Day 27–30</div></div>
 </div>
