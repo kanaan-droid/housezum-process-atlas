@@ -1,401 +1,434 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HouseZum — Documentation Atlas</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg-deep: #f8f9fb;
-    --bg-card: #ffffff;
-    --bg-card-hover: #f1f3f8;
-    --border: rgba(0, 0, 0, 0.08);
-    --border-hover: rgba(139, 92, 246, 0.35);
-    --violet: #7c3aed;
-    --violet-glow: rgba(139, 92, 246, 0.15);
-    --blue: #2563eb;
-    --emerald: #059669;
-    --amber: #d97706;
-    --text: #1e293b;
-    --text-muted: #64748b;
-    --text-dim: #94a3b8;
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HouseZum — Documentation Atlas</title>
+  <style>
+    :root {
+      --hz-bg: #FFFFFF;
+      --hz-bg-secondary: #F8FAFC;
+      --hz-card: #FFFFFF;
+      --hz-card-hover: #F8FAFC;
+      --hz-text: #1E293B;
+      --hz-text-secondary: #64748B;
+      --hz-text-tertiary: #94A3B8;
+      --hz-border: rgba(0, 0, 0, 0.08);
+      --hz-violet: #7C3AED;
+      --hz-violet-light: rgba(124, 58, 237, 0.1);
+      --hz-blue: #3B82F6;
+      --hz-blue-light: rgba(59, 130, 246, 0.1);
+      --hz-green: #10B981;
+      --hz-green-light: rgba(16, 185, 129, 0.1);
+      --hz-orange: #F59E0B;
+      --hz-orange-light: rgba(245, 158, 11, 0.1);
+      --hz-red: #EF4444;
+      --hz-red-light: rgba(239, 68, 68, 0.1);
+    }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--hz-bg);
+      color: var(--hz-text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg-deep);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
 
-  /* Ambient background */
-  body::before {
-    content: '';
-    position: fixed;
-    top: -30%;
-    left: -10%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(ellipse, rgba(139,92,246,0.04) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    bottom: -20%;
-    right: -10%;
-    width: 50%;
-    height: 50%;
-    background: radial-gradient(ellipse, rgba(16,185,129,0.03) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
+    header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
 
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
-  }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--hz-violet-light);
+      color: var(--hz-violet);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
 
-  /* Header */
-  .header {
-    text-align: center;
-    margin-bottom: 4rem;
-  }
-  .header__badge {
-    display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--violet);
-    border: 1px solid var(--border);
-    padding: 0.35rem 1rem;
-    border-radius: 100px;
-    margin-bottom: 1.5rem;
-  }
-  .header__title {
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.15;
-    margin-bottom: 0.75rem;
-  }
-  .header__title span {
-    background: linear-gradient(135deg, var(--violet), var(--blue), var(--emerald));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .header__sub {
-    color: var(--text-muted);
-    font-size: 1.05rem;
-    max-width: 520px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7C3AED, #3B82F6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
 
-  /* Section */
-  .section {
-    margin-bottom: 3.5rem;
-  }
-  .section__header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .section__icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-  .section__icon--processes { background: rgba(139,92,246,0.15); }
-  .section__icon--architecture { background: rgba(59,130,246,0.15); }
-  .section__icon--features { background: rgba(16,185,129,0.15); }
-  .section__icon--guides { background: rgba(245,158,11,0.15); }
+    header p {
+      color: var(--hz-text-secondary);
+      font-size: 18px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-  .section__title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-  .section__count {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    margin-left: auto;
-  }
+    .section {
+      margin-bottom: 48px;
+    }
 
-  /* Card grid */
-  .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 0.75rem;
-  }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--hz-border);
+    }
 
-  .card {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.85rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.15rem;
-    text-decoration: none;
-    color: var(--text);
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .card:hover {
-    background: var(--bg-card-hover);
-    border-color: var(--border-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  }
-  .card--disabled {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-  .card__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 0.45rem;
-  }
-  .card__dot--live { background: var(--emerald); box-shadow: 0 0 8px rgba(16,185,129,0.5); }
-  .card__dot--soon { background: var(--text-dim); }
+    .section-icon {
+      font-size: 24px;
+    }
 
-  .card__content { flex: 1; min-width: 0; }
-  .card__title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    line-height: 1.3;
-  }
-  .card__desc {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
-  .card__tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    margin-top: 0.5rem;
-    display: inline-block;
-  }
-  .card__tag--live {
-    color: var(--emerald);
-    background: rgba(16,185,129,0.1);
-  }
-  .card__tag--soon {
-    color: var(--text-dim);
-    background: rgba(100,116,139,0.1);
-  }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--hz-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
 
-  /* Footer */
-  .footer {
-    text-align: center;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-    margin-top: 2rem;
-  }
-  .footer__text {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-  }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
 
-  @media (max-width: 600px) {
-    .container { padding: 2rem 1rem; }
-    .cards { grid-template-columns: 1fr; }
-  }
-</style>
+    .card {
+      background: var(--hz-card);
+      border: 1px solid var(--hz-border);
+      border-radius: 16px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+      display: block;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .card:hover {
+      background: var(--hz-card-hover);
+      border-color: var(--hz-violet);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
+    }
+
+    .card-disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .card-disabled:hover {
+      transform: none;
+      border-color: var(--hz-border);
+      box-shadow: none;
+      background: var(--hz-card);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--hz-text);
+    }
+
+    .card-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-live {
+      background: var(--hz-green-light);
+      color: var(--hz-green);
+    }
+
+    .status-new {
+      background: var(--hz-violet-light);
+      color: var(--hz-violet);
+    }
+
+    .status-soon {
+      background: var(--hz-orange-light);
+      color: var(--hz-orange);
+    }
+
+    .status-download {
+      background: var(--hz-blue-light);
+      color: var(--hz-blue);
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--hz-text-secondary);
+      line-height: 1.5;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      background: var(--hz-bg-secondary);
+      border-radius: 6px;
+      color: var(--hz-text-tertiary);
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      color: var(--hz-text-tertiary);
+      font-size: 14px;
+      border-top: 1px solid var(--hz-border);
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 32px; }
+      .grid { grid-template-columns: 1fr; }
+      .container { padding: 24px 16px 60px; }
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <div class="badge">Documentation Atlas</div>
+      <h1>HouseZum Docs</h1>
+      <p>Product specifications, architecture references, feature specs, and development guides — all in one place.</p>
+    </header>
 
-<div class="container">
+    <!-- SPECIFICATIONS -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-icon">📋</span>
+        <span class="section-title">Specifications</span>
+      </div>
+      <div class="grid">
+        <a href="specs/HouseZum-PRD-v2.0.docx" class="card" download>
+          <div class="card-header">
+            <span class="card-title">Product Requirements (PRD)</span>
+            <span class="card-status status-download">Download</span>
+          </div>
+          <p class="card-desc">Comprehensive PRD covering personas, transaction lifecycle, sharing model, data architecture, and phased roadmap.</p>
+          <div class="card-meta">
+            <span class="meta-tag">v2.0</span>
+            <span class="meta-tag">Feb 2026</span>
+            <span class="meta-tag">.docx</span>
+          </div>
+        </a>
 
-  <header class="header">
-    <div class="header__badge">Documentation Atlas</div>
-    <h1 class="header__title"><span>HouseZum</span> Docs</h1>
-    <p class="header__sub">Product documentation, architecture references, feature specs, and development guides — all in one place.</p>
-  </header>
+        <a href="specs/HouseZum-Listing-Sharing-Spec-v1.1.docx" class="card" download>
+          <div class="card-header">
+            <span class="card-title">Listing Sharing Feature Spec</span>
+            <span class="card-status status-new">New</span>
+          </div>
+          <p class="card-desc">Agent-to-agent sharing, multi-market support (SNPI, Bayut, MLS), visibility tiers, anonymous tracking, request-based enrichment.</p>
+          <div class="card-meta">
+            <span class="meta-tag">v1.1</span>
+            <span class="meta-tag">Feb 2026</span>
+            <span class="meta-tag">.docx</span>
+          </div>
+        </a>
 
-  <!-- PROCESSES -->
-  <section class="section">
-    <div class="section__header">
-      <div class="section__icon section__icon--processes">🔄</div>
-      <h2 class="section__title">Processes</h2>
-      <span class="section__count">Client-facing workflows &amp; journeys</span>
-    </div>
-    <div class="cards">
-      <a href="processes/home-buying.html" class="card">
-        <div class="card__dot card__dot--live"></div>
-        <div class="card__content">
-          <div class="card__title">Home Buying Process</div>
-          <div class="card__desc">7 interactive diagrams covering the complete Italian home buying journey — from search to keys.</div>
-          <span class="card__tag card__tag--live">Live</span>
-        </div>
-      </a>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Home Selling Process</div>
-          <div class="card__desc">Seller workflow from listing to closing, including agent tasks and document requirements.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Rental Process</div>
-          <div class="card__desc">End-to-end rental workflow for landlords and tenants.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-    </div>
-  </section>
+        <a href="specs/HouseZum-Home-Buying-Process-Map.docx" class="card" download>
+          <div class="card-header">
+            <span class="card-title">Home Buying Process Map</span>
+            <span class="card-status status-download">Download</span>
+          </div>
+          <p class="card-desc">15-step transaction lifecycle with actor touchpoints, documents, pain points, and AI opportunities. Based on California (~90% universal).</p>
+          <div class="card-meta">
+            <span class="meta-tag">v1.0</span>
+            <span class="meta-tag">Feb 2026</span>
+            <span class="meta-tag">.docx</span>
+          </div>
+        </a>
 
-  <!-- ARCHITECTURE -->
-  <section class="section">
-    <div class="section__header">
-      <div class="section__icon section__icon--architecture">🏗️</div>
-      <h2 class="section__title">Architecture</h2>
-      <span class="section__count">Technical design &amp; system docs</span>
-    </div>
-    <div class="cards">
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">System Overview</div>
-          <div class="card__desc">High-level architecture: Next.js, Supabase, Vercel, and how they connect.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
+        <a href="specs/housezum-mls-integration-research.md" class="card">
+          <div class="card-header">
+            <span class="card-title">MLS Integration Research</span>
+            <span class="card-status status-download">Download</span>
+          </div>
+          <p class="card-desc">Market-by-market analysis: France (SNPI), UAE (Bayut), USA (CRMLS), Germany, UK, Italy, Switzerland. APIs, feasibility, and phased rollout.</p>
+          <div class="card-meta">
+            <span class="meta-tag">8 Markets</span>
+            <span class="meta-tag">Feb 2026</span>
+            <span class="meta-tag">.md</span>
+          </div>
+        </a>
       </div>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Database Schema</div>
-          <div class="card__desc">Supabase tables, relationships, RLS policies, and data model diagrams.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Feature-Sliced Architecture</div>
-          <div class="card__desc">Service layer pattern, custom hooks, and modular component structure.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- FEATURES -->
-  <section class="section">
-    <div class="section__header">
-      <div class="section__icon section__icon--features">✨</div>
-      <h2 class="section__title">Features</h2>
-      <span class="section__count">Functional specs &amp; capabilities</span>
-    </div>
-    <div class="cards">
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Property Management</div>
-          <div class="card__desc">CRUD operations for rooms, features, systems, exterior elements with category-specific fields.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
+    <!-- PROCESSES -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-icon">🔄</span>
+        <span class="section-title">Processes</span>
       </div>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Contacts &amp; Relationships</div>
-          <div class="card__desc">Buyer, seller, agent, and service provider management with property linking.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">AI Form Generator</div>
-          <div class="card__desc">13 real estate document templates with PDF generation, email and WhatsApp sharing.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Internationalization</div>
-          <div class="card__desc">Multi-language support across EN, FR, DE, IT with browser detection and user preferences.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-    </div>
-  </section>
+      <div class="grid">
+        <a href="processes/home-buying.html" class="card">
+          <div class="card-header">
+            <span class="card-title">Home Buying Process</span>
+            <span class="card-status status-live">Live</span>
+          </div>
+          <p class="card-desc">7 interactive diagrams covering the complete Italian home buying journey — from search to keys.</p>
+        </a>
 
-  <!-- GUIDES -->
-  <section class="section">
-    <div class="section__header">
-      <div class="section__icon section__icon--guides">📘</div>
-      <h2 class="section__title">Guides</h2>
-      <span class="section__count">Dev workflows &amp; how-tos</span>
-    </div>
-    <div class="cards">
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Deployment &amp; CI/CD</div>
-          <div class="card__desc">Vercel deployment, Git workflows, environment variables, and production troubleshooting.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Home Selling Process</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">Seller workflow from listing to closing, including agent tasks and document requirements.</p>
         </div>
-      </div>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">i18n Implementation</div>
-          <div class="card__desc">next-intl setup, adding translation keys, and locale management guide.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-      <div class="card card--disabled">
-        <div class="card__dot card__dot--soon"></div>
-        <div class="card__content">
-          <div class="card__title">Design System</div>
-          <div class="card__desc">Aurora theme, CSS variables, Tailwind overrides, and component styling patterns.</div>
-          <span class="card__tag card__tag--soon">Coming soon</span>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <footer class="footer">
-    <p class="footer__text">HouseZum Documentation Atlas — Last updated February 2026</p>
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Rental Process</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">End-to-end rental workflow for landlords and tenants.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-icon">🏗️</span>
+        <span class="section-title">Architecture</span>
+      </div>
+      <div class="grid">
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">System Overview</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">High-level architecture: Next.js, Supabase, Vercel, and how they connect.</p>
+        </div>
+
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Database Schema</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">Supabase tables, relationships, RLS policies, and data model diagrams.</p>
+        </div>
+
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Feature-Sliced Architecture</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">Service layer pattern, custom hooks, and modular component structure.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-icon">✨</span>
+        <span class="section-title">Features</span>
+      </div>
+      <div class="grid">
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Property Management</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">CRUD operations for rooms, features, systems, exterior elements with category-specific fields.</p>
+        </div>
+
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Contacts & Relationships</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">Buyer, seller, agent, and service provider management with property linking.</p>
+        </div>
+
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">AI Form Generator</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">13 real estate document templates with PDF generation, email and WhatsApp sharing.</p>
+        </div>
+
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Internationalization</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">Multi-language support across EN, FR, DE, IT with browser detection and user preferences.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- GUIDES -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-icon">📘</span>
+        <span class="section-title">Guides</span>
+      </div>
+      <div class="grid">
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Deployment & CI/CD</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">Vercel deployment, Git workflows, environment variables, and production troubleshooting.</p>
+        </div>
+
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">i18n Implementation</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">next-intl setup, adding translation keys, and locale management guide.</p>
+        </div>
+
+        <div class="card card-disabled">
+          <div class="card-header">
+            <span class="card-title">Design System</span>
+            <span class="card-status status-soon">Coming soon</span>
+          </div>
+          <p class="card-desc">Aurora theme, CSS variables, Tailwind overrides, and component styling patterns.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    HouseZum Documentation Atlas — Last updated February 2026
   </footer>
-
-</div>
-
 </body>
 </html>
