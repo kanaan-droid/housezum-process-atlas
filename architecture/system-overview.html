@@ -3,100 +3,968 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>System Overview — HouseZum Docs</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>HouseZoom.ai — Architecture</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
   :root {
-    --bg-deep: #f8f9fb;
-    --bg-card: #ffffff;
-    --border: rgba(0,0,0,0.08);
-    --violet: #7c3aed;
-    --blue: #3b82f6;
-    --emerald: #10b981;
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface-light: #1a2236;
+    --border: #1e2d4a;
+    --accent: #3b82f6;
+    --accent-glow: rgba(59, 130, 246, 0.15);
+    --green: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.15);
     --amber: #f59e0b;
-    --text: #1e293b;
-    --text-muted: #64748b;
-    --text-dim: #94a3b8;
+    --amber-glow: rgba(245, 158, 11, 0.15);
+    --purple: #8b5cf6;
+    --purple-glow: rgba(139, 92, 246, 0.15);
+    --rose: #f43f5e;
+    --rose-glow: rgba(244, 63, 94, 0.15);
+    --cyan: #06b6d4;
+    --cyan-glow: rgba(6, 182, 212, 0.15);
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
+
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg-deep);
+    background: var(--bg);
     color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    padding: 24px 20px;
     min-height: 100vh;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    max-width: 560px;
+    margin: 0 auto 28px;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+  }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .tab-btn:hover:not(.active) {
+    color: var(--text);
+  }
+
+  .content { max-width: 920px; margin: 0 auto; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .section-title h2 {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .section-title p {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  .layer {
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .layer-label {
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+
+  @media (max-width: 768px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  .box {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .box .top-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .box-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .box-header .icon { font-size: 16px; }
+  .box-header .title { font-weight: 700; font-size: 13px; letter-spacing: 0.02em; }
+  .box-subtitle { font-size: 11px; color: var(--text-dim); margin-bottom: 10px; }
+  .box-items { display: flex; flex-direction: column; gap: 6px; }
+  .box-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .box-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 4px 0;
+  }
+  .arrow-line { width: 1px; height: 16px; }
+  .arrow-label {
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .arrow-head { font-size: 10px; }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  /* Dataset cards */
+  .dataset-card {
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .dataset-card .top-line {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+  .dataset-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .dataset-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dataset-header-left .icon { font-size: 18px; }
+  .dataset-header-left .title { font-weight: 700; font-size: 14px; }
+  .moat-badge {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .dataset-desc {
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .dataset-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 600px) {
+    .dataset-grid { grid-template-columns: 1fr; }
+  }
+  .dataset-section-label {
+    color: var(--text-dim);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .dataset-ml {
+    font-size: 11px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .dataset-unique {
+    font-size: 11px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* Flywheel */
+  .flywheel {
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .flywheel-title {
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+  .flywheel-steps {
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
-  body::before {
-    content: '';
-    position: fixed;
-    top: -30%;
-    left: -10%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 70%);
-    pointer-events: none;
+  .flywheel-step {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .page {
-    position: relative;
-    z-index: 1;
-    text-align: center;
-    padding: 2rem;
-    max-width: 480px;
-  }
-  .page__icon {
-    font-size: 3rem;
-    margin-bottom: 1.5rem;
-  }
-  .page__title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    letter-spacing: -0.02em;
-  }
-  .page__desc {
+  .flywheel-step .icon { font-size: 14px; }
+  .flywheel-step .label { font-size: 11px; font-weight: 600; }
+  .flywheel-arrow { font-size: 12px; }
+  .flywheel-desc {
     color: var(--text-muted);
-    font-size: 1rem;
+    font-size: 11px;
+    margin-top: 12px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
     line-height: 1.6;
-    margin-bottom: 2rem;
   }
-  .page__badge {
-    display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    border: 1px solid var(--border);
-    padding: 0.35rem 1rem;
-    border-radius: 100px;
-    margin-bottom: 2rem;
+
+  /* Compound moat */
+  .compound-moat {
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 16px;
   }
-  .page__back {
+  .compound-moat h3 {
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .compound-moat p {
+    font-size: 12px;
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .compound-moat strong { color: var(--amber); }
+
+  /* Back link */
+  .back-link {
     display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--violet);
+    color: var(--text-muted);
     text-decoration: none;
-    border: 1px solid var(--border);
-    padding: 0.5rem 1.25rem;
-    border-radius: 8px;
-    transition: all 0.2s;
+    font-size: 12px;
+    margin-bottom: 20px;
+    transition: color 0.2s;
   }
-  .page__back:hover {
-    background: rgba(139,92,246,0.1);
-    border-color: rgba(139,92,246,0.4);
-  }
+  .back-link:hover { color: var(--text); }
 </style>
 </head>
 <body>
-<div class="page">
-  <div class="page__icon">🏗️</div>
-  <div class="page__badge">Coming Soon</div>
-  <h1 class="page__title">System Overview</h1>
-  <p class="page__desc">High-level architecture: Next.js, Supabase, Vercel, and how they connect.</p>
-  <a href="../index.html" class="page__back">← Back to Atlas</a>
+
+<a href="index.html" class="back-link">← Back to Atlas</a>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab(0)">Business Domain</button>
+  <button class="tab-btn" onclick="switchTab(1)">Technical Architecture</button>
+  <button class="tab-btn" onclick="switchTab(2)">Data Moat</button>
 </div>
+
+<div class="content">
+
+<!-- ============================================ -->
+<!-- TAB 0: BUSINESS DOMAIN -->
+<!-- ============================================ -->
+<div class="tab-panel active" id="tab-0">
+
+  <div class="section-title">
+    <h2>Business Domain Architecture</h2>
+    <p>HouseZoom CRM — AI-Native Real Estate Operating System</p>
+  </div>
+
+  <!-- Layer 6: Identity -->
+  <div class="layer" style="background: linear-gradient(135deg, var(--purple-glow), transparent); border: 1px solid rgba(139,92,246,0.2);">
+    <div class="layer-label" style="color: var(--purple);">LAYER 6 — IDENTITY & ACCESS</div>
+    <div class="grid-3">
+      <div class="box" style="border: 1px solid rgba(139,92,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--purple), transparent);"></div>
+        <div class="box-header"><span class="icon">🏢</span><span class="title" style="color: var(--purple);">Organizations</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Agency registration</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Plan & billing</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Feature flags</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Country defaults</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(139,92,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--purple), transparent);"></div>
+        <div class="box-header"><span class="icon">👥</span><span class="title" style="color: var(--purple);">Teams & Roles</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>6-tier RBAC hierarchy</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Branch/region mapping</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Permission overrides</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Invitation flow</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(139,92,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--purple), transparent);"></div>
+        <div class="box-header"><span class="icon">🔒</span><span class="title" style="color: var(--purple);">Compliance</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Audit trail</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Data isolation</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Export controls</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Retention policies</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line" style="background: rgba(139,92,246,0.4);"></div><span class="arrow-label" style="color: var(--purple);">provisions & governs</span><span class="arrow-head" style="color: var(--purple);">▼</span></div>
+
+  <!-- Layers 1-2: Core Domain -->
+  <div class="layer" style="background: linear-gradient(135deg, var(--accent-glow), transparent); border: 1px solid rgba(59,130,246,0.2);">
+    <div class="layer-label" style="color: var(--accent);">LAYERS 1–2 — CORE DOMAIN (5 PILLARS)</div>
+    <div class="grid-3" style="margin-bottom: 10px;">
+      <div class="box" style="border: 1px solid rgba(59,130,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+        <div class="box-header"><span class="icon">🎯</span><span class="title" style="color: var(--accent);">Leads</span></div>
+        <div class="box-subtitle">Pillar #1</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Multi-source intake (portal, WA, referral)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Intent scoring (0-100)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Qualification pipeline</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Conversation threads</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(59,130,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+        <div class="box-header"><span class="icon">🏠</span><span class="title" style="color: var(--accent);">Property Intelligence</span></div>
+        <div class="box-subtitle">Pillar #2</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Multi-market schema (JSONB regulatory)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Document extraction → Facts</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Readiness scoring</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Room-level detail (items, photos)</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(59,130,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+        <div class="box-header"><span class="icon">⚡</span><span class="title" style="color: var(--accent);">Action Engine</span></div>
+        <div class="box-subtitle">Pillar #3</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>AI-inferred + manual tasks</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Priority: P0/P1/P2</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Assignment & reminders</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Entity-linked (lead/property/deal)</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="box" style="border: 1px solid rgba(59,130,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+        <div class="box-header"><span class="icon">📡</span><span class="title" style="color: var(--accent);">Publishing & Listings</span></div>
+        <div class="box-subtitle">Pillar #4</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Portal adapters (Bayut, PF, SeLoger, Immobiliare...)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Validate → Simulate → Publish lifecycle</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Multi-portal from single property</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Compliance checks per market</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(59,130,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+        <div class="box-header"><span class="icon">💰</span><span class="title" style="color: var(--accent);">Deal Pipeline</span></div>
+        <div class="box-subtitle">Pillar #5</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Lead + Property → Deal</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Stage progression with probability</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Commission tracking</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Workflow-driven transitions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line" style="background: rgba(16,185,129,0.4);"></div><span class="arrow-label" style="color: var(--green);">orchestrated by</span><span class="arrow-head" style="color: var(--green);">▼</span></div>
+
+  <!-- Layer 3: Workflow -->
+  <div class="layer" style="background: linear-gradient(135deg, var(--green-glow), transparent); border: 1px solid rgba(16,185,129,0.2);">
+    <div class="layer-label" style="color: var(--green);">LAYER 3 — WORKFLOW ENGINE (THE KEY DIFFERENTIATOR)</div>
+    <div class="grid-3">
+      <div class="box" style="border: 1px solid rgba(16,185,129,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--green), transparent);"></div>
+        <div class="box-header"><span class="icon">📋</span><span class="title" style="color: var(--green);">Templates</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>System templates per country/region</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Versioned & locked legal steps</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Agency clones + customizes</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Workflows are DATA, not code</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(16,185,129,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--green), transparent);"></div>
+        <div class="box-header"><span class="icon">🔄</span><span class="title" style="color: var(--green);">Execution</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Deal ↔ Workflow Instance</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Stage transitions (manual/AI-suggested)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Entry/exit conditions</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>SLA tracking per stage</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(16,185,129,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--green), transparent);"></div>
+        <div class="box-header"><span class="icon">🌍</span><span class="title" style="color: var(--green);">Market Scaling</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>New country = new template + regulatory config</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>No code changes to add a market</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Regional variations (canton, emirate)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Infinite market extensibility</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line" style="background: rgba(245,158,11,0.4);"></div><span class="arrow-label" style="color: var(--amber);">powered by</span><span class="arrow-head" style="color: var(--amber);">▼</span></div>
+
+  <!-- Layer 4-5: Intelligence -->
+  <div class="grid-2">
+    <div class="layer" style="background: linear-gradient(135deg, var(--amber-glow), transparent); border: 1px solid rgba(245,158,11,0.2);">
+      <div class="layer-label" style="color: var(--amber);">LAYER 4 — AGENTIC AI</div>
+      <div class="box" style="border: 1px solid rgba(245,158,11,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--amber), transparent);"></div>
+        <div class="box-header"><span class="icon">🤖</span><span class="title" style="color: var(--amber);">Background Agents</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Lead Intelligence — intent scoring, next-best-question</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Property Ingestion — doc extraction, fact normalization</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Readiness & Action — prioritized next steps, SLA alerts</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Workflow Compliance — missing docs, blocked stages</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Marketing Optimization — copy, photos, portal compliance</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Human-in-the-loop: suggest, never auto-act (MVP)</div>
+        </div>
+      </div>
+    </div>
+    <div class="layer" style="background: linear-gradient(135deg, var(--cyan-glow), transparent); border: 1px solid rgba(6,182,212,0.2);">
+      <div class="layer-label" style="color: var(--cyan);">LAYER 5 — ANALYTICS</div>
+      <div class="box" style="border: 1px solid rgba(6,182,212,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--cyan), transparent);"></div>
+        <div class="box-header"><span class="icon">📊</span><span class="title" style="color: var(--cyan);">Multi-Level Dashboards</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>Agent level — response time, win rate, task completion</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>Team level — pipeline distribution, SLA compliance</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>Org level — conversion funnel, lead source ROI</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>Cross-country benchmarking (Phase 2)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>AI suggestion acceptance tracking</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>Workflow A vs B conversion comparison</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- TAB 1: TECHNICAL ARCHITECTURE -->
+<!-- ============================================ -->
+<div class="tab-panel" id="tab-1">
+
+  <div class="section-title">
+    <h2>Technical Architecture</h2>
+    <p>System components, AI/ML pipeline, and integration layers</p>
+  </div>
+
+  <!-- Client Layer -->
+  <div class="layer" style="background: linear-gradient(135deg, var(--accent-glow), transparent); border: 1px solid rgba(59,130,246,0.2);">
+    <div class="layer-label" style="color: var(--accent);">CLIENT LAYER</div>
+    <div class="grid-3">
+      <div class="box" style="border: 1px solid rgba(59,130,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+        <div class="box-header"><span class="icon">📱</span><span class="title" style="color: var(--accent);">Agent Mobile App</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Next.js 14 + Capacitor iOS</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Voice-first AI assistant</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Camera scan (Vision API)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Offline-capable (planned)</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(59,130,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+        <div class="box-header"><span class="icon">🖥️</span><span class="title" style="color: var(--accent);">Agency CRM Dashboard</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Next.js 14 (web only)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Admin/Manager views</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Aggregate analytics</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Workflow template editor</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(59,130,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+        <div class="box-header"><span class="icon">🌐</span><span class="title" style="color: var(--accent);">Public Pages</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Share links (/s/[token])</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Disclosure forms (/d/[token])</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Invitation accept (/invite/[token])</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>No auth required</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line" style="background: rgba(148,163,184,0.4);"></div><span class="arrow-label" style="color: var(--text-dim);">API routes (Next.js)</span><span class="arrow-head" style="color: var(--text-dim);">▼</span></div>
+
+  <!-- Application Layer -->
+  <div class="layer" style="background: linear-gradient(135deg, var(--green-glow), transparent); border: 1px solid rgba(16,185,129,0.2);">
+    <div class="layer-label" style="color: var(--green);">APPLICATION LAYER (Vercel Serverless)</div>
+    <div class="grid-4">
+      <div class="box" style="border: 1px solid rgba(16,185,129,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--green), transparent);"></div>
+        <div class="box-header"><span class="icon">🔐</span><span class="title" style="color: var(--green);">Auth & RBAC</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Supabase Auth</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Org context middleware</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Role-based route guards</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Invitation flow</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(16,185,129,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--green), transparent);"></div>
+        <div class="box-header"><span class="icon">📦</span><span class="title" style="color: var(--green);">Core API</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Property CRUD</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Contact CRUD</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Lead/Deal CRUD</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Document management</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(16,185,129,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--green), transparent);"></div>
+        <div class="box-header"><span class="icon">🔄</span><span class="title" style="color: var(--green);">Workflow Engine</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Template resolution</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Stage transitions</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Condition evaluation</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>SLA monitoring</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(16,185,129,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--green), transparent);"></div>
+        <div class="box-header"><span class="icon">📡</span><span class="title" style="color: var(--green);">Integration Hub</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Portal adapters</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Email (Resend)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>WhatsApp (Twilio)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>E-Sign (DocuSign)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line" style="background: rgba(245,158,11,0.4);"></div><span class="arrow-label" style="color: var(--amber);">event-driven</span><span class="arrow-head" style="color: var(--amber);">▼</span></div>
+
+  <!-- AI/ML Layer -->
+  <div class="layer" style="background: linear-gradient(135deg, var(--amber-glow), transparent); border: 1px solid rgba(245,158,11,0.2);">
+    <div class="layer-label" style="color: var(--amber);">AI / ML LAYER (THE INTELLIGENCE ENGINE)</div>
+    <div class="grid-2" style="margin-bottom: 10px;">
+      <div class="box" style="border: 1px solid rgba(245,158,11,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--amber), transparent);"></div>
+        <div class="box-header"><span class="icon">🧠</span><span class="title" style="color: var(--amber);">Foundation Models (External)</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>GPT-4 — listing content, chat, analysis</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Claude Vision — document scanning, item recognition</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Whisper — voice transcription (multi-language)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Embeddings — semantic search, matching</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(245,158,11,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--amber), transparent);"></div>
+        <div class="box-header"><span class="icon">⚙️</span><span class="title" style="color: var(--amber);">Custom ML Models (Our Moat)</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Lead intent scoring — trained on conversion outcomes</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Property valuation — comps + market signals</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Response optimization — best time/channel/message</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Workflow prediction — stage duration, risk scoring</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="box" style="border: 1px solid rgba(245,158,11,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--amber), transparent);"></div>
+        <div class="box-header"><span class="icon">🤖</span><span class="title" style="color: var(--amber);">Agentic Pipeline</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Event bus (Supabase Realtime / pg_notify)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Agent workers (edge functions)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Structured output → Actions</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Human confirmation gate</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(245,158,11,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--amber), transparent);"></div>
+        <div class="box-header"><span class="icon">📄</span><span class="title" style="color: var(--amber);">Document Intelligence</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>OCR + Vision extraction</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Fact normalization pipeline</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Cross-doc contradiction detection</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Market-specific template recognition</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(245,158,11,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--amber), transparent);"></div>
+        <div class="box-header"><span class="icon">🎯</span><span class="title" style="color: var(--amber);">Recommendation Engine</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Lead ↔ Property matching</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Next-best-action suggestions</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Listing optimization</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Price positioning</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line" style="background: rgba(139,92,246,0.4);"></div><span class="arrow-label" style="color: var(--purple);">reads/writes</span><span class="arrow-head" style="color: var(--purple);">▼</span></div>
+
+  <!-- Data Layer -->
+  <div class="layer" style="background: linear-gradient(135deg, var(--purple-glow), transparent); border: 1px solid rgba(139,92,246,0.2);">
+    <div class="layer-label" style="color: var(--purple);">DATA LAYER</div>
+    <div class="grid-4">
+      <div class="box" style="border: 1px solid rgba(139,92,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--purple), transparent);"></div>
+        <div class="box-header"><span class="icon">🐘</span><span class="title" style="color: var(--purple);">PostgreSQL</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Core tables + RLS</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>JSONB for flexibility</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Realtime subscriptions</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Edge Functions</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(139,92,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--purple), transparent);"></div>
+        <div class="box-header"><span class="icon">📁</span><span class="title" style="color: var(--purple);">Object Storage</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Property photos</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Documents & scans</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Generated media</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Supabase Storage</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(139,92,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--purple), transparent);"></div>
+        <div class="box-header"><span class="icon">🔍</span><span class="title" style="color: var(--purple);">Vector Store</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>pgvector embeddings</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Semantic property search</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Document similarity</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Lead-property matching</div>
+        </div>
+      </div>
+      <div class="box" style="border: 1px solid rgba(139,92,246,0.2);">
+        <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--purple), transparent);"></div>
+        <div class="box-header"><span class="icon">📈</span><span class="title" style="color: var(--purple);">Analytics Store</span></div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Event tracking</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Materialized views</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Time-series metrics</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Cross-org benchmarks</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External integrations -->
+  <div class="grid-2" style="margin-top: 12px;">
+    <div class="layer" style="background: linear-gradient(135deg, var(--rose-glow), transparent); border: 1px solid rgba(244,63,94,0.2);">
+      <div class="layer-label" style="color: var(--rose);">PORTAL ADAPTERS (OUTBOUND)</div>
+      <div class="tag-list">
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">Bayut</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">Property Finder</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">Dubizzle</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">SeLoger</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">Idealista</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">Immobiliare</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">ImmoScout24</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">Rightmove</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">Zillow</span>
+        <span class="tag" style="background: rgba(244,63,94,0.13); color: var(--rose);">Realtor.com</span>
+      </div>
+    </div>
+    <div class="layer" style="background: linear-gradient(135deg, var(--cyan-glow), transparent); border: 1px solid rgba(6,182,212,0.2);">
+      <div class="layer-label" style="color: var(--cyan);">DATA SOURCES (INBOUND)</div>
+      <div class="tag-list">
+        <span class="tag" style="background: rgba(6,182,212,0.13); color: var(--cyan);">Portal Lead APIs</span>
+        <span class="tag" style="background: rgba(6,182,212,0.13); color: var(--cyan);">WhatsApp Business</span>
+        <span class="tag" style="background: rgba(6,182,212,0.13); color: var(--cyan);">Email (IMAP/Resend)</span>
+        <span class="tag" style="background: rgba(6,182,212,0.13); color: var(--cyan);">Land Registry APIs</span>
+        <span class="tag" style="background: rgba(6,182,212,0.13); color: var(--cyan);">Municipal DBs</span>
+        <span class="tag" style="background: rgba(6,182,212,0.13); color: var(--cyan);">MLS/IDX Feeds</span>
+        <span class="tag" style="background: rgba(6,182,212,0.13); color: var(--cyan);">Market Data APIs</span>
+        <span class="tag" style="background: rgba(6,182,212,0.13); color: var(--cyan);">Calendar (CalDAV)</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- TAB 2: DATA MOAT -->
+<!-- ============================================ -->
+<div class="tab-panel" id="tab-2">
+
+  <div class="section-title">
+    <h2>Data Moat & ML Strategy</h2>
+    <p>Defensible datasets that compound with every transaction</p>
+  </div>
+
+  <!-- Flywheel -->
+  <div class="flywheel" style="background: linear-gradient(135deg, var(--amber-glow), var(--green-glow)); border: 1px solid rgba(245,158,11,0.2);">
+    <div class="flywheel-title" style="color: var(--amber);">THE DATA FLYWHEEL</div>
+    <div class="flywheel-steps">
+      <div class="flywheel-step" style="border: 1px solid rgba(245,158,11,0.25);"><span class="icon">👥</span><span class="label">More agents</span></div>
+      <span class="flywheel-arrow" style="color: var(--amber);">→</span>
+      <div class="flywheel-step" style="border: 1px solid rgba(245,158,11,0.25);"><span class="icon">💰</span><span class="label">More transactions</span></div>
+      <span class="flywheel-arrow" style="color: var(--amber);">→</span>
+      <div class="flywheel-step" style="border: 1px solid rgba(245,158,11,0.25);"><span class="icon">📊</span><span class="label">More data</span></div>
+      <span class="flywheel-arrow" style="color: var(--amber);">→</span>
+      <div class="flywheel-step" style="border: 1px solid rgba(245,158,11,0.25);"><span class="icon">🧠</span><span class="label">Better AI</span></div>
+      <span class="flywheel-arrow" style="color: var(--amber);">→</span>
+      <div class="flywheel-step" style="border: 1px solid rgba(245,158,11,0.25);"><span class="icon">⚡</span><span class="label">Higher productivity</span></div>
+      <span class="flywheel-arrow" style="color: var(--amber);">→</span>
+      <div class="flywheel-step" style="border: 1px solid rgba(245,158,11,0.25);"><span class="icon">🔄</span><span class="label">More agents...</span></div>
+    </div>
+    <p class="flywheel-desc">Each transaction generates workflow data, conversation data, document data, and pricing data. This trains models that make the NEXT transaction faster. Competitors starting from zero can't catch up.</p>
+  </div>
+
+  <!-- Dataset 1: Transaction Workflow Data -->
+  <div class="dataset-card" style="border: 1px solid rgba(16,185,129,0.2);">
+    <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--green), transparent);"></div>
+    <div class="dataset-header">
+      <div class="dataset-header-left"><span class="icon">🔄</span><span class="title" style="color: var(--green);">Transaction Workflow Data</span></div>
+      <span class="moat-badge" style="background: rgba(16,185,129,0.13); color: var(--green);">MOAT: VERY HIGH</span>
+    </div>
+    <p class="dataset-desc">Every deal that flows through HouseZoom generates a complete transaction graph: which steps were taken, in what order, how long each took, what documents were collected, what got rejected and why.</p>
+    <div class="dataset-grid">
+      <div>
+        <div class="dataset-section-label">TRAINING SIGNALS</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Stage duration per market/deal type → predict deal timeline</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Document rejection patterns → auto-flag issues before submission</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Step skip rates → identify unnecessary vs critical steps</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--green);"></div>Success/fail correlation with workflow path → optimal suggestions</div>
+        </div>
+      </div>
+      <div>
+        <div class="dataset-section-label">ML APPLICATION</div>
+        <p class="dataset-ml" style="color: var(--text);">Workflow Optimizer — suggests the optimal transaction path for a given deal type, market, and property. No one else has this data across markets.</p>
+        <div class="dataset-section-label">WHY IT'S DEFENSIBLE</div>
+        <p class="dataset-unique" style="color: var(--green);">Country-specific CRMs see ONE market's workflows. HouseZoom sees ALL markets and can cross-pollinate best practices.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset 2: Lead Conversation Intelligence -->
+  <div class="dataset-card" style="border: 1px solid rgba(59,130,246,0.2);">
+    <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--accent), transparent);"></div>
+    <div class="dataset-header">
+      <div class="dataset-header-left"><span class="icon">💬</span><span class="title" style="color: var(--accent);">Lead Conversation Intelligence</span></div>
+      <span class="moat-badge" style="background: rgba(59,130,246,0.13); color: var(--accent);">MOAT: HIGH</span>
+    </div>
+    <p class="dataset-desc">Every WhatsApp/email thread between agent and lead, annotated with outcome (qualified/closed/won). Multi-language, multi-market.</p>
+    <div class="dataset-grid">
+      <div>
+        <div class="dataset-section-label">TRAINING SIGNALS</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Message patterns that correlate with conversion</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Response time impact on close rate by market</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Question sequences that qualify fastest</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--accent);"></div>Language/tone patterns by nationality + purpose</div>
+        </div>
+      </div>
+      <div>
+        <div class="dataset-section-label">ML APPLICATION</div>
+        <p class="dataset-ml" style="color: var(--text);">Lead Intelligence — real-time intent scoring, auto-suggested responses, optimal follow-up timing. Trained on actual conversions, not generic CRM rules.</p>
+        <div class="dataset-section-label">WHY IT'S DEFENSIBLE</div>
+        <p class="dataset-unique" style="color: var(--accent);">Multi-language conversation data (EN/AR/FR/DE/IT) with deal outcomes attached. No existing CRM has this cross-market conversation corpus.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset 3: Property Document Corpus -->
+  <div class="dataset-card" style="border: 1px solid rgba(245,158,11,0.2);">
+    <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--amber), transparent);"></div>
+    <div class="dataset-header">
+      <div class="dataset-header-left"><span class="icon">📄</span><span class="title" style="color: var(--amber);">Property Document Corpus</span></div>
+      <span class="moat-badge" style="background: rgba(245,158,11,0.13); color: var(--amber);">MOAT: HIGH</span>
+    </div>
+    <p class="dataset-desc">Every scanned Form A, mandat, energy certificate, title deed — extracted into structured facts with confidence scores. Multi-format, multi-country.</p>
+    <div class="dataset-grid">
+      <div>
+        <div class="dataset-section-label">TRAINING SIGNALS</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Document type recognition accuracy improves with volume</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Field extraction patterns per country/document type</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Missing document → deal delay correlation</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--amber);"></div>Fact contradictions across documents (fraud detection)</div>
+        </div>
+      </div>
+      <div>
+        <div class="dataset-section-label">ML APPLICATION</div>
+        <p class="dataset-ml" style="color: var(--text);">Document Intelligence — instant extraction, compliance checking, contradiction detection. Fine-tuned models per document type per market.</p>
+        <div class="dataset-section-label">WHY IT'S DEFENSIBLE</div>
+        <p class="dataset-unique" style="color: var(--amber);">Real estate document formats vary wildly by country. Building extraction models for Form A (UAE), Mandat (France), Grundbuch (Switzerland) creates compound expertise.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset 4: Cross-Market Pricing -->
+  <div class="dataset-card" style="border: 1px solid rgba(244,63,94,0.2);">
+    <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--rose), transparent);"></div>
+    <div class="dataset-header">
+      <div class="dataset-header-left"><span class="icon">💰</span><span class="title" style="color: var(--rose);">Cross-Market Pricing Intelligence</span></div>
+      <span class="moat-badge" style="background: rgba(244,63,94,0.13); color: var(--rose);">MOAT: MEDIUM-HIGH</span>
+    </div>
+    <p class="dataset-desc">Property listings with actual transaction prices (not just asking prices), linked to deal outcomes and market context.</p>
+    <div class="dataset-grid">
+      <div>
+        <div class="dataset-section-label">TRAINING SIGNALS</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--rose);"></div>Asking price vs closing price delta by market/segment</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--rose);"></div>Price per sqm trends by micro-location</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--rose);"></div>Time-on-market vs price positioning</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--rose);"></div>Seasonal patterns by market</div>
+        </div>
+      </div>
+      <div>
+        <div class="dataset-section-label">ML APPLICATION</div>
+        <p class="dataset-ml" style="color: var(--text);">Pricing Advisor — suggest optimal listing price based on comps, market velocity, and agent's historical close patterns.</p>
+        <div class="dataset-section-label">WHY IT'S DEFENSIBLE</div>
+        <p class="dataset-unique" style="color: var(--rose);">Aggregated across markets with standardized schemas. Most pricing data is siloed per portal per country.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset 5: Agent Performance -->
+  <div class="dataset-card" style="border: 1px solid rgba(139,92,246,0.2);">
+    <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--purple), transparent);"></div>
+    <div class="dataset-header">
+      <div class="dataset-header-left"><span class="icon">📊</span><span class="title" style="color: var(--purple);">Agent Performance Patterns</span></div>
+      <span class="moat-badge" style="background: rgba(139,92,246,0.13); color: var(--purple);">MOAT: MEDIUM</span>
+    </div>
+    <p class="dataset-desc">Detailed activity logs per agent: response times, communication patterns, tool usage, deal velocity, AI suggestion acceptance.</p>
+    <div class="dataset-grid">
+      <div>
+        <div class="dataset-section-label">TRAINING SIGNALS</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Top performer behavior patterns (replicable playbooks)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Tool usage correlation with performance</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>AI adoption curve → productivity impact</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--purple);"></div>Team composition effects on deal flow</div>
+        </div>
+      </div>
+      <div>
+        <div class="dataset-section-label">ML APPLICATION</div>
+        <p class="dataset-ml" style="color: var(--text);">Performance Coach — personalized suggestions based on what top performers in similar markets do differently. Automated playbook generation.</p>
+        <div class="dataset-section-label">WHY IT'S DEFENSIBLE</div>
+        <p class="dataset-unique" style="color: var(--purple);">Activity-level data (not just outcomes) across markets enables genuine benchmarking. Current CRMs only have basic metrics.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dataset 6: Regulatory Compliance -->
+  <div class="dataset-card" style="border: 1px solid rgba(6,182,212,0.2);">
+    <div class="top-line" style="background: linear-gradient(90deg, transparent, var(--cyan), transparent);"></div>
+    <div class="dataset-header">
+      <div class="dataset-header-left"><span class="icon">⚖️</span><span class="title" style="color: var(--cyan);">Regulatory Compliance Graph</span></div>
+      <span class="moat-badge" style="background: rgba(6,182,212,0.13); color: var(--cyan);">MOAT: VERY HIGH</span>
+    </div>
+    <p class="dataset-desc">The living knowledge base of what's legally required per country/region/transaction type. Updated by compliance agents, validated by outcomes.</p>
+    <div class="dataset-grid">
+      <div>
+        <div class="dataset-section-label">TRAINING SIGNALS</div>
+        <div class="box-items">
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>Regulation changes and their workflow impact</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>Compliance failure patterns (what gets missed)</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>Regional variation mapping</div>
+          <div class="box-item"><div class="box-dot" style="background: var(--cyan);"></div>New market requirements auto-detected from early adopters</div>
+        </div>
+      </div>
+      <div>
+        <div class="dataset-section-label">ML APPLICATION</div>
+        <p class="dataset-ml" style="color: var(--text);">Compliance Engine — automatically validates transactions against current regulations. Alerts on regulatory changes that affect in-flight deals.</p>
+        <div class="dataset-section-label">WHY IT'S DEFENSIBLE</div>
+        <p class="dataset-unique" style="color: var(--cyan);">This is the HARDEST dataset to build. It requires real transactions in real markets. Pure software can be copied; regulatory knowledge cannot be faked.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compound Moat -->
+  <div class="compound-moat" style="background: linear-gradient(135deg, var(--rose-glow), var(--amber-glow)); border: 1px solid rgba(244,63,94,0.2);">
+    <h3 style="color: var(--rose);">THE COMPOUND MOAT</h3>
+    <p style="color: var(--text);">Any single dataset can be approximated. The moat is the <strong>intersection</strong>: workflow data + conversation data + document intelligence + pricing signals + regulatory knowledge, all linked at the <strong>transaction level</strong> across <strong>multiple markets</strong>. This creates a cross-market intelligence graph that no single-country CRM can replicate and no new entrant can bootstrap.</p>
+  </div>
+
+</div>
+
+</div>
+
+<script>
+function switchTab(index) {
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === index);
+  });
+  document.querySelectorAll('.tab-panel').forEach((panel, i) => {
+    panel.classList.toggle('active', i === index);
+  });
+}
+</script>
+
 </body>
 </html>
