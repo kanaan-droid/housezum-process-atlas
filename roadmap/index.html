@@ -8,34 +8,19 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#06080f;
-  --surface:#0d1117;
-  --surface-2:#151b27;
-  --surface-3:#1c2333;
-  --border:rgba(148,163,184,0.08);
-  --border-hover:rgba(148,163,184,0.15);
-  --text:#e2e8f0;
-  --text-muted:#94a3b8;
-  --text-dim:#64748b;
-  --blue:#3b82f6;
-  --blue-glow:rgba(59,130,246,0.12);
-  --green:#10b981;
-  --green-glow:rgba(16,185,129,0.12);
-  --amber:#f59e0b;
-  --amber-glow:rgba(245,158,11,0.12);
-  --purple:#8b5cf6;
-  --purple-glow:rgba(139,92,246,0.12);
-  --rose:#f43f5e;
-  --rose-glow:rgba(244,63,94,0.12);
-  --cyan:#06b6d4;
-  --cyan-glow:rgba(6,182,212,0.12);
-  --indigo:#6366f1;
-  --indigo-glow:rgba(99,102,241,0.12);
+  --bg:#06080f;--surface:#0d1117;--surface-2:#151b27;--surface-3:#1c2333;
+  --border:rgba(148,163,184,0.08);--border-hover:rgba(148,163,184,0.15);
+  --text:#e2e8f0;--text-muted:#94a3b8;--text-dim:#64748b;
+  --blue:#3b82f6;--blue-glow:rgba(59,130,246,0.12);
+  --green:#10b981;--green-glow:rgba(16,185,129,0.12);
+  --amber:#f59e0b;--amber-glow:rgba(245,158,11,0.12);
+  --purple:#8b5cf6;--purple-glow:rgba(139,92,246,0.12);
+  --rose:#f43f5e;--rose-glow:rgba(244,63,94,0.12);
+  --cyan:#06b6d4;--cyan-glow:rgba(6,182,212,0.12);
+  --indigo:#6366f1;--indigo-glow:rgba(99,102,241,0.12);
 }
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 .mono{font-family:'JetBrains Mono',monospace}
-
-/* ── Header ── */
 .header{padding:40px 24px 20px;text-align:center;position:relative}
 .header::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(99,102,241,0.08),transparent 70%);pointer-events:none}
 .header h1{font-size:28px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#a78bfa,#6366f1,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -44,32 +29,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .header .stat{text-align:center}
 .header .stat-val{font-size:22px;font-weight:800;color:var(--text)}
 .header .stat-label{font-size:10px;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;margin-top:2px}
-
-/* ── View Toggle ── */
-.view-bar{display:flex;justify-content:center;gap:4px;padding:0 24px;margin:20px auto;max-width:400px;background:var(--surface);border-radius:10px;padding:4px}
+.view-bar{display:flex;justify-content:center;gap:4px;margin:20px auto;max-width:400px;background:var(--surface);border-radius:10px;padding:4px}
 .view-btn{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:0.02em;color:var(--text-dim);background:transparent;font-family:inherit;transition:all .2s}
 .view-btn.active{color:#fff;background:var(--indigo)}
 .view-btn:hover:not(.active){color:var(--text-muted)}
-
-/* ── Filter Bar ── */
 .filter-bar{display:flex;justify-content:center;gap:6px;padding:12px 24px;flex-wrap:wrap}
 .filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .filter-chip.active{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-glow)}
 .filter-chip:hover:not(.active){border-color:var(--border-hover);color:var(--text-muted)}
-
-/* ── Kanban View ── */
 .kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px;max-width:1400px;margin:0 auto}
 @media(max-width:1100px){.kanban{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.kanban{grid-template-columns:1fr}}
-
 .column{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden}
 .column-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
 .column-dot{width:10px;height:10px;border-radius:3px}
 .column-title{font-size:12px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase}
 .column-count{font-size:11px;color:var(--text-dim);margin-left:auto;font-weight:600}
 .column-body{padding:8px;max-height:70vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface-3) transparent}
-
-/* ── Cards ── */
 .card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
 .card:hover{border-color:var(--border-hover);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
 .card-id{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.05em;font-family:'JetBrains Mono',monospace}
@@ -78,8 +54,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .card-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
 .card-tag{font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
 .card-date{font-size:10px;color:var(--text-dim);margin-left:auto;font-family:'JetBrains Mono',monospace}
-
-/* Tag colors */
 .tag-comms{color:var(--cyan);background:var(--cyan-glow)}
 .tag-compliance{color:var(--rose);background:var(--rose-glow)}
 .tag-admin{color:var(--purple);background:var(--purple-glow)}
@@ -88,22 +62,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tag-ai{color:var(--green);background:var(--green-glow)}
 .tag-ux{color:var(--indigo);background:var(--indigo-glow)}
 .tag-integrations{color:#ec4899;background:rgba(236,72,153,0.12)}
-
-/* Column accent colors */
-.col-progress .column-dot{background:var(--amber)}
-.col-progress .column-header{background:var(--amber-glow)}
-.col-next .column-dot{background:var(--blue)}
-.col-next .column-header{background:var(--blue-glow)}
-.col-backlog .column-dot{background:var(--purple)}
-.col-backlog .column-header{background:var(--purple-glow)}
-.col-done .column-dot{background:var(--green)}
-.col-done .column-header{background:var(--green-glow)}
-.col-debt .column-dot{background:var(--rose)}
-.col-debt .column-header{background:var(--rose-glow)}
-.col-bugs .column-dot{background:var(--rose)}
-.col-bugs .column-header{background:var(--rose-glow)}
-
-/* ── Timeline View ── */
+.col-progress .column-dot{background:var(--amber)}.col-progress .column-header{background:var(--amber-glow)}
+.col-next .column-dot{background:var(--blue)}.col-next .column-header{background:var(--blue-glow)}
+.col-backlog .column-dot{background:var(--purple)}.col-backlog .column-header{background:var(--purple-glow)}
+.col-done .column-dot{background:var(--green)}.col-done .column-header{background:var(--green-glow)}
+.col-debt .column-dot{background:var(--rose)}.col-debt .column-header{background:var(--rose-glow)}
 .timeline{max-width:900px;margin:0 auto;padding:20px 24px}
 .tl-month{margin-bottom:32px}
 .tl-month-label{font-size:14px;font-weight:800;color:var(--text-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:12px;padding-left:20px;position:relative}
@@ -113,11 +76,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tl-item.done::before{background:var(--green);border-color:var(--green)}
 .tl-item.progress::before{background:var(--amber);border-color:var(--amber)}
 .tl-date{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-dim);min-width:70px;padding-top:2px}
-.tl-content{flex:1}
-.tl-content h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.tl-content{flex:1}.tl-content h4{font-size:13px;font-weight:700;margin-bottom:3px}
 .tl-content p{font-size:11px;color:var(--text-dim);line-height:1.5}
-
-/* ── Session Log View ── */
 .sessions{max-width:900px;margin:0 auto;padding:20px 24px}
 .session-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;transition:all .2s}
 .session-item:hover{border-color:var(--border-hover)}
@@ -125,8 +85,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .session-title{font-size:14px;font-weight:700;margin:6px 0 4px}
 .session-decisions{font-size:11px;color:var(--text-dim);line-height:1.6}
 .session-decisions strong{color:var(--text-muted);font-weight:600}
-
-/* ── Expanded Card Modal ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:1000;justify-content:center;align-items:center;padding:24px}
 .modal-overlay.active{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:560px;width:100%;max-height:80vh;overflow-y:auto;position:relative}
@@ -138,396 +96,959 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .modal .detail-row{display:flex;gap:8px;margin:6px 0;font-size:11px}
 .modal .detail-label{color:var(--text-dim);min-width:60px;font-weight:600}
 .modal .detail-value{color:var(--text)}
-
-/* ── Footer ── */
 .footer{text-align:center;padding:40px 24px;color:var(--text-dim);font-size:11px}
-
-/* ── Animations ── */
 .card,.session-item,.tl-item{animation:slideUp .3s ease both}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-
 <div class="header">
   <h1>HouseZoom.ai Roadmap</h1>
   <p>Product development status — auto-generated from ROADMAP.md</p>
   <div class="stats" id="stats"></div>
 </div>
-
 <div class="view-bar">
   <button class="view-btn active" data-view="kanban">Board</button>
   <button class="view-btn" data-view="timeline">Timeline</button>
   <button class="view-btn" data-view="sessions">Sessions</button>
 </div>
-
 <div class="filter-bar" id="filterBar"></div>
-
 <div id="kanbanView" class="kanban"></div>
 <div id="timelineView" class="timeline" style="display:none"></div>
 <div id="sessionsView" class="sessions" style="display:none"></div>
-
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">&times;</button>
     <div id="modalContent"></div>
   </div>
 </div>
-
 <div class="footer">
   <p>HouseZoom.ai Product Roadmap — Last updated <span id="lastUpdated"></span></p>
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
-
 <script>
-// ============================================
-// ROADMAP DATA — Update this when ROADMAP.md changes
-// ============================================
-
 const LAST_UPDATED = '2026-03-04';
-
 const DATA = {
-  inProgress: [
-    { id: 'IP-2', title: 'Communications — Calendar Bidirectional Sync', desc: 'Detect external calendar changes, conflict detection, reconcile with HouseZoom viewings.', tag: 'comms', added: '2026-03-03', files: 'calendar/sync route' },
+  "inProgress": [
+    {
+      "id": "IP-2",
+      "title": "Communications Integration — Phase 3",
+      "desc": "Calendar bidirectional sync: detect external changes, conflict detection, reconcile with HZ. See HOUSEZOOM-COMMUNICATIONS-INTEGRATION-SPEC.docx §5",
+      "files": "calendar/sync route",
+      "tag": "comms",
+      "added": "2026-03-03"
+    }
   ],
-
-  nextUp: [
-    { id: 'NU-2', title: 'Wire Scan into Enrichment Wizard', desc: 'Add "Scan Document" as data source in Wizard Step 4 — opens ScanDocumentModal, pre-populates wizard fields from flyer/Form A.', tag: 'core', added: '2026-02-16' },
-    { id: 'NU-3', title: 'WhatsApp Phase 2 — Inbound Messages', desc: 'Receive WhatsApp messages from owners/buyers. Conversation threads. Webhook from Twilio.', tag: 'comms', added: '2026-02-14' },
-    { id: 'NU-4', title: 'DocuSign Phase 2 — Templates + Embedded Signing', desc: 'Pre-built templates for common forms. Embedded signing (sign in-app). Status tracking UI.', tag: 'integrations', added: '2026-02-14' },
-    { id: 'NU-5', title: 'Upgrade Twilio to Production WhatsApp', desc: 'Replace sandbox with verified WhatsApp Business number. Requires Meta Business verification.', tag: 'infra', added: '2026-02-14' },
-    { id: 'NU-6', title: 'Weekly Refresh Script', desc: 'Append new listings, contacts, leads, deals weekly. Agent churn. Keeps demo fresh.', tag: 'infra', added: '2026-02-28' },
+  "nextUp": [
+    {
+      "id": "NU-2",
+      "title": "Wire Scan into Enrichment Wizard",
+      "desc": "Add \"Scan Document\" as a data source option in Wizard Step 4 — opens ScanDocumentModal, pre-populates wizard fields from flyer/Form A",
+      "files": "list-property/page.tsx, ScanDocumentModal.tsx",
+      "tag": "ux",
+      "added": "2026-02-16"
+    },
+    {
+      "id": "NU-3",
+      "title": "WhatsApp Phase 2 — Inbound messages",
+      "desc": "Receive WhatsApp messages from owners/buyers. Conversation threads. Webhook from Twilio",
+      "files": "twilioService.ts, new webhook route",
+      "tag": "comms",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "NU-4",
+      "title": "DocuSign Phase 2 — Templates + embedded signing",
+      "desc": "Pre-built templates for common forms. Embedded signing (sign in-app). Status tracking UI on property detail",
+      "files": "docusignService.ts, DocuSignButton.tsx",
+      "tag": "ai",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "NU-5",
+      "title": "Upgrade Twilio to production WhatsApp",
+      "desc": "Replace sandbox (+14155238886) with verified WhatsApp Business number. Requires Meta Business verification (~2-5 days)",
+      "files": ".env.local, Twilio dashboard",
+      "tag": "comms",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "NU-6",
+      "title": "Weekly refresh script",
+      "desc": "Append new listings, contacts, leads, deals, viewings weekly. Agent churn (add/deactivate). Keeps demo fresh",
+      "files": "scripts/refresh-dubai.mjs",
+      "tag": "admin",
+      "added": "2026-02-28"
+    }
   ],
-
-  backlog: [
-    { id: 'BL-1', title: 'Migrate iOS to Local Capacitor Build', desc: 'Remove server.url. Move API routes to external URLs. Unlocks: native camera, push, biometrics, offline.', tag: 'infra', added: '2026-02-16' },
-    { id: 'BL-2', title: 'Push Notifications', desc: 'Native push for: disclosure submitted, viewing reminder, document signed. Requires BL-1.', tag: 'core', added: '2026-02-16' },
-    { id: 'BL-3', title: 'Portal Import Integration', desc: 'Import listings from Bayut (UAE), SeLoger (France), MLS (US).', tag: 'integrations', added: '2026-02-10' },
-    { id: 'BL-4', title: 'Phase 2 Listing Generator', desc: 'Direct posting to platforms (Bayut, SeLoger, Zillow). Video content generation.', tag: 'core', added: '2026-02-07' },
-    { id: 'BL-5', title: 'Agent Notification on Enrichment Submit', desc: 'Email + in-app notification when owner submits enrichment form.', tag: 'core', added: '2026-02-11' },
-    { id: 'BL-6', title: 'Enrichment Token Expiry', desc: 'Auto-expire enrichment links after 30 days. Show "expired" page.', tag: 'core', added: '2026-02-11' },
-    { id: 'BL-7', title: 'Contact Picker in WhatsApp Modal', desc: 'Search HouseZoom contacts when sending WhatsApp. Currently manual phone entry.', tag: 'ux', added: '2026-02-14' },
-    { id: 'BL-8', title: 'Multi-Agent Document Verification', desc: 'Legal compliance checking across agents. Market-specific mandatory fields.', tag: 'compliance', added: '2026-02-14' },
-    { id: 'BL-9', title: 'Source Integrations (SNPI, Bayut)', desc: 'API connections to regional listing platforms.', tag: 'integrations', added: '2026-02-05' },
-    { id: 'BL-10', title: 'Wake Word Activation', desc: '"Hey HouseZoom" to start voice input hands-free during viewings.', tag: 'ai', added: '2026-02-14' },
-    { id: 'BL-11', title: 'Offline Mode', desc: 'Cache property data for use without network. Sync when back online.', tag: 'infra', added: '2026-02-14' },
-    { id: 'BL-12', title: 'Biometric Login', desc: 'Face ID / Touch ID via Capacitor. Requires BL-1.', tag: 'infra', added: '2026-02-14' },
-    { id: 'BL-13', title: '2FA/MFA for Sign-up', desc: 'Two-factor authentication for agent accounts.', tag: 'infra', added: '2026-02-14' },
-    { id: 'BL-14', title: 'France Encryption Compliance', desc: 'App Store compliance for French market (encryption declaration).', tag: 'compliance', added: '2026-02-14' },
-    { id: 'BL-15', title: 'AI-Generated Listing Images', desc: 'DALL-E / Runway integration for AI property visuals. User-paid tier.', tag: 'ai', added: '2026-02-07' },
-    { id: 'BL-16', title: 'Property Sharing (Agent-to-Agent)', desc: 'Request-based enrichment. Visibility tiers per spec.', tag: 'core', added: '2026-02-05' },
-    { id: 'BL-17', title: 'DocuSign Production Env Vars', desc: 'Add production DocuSign credentials to Vercel (currently sandbox only).', tag: 'infra', added: '2026-02-14' },
-    { id: 'BL-18', title: 'Full Document-to-PDF Conversion', desc: 'Server-side RTF/DOCX→PDF conversion for WhatsApp attachments.', tag: 'core', added: '2026-02-23' },
-    { id: 'BL-19', title: 'Media Library Smart Routing', desc: '"Use in Listing" opens platform picker with image pre-selected.', tag: 'ux', added: '2026-02-23' },
-    { id: 'BL-20', title: 'Contact Visibility (Org vs Private)', desc: 'Admin sees org contacts, not agent personal contacts. Per-contact toggle.', tag: 'admin', added: '2026-02-25' },
-    { id: 'BL-21', title: 'Data Migration Flow', desc: '"Import my data" when individual agent joins agency.', tag: 'admin', added: '2026-02-25' },
-    { id: 'BL-22', title: 'Multi-Org Support', desc: 'Org switcher, multiple memberships per user. Like Slack workspaces.', tag: 'admin', added: '2026-02-25' },
-    { id: 'BL-23', title: 'Subdomain Routing', desc: 'agency-name.housezoom.ai — custom subdomains for agencies.', tag: 'infra', added: '2026-02-25' },
-    { id: 'BL-24', title: 'Salesforce Integration', desc: 'Bi-directional sync of contacts, leads, deals via SF REST API.', tag: 'integrations', added: '2026-02-28' },
-    { id: 'BL-25', title: 'AI Email/WhatsApp Agent', desc: 'AI reads, summarizes, drafts responses for business email + WA Business.', tag: 'ai', added: '2026-02-28' },
-    { id: 'BL-26', title: 'HouseZoom Logo Consistency', desc: 'Ensure /LogoHZ.png appears on all auth pages, onboarding, dashboard.', tag: 'ux', added: '2026-02-28' },
-    { id: 'BL-27', title: 'Compliance Engine Admin UI — Advanced', desc: 'CRUD for company-layer rules (8 templates, strictness guardrails).', tag: 'compliance', added: '2026-02-28' },
-    { id: 'BL-28', title: 'Compliance Exceptions & Waivers', desc: 'Deal-specific rule waivers with expiry, approval workflow, audit trail.', tag: 'compliance', added: '2026-02-28' },
-    { id: 'BL-29', title: 'Compliance Version History + Audit', desc: 'Rule change timeline, diff view, rollback to previous version.', tag: 'compliance', added: '2026-02-28' },
-    { id: 'BL-30', title: 'Compliance Draft→Simulate→Publish', desc: 'Draft rules, simulate against properties, publish when ready.', tag: 'compliance', added: '2026-02-28' },
-    { id: 'BL-31', title: 'Compliance AI Copilot', desc: 'AI-assisted rule authoring: suggest conditions, detect conflicts.', tag: 'ai', added: '2026-02-28' },
-    { id: 'BL-32', title: 'Integrations Page (OAuth)', desc: 'Admin Settings: OAuth connect/disconnect for DocuSign, WhatsApp, Calendar, Salesforce, portals.', tag: 'integrations', added: '2026-02-28' },
+  "backlog": [
+    {
+      "id": "BL-1",
+      "title": "Migrate iOS to local Capacitor build (Option B)",
+      "desc": "Remove server.url from capacitor config. Requires: move all /api/* routes to external URLs (10+ routes), add output: 'export' to next.config.js, update all fetch('/api/...') to absolute Vercel URLs. Unlocks: native camera, push notifications, biometrics, offline. Estimated: 1-2 sessions",
+      "tag": "infra",
+      "added": "2026-02-16"
+    },
+    {
+      "id": "BL-2",
+      "title": "Push notifications",
+      "desc": "Native push for: disclosure submitted, viewing reminder, document signed. Requires BL-1 (local Capacitor build)",
+      "tag": "infra",
+      "added": "2026-02-16"
+    },
+    {
+      "id": "BL-3",
+      "title": "Portal import integration",
+      "desc": "Import listings from Bayut (UAE), SeLoger (France), MLS (US). Placeholders ready in wizard Step 4",
+      "tag": "integrations",
+      "added": "2026-02-10"
+    },
+    {
+      "id": "BL-4",
+      "title": "Phase 2 listing generator",
+      "desc": "Direct posting to platforms (Bayut, SeLoger, Zillow). Video content generation (FFmpeg slideshows)",
+      "tag": "integrations",
+      "added": "2026-02-07"
+    },
+    {
+      "id": "BL-5",
+      "title": "Agent notification on enrichment submit",
+      "desc": "Email + in-app notification when owner submits enrichment form",
+      "tag": "comms",
+      "added": "2026-02-11"
+    },
+    {
+      "id": "BL-6",
+      "title": "Enrichment token expiry",
+      "desc": "Auto-expire enrichment links after 30 days. Show \"expired\" page",
+      "tag": "core",
+      "added": "2026-02-11"
+    },
+    {
+      "id": "BL-7",
+      "title": "Contact picker in WhatsApp modal",
+      "desc": "Search HouseZoom contacts when sending WhatsApp. Currently manual phone entry",
+      "tag": "comms",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "BL-8",
+      "title": "Multi-agent document verification",
+      "desc": "Legal compliance checking across agents. Market-specific mandatory fields",
+      "tag": "compliance",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "BL-9",
+      "title": "Source integrations (SNPI, Bayut)",
+      "desc": "API connections to regional listing platforms",
+      "tag": "integrations",
+      "added": "2026-02-05"
+    },
+    {
+      "id": "BL-10",
+      "title": "Wake word activation",
+      "desc": "\"Hey HouseZoom\" to start voice input hands-free during viewings",
+      "tag": "ai",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "BL-11",
+      "title": "Offline mode",
+      "desc": "Cache property data for use without network. Sync when back online",
+      "tag": "infra",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "BL-12",
+      "title": "Biometric login",
+      "desc": "Face ID / Touch ID via Capacitor. Requires BL-1",
+      "tag": "infra",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "BL-13",
+      "title": "2FA/MFA for sign-up",
+      "desc": "Two-factor authentication for agent accounts",
+      "tag": "infra",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "BL-14",
+      "title": "France encryption compliance",
+      "desc": "App Store compliance for French market (encryption declaration)",
+      "tag": "compliance",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "BL-15",
+      "title": "AI-generated listing images",
+      "desc": "DALL-E / Runway integration for AI property visuals. User-paid tier",
+      "tag": "ai",
+      "added": "2026-02-07"
+    },
+    {
+      "id": "BL-16",
+      "title": "Property sharing (agent-to-agent)",
+      "desc": "Request-based enrichment. Visibility tiers per spec",
+      "tag": "core",
+      "added": "2026-02-05"
+    },
+    {
+      "id": "BL-17",
+      "title": "DocuSign production env vars",
+      "desc": "Add production DocuSign credentials to Vercel (currently sandbox only)",
+      "tag": "infra",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "BL-18",
+      "title": "Full document-to-PDF conversion",
+      "desc": "Server-side RTF/DOCX→PDF conversion (LibreOffice or similar) for WhatsApp attachments. Currently sends proxy PDF with download link",
+      "tag": "comms",
+      "added": "2026-02-23"
+    },
+    {
+      "id": "BL-19",
+      "title": "Media Library \"Use in Listing\" smart routing",
+      "desc": "\"Use in Listing\" button should open platform picker with generated image pre-selected, not restart full listing generator wizard",
+      "tag": "ux",
+      "added": "2026-02-23"
+    },
+    {
+      "id": "BL-20",
+      "title": "Contact visibility field (org vs private)",
+      "desc": "Admin sees org contacts, not agent personal contacts. Per-contact visibility toggle",
+      "tag": "admin",
+      "added": "2026-02-25"
+    },
+    {
+      "id": "BL-21",
+      "title": "Data migration flow",
+      "desc": "\"Import my data\" when individual agent joins agency. Migrate properties, contacts, documents",
+      "tag": "admin",
+      "added": "2026-02-25"
+    },
+    {
+      "id": "BL-22",
+      "title": "Multi-org support",
+      "desc": "Org switcher, multiple memberships per user. Switch context without logout",
+      "tag": "admin",
+      "added": "2026-02-25"
+    },
+    {
+      "id": "BL-23",
+      "title": "Subdomain routing",
+      "desc": "agency-name.housezoom.ai — custom subdomains for agencies",
+      "tag": "admin",
+      "added": "2026-02-25"
+    },
+    {
+      "id": "BL-24",
+      "title": "Salesforce integration",
+      "desc": "Bi-directional sync of contacts, leads, deals via SF REST API. Agencies already using SF as system of record",
+      "tag": "admin",
+      "added": "2026-02-28"
+    },
+    {
+      "id": "BL-25",
+      "title": "AI Email/WhatsApp Agent",
+      "desc": "AI reads, summarizes, drafts responses for business email + WA Business. Human confirms before sending. Audit trail. Business accounts only",
+      "tag": "comms",
+      "added": "2026-02-28"
+    },
+    {
+      "id": "BL-26",
+      "title": "HouseZoom logo consistency",
+      "desc": "Ensure /LogoHZ.png appears on all auth pages, onboarding, solo agent dashboard",
+      "tag": "admin",
+      "added": "2026-02-28"
+    },
+    {
+      "id": "BL-27",
+      "title": "Compliance Engine Admin UI — Advanced",
+      "desc": "CRUD for company-layer rules (8 rule templates, strictness guardrails). Basic read-only page done (D-59); remaining: create/edit rules, inline validation, bulk enable/disable. See COUNTRY-COMPLIANCE-SPEC.docx §5",
+      "tag": "compliance",
+      "added": "2026-02-28"
+    },
+    {
+      "id": "BL-28",
+      "title": "Compliance exceptions & waivers",
+      "desc": "Deal-specific rule waivers with expiry, approval workflow, audit trail. Uses compliance_exceptions table",
+      "tag": "compliance",
+      "added": "2026-02-28"
+    },
+    {
+      "id": "BL-29",
+      "title": "Compliance version history + audit",
+      "desc": "Rule change timeline, diff view, rollback to previous version. Versions & Audit tab in admin UI",
+      "tag": "compliance",
+      "added": "2026-02-28"
+    },
+    {
+      "id": "BL-30",
+      "title": "Compliance Draft→Simulate→Publish",
+      "desc": "Draft rules, simulate against existing properties, publish when ready. Prevents accidental blocking of live listings",
+      "tag": "compliance",
+      "added": "2026-02-28"
+    },
+    {
+      "id": "BL-31",
+      "title": "Compliance AI copilot",
+      "desc": "AI-assisted rule authoring: suggest conditions from market regulations, detect conflicts, recommend severity levels",
+      "tag": "compliance",
+      "added": "2026-02-28"
+    },
+    {
+      "id": "BL-32",
+      "title": "Integrations page (OAuth)",
+      "desc": "Admin → Settings → Integrations: OAuth connect/disconnect for DocuSign, WhatsApp Business, Google Calendar, Salesforce, Bayut, SeLoger. Agency's own accounts, tokens in organizations.settings JSONB.",
+      "tag": "comms",
+      "added": "2026-02-28"
+    }
   ],
-
-  techDebt: [
-    { id: 'TD-1', title: 'Service Layer Refactor Phase 3', desc: 'Property detail page ~2400 lines → split into ~200-line service modules.', tag: 'infra', added: '2026-02-10' },
-    { id: 'TD-2', title: 'Replace Native File Inputs for i18n', desc: 'Browser-native text doesn\'t respect app locale. Need custom styled buttons.', tag: 'ux', added: '2026-02-05' },
-    { id: 'TD-3', title: 'Unify WhatsApp Flows', desc: 'Two coexisting flows: Twilio modal + old wa.me link. Should be one.', tag: 'comms', added: '2026-02-14' },
-    { id: 'TD-4', title: 'iOS App Camera Blocked by Remote URL', desc: 'Capacitor loads from Vercel URL → native plugins don\'t work. Fix = BL-1.', tag: 'infra', added: '2026-02-16' },
-    { id: 'TD-5', title: 'Remove Debug console.logs', desc: 'PhotoGallery, WhatsApp, EmailCompose debug logs. Remove before production.', tag: 'infra', added: '2026-02-23' },
-    { id: 'TD-9', title: 'FK Constraints Referencing Legacy public.users', desc: 'Some tables had FKs to public.users instead of auth.users. Partially fixed.', tag: 'infra', added: '2026-02-28' },
-    { id: 'TD-11', title: 'WhatsApp Seed Card "Draft Reply" CTA', desc: 'Seed unanswered_message cards navigate to contact page instead of compose modal.', tag: 'comms', added: '2026-03-03' },
+  "techDebt": [
+    {
+      "id": "TD-1",
+      "title": "Service layer refactor Phase 3",
+      "desc": "Property detail page ~2400 lines → split into ~200-line service modules",
+      "files": "properties/[id]/page.tsx",
+      "tag": "ai",
+      "added": "2026-02-10"
+    },
+    {
+      "id": "TD-2",
+      "title": "Replace native file inputs for i18n",
+      "desc": "Browser-native \"Choose File\"/\"No file chosen\" text doesn't respect app locale. Need custom styled buttons",
+      "files": "Various upload components",
+      "tag": "ux",
+      "added": "2026-02-05"
+    },
+    {
+      "id": "TD-3",
+      "title": "Unify WhatsApp flows",
+      "desc": "Two coexisting flows: Twilio modal (property/contact pages) + old wa.me link (form generator). Should be one",
+      "files": "WhatsAppButton.tsx, form-generator/page.tsx",
+      "tag": "comms",
+      "added": "2026-02-14"
+    },
+    {
+      "id": "TD-4",
+      "title": "iOS app camera blocked by remote URL",
+      "desc": "Capacitor app loads from Vercel URL → native plugins don't work. File input works on Safari but fails in WKWebView for some operations. Permanent fix = BL-1",
+      "files": "capacitor.config.ts",
+      "tag": "ai",
+      "added": "2026-02-16"
+    },
+    {
+      "id": "TD-5",
+      "title": "Remove debug console.logs",
+      "desc": "PhotoGallery, WhatsApp send, EmailCompose debug logs added during Phase 2.0 smoke test. Remove before production",
+      "files": "Various",
+      "tag": "comms",
+      "added": "2026-02-23"
+    },
+    {
+      "id": "TD-11",
+      "title": "WhatsApp seed card \"Draft Reply\" CTA",
+      "desc": "Seed unanswered_message cards (WhatsApp type) \"Draft Reply\" navigates to contact page instead of opening compose modal. Need to wire properly when WhatsApp Phase 2 (NU-3) is built",
+      "files": "Various",
+      "tag": "comms",
+      "added": "2026-03-03"
+    },
+    {
+      "id": "TD-9",
+      "title": "FK constraints referencing legacy public.users",
+      "desc": "Properties, conversations, whatsapp_messages, esign_envelopes had FKs to public.users instead of auth.users. Fixed for first 4 tables via ALTER. Check if others remain",
+      "files": "Various",
+      "tag": "comms",
+      "added": "2026-02-28"
+    }
   ],
-
-  bugs: [
-    { id: 'BG-1', title: 'Camera Scan Fails in TestFlight App', desc: 'File input works on mobile Safari but fails silently in Capacitor WKWebView. Blocked by BL-1.', tag: 'infra', added: '2026-02-16' },
-    { id: 'BG-3', title: 'ComplianceBanner Doesn\'t Refresh on Doc Upload', desc: 'Fingerprint caching doesn\'t include document count. Needs page reload.', tag: 'compliance', added: '2026-02-28' },
+  "bugs": [
+    {
+      "id": "BG-1",
+      "title": "Camera scan fails in TestFlight app",
+      "desc": "\u003cinput type=\"file\"\u003e works on mobile Safari but fails silently in Capacitor WKWebView when loaded from remote URL. No crash, just error",
+      "tag": "ai",
+      "added": "2026-02-16"
+    },
+    {
+      "id": "BG-3",
+      "title": "ComplianceBanner doesn't refresh on doc upload",
+      "desc": "Fingerprint used for evaluation caching doesn't include document count. Uploading a required document won't update the banner until page reload",
+      "tag": "compliance",
+      "added": "2026-02-28"
+    }
   ],
-
-  done: [
-    { id: 'D-72', title: 'Vercel Cron — 90-Day Purge', desc: 'Vercel Cron triggers /api/cron/purge-events daily at 3 AM UTC. CRON_SECRET validation.', tag: 'infra', completed: '2026-03-04' },
-    { id: 'D-71', title: 'Shadow Contact Detection + Auto-Scheduling', desc: 'Unknown Gmail senders get new_lead_detected Intel Cards. "Add as Contact" CTA pre-fills contacts modal. Auto-scheduling pre-fills viewing form from email intent. i18n (4 locales).', tag: 'comms', completed: '2026-03-04' },
-    { id: 'D-70', title: 'Remove Debug console.logs', desc: 'Cleaned debug logs from intent detection and Gmail sync.', tag: 'infra', completed: '2026-03-03' },
-    { id: 'D-69', title: 'Communications — Phase 2 (Gmail)', desc: 'Gmail label-based integration: OAuth, auto-create label, sync pipeline, AI intent detection (10 categories), Intel Card generation, Draft Reply CTA, card completion, card overlay loading.', tag: 'comms', completed: '2026-03-03' },
-    { id: 'D-60', title: 'Compliance Engine — Listing Flow', desc: 'ComplianceBanner (green/amber/red), ShareListingModal compliance gate, property header badge. i18n.', tag: 'compliance', completed: '2026-02-28' },
-    { id: 'D-59', title: 'Compliance Engine — DB + Service + Admin', desc: '4-layer rule engine service, 5 TypeScript types, CRUD hook, admin page. i18n.', tag: 'compliance', completed: '2026-02-28' },
-    { id: 'D-58', title: 'Country Compliance Engine Spec', desc: '4-layer rule engine, 125 rules, 6-step conflict resolution. Cross-validated with 3 AI systems.', tag: 'compliance', completed: '2026-02-28' },
-    { id: 'D-57', title: 'Merge Members + Invitations', desc: 'Combined into single Team Members page with Active/Invitations tabs.', tag: 'admin', completed: '2026-02-28' },
-    { id: 'D-56', title: 'Property Card Badge Layout Fix', desc: 'Stamp overlay for terminal states, solid opaque corner badges, completeness to progress bar.', tag: 'ux', completed: '2026-02-28' },
-    { id: 'D-55', title: 'Agency Branding — OrgLogo', desc: 'Reusable OrgLogo component (sm/md/lg), admin sidebar, dashboard badge, settings upload.', tag: 'admin', completed: '2026-02-28' },
-    { id: 'D-54', title: 'Agent Profile Enrichment', desc: 'Seeded 10 agents with bios, RERA licenses, phones, languages, brokerage name.', tag: 'core', completed: '2026-02-28' },
-    { id: 'D-53', title: 'Org Currency from Settings', desc: 'OrgProvider exposes currency. All pages use org currency instead of browser locale.', tag: 'admin', completed: '2026-02-28' },
-    { id: 'D-52', title: 'Dubai Agency Seed Data', desc: 'Gulf Horizon Realty: 10 agents, 100 properties, 300 contacts, 632 photos, full pipeline.', tag: 'core', completed: '2026-02-28' },
-    { id: 'D-51', title: 'Agency AI Insights', desc: '14 rules, 5 categories, severity levels. Admin page with filters, dismiss, entity links.', tag: 'ai', completed: '2026-02-26' },
-    { id: 'D-50', title: 'CSV Import Wizard', desc: '4-step wizard for contacts, leads, properties. Papaparse, dedup, batch insert.', tag: 'admin', completed: '2026-02-26' },
-    { id: 'D-49', title: 'Wire Teams (Real Data)', desc: 'Team CRUD, member assignment, manager selection, stats. i18n.', tag: 'admin', completed: '2026-02-25' },
-    { id: 'D-48', title: 'Wire Listings (Real Data)', desc: 'Listing service, stat cards, real properties table, search + filters.', tag: 'admin', completed: '2026-02-25' },
-    { id: 'D-47', title: 'Wire Analytics (Real Data)', desc: '8 KPI cards, 4 Recharts charts, agent performance table, CSV export.', tag: 'admin', completed: '2026-02-25' },
-    { id: 'D-46', title: 'Wire Workflows (Real Data)', desc: 'Workflow tables, 4 market templates, deal-workflow integration.', tag: 'admin', completed: '2026-02-25' },
-    { id: 'D-45', title: 'Wire Deals (Real Data)', desc: 'Deal service, kanban page, deal detail, commission tracking.', tag: 'admin', completed: '2026-02-25' },
-    { id: 'D-44', title: 'Wire Leads (Real Data)', desc: 'Lead service, list + detail pages, convert-to-deal.', tag: 'admin', completed: '2026-02-25' },
-    { id: 'D-37', title: 'Phase 2.1 — Agency Onboarding + Admin Shell', desc: 'Admin layout, onboarding, member management, invite flow, 8 shell pages. i18n.', tag: 'admin', completed: '2026-02-25' },
-    { id: 'D-28', title: 'Phase 2.0 — Foundation (DB + Org Context)', desc: '9 new tables, org_id on 14 existing tables, RBAC functions, OrgProvider.', tag: 'admin', completed: '2026-02-23' },
+  "done": [
+    {
+      "id": "D-72",
+      "title": "Vercel Cron — 90-day purge",
+      "desc": "Vercel Cron job in vercel.json triggers /api/cron/purge-events daily at 3 AM UTC. CRON_SECRET validation (Bearer token + x-cron-secret fallback). Purges external_events where expires_at \u003c NOW().",
+      "completed": "2026-03-04",
+      "tag": "ai"
+    },
+    {
+      "id": "D-71",
+      "title": "Communications Integration — Phase 3 (Shadow Contact Detection + Auto-Scheduling)",
+      "desc": "Shadow Contact Detection: when Gmail sender doesn't match any CRM contact, generates new_lead_detected Intel Card (score 55, \"today\" category) with \"Add as Contact\" primary CTA (pre-fills name/email/phone/type on contacts page) and \"Draft Reply\" secondary CTA. UserPlus icon, indigo styling, \"NEW LEAD\" badge. 7-day dedup per sender. Triggers for all intents except spam. Auto-scheduling: email_meeting_proposal cards get enriched secondary CTA pre-filling Schedule Viewing form with extracted date/time/property from intent detection. Intent detection prompt updated to extract proposed_date, proposed_time, property_reference. Schedule Viewing page reads URL query params for pre-fill with \"Pre-filled from email\" banner. Contacts page reads add=1 query params for pre-filled Add Contact modal. DB: new_lead_detected added to intel_cards card_type CHECK constraint. vercel.json maxDuration 30s for gmail/sync, 15s for draft-reply. i18n (4 locales, 6 new keys).",
+      "completed": "2026-03-04",
+      "tag": "comms"
+    },
+    {
+      "id": "D-70",
+      "title": "Remove debug console.logs (NU-7)",
+      "desc": "Cleaned debug logs from intent detection and Gmail sync.",
+      "completed": "2026-03-03",
+      "tag": "comms"
+    },
+    {
+      "id": "D-69",
+      "title": "Communications Integration — Phase 2 (Gmail)",
+      "desc": "Gmail label-based integration: OAuth scope upgrade (gmail.readonly + gmail.labels), auto-create \"HouseZoom\" label, sync API route polling labeled threads, signal processing pipeline (external_events + entity_links tables), AI intent detection (10 categories via Claude), Intel Card generation from email signals with priority scoring, Draft Reply CTA (Claude-generated contextual replies → EmailComposeModal with suggested attachments), card completion on action (disappears from dashboard), card overlay loading state, smart sync messages. Connected Apps Gmail card. i18n (4 locales).",
+      "completed": "2026-03-03",
+      "tag": "comms"
+    },
+    {
+      "id": "D-60",
+      "title": "Compliance Engine — listing flow integration",
+      "desc": "ComplianceBanner component (green/amber/red collapsible, category-grouped). SummaryTab integration. ShareListingModal compliance gate (blocks sharing on critical failures). Property detail header badge with live onStatusChange callback. i18n (4 locales, ~20 keys).",
+      "completed": "2026-02-28",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-59",
+      "title": "Compliance Engine — DB + service + admin page",
+      "desc": "4-layer rule engine service (complianceEngine.ts: evaluateCompliance, canPerformAction, getComplianceStatus). 5 TypeScript types. useComplianceRules CRUD hook. Admin compliance page (stat cards, filters, expandable detail view, delete). AdminNav compliance link. i18n (4 locales, ~50 keys).",
+      "completed": "2026-02-28",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-58",
+      "title": "Country Compliance Workflow Engine spec",
+      "desc": "Full spec doc (COUNTRY-COMPLIANCE-SPEC.docx): 4-layer rule engine (BASE→Country→Region→Company→AI), 6-step conflict resolution, rule schema with versioning + scopes, Admin UI spec (Rules/Exceptions/Audit tabs, 8 rule templates, Draft→Simulate→Publish). 125-rule spreadsheet (35 BASE, 25 UAE, 25 Dubai, 20 GHR, 20 AI) with conflict resolution + rule schema tabs. Cross-validated with Gemini + ChatGPT.",
+      "completed": "2026-02-28",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-57",
+      "title": "Merge Members + Invitations into Team Members",
+      "desc": "Combined /admin/members + /admin/invitations into single page with Active/Invitations tabs. Removed invitations page. Updated AdminSidebar. Pending invite count badge on tab. i18n (4 locales).",
+      "completed": "2026-02-28",
+      "tag": "admin"
+    },
+    {
+      "id": "D-56",
+      "title": "Property card badge layout fix",
+      "desc": "Completeness % moved to progress bar. SOLD/RENTED/CLOSED watermark stamp overlay. Corner badges: max 2-3 solid opaque pills (listing type \u003e MY LISTING \u003e status). Contradiction logic (closed+rent→RENTED). MY LISTING downsized. i18n keys.",
+      "completed": "2026-02-28",
+      "tag": "ux"
+    },
+    {
+      "id": "D-55",
+      "title": "Agency branding — OrgLogo component",
+      "desc": "Reusable OrgLogo (sm/md/lg with fallback initials). Admin sidebar shows org logo. Dashboard shows org badge or HZ logo for solo agents. Admin settings: functional logo upload to Supabase Storage. i18n (4 locales).",
+      "completed": "2026-02-28",
+      "tag": "admin"
+    },
+    {
+      "id": "D-54",
+      "title": "Agent profile enrichment",
+      "desc": "Seeded 10 Gulf Horizon agents with bios, RERA license numbers, phones, languages, brokerage name. Seed script updated to populate full profiles on future runs.",
+      "completed": "2026-02-28",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-53",
+      "title": "Org currency from settings",
+      "desc": "OrgProvider exposes currency from org.settings. formatCurrency/formatCurrencyCompact accept currency param. All admin + property pages use org currency instead of browser locale.",
+      "completed": "2026-02-28",
+      "tag": "admin"
+    },
+    {
+      "id": "D-52",
+      "title": "Dubai agency seed data",
+      "desc": "scripts/seed-dubai.mjs — Gulf Horizon Realty: 10 agents, 100 properties (15 areas, sale+rent), 300 contacts, 54 leads, 20 deals, 15 workflows, 80 viewings, 200 WhatsApp messages, 632 Unsplash photos, 150 audit log entries. Idempotent re-run. Migration 006: rental support (monthly_rent, lease_term, cheques, etc).",
+      "completed": "2026-02-28",
+      "tag": "comms"
+    },
+    {
+      "id": "D-51",
+      "title": "Phase 2.3 #2 — Agency AI Insights",
+      "desc": "Rule-based insight engine (aiInsightsService.ts) with 14 rules across 5 categories (leads, pipeline, agents, compliance, revenue). AI Insights page (/admin/ai-insights) with summary cards, filterable alert feed, dismiss, entity links. AdminNav badge count. Admin overview AI Alerts card (top 3). Permission gate (owner/admin/manager). i18n (4 locales, ~70 keys).",
+      "completed": "2026-02-26",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-50",
+      "title": "Phase 2.3 #1 — CSV Import",
+      "desc": "Admin import wizard (/admin/import) with 3 types (contacts, leads, properties) and 4-step flow (upload, map columns, preview/dedup, results). Papaparse client-side parsing, column auto-match via alias arrays, batch insert (50/batch, max 5k rows), dedup (email/phone for contacts, email for leads, address for properties). Owner/admin permission gate. i18n (4 locales).",
+      "completed": "2026-02-26",
+      "tag": "comms"
+    },
+    {
+      "id": "D-49",
+      "title": "Phase 2.2 #6 — Wire Teams (real data)",
+      "desc": "Team service + hook, CRUD (create/edit/delete), team cards w/ member avatars + stats, member assignment/removal, manager selection, team detail panel, unassigned members notice, permissions matrix, i18n (4 locales).",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-48",
+      "title": "Phase 2.2 #5 — Wire Listings (real data)",
+      "desc": "Listing service + hook, 4 stat cards (total, avg price, this month, types), real properties table w/ thumbnails + agent names, search + filters (status, agent, type), sortable columns, type badges, mobile cards, i18n (4 locales).",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-47",
+      "title": "Phase 2.2 #4 — Wire Analytics (real data)",
+      "desc": "Analytics service + hook, 8 KPI cards, 4 Recharts charts (pipeline, revenue, leads, deals), agent performance table (sortable, top performer, CSV export), date range + agent filters, i18n (4 locales).",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-46",
+      "title": "Phase 2.2 #3 — Wire Workflows (real data)",
+      "desc": "Workflow tables (005 migration), seed 4 market templates (UAE, CH, FR, IT), service/hook layer, workflows page (system+custom templates, instances), deal-workflow integration (auto-create instance), workflow pipeline card on deal detail, i18n (4 locales).",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-45",
+      "title": "Phase 2.2 #2 — Wire Deals (real data)",
+      "desc": "Deal service, hook, kanban page w/ real data, deal detail page, commission tracking, stage management, form modal, permissions, i18n (4 locales).",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-44",
+      "title": "Phase 2.2 #1 — Wire Leads (real data)",
+      "desc": "Service layer (leadService.ts), hook (useLeads.ts), list page with table + mobile cards + filters, detail page, form modal, convert-to-deal, permissions matrix, i18n (4 locales).",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-43",
+      "title": "Invite/onboarding bug fixes",
+      "desc": "1) Hide Resend/Revoke on accepted/expired/revoked invitations (desktop + mobile). 2) Duplicate invite guard: check org_members + pending invitations before creating new invite. 3) Profile upsert: INSERT→UPSERT on agent_profiles in invite-signup route so full_name is always saved.",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-40",
+      "title": "BG-2 fix: Invite status update",
+      "desc": "signInWithPassword() was tainting the service role client's auth state → RLS blocked the invitation UPDATE. Split into two Supabase clients: supabaseAdmin (clean, for DB ops) + supabaseAuth (for sign-in only). All sb references replaced.",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-39",
+      "title": "TD-8: Next.js 16 _shell rewrite workaround",
+      "desc": "Next 16 client-side router generates /_shell/index.html?id= requests that break in WKWebView/Capacitor. Workaround: Vercel rewrite in next.config.js. Remove once Next.js fixes #85374",
+      "completed": "2026-02-27",
+      "tag": "infra"
+    },
+    {
+      "id": "D-39",
+      "title": "TD-7: Branded confirmation email",
+      "desc": "HouseZoom-branded HTML template for Supabase Auth \"Confirm signup\" email. Purple header, CTA button, fallback URL, professional footer. Ready to paste into Dashboard.",
+      "completed": "2026-02-25",
+      "tag": "comms"
+    },
+    {
+      "id": "D-38",
+      "title": "TD-6: Drop legacy public.users",
+      "desc": "Migration 003_drop_legacy_users.sql: drops on_auth_user_created trigger + handle_new_user() function + public.users table. Unblocks admin.createUser(). Zero references to from('users') in src/.",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-37",
+      "title": "Phase 2.1 — Agency Onboarding + Admin Shell",
+      "desc": "Admin layout + top nav + role guard. Onboarding flow (solo + agency). Admin overview with real KPI data. Member list with role management. Invite send + accept (single-page join flow, server-side user creation). 8 shell pages (Teams, Listings, Analytics, Workflows, Settings, Leads, Deals, Invitations). RLS bypass via service role API routes. i18n (en/fr/de/it).",
+      "completed": "2026-02-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-28",
+      "title": "Phase 2.0 — Foundation (DB + Org Context)",
+      "desc": "9 new tables (organizations, teams, org_members, invitations, audit_log, leads, deals, workflow_templates, workflow_instances). org_id on 14 existing tables. RBAC functions. Org-scoped RLS policies. OrgProvider + useOrg hook. All service files + hooks updated. Deal stages include negotiation.",
+      "completed": "2026-02-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-29",
+      "title": "Email/WhatsApp document attachments",
+      "desc": "Form PDF generation (jsPDF), Resend attachments, signed URLs for storage docs, WhatsApp PDF upload, non-PDF→proxy PDF conversion",
+      "completed": "2026-02-23",
+      "tag": "comms"
+    },
+    {
+      "id": "D-30",
+      "title": "Photo Gallery fullscreen lightbox",
+      "desc": "Tap-to-expand with close, counter, room/platform tags, download/delete, prev/next arrows, swipe gestures, keyboard nav, thumbnail strip, body scroll lock",
+      "completed": "2026-02-23",
+      "tag": "ai"
+    },
+    {
+      "id": "D-31",
+      "title": "Listing generator fixes",
+      "desc": "Thumbnails from property_photos join, blob download fix, generated media saved to album (org_id on API route insert)",
+      "completed": "2026-02-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-32",
+      "title": "Enrichment flow UX overhaul",
+      "desc": "Renamed \"Disclosure\" → \"Enrichment\" across wizard + email + public form + i18n. Property address in email. Property-on-file card shows details. Agent name fallback chain fixed.",
+      "completed": "2026-02-23",
+      "tag": "comms"
+    },
+    {
+      "id": "D-33",
+      "title": "Media Library enhancements",
+      "desc": "Clickable property links, \"Use in Listing\" button, fixed listing_title column query",
+      "completed": "2026-02-23",
+      "tag": "ux"
+    },
+    {
+      "id": "D-34",
+      "title": "Agent Tools — List a Property card",
+      "desc": "New card linking to Add Listing flow via /properties?add=1. Separate from \"Send Enrichment Request\"",
+      "completed": "2026-02-23",
+      "tag": "core"
+    },
+    {
+      "id": "D-35",
+      "title": "Roof category fix",
+      "desc": "Added 'roof' to property_items_category_check constraint",
+      "completed": "2026-02-23",
+      "tag": "ai"
+    },
+    {
+      "id": "D-36",
+      "title": "RLS policy cleanup",
+      "desc": "Dropped 17 stale user-scoped policies superseded by org-scoped ones",
+      "completed": "2026-02-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-1",
+      "title": "Camera Scan Option A (Vision API)",
+      "desc": "Photo + room items → Claude Vision → matches to property_items. Works on mobile Safari",
+      "completed": "2026-02-16",
+      "tag": "ai"
+    },
+    {
+      "id": "D-2",
+      "title": "Disclosure form envelope card",
+      "desc": "Read-only Form A fields on welcome screen + locked fields in summary. Universal lock logic",
+      "completed": "2026-02-16",
+      "tag": "infra"
+    },
+    {
+      "id": "D-3",
+      "title": "Test data seeding (Berninastrasse)",
+      "desc": "38 items: kitchen appliances, windows, doors, bathrooms, systems, exterior. Swiss brands",
+      "completed": "2026-02-16",
+      "tag": "infra"
+    },
+    {
+      "id": "D-4",
+      "title": "Room-item linking (room_name)",
+      "desc": "Added room_name column to property_items. Features link to rooms. Kitchen shows 8 items. buildRoomCards() updated",
+      "completed": "2026-02-16",
+      "tag": "ux"
+    },
+    {
+      "id": "D-5",
+      "title": "Camera scan validated",
+      "desc": "Tested with Gaggenau cooktop image — AI matched to stored item with brand, model, details",
+      "completed": "2026-02-16",
+      "tag": "ai"
+    },
+    {
+      "id": "D-6",
+      "title": "Resend email confirmed working",
+      "desc": "Outage resolved, disclosure emails delivering",
+      "completed": "2026-02-16",
+      "tag": "comms"
+    },
+    {
+      "id": "D-7",
+      "title": "Smart Document Scanner",
+      "desc": "ScanDocumentModal: auto-detect Form A/B/F, Flyer, Mandat. Confidence scoring. Field extraction + property creation",
+      "completed": "2026-02-15",
+      "tag": "ux"
+    },
+    {
+      "id": "D-8",
+      "title": "Multi-market property schema",
+      "desc": "22 new columns + market JSONB (UAE, France). Form A field mapping",
+      "completed": "2026-02-15",
+      "tag": "core"
+    },
+    {
+      "id": "D-9",
+      "title": "DocuSign e-signature Phase 1",
+      "desc": "JWT auth, send envelopes, check status. Wired into form generator",
+      "completed": "2026-02-14",
+      "tag": "infra"
+    },
+    {
+      "id": "D-10",
+      "title": "WhatsApp Phase 1 (Twilio)",
+      "desc": "Outbound messaging: text, document, listing share. Property + contact pages",
+      "completed": "2026-02-14",
+      "tag": "comms"
+    },
+    {
+      "id": "D-11",
+      "title": "Viewing Mode (3-screen)",
+      "desc": "Property Select → Room Cards → Room Chat. Voice navigation. Room-scoped AI context",
+      "completed": "2026-02-14",
+      "tag": "ai"
+    },
+    {
+      "id": "D-12",
+      "title": "Room photo tagging",
+      "desc": "Photo ↔ room association. Auto-match in Viewing Mode",
+      "completed": "2026-02-14",
+      "tag": "ux"
+    },
+    {
+      "id": "D-13",
+      "title": "iOS voice fixes",
+      "desc": "10s hard timeout for WKWebView. Form wrapper for iOS \"Go\" key",
+      "completed": "2026-02-14",
+      "tag": "infra"
+    },
+    {
+      "id": "D-14",
+      "title": "Disclosure form system",
+      "desc": "Owner fills property details via /d/[token]. Email sending via Resend. Wizard Step 2 integration",
+      "completed": "2026-02-11",
+      "tag": "comms"
+    },
+    {
+      "id": "D-15",
+      "title": "List Property Wizard v0.5",
+      "desc": "7-step wizard with 11 TurboTax detail screens. Docs upload, contact linking, AI completeness check",
+      "completed": "2026-02-10–11",
+      "tag": "ai"
+    },
+    {
+      "id": "D-16",
+      "title": "Listing Content Generator v2.0",
+      "desc": "Hub-based, per-platform generation with approve/edit/regenerate cycle",
+      "completed": "2026-02-07",
+      "tag": "core"
+    },
+    {
+      "id": "D-17",
+      "title": "Listing Media Generator",
+      "desc": "Template-based image compositing (Sharp+Canvas). 3 templates. Media library",
+      "completed": "2026-02-07–08",
+      "tag": "core"
+    },
+    {
+      "id": "D-18",
+      "title": "Schedule Viewing + Feedback",
+      "desc": "Viewing scheduling with post-viewing feedback form",
+      "completed": "2026-02-09",
+      "tag": "core"
+    },
+    {
+      "id": "D-19",
+      "title": "AI Property Checklist",
+      "desc": "AI-powered action items with sub-items and feedback loop",
+      "completed": "2026-02-09",
+      "tag": "ai"
+    },
+    {
+      "id": "D-20",
+      "title": "Photo Gallery v4",
+      "desc": "Airbnb-style hero+grid, fullscreen viewer, multi-upload",
+      "completed": "2026-02-09",
+      "tag": "ai"
+    },
+    {
+      "id": "D-21",
+      "title": "Price field",
+      "desc": "Price column, display on cards/detail/edit",
+      "completed": "2026-02-08",
+      "tag": "ai"
+    },
+    {
+      "id": "D-22",
+      "title": "HouseZum → HouseZoom.ai rebrand",
+      "desc": "All pages + i18n files updated",
+      "completed": "2026-02-10",
+      "tag": "ai"
+    },
+    {
+      "id": "D-23",
+      "title": "iOS app icon",
+      "desc": "Custom HouseZoom.ai logo replacing Capacitor default",
+      "completed": "2026-02-14",
+      "tag": "ai"
+    },
+    {
+      "id": "D-24",
+      "title": "Form Generator",
+      "desc": "13 real estate templates, PDF output, multi-channel sharing",
+      "completed": "Earlier",
+      "tag": "core"
+    },
+    {
+      "id": "D-25",
+      "title": "Contact management",
+      "desc": "CRUD with buyer/seller profiles, property linking",
+      "completed": "Earlier",
+      "tag": "core"
+    },
+    {
+      "id": "D-26",
+      "title": "Property management",
+      "desc": "CRUD with rooms, features, systems, exterior",
+      "completed": "Earlier",
+      "tag": "core"
+    },
+    {
+      "id": "D-27",
+      "title": "AI Assistant",
+      "desc": "Voice + text chat with property context",
+      "completed": "Earlier",
+      "tag": "ai"
+    },
+    {
+      "id": "D-28a",
+      "title": "Internationalization",
+      "desc": "EN, FR, DE, IT across all features",
+      "completed": "Earlier",
+      "tag": "core"
+    },
+    {
+      "id": "D-29a",
+      "title": "Listing sharing",
+      "desc": "Public share pages via unique tokens",
+      "completed": "Earlier",
+      "tag": "core"
+    },
+    {
+      "id": "D-30a",
+      "title": "Auth system",
+      "desc": "Login, signup, profile settings via Supabase",
+      "completed": "Earlier",
+      "tag": "infra"
+    }
   ],
-
-  sessions: [
-    { date: '2026-03-04', title: 'Shadow Contact Detection + Auto-Scheduling + 90-Day Purge', decisions: 'general_inquiry from unknown sender IS a lead; contacts pre-fill via URL query params; Vercel Hobby = 2 cron jobs; pg_cron not available on Supabase free plan; gmail_last_sync=0 to force re-process; vercel.json maxDuration needed for AI-heavy sync routes' },
-    { date: '2026-03-03', title: 'Gmail Integration (Phase 2) Complete', decisions: 'Anthropic model = claude-sonnet-4-20250514; gmail_last_sync timestamp gotcha; .single() fails silently on 0 rows; label-based opt-in = privacy differentiator; card overlay > toast for loading UX' },
-    { date: '2026-02-28', title: 'Phase 3 Kickoff — Dubai Pilot Foundation', decisions: 'Seed realistic demo data > quick prototype; org currency from settings not locale; 4-layer compliance model validated by 3 AI systems; statutory lock prevents weakening legal rules' },
-    { date: '2026-02-27', title: 'UI/UX Audit (5 Batches)', decisions: 'Design tokens as CSS vars + Tailwind; admin sidebar over top nav; _shell rewrite for Next 16 + Capacitor; orchestration card for new properties' },
-    { date: '2026-02-25', title: 'Phase 2.1 Shipped — Agency Onboarding', decisions: 'Service role API routes for RLS bypass; single-page invite flow; admin.createUser() with auto-confirm; shell pages + ShellBanner' },
-    { date: '2026-02-23', title: 'Phase 2.0 Complete — DB Migration', decisions: 'BEGIN/COMMIT for RLS rewrite; keep agent_profiles separate; negotiation deal stage; enrichment ≠ disclosure ≠ listing' },
-    { date: '2026-02-16', title: 'Camera Scan, Disclosure Form, Room Linking', decisions: 'HTML file input for remote URL app; Capacitor native requires local build; room_name column for linking' },
-    { date: '2026-02-14', title: 'WhatsApp, DocuSign, Viewing Mode, iOS', decisions: 'Twilio REST over SDK; DocuSign over BoldSign; room-by-room walkthrough; hard mic timeout for iOS' },
-    { date: '2026-02-10', title: 'List Property Wizard, HouseZoom Rebrand', decisions: 'TurboTax flow over tabs; 11 sequential screens; inline CRUD over modals' },
-    { date: '2026-02-07', title: 'Listing Generator v2.0, Media Generator', decisions: 'Hub-based generation; Sharp+Canvas zero-cost images; bundled fonts for serverless' },
+  "sessions": [
+    {
+      "date": "2026-03-04",
+      "title": "Shadow Contact Detection + Auto-Scheduling + 90-day Purge. Shadow contact detection: unknown Gmail senders get new_lead_detected Intel Cards with \"Add as Contact\" CTA (pre-fills contacts page modal via query params). Indigo styling, UserPlus icon, \"NEW LEAD\" badge, score=55 (today). All intents trigger detection (removed general_inquiry exclusion). Auto-scheduling: meeting_proposal cards pre-fill Schedule Viewing form via URL params. 90-day purge: Vercel Cron daily at 3 AM UTC calls /api/cron/purge-events with CRON_SECRET validation. vercel.json added (maxDuration + crons). Bug fixes: intent detection not running (was skipped for already-processed events), contacts page not reading query params for pre-fill, card type falling through to email_general instead of new_lead_detected. CRON_SECRET added to .env.local + Vercel.",
+      "decisions": "general_inquiry from unknown sender IS a lead; contacts pre-fill via URL query params; Vercel Hobby = 2 cron jobs; pg_cron not available on Supabase free plan; gmail_last_sync=0 to force re-process; vercel.json maxDuration needed for AI-heavy sync routes"
+    },
+    {
+      "date": "2026-03-03",
+      "title": "Gmail integration (Phase 2) complete. Gmail OAuth scope upgrade (gmail.readonly + gmail.labels). Auto-create \"HouseZoom\" label. Sync route: poll labeled threads → external_events with dedup. Entity linking (exact email match → contacts → deals/properties). AI intent detection (Claude classifies 10 categories — meeting_proposal, document_request, price_negotiation, etc. — 95% confidence). Email-to-card generator with priority scoring (P = U×0.4 + V×0.3 + C×0.3). Draft Reply CTA: Claude generates contextual reply → EmailComposeModal pre-filled with to/subject/body + suggested property doc attachments. Card completion on action (completed cards disappear). Card overlay loading state (purple spinner). Smart sync messages (\"2 cards generated\" vs \"0 sync\"). DB: external_events source_type constraint expanded, intel_cards card_type constraint expanded (7 new email types), .maybeSingle() for dedup. Cleaned debug logs (NU-7).",
+      "decisions": "Anthropic model = claude-sonnet-4-20250514 (not 4-5); gmail_last_sync timestamp gotcha; .single() fails silently on 0 rows; label-based opt-in = privacy differentiator; card overlay \u003e toast for loading UX"
+    },
+    {
+      "date": "2026-02-28 eve",
+      "title": "Phase 3.1 — Compliance Engine implementation + listing flow integration. Compliance engine service (D-59): complianceEngine.ts with 4-layer evaluation, 5 TypeScript types, useComplianceRules hook, admin compliance page, AdminNav link, i18n (~50 keys). Listing flow integration (D-60): ComplianceBanner on SummaryTab, ShareListingModal compliance gate, property header badge with onStatusChange callback, i18n (~20 keys). Bug fixes: org_id filter dropping country/region rules; header badge showing stale data.",
+      "decisions": "4-layer evaluation on client; onStatusChange callback \u003e separate DB fetch; RLS over app-level org_id filtering; fingerprint caching for evaluation"
+    },
+    {
+      "date": "2026-02-28 pm",
+      "title": "Phase 3 continued — badge fix, team members merge, compliance engine spec. Property card badge overflow fix (D-56): stamp overlay for terminal states, solid opaque corner badges, completeness % to progress bar. Merged Members + Invitations into single Team Members page with tabs (D-57). Country Legal Compliance Workflow Engine spec (D-58): 4-layer rule engine with 125 pre-populated rules across BASE/UAE/Dubai/GHR/AI, cross-validated with Gemini + ChatGPT, full Admin UI spec, database schema, implementation plan.",
+      "decisions": "Badge stamp for terminal states \u003e hiding badges; solid opaque badges for agent utility; Team Members merge saves sidebar slot; 4-layer compliance model validated by 3 AI systems; scope dimensions \u003e sub-layers; statutory lock prevents weakening legal rules; \"Market Pack + Agency Playbook\" mental model for admin UI"
+    },
+    {
+      "date": "2026-02-28",
+      "title": "Phase 3 kickoff — Dubai pilot foundation. Rental support (migration 006: monthly_rent, lease_term, cheques, etc + UI badges/filters/edit modal). Dubai seed script (Gulf Horizon Realty: 10 agents, 100 properties, 300 contacts, 632 photos, full pipeline). Org currency fix (from org.settings not browser locale). Agency branding (OrgLogo component, admin sidebar, dashboard badge, settings upload). Agent profile enrichment (bios, licenses, phones). FK constraint fixes (properties, conversations, whatsapp_messages, esign_envelopes → auth.users). Data dedup cleanup.",
+      "decisions": "Seed realistic demo data \u003e quick prototype; org currency from settings not locale; separate seed script updates from CC prompts; ui-avatars.com for placeholder org logos; idempotent seed with skip guards"
+    },
+    {
+      "date": "2026-02-27",
+      "title": "UI/UX Audit complete (5 batches). Batch 1: consistency (bottom nav, borders, coral WCAG, WhatsApp green, progress bar). Batch 2: density (compact contacts, overflow menus, lead score badges, relative timestamps, auto-focus, 44px touch targets). Batch 3: data formatting (locale currency, skeletons, workflow stages, analytics deep-links, AI typing indicator). Batch 4: design tokens, compact property header, admin overview restructure. Batch 5: admin sidebar nav, AI Insights depth layer, property orchestration card, empty states. Also fixed: currency on list cards, voice/text modality matching, Next.js 16 _shell WKWebView 404 via Vercel rewrite.",
+      "decisions": "Design tokens as CSS vars + Tailwind; admin sidebar over top nav; _shell rewrite workaround for Next 16 + Capacitor (TD-8); remote URL mode for Capacitor; orchestration card for new properties"
+    },
+    {
+      "date": "2026-02-25",
+      "title": "Phase 2.1 shipped. Admin shell (8 pages), onboarding flow, invite send+accept, member management. Bugs fixed: RLS bypass via service role, plan constraint, public.users trigger, invite token persistence, invite UX redesign (single-page join flow). Invite status update bug still open (BG-2).",
+      "decisions": "Onboarding + invite via server-side API routes (service_role) to bypass RLS chicken-and-egg; single-page invite flow over multi-page redirect; admin.createUser() with auto-confirm skips email verification for invited users; shell pages use hardcoded sample data + ShellBanner"
+    },
+    {
+      "date": "2026-02-23",
+      "title": "Phase 2.0 complete. DB migration (8 scripts), OrgProvider + useOrg, service/hook updates (20+ files), smoke test, bug fixes (photos, attachments, gallery, generated media, RLS cleanup), UX fixes (enrichment rename, agent name, media library links, List a Property card)",
+      "decisions": "BEGIN/COMMIT for RLS rewrite; keep agent_profiles separate from org_members; negotiation deal stage added; enrichment ≠ disclosure ≠ listing (three separate concepts); debug logs as TD-5"
+    },
+    {
+      "date": "2026-02-16",
+      "title": "Camera Scan Option A, Disclosure envelope card, test data seeding, room_name linking, Capacitor camera debugging",
+      "decisions": "HTML file input (no capture) for remote URL app; Capacitor native requires local build migration (BL-1); room_name column for feature→room linking"
+    },
+    {
+      "date": "2026-02-15",
+      "title": "Form A schema, Smart Document Scanner, ScanDocumentModal",
+      "decisions": "Universal vs market-specific fields; auto-detect over manual; scanned docs as property docs"
+    },
+    {
+      "date": "2026-02-14 eve",
+      "title": "WhatsApp Phase 1, DocuSign Phase 1, iOS voice fixes, app icon",
+      "decisions": "Twilio REST over SDK; DocuSign over BoldSign for brand recognition; hard mic timeout for iOS"
+    },
+    {
+      "date": "2026-02-14",
+      "title": "Viewing Mode, room photo tagging, WhatsApp + e-sign specs",
+      "decisions": "Room-by-room walkthrough \u003e field mode; score-based photo matching; voiceTranscribed flag"
+    },
+    {
+      "date": "2026-02-11",
+      "title": "Disclosure form, wizard v0.5 pass 4-5, Resend email setup",
+      "decisions": "Wizard Step 2 for disclosure; skippable for now; owner fills same screens as agent"
+    },
+    {
+      "date": "2026-02-10",
+      "title": "List Property Wizard passes 1-3, HouseZoom rebrand",
+      "decisions": "TurboTax flow over tabs; 11 sequential screens; inline CRUD over modals"
+    },
+    {
+      "date": "2026-02-09",
+      "title": "Schedule Viewing v2, Property Checklist, Photo Gallery v4",
+      "decisions": "AI-powered checklists; Airbnb-style gallery"
+    },
+    {
+      "date": "2026-02-08",
+      "title": "Price field, Listing Media Generator Drop 2",
+      "decisions": "Zero-cost image generation (Sharp+Canvas) over AI ($0.04/img)"
+    },
+    {
+      "date": "2026-02-07",
+      "title": "Listing Content Generator v2.0, Media Generator Drop 1",
+      "decisions": "Hub-based generation; template compositing; bundled fonts for serverless"
+    }
   ]
 };
-
-// ============================================
-// TAG DEFINITIONS
-// ============================================
-const TAGS = {
-  comms: { label: 'Comms', color: 'cyan' },
-  compliance: { label: 'Compliance', color: 'rose' },
-  admin: { label: 'Admin', color: 'purple' },
-  core: { label: 'Core', color: 'blue' },
-  infra: { label: 'Infra', color: 'amber' },
-  ai: { label: 'AI', color: 'green' },
-  ux: { label: 'UX', color: 'indigo' },
-  integrations: { label: 'Integrations', color: 'integrations' },
-};
-
-let activeView = 'kanban';
-let activeFilter = 'all';
-
-// ============================================
-// RENDER FUNCTIONS
-// ============================================
-
-function renderStats() {
-  const el = document.getElementById('stats');
-  const counts = {
-    'In Progress': DATA.inProgress.length,
-    'Next Up': DATA.nextUp.length,
-    'Backlog': DATA.backlog.length,
-    'Done': DATA.done.length,
-  };
-  el.innerHTML = Object.entries(counts).map(([label, val]) =>
-    `<div class="stat"><div class="stat-val">${val}</div><div class="stat-label">${label}</div></div>`
-  ).join('');
-}
-
-function renderFilters() {
-  const el = document.getElementById('filterBar');
-  const allTags = ['all', ...Object.keys(TAGS)];
-  el.innerHTML = allTags.map(t =>
-    `<button class="filter-chip ${t === activeFilter ? 'active' : ''}" data-filter="${t}">${t === 'all' ? 'All' : TAGS[t].label}</button>`
-  ).join('');
-}
-
-function filterItems(items) {
-  if (activeFilter === 'all') return items;
-  return items.filter(i => i.tag === activeFilter);
-}
-
-function renderCard(item, status) {
-  const tag = TAGS[item.tag] || { label: item.tag, color: 'blue' };
-  const date = item.completed || item.added || '';
-  return `<div class="card" onclick="showModal('${item.id}', '${status}')">
-    <div class="card-id">${item.id}</div>
-    <div class="card-title">${item.title}</div>
-    <div class="card-desc">${item.desc}</div>
-    <div class="card-meta">
-      <span class="card-tag tag-${tag.color}">${tag.label}</span>
-      ${item.files ? `<span class="card-tag tag-infra" style="opacity:0.6">📁</span>` : ''}
-      <span class="card-date">${date}</span>
-    </div>
-  </div>`;
-}
-
-function renderKanban() {
-  const el = document.getElementById('kanbanView');
-  const columns = [
-    { key: 'progress', title: 'In Progress', items: filterItems(DATA.inProgress), status: 'progress' },
-    { key: 'next', title: 'Next Up', items: filterItems(DATA.nextUp), status: 'next' },
-    { key: 'debt', title: 'Tech Debt & Bugs', items: filterItems([...DATA.techDebt, ...DATA.bugs]), status: 'debt' },
-    { key: 'done', title: 'Done', items: filterItems(DATA.done).slice(0, 15), status: 'done' },
-  ];
-
-  el.innerHTML = columns.map(col => `
-    <div class="column col-${col.key}">
-      <div class="column-header">
-        <div class="column-dot"></div>
-        <div class="column-title">${col.title}</div>
-        <div class="column-count">${col.items.length}${col.key === 'done' ? '+' : ''}</div>
-      </div>
-      <div class="column-body">
-        ${col.items.map(item => renderCard(item, col.status)).join('')}
-        ${col.items.length === 0 ? '<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11px">No items</div>' : ''}
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderTimeline() {
-  const el = document.getElementById('timelineView');
-  const allDone = [...DATA.done].sort((a, b) => b.completed.localeCompare(a.completed));
-  const months = {};
-
-  // Group by month
-  allDone.forEach(item => {
-    const m = item.completed.substring(0, 7);
-    if (!months[m]) months[m] = [];
-    months[m].push(item);
-  });
-
-  // Add in-progress
-  DATA.inProgress.forEach(item => {
-    const m = 'In Progress';
-    if (!months[m]) months[m] = [];
-    months[m].push({ ...item, _status: 'progress' });
-  });
-
-  const monthNames = { '01': 'January', '02': 'February', '03': 'March', '04': 'April', '05': 'May', '06': 'June', '07': 'July', '08': 'August', '09': 'September', '10': 'October', '11': 'November', '12': 'December' };
-
-  let html = '';
-
-  // In progress first
-  if (months['In Progress']) {
-    html += `<div class="tl-month">
-      <div class="tl-month-label" style="color:var(--amber)">🔨 In Progress</div>
-      ${months['In Progress'].map(item => {
-        const tag = TAGS[item.tag] || { label: item.tag, color: 'blue' };
-        return `<div class="tl-item progress">
-          <div class="tl-date">${item.added}</div>
-          <div class="tl-content">
-            <h4>${item.id} — ${item.title}</h4>
-            <p>${item.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-    delete months['In Progress'];
-  }
-
-  Object.keys(months).sort().reverse().forEach(m => {
-    const [y, mo] = m.split('-');
-    const label = `${monthNames[mo]} ${y}`;
-    const items = filterItems(months[m]);
-    if (items.length === 0) return;
-
-    html += `<div class="tl-month">
-      <div class="tl-month-label">${label}</div>
-      ${items.map(item => {
-        const tag = TAGS[item.tag] || { label: item.tag, color: 'blue' };
-        return `<div class="tl-item done">
-          <div class="tl-date">${item.completed}</div>
-          <div class="tl-content">
-            <h4>${item.id} — ${item.title}</h4>
-            <p>${item.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p>
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  });
-
-  el.innerHTML = html;
-}
-
-function renderSessions() {
-  const el = document.getElementById('sessionsView');
-  el.innerHTML = DATA.sessions.map(s => `
-    <div class="session-item">
-      <div class="session-date">${s.date}</div>
-      <div class="session-title">${s.title}</div>
-      <div class="session-decisions"><strong>Key decisions:</strong> ${s.decisions}</div>
-    </div>
-  `).join('');
-}
-
-// ============================================
-// MODAL
-// ============================================
-
-function showModal(id, status) {
-  const allItems = [...DATA.inProgress, ...DATA.nextUp, ...DATA.backlog, ...DATA.techDebt, ...DATA.bugs, ...DATA.done];
-  const item = allItems.find(i => i.id === id);
-  if (!item) return;
-
-  const tag = TAGS[item.tag] || { label: item.tag, color: 'blue' };
-  const statusLabels = { progress: 'In Progress', next: 'Next Up', debt: 'Tech Debt / Bug', done: 'Done', backlog: 'Backlog' };
-
-  document.getElementById('modalContent').innerHTML = `
-    <div class="card-id">${item.id}</div>
-    <h3>${item.title}</h3>
-    <div class="card-meta" style="margin:8px 0 16px">
-      <span class="card-tag tag-${tag.color}">${tag.label}</span>
-      <span class="card-tag" style="color:var(--text-muted);background:var(--surface-2)">${statusLabels[status] || status}</span>
-    </div>
-    <div class="full-desc">${item.desc}</div>
-    ${item.files ? `<div class="detail-row"><div class="detail-label">Files</div><div class="detail-value mono" style="font-size:11px">${item.files}</div></div>` : ''}
-    <div class="detail-row"><div class="detail-label">${item.completed ? 'Completed' : 'Added'}</div><div class="detail-value mono" style="font-size:11px">${item.completed || item.added}</div></div>
-  `;
-
-  document.getElementById('modal').classList.add('active');
-}
-
-function closeModal() {
-  document.getElementById('modal').classList.remove('active');
-}
-
-// ============================================
-// EVENT HANDLERS
-// ============================================
-
-document.querySelectorAll('.view-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    activeView = btn.dataset.view;
-
-    document.getElementById('kanbanView').style.display = activeView === 'kanban' ? '' : 'none';
-    document.getElementById('timelineView').style.display = activeView === 'timeline' ? '' : 'none';
-    document.getElementById('sessionsView').style.display = activeView === 'sessions' ? '' : 'none';
-
-    render();
-  });
-});
-
-document.getElementById('filterBar').addEventListener('click', e => {
-  if (e.target.classList.contains('filter-chip')) {
-    activeFilter = e.target.dataset.filter;
-    render();
-  }
-});
-
-document.getElementById('modal').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal')) closeModal();
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
-
-// ============================================
-// RENDER ALL
-// ============================================
-
-function render() {
-  renderStats();
-  renderFilters();
-  renderKanban();
-  renderTimeline();
-  renderSessions();
-  document.getElementById('lastUpdated').textContent = LAST_UPDATED;
-}
-
+const TAGS={comms:{label:'Comms',color:'cyan'},compliance:{label:'Compliance',color:'rose'},admin:{label:'Admin',color:'purple'},core:{label:'Core',color:'blue'},infra:{label:'Infra',color:'amber'},ai:{label:'AI',color:'green'},ux:{label:'UX',color:'indigo'},integrations:{label:'Integrations',color:'integrations'}};
+let activeView='kanban',activeFilter='all';
+function renderStats(){const e=document.getElementById('stats'),c={'In Progress':DATA.inProgress.length,'Next Up':DATA.nextUp.length,'Backlog':DATA.backlog.length,'Done':DATA.done.length};e.innerHTML=Object.entries(c).map(([l,v])=>`<div class="stat"><div class="stat-val">${v}</div><div class="stat-label">${l}</div></div>`).join('')}
+function renderFilters(){const e=document.getElementById('filterBar'),a=['all',...Object.keys(TAGS)];e.innerHTML=a.map(t=>`<button class="filter-chip ${t===activeFilter?'active':''}" data-filter="${t}">${t==='all'?'All':TAGS[t].label}</button>`).join('')}
+function filterItems(items){if(activeFilter==='all')return items;return items.filter(i=>i.tag===activeFilter)}
+function renderCard(item,status){const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const date=item.completed||item.added||'';return `<div class="card" onclick="showModal('${item.id}','${status}')"><div class="card-id">${item.id}</div><div class="card-title">${item.title}</div><div class="card-desc">${item.desc}</div><div class="card-meta"><span class="card-tag tag-${tag.color}">${tag.label}</span>${item.files?`<span class="card-tag tag-infra" style="opacity:0.6">📁</span>`:''}<span class="card-date">${date}</span></div></div>`}
+function renderKanban(){const e=document.getElementById('kanbanView'),cols=[{key:'progress',title:'In Progress',items:filterItems(DATA.inProgress),status:'progress'},{key:'next',title:'Next Up',items:filterItems(DATA.nextUp),status:'next'},{key:'debt',title:'Tech Debt & Bugs',items:filterItems([...DATA.techDebt,...DATA.bugs]),status:'debt'},{key:'done',title:'Done',items:filterItems(DATA.done).slice(0,15),status:'done'}];e.innerHTML=cols.map(c=>`<div class="column col-${c.key}"><div class="column-header"><div class="column-dot"></div><div class="column-title">${c.title}</div><div class="column-count">${c.items.length}${c.key==='done'?'+':''}</div></div><div class="column-body">${c.items.map(i=>renderCard(i,c.status)).join('')}${c.items.length===0?'<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11px">No items</div>':''}</div></div>`).join('')}
+function renderTimeline(){const e=document.getElementById('timelineView'),allDone=[...DATA.done].sort((a,b)=>b.completed.localeCompare(a.completed)),months={},monthNames={'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};allDone.forEach(i=>{const m=i.completed.substring(0,7);if(!months[m])months[m]=[];months[m].push(i)});DATA.inProgress.forEach(i=>{const m='In Progress';if(!months[m])months[m]=[];months[m].push({...i,_status:'progress'})});let html='';if(months['In Progress']){html+=`<div class="tl-month"><div class="tl-month-label" style="color:var(--amber)">🔨 In Progress</div>${months['In Progress'].map(i=>{const tag=TAGS[i.tag]||{label:i.tag,color:'blue'};return `<div class="tl-item progress"><div class="tl-date">${i.added}</div><div class="tl-content"><h4>${i.id} — ${i.title}</h4><p>${i.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p></div></div>`}).join('')}</div>`;delete months['In Progress']}Object.keys(months).sort().reverse().forEach(m=>{const[y,mo]=m.split('-');const label=`${monthNames[mo]} ${y}`;const items=filterItems(months[m]);if(items.length===0)return;html+=`<div class="tl-month"><div class="tl-month-label">${label}</div>${items.map(i=>{const tag=TAGS[i.tag]||{label:i.tag,color:'blue'};return `<div class="tl-item done"><div class="tl-date">${i.completed}</div><div class="tl-content"><h4>${i.id} — ${i.title}</h4><p>${i.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p></div></div>`}).join('')}</div>`});e.innerHTML=html}
+function renderSessions(){const e=document.getElementById('sessionsView');e.innerHTML=DATA.sessions.map(s=>`<div class="session-item"><div class="session-date">${s.date}</div><div class="session-title">${s.title}</div><div class="session-decisions"><strong>Key decisions:</strong> ${s.decisions}</div></div>`).join('')}
+function showModal(id,status){const allItems=[...DATA.inProgress,...DATA.nextUp,...DATA.backlog,...DATA.techDebt,...DATA.bugs,...DATA.done];const item=allItems.find(i=>i.id===id);if(!item)return;const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const statusLabels={progress:'In Progress',next:'Next Up',debt:'Tech Debt / Bug',done:'Done',backlog:'Backlog'};document.getElementById('modalContent').innerHTML=`<div class="card-id">${item.id}</div><h3>${item.title}</h3><div class="card-meta" style="margin:8px 0 16px"><span class="card-tag tag-${tag.color}">${tag.label}</span><span class="card-tag" style="color:var(--text-muted);background:var(--surface-2)">${statusLabels[status]||status}</span></div><div class="full-desc">${item.desc}</div>${item.files?`<div class="detail-row"><div class="detail-label">Files</div><div class="detail-value mono" style="font-size:11px">${item.files}</div></div>`:''}<div class="detail-row"><div class="detail-label">${item.completed?'Completed':'Added'}</div><div class="detail-value mono" style="font-size:11px">${item.completed||item.added}</div></div>`;document.getElementById('modal').classList.add('active')}
+function closeModal(){document.getElementById('modal').classList.remove('active')}
+document.querySelectorAll('.view-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeView=btn.dataset.view;document.getElementById('kanbanView').style.display=activeView==='kanban'?'':'none';document.getElementById('timelineView').style.display=activeView==='timeline'?'':'none';document.getElementById('sessionsView').style.display=activeView==='sessions'?'':'none';render()})});
+document.getElementById('filterBar').addEventListener('click',e=>{if(e.target.classList.contains('filter-chip')){activeFilter=e.target.dataset.filter;render()}});
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+function render(){renderStats();renderFilters();renderKanban();renderTimeline();renderSessions();document.getElementById('lastUpdated').textContent=LAST_UPDATED}
 render();
 </script>
 </body>
