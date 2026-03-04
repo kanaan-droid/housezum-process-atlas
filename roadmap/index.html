@@ -37,9 +37,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .filter-chip.active{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-glow)}
 .filter-chip:hover:not(.active){border-color:var(--border-hover);color:var(--text-muted)}
-.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:20px 24px;max-width:1600px;margin:0 auto}
-@media(max-width:1300px){.kanban{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:900px){.kanban{grid-template-columns:repeat(2,1fr)}}
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px;max-width:1400px;margin:0 auto}
+@media(max-width:1100px){.kanban{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.kanban{grid-template-columns:1fr}}
 .column{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden}
 .column-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
@@ -413,9 +412,9 @@ const DATA = {
       "added": "2026-03-04"
     },
     {
-      "id": "BL-35",
-      "title": "Listing Intelligence Engine",
-      "desc": "AI-powered market analysis for agents. Answers: \"What should I list at?\", \"How do I defend this price?\". Core outputs: Price Positioning Score (non-linear formula), Negotiation Buffer, Time-to-Sell Forecast with confidence bands, Comparable Evidence Pack (5-8 real DLD/DVF transactions), Price Ladder UI, Supply Pressure display, Claude-generated narrative, Mandate Win Pack PDF saved to property_documents. Data: DLD (UAE MVP), DVF (France Phase 2). PostGIS spatial comp selection. Deterministic engine + LLM narrative only. Intel Card integration (market_risk type). Listing Confidence Meter (live score in listing form). Lives under Agent Tools. Full spec in docs/specs/HOUSEZOOM-LISTING-INTELLIGENCE-ENGINE-SPEC.docx. Cross-validated with ChatGPT + Gemini.",
+      "id": "~~BL-35~~",
+      "title": "~~Listing Intelligence Engine~~",
+      "desc": "DONE → D-77 through D-81",
       "tag": "ai",
       "added": "2026-03-04"
     }
@@ -495,6 +494,41 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-81",
+      "title": "BL-35 Session 5: Intel Cards + Listing Confidence Meter",
+      "desc": "market_risk Intel Card generation (nightly, score\u003c70 threshold), IntelCardItem market_risk rendering, ListingConfidenceMeter component (debounced, live score in property forms)",
+      "completed": "2026-03-04",
+      "tag": "core"
+    },
+    {
+      "id": "D-80",
+      "title": "BL-35 Session 4: AI Narrative + Mandate Win Pack PDF",
+      "desc": "Claude narrative (seller-facing, no invented numbers), jsPDF report saved to property_documents + market_reports, WhatsApp/Email share",
+      "completed": "2026-03-04",
+      "tag": "comms"
+    },
+    {
+      "id": "D-79",
+      "title": "BL-35 Session 3: Market Analysis UI",
+      "desc": "Agent Tools page /tools/market-analysis, 8 result sections (score, range, ladder, time-to-sell, comps, supply pressure, track record, compliance), entry from property SummaryTab",
+      "completed": "2026-03-04",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-78",
+      "title": "BL-35 Session 2: Market Intelligence Engine",
+      "desc": "marketIntelligenceEngine.ts: comp selection (weighted similarity), positioning score (non-linear), time-to-sell forecast, price ladder, supply pressure, agent track record, orchestrator",
+      "completed": "2026-03-04",
+      "tag": "ai"
+    },
+    {
+      "id": "D-77",
+      "title": "BL-35 Session 1: DLD Ingest + Schema",
+      "desc": "5 new tables (market_transactions, market_area_stats, building_stats, market_comp_cache, market_reports), PostGIS GIST index, DLD ingest service, nightly Vercel Cron, 32,281 real DLD transactions imported",
+      "completed": "2026-03-04",
+      "tag": "infra"
+    },
     {
       "id": "D-76",
       "title": "Fix gmail_last_sync reading wrong table",
@@ -989,6 +1023,11 @@ const DATA = {
   "sessions": [
     {
       "date": "2026-03-04",
+      "title": "BL-35 Listing Intelligence Engine — all 5 sessions complete. Real DLD data (32,281 transactions), comp selection engine, market analysis UI, Claude narrative, Mandate Win Pack PDF, Intel Cards, Listing Confidence Meter.",
+      "decisions": "Real DLD data from Dubai Open Data portal; sq.m → sqft conversion; PostGIS spatial scoring; deterministic engine + LLM narrative only; score\u003c70 threshold for market_risk cards; debounced quick-score API for live meter"
+    },
+    {
+      "date": "2026-03-04",
       "title": "Fix Intel Card tap=dismiss. email_meeting_proposal for unknown senders. Schedule Viewing auto-create contact. Fix gmail_last_sync wrong table. Gmail Pub/Sub added to backlog.",
       "decisions": "HIGH_VALUE_INTENTS pattern for unknown sender routing; auto-create contact on viewing submit \u003e two-step flow; gmail_last_sync lives in external_accounts.metadata not organizations.settings; Pub/Sub deprioritized pending infra decision"
     },
@@ -1085,7 +1124,7 @@ function renderStats(){const e=document.getElementById('stats'),c={'In Progress'
 function renderFilters(){const e=document.getElementById('filterBar'),a=['all',...Object.keys(TAGS)];e.innerHTML=a.map(t=>`<button class="filter-chip ${t===activeFilter?'active':''}" data-filter="${t}">${t==='all'?'All':TAGS[t].label}</button>`).join('')}
 function filterItems(items){if(activeFilter==='all')return items;return items.filter(i=>i.tag===activeFilter)}
 function renderCard(item,status){const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const date=item.completed||item.added||'';return `<div class="card" onclick="showModal('${item.id}','${status}')"><div class="card-id">${item.id}</div><div class="card-title">${item.title}</div><div class="card-desc">${item.desc}</div><div class="card-meta"><span class="card-tag tag-${tag.color}">${tag.label}</span>${item.files?`<span class="card-tag tag-infra" style="opacity:0.6">📁</span>`:''}<span class="card-date">${date}</span></div></div>`}
-function renderKanban(){const e=document.getElementById('kanbanView'),blSorted=[...DATA.backlog].sort((a,b)=>(b.added||'').localeCompare(a.added||'')),blItems=filterItems(blSorted),cols=[{key:'progress',title:'In Progress',items:filterItems(DATA.inProgress),status:'progress'},{key:'next',title:'Next Up',items:filterItems(DATA.nextUp),status:'next'},{key:'backlog',title:'Backlog',items:blItems,status:'backlog'},{key:'debt',title:'Tech Debt & Bugs',items:filterItems([...DATA.techDebt,...DATA.bugs]),status:'debt'},{key:'done',title:'Done',items:filterItems(DATA.done).slice(0,15),status:'done'}];e.innerHTML=cols.map(c=>{const count=c.key==='done'?DATA.done.length:c.items.length;return `<div class="column col-${c.key}"><div class="column-header"><div class="column-dot"></div><div class="column-title">${c.title}</div><div class="column-count">${count}${c.key==='done'?'+':''}</div></div><div class="column-body">${c.items.map(i=>renderCard(i,c.status)).join('')}${c.items.length===0?'<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11px">No items</div>':''}</div></div>`}).join('')}
+function renderKanban(){const e=document.getElementById('kanbanView'),cols=[{key:'progress',title:'In Progress',items:filterItems(DATA.inProgress),status:'progress'},{key:'next',title:'Next Up',items:filterItems(DATA.nextUp),status:'next'},{key:'debt',title:'Tech Debt & Bugs',items:filterItems([...DATA.techDebt,...DATA.bugs]),status:'debt'},{key:'done',title:'Done',items:filterItems(DATA.done).slice(0,15),status:'done'}];e.innerHTML=cols.map(c=>`<div class="column col-${c.key}"><div class="column-header"><div class="column-dot"></div><div class="column-title">${c.title}</div><div class="column-count">${c.items.length}${c.key==='done'?'+':''}</div></div><div class="column-body">${c.items.map(i=>renderCard(i,c.status)).join('')}${c.items.length===0?'<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11px">No items</div>':''}</div></div>`).join('')}
 function renderTimeline(){const e=document.getElementById('timelineView'),allDone=[...DATA.done].sort((a,b)=>b.completed.localeCompare(a.completed)),months={},monthNames={'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};allDone.forEach(i=>{const m=i.completed.substring(0,7);if(!months[m])months[m]=[];months[m].push(i)});DATA.inProgress.forEach(i=>{const m='In Progress';if(!months[m])months[m]=[];months[m].push({...i,_status:'progress'})});let html='';if(months['In Progress']){html+=`<div class="tl-month"><div class="tl-month-label" style="color:var(--amber)">🔨 In Progress</div>${months['In Progress'].map(i=>{const tag=TAGS[i.tag]||{label:i.tag,color:'blue'};return `<div class="tl-item progress"><div class="tl-date">${i.added}</div><div class="tl-content"><h4>${i.id} — ${i.title}</h4><p>${i.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p></div></div>`}).join('')}</div>`;delete months['In Progress']}Object.keys(months).sort().reverse().forEach(m=>{const[y,mo]=m.split('-');const label=`${monthNames[mo]} ${y}`;const items=filterItems(months[m]);if(items.length===0)return;html+=`<div class="tl-month"><div class="tl-month-label">${label}</div>${items.map(i=>{const tag=TAGS[i.tag]||{label:i.tag,color:'blue'};return `<div class="tl-item done"><div class="tl-date">${i.completed}</div><div class="tl-content"><h4>${i.id} — ${i.title}</h4><p>${i.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p></div></div>`}).join('')}</div>`});e.innerHTML=html}
 function renderSessions(){const e=document.getElementById('sessionsView');e.innerHTML=DATA.sessions.map(s=>`<div class="session-item"><div class="session-date">${s.date}</div><div class="session-title">${s.title}</div><div class="session-decisions"><strong>Key decisions:</strong> ${s.decisions}</div></div>`).join('')}
 function showModal(id,status){const allItems=[...DATA.inProgress,...DATA.nextUp,...DATA.backlog,...DATA.techDebt,...DATA.bugs,...DATA.done];const item=allItems.find(i=>i.id===id);if(!item)return;const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const statusLabels={progress:'In Progress',next:'Next Up',debt:'Tech Debt / Bug',done:'Done',backlog:'Backlog'};document.getElementById('modalContent').innerHTML=`<div class="card-id">${item.id}</div><h3>${item.title}</h3><div class="card-meta" style="margin:8px 0 16px"><span class="card-tag tag-${tag.color}">${tag.label}</span><span class="card-tag" style="color:var(--text-muted);background:var(--surface-2)">${statusLabels[status]||status}</span></div><div class="full-desc">${item.desc}</div>${item.files?`<div class="detail-row"><div class="detail-label">Files</div><div class="detail-value mono" style="font-size:11px">${item.files}</div></div>`:''}<div class="detail-row"><div class="detail-label">${item.completed?'Completed':'Added'}</div><div class="detail-value mono" style="font-size:11px">${item.completed||item.added}</div></div>`;document.getElementById('modal').classList.add('active')}
