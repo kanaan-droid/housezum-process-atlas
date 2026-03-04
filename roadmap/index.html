@@ -411,6 +411,13 @@ const DATA = {
       "desc": "Build automated test harness with ~100 labeled real estate email/WhatsApp message test cases (message → expected intent). Measure accuracy per category, identify failure modes, iterate on few-shot examples in intentDetectionService.ts prompt. Target: \u003e90% accuracy across all 10 intent categories. No fine-tuning needed — prompt engineering + examples should suffice.",
       "tag": "comms",
       "added": "2026-03-04"
+    },
+    {
+      "id": "BL-35",
+      "title": "Listing Intelligence Engine",
+      "desc": "AI-powered market analysis for agents. Answers: \"What should I list at?\", \"How do I defend this price?\". Core outputs: Price Positioning Score (non-linear formula), Negotiation Buffer, Time-to-Sell Forecast with confidence bands, Comparable Evidence Pack (5-8 real DLD/DVF transactions), Price Ladder UI, Supply Pressure display, Claude-generated narrative, Mandate Win Pack PDF saved to property_documents. Data: DLD (UAE MVP), DVF (France Phase 2). PostGIS spatial comp selection. Deterministic engine + LLM narrative only. Intel Card integration (market_risk type). Listing Confidence Meter (live score in listing form). Lives under Agent Tools. Full spec in docs/specs/HOUSEZOOM-LISTING-INTELLIGENCE-ENGINE-SPEC.docx. Cross-validated with ChatGPT + Gemini.",
+      "tag": "ai",
+      "added": "2026-03-04"
     }
   ],
   "techDebt": [
