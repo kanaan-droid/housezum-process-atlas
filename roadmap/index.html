@@ -129,16 +129,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <script>
 const LAST_UPDATED = '2026-03-04';
 const DATA = {
-  "inProgress": [
-    {
-      "id": "IP-2",
-      "title": "Communications Integration — Phase 3",
-      "desc": "Calendar bidirectional sync: detect external changes, conflict detection, reconcile with HZ. See HOUSEZOOM-COMMUNICATIONS-INTEGRATION-SPEC.docx §5",
-      "files": "calendar/sync route",
-      "tag": "comms",
-      "added": "2026-03-03"
-    }
-  ],
+  "inProgress": [],
   "nextUp": [
     {
       "id": "NU-2",
@@ -405,6 +396,13 @@ const DATA = {
       "desc": "Admin → Settings → Integrations: OAuth connect/disconnect for DocuSign, WhatsApp Business, Google Calendar, Salesforce, Bayut, SeLoger. Agency's own accounts, tokens in organizations.settings JSONB.",
       "tag": "comms",
       "added": "2026-02-28"
+    },
+    {
+      "id": "BL-33",
+      "title": "Gmail auto-sync via Google Pub/Sub webhooks",
+      "desc": "Replace manual Sync Now button with real-time push notifications. No manual trigger. Add after infra decision (possible AWS migration).",
+      "tag": "comms",
+      "added": "2026-03-04"
     }
   ],
   "techDebt": [
@@ -482,6 +480,34 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-76",
+      "title": "Fix gmail_last_sync reading wrong table",
+      "desc": "Was resetting organizations.settings instead of external_accounts.metadata. Added type coercion guard for stored value. Added diagnostic logging + dedupSkipped counter to sync response.",
+      "completed": "2026-03-04",
+      "tag": "comms"
+    },
+    {
+      "id": "D-75",
+      "title": "Schedule Viewing auto-create contact from email",
+      "desc": "Contact field shows \"Will be created\" read-only display. On submit, auto-inserts contact (name, email, type=buyer, import_source=manual) before creating viewing. Silent failure fixed (wrong column name source → import_source).",
+      "completed": "2026-03-04",
+      "tag": "comms"
+    },
+    {
+      "id": "D-74",
+      "title": "email_meeting_proposal for unknown senders",
+      "desc": "HIGH_VALUE_INTENTS replaces SKIP_LEAD_INTENTS. Unknown sender + meeting_proposal/document_request/price_negotiation → intent-based card with Schedule Viewing primary + Add as Contact secondary CTA.",
+      "completed": "2026-03-04",
+      "tag": "comms"
+    },
+    {
+      "id": "D-73",
+      "title": "Fix Intel Card tap=dismiss",
+      "desc": "Card body tap expands/collapses. CTAs use stopPropagation. Dismiss only via 3-dot menu.",
+      "completed": "2026-03-04",
+      "tag": "core"
+    },
     {
       "id": "D-72",
       "title": "Vercel Cron — 90-day purge",
@@ -946,6 +972,11 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-03-04",
+      "title": "Fix Intel Card tap=dismiss. email_meeting_proposal for unknown senders. Schedule Viewing auto-create contact. Fix gmail_last_sync wrong table. Gmail Pub/Sub added to backlog.",
+      "decisions": "HIGH_VALUE_INTENTS pattern for unknown sender routing; auto-create contact on viewing submit \u003e two-step flow; gmail_last_sync lives in external_accounts.metadata not organizations.settings; Pub/Sub deprioritized pending infra decision"
+    },
     {
       "date": "2026-03-04",
       "title": "Shadow Contact Detection + Auto-Scheduling + 90-day Purge. Shadow contact detection: unknown Gmail senders get new_lead_detected Intel Cards with \"Add as Contact\" CTA (pre-fills contacts page modal via query params). Indigo styling, UserPlus icon, \"NEW LEAD\" badge, score=55 (today). All intents trigger detection (removed general_inquiry exclusion). Auto-scheduling: meeting_proposal cards pre-fill Schedule Viewing form via URL params. 90-day purge: Vercel Cron daily at 3 AM UTC calls /api/cron/purge-events with CRON_SECRET validation. vercel.json added (maxDuration + crons). Bug fixes: intent detection not running (was skipped for already-processed events), contacts page not reading query params for pre-fill, card type falling through to email_general instead of new_lead_detected. CRON_SECRET added to .env.local + Vercel.",
