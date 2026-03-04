@@ -404,6 +404,13 @@ const DATA = {
       "desc": "Replace manual Sync Now button with real-time push notifications. No manual trigger. Add after infra decision (possible AWS migration).",
       "tag": "comms",
       "added": "2026-03-04"
+    },
+    {
+      "id": "BL-34",
+      "title": "Intent Detection Accuracy Tuning",
+      "desc": "Build automated test harness with ~100 labeled real estate email/WhatsApp message test cases (message → expected intent). Measure accuracy per category, identify failure modes, iterate on few-shot examples in intentDetectionService.ts prompt. Target: \u003e90% accuracy across all 10 intent categories. No fine-tuning needed — prompt engineering + examples should suffice.",
+      "tag": "comms",
+      "added": "2026-03-04"
     }
   ],
   "techDebt": [
