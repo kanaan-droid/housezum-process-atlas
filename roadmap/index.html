@@ -420,42 +420,49 @@ const DATA = {
       "added": "2026-03-04"
     },
     {
-      "id": "BL-36",
-      "title": "Lead Qualification Form",
-      "desc": "Public token-based form sent to leads (like enrichment form for owners). Agent sends from lead detail page. Lead fills in: budget, timeline, property preferences, financing status, motivation. Data auto-populates lead record (intent_score boost, qualification fields). Intel Card generated on submission. Same pattern as /d/[token] enrichment form.",
+      "id": "~~BL-36~~",
+      "title": "~~Lead Qualification Form~~",
+      "desc": "DONE → D-82",
       "tag": "admin",
       "added": "2026-03-05"
     },
     {
       "id": "BL-37",
+      "title": "Forgot Password flow",
+      "desc": "\"Forgot password?\" link on login page → sends reset email via Supabase Auth. Currently users must reset via Supabase dashboard.",
+      "tag": "comms",
+      "added": "2026-03-05"
+    },
+    {
+      "id": "BL-38",
       "title": "Deal Orchestrator Agent",
       "desc": "\"What should I do today?\" — daily plan based on deal health, compliance state, comms recency. Layer 3 Planning Agent. Build after Pub/Sub webhooks.",
       "tag": "comms",
       "added": "2026-03-04"
     },
     {
-      "id": "BL-38",
+      "id": "BL-39",
       "title": "Compliance Monitor Agent",
       "desc": "Convert static on-demand compliance eval to active continuous monitoring. Auto-task creation, escalation to manager on SLA breach.",
       "tag": "compliance",
       "added": "2026-03-04"
     },
     {
-      "id": "BL-39",
+      "id": "BL-40",
       "title": "Buyer-Seller Matching Agent",
       "desc": "On new listing/buyer/price change: scan buyer DB, score match probability, generate shortlist + draft outreach message.",
       "tag": "core",
       "added": "2026-03-04"
     },
     {
-      "id": "BL-40",
+      "id": "BL-41",
       "title": "Communication Graph",
       "desc": "Track who communicates with whom, frequency, response latency, conversation threads. Enables deal risk prediction.",
       "tag": "comms",
       "added": "2026-03-04"
     },
     {
-      "id": "BL-41",
+      "id": "BL-42",
       "title": "AI Data Capture Infrastructure",
       "desc": "ai_interactions + ai_feedback tables. Store AI proposal vs human final output (delta pattern). Intent corrections, draft edits, entity confirmations. Fuel for future fine-tuning.",
       "tag": "ai",
@@ -537,6 +544,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-82",
+      "title": "BL-36 Lead Qualification Form",
+      "desc": "Public token-based /q/[token] form (no auth). Typeform-style 4-screen flow: budget bands → buying purpose → timeline → must-haves (140 char). GDPR consent checkbox for EU orgs (FR/CH/IT). Post-submit confirmation screen with answer summary. Agent sends via SendQualificationModal (WhatsApp + email tabs, copy link, pre-filled copy). On submission: lead status → 'qualified' (system-only, removed from manual options), intent_score boosted (+15 budget, +20 ready-now timeline, +10 must-haves, +5 purpose), qualification fields written to leads table. lead_qualified Intel Card generated for assigned agent (green badge, UserCheck icon, \"View Lead\" + \"Send WhatsApp\" CTAs). Qualification data visible in lead detail panel + \"Form submitted\" badge on leads table rows. Send Qualification entry points: admin leads overflow menu, contact detail page (if linked lead exists), lead_followup Intel Card secondary CTA. Seed data reset: fake-qualified leads → nurturing. i18n (4 locales, 20+ keys). New table: lead_qualification_requests.",
+      "completed": "2026-03-05",
+      "tag": "comms"
+    },
     {
       "id": "D-81",
       "title": "BL-35 Session 5: Intel Cards + Listing Confidence Meter",
@@ -1064,6 +1078,11 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-03-05",
+      "title": "BL-36 Lead Qualification Form — complete. Cross-validated form design with Gemini + ChatGPT before building. Typeform-style 4-screen public form (/q/[token]). 4 questions: budget bands, buying purpose, investor vs end-user, timeline, must-haves. Progressive disclosure model (Round 1 cold form → Round 2 post-viewing for financing). SendQualificationModal with WhatsApp/email tabs. lead_qualified Intel Card for assigned agent. Status taxonomy fix: 'qualified' is now system-only (set by form submission API only, removed from manual agent options). Seed data reset. Entry points: admin leads, contact detail, lead_followup Intel Card. Forgot Password added to backlog (BL-37).",
+      "decisions": "Cross-validate with Gemini+ChatGPT before building \u003e build blind; buying purpose (investor vs end-user) is most actionable signal; 'qualified' status must be system-set only; lead_qualified card goes to assigned agent not admin sender; token expiry 30 days (same as enrichment pattern)"
+    },
     {
       "date": "2026-03-04",
       "title": "BL-35 Listing Intelligence Engine — all 5 sessions complete. Real DLD data (32,281 transactions), comp selection engine, market analysis UI, Claude narrative, Mandate Win Pack PDF, Intel Cards, Listing Confidence Meter.",
