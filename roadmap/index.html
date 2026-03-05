@@ -127,7 +127,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-03-04';
+const LAST_UPDATED = '2026-03-05';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -424,6 +424,41 @@ const DATA = {
       "desc": "Public token-based form sent to leads (like enrichment form for owners). Agent sends from lead detail page. Lead fills in: budget, timeline, property preferences, financing status, motivation. Data auto-populates lead record (intent_score boost, qualification fields). Intel Card generated on submission. Same pattern as /d/[token] enrichment form.",
       "tag": "admin",
       "added": "2026-03-05"
+    },
+    {
+      "id": "BL-37",
+      "title": "Deal Orchestrator Agent",
+      "desc": "\"What should I do today?\" — daily plan based on deal health, compliance state, comms recency. Layer 3 Planning Agent. Build after Pub/Sub webhooks.",
+      "tag": "comms",
+      "added": "2026-03-04"
+    },
+    {
+      "id": "BL-38",
+      "title": "Compliance Monitor Agent",
+      "desc": "Convert static on-demand compliance eval to active continuous monitoring. Auto-task creation, escalation to manager on SLA breach.",
+      "tag": "compliance",
+      "added": "2026-03-04"
+    },
+    {
+      "id": "BL-39",
+      "title": "Buyer-Seller Matching Agent",
+      "desc": "On new listing/buyer/price change: scan buyer DB, score match probability, generate shortlist + draft outreach message.",
+      "tag": "core",
+      "added": "2026-03-04"
+    },
+    {
+      "id": "BL-40",
+      "title": "Communication Graph",
+      "desc": "Track who communicates with whom, frequency, response latency, conversation threads. Enables deal risk prediction.",
+      "tag": "comms",
+      "added": "2026-03-04"
+    },
+    {
+      "id": "BL-41",
+      "title": "AI Data Capture Infrastructure",
+      "desc": "ai_interactions + ai_feedback tables. Store AI proposal vs human final output (delta pattern). Intent corrections, draft edits, entity confirmations. Fuel for future fine-tuning.",
+      "tag": "ai",
+      "added": "2026-03-04"
     }
   ],
   "techDebt": [
