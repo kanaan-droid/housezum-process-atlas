@@ -128,7 +128,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-03-05';
+const LAST_UPDATED = '2026-03-06';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -467,6 +467,76 @@ const DATA = {
       "desc": "ai_interactions + ai_feedback tables. Store AI proposal vs human final output (delta pattern). Intent corrections, draft edits, entity confirmations. Fuel for future fine-tuning.",
       "tag": "ai",
       "added": "2026-03-04"
+    },
+    {
+      "id": "~~BL-43~~",
+      "title": "~~Viewing Briefing System~~",
+      "desc": "DONE → D-84, D-85",
+      "tag": "core",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "~~BL-52~~",
+      "title": "~~V2 Schema Foundation~~",
+      "desc": "DONE → D-86",
+      "tag": "core",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "~~BL-44~~",
+      "title": "~~Record Feedback — Viewing Feedback Form~~",
+      "desc": "DONE → D-87",
+      "tag": "core",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "~~BL-45~~",
+      "title": "~~Document-Contact Linking~~",
+      "desc": "DONE → D-88",
+      "tag": "core",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "BL-46",
+      "title": "Deal Timeline — Viewings + Docs Unified",
+      "desc": "Single timeline on deal detail: all viewings (with feedback) + all documents for deal's property + contacts. Powered by activity_events. Depends on BL-44 + BL-45 + BL-52.",
+      "tag": "admin",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "BL-47",
+      "title": "Document Compliance Check Per Contact",
+      "desc": "\"Has this buyer signed a Form B?\" on contact profile. Queries entity_parties by contact + document_type. Depends on BL-45 + BL-52.",
+      "tag": "compliance",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "BL-48",
+      "title": "Buyer Journey View",
+      "desc": "All touchpoints for one contact: emails → viewings → docs signed → deal stage. Powered by activity_events. Depends on BL-44 + BL-45 + BL-52.",
+      "tag": "comms",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "BL-49",
+      "title": "Person-First Contacts Refactor",
+      "desc": "Deprecate contacts.type for business logic. Role lives in entity_parties. contacts = Person DNA: name, phone, email, nationality, preferred_language, preferred_channel. Depends on BL-52.",
+      "tag": "comms",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "BL-50",
+      "title": "activity_events — Wire Up",
+      "desc": "Populate activity_events from: viewings, whatsapp_messages, external_events, intel_cards, deal stage changes. Powers Contact + Deal timelines and AI context. Schema in BL-52.",
+      "tag": "comms",
+      "added": "2026-03-06"
+    },
+    {
+      "id": "BL-51",
+      "title": "deal_participants",
+      "desc": "Multiple buyers, sellers, guarantors, notaries per deal. Covered by entity_parties (BL-52). Needed for France/Switzerland co-ownership + UAE investor groups.",
+      "tag": "admin",
+      "added": "2026-03-06"
     }
   ],
   "techDebt": [
@@ -525,6 +595,14 @@ const DATA = {
       "files": "Various",
       "tag": "comms",
       "added": "2026-02-28"
+    },
+    {
+      "id": "TD-12",
+      "title": "⚠️ HIGH STAKES: properties → assets + listings split",
+      "desc": "This is the single biggest architectural risk in the codebase. Do not attempt until post-v1 but plan every new column carefully. Current properties table conflates two distinct concepts: (1) assets — the physical real estate object (address, size, rooms, building, cadastral ID — never changes); (2) listings — the commercial mandate (price, status, agent, commission, token, photos, compliance snapshot — changes every time a property is re-listed). Why this will break: same villa listed for rent in 2025, rented, re-listed for sale in 2027 — one properties row cannot model this without overwriting history. AI loses all previous price reactions, viewer feedback, and market positioning data. Historical reporting becomes impossible. Scope of the future refactor: 50+ .from('properties') queries across hooks, components, API routes, services, compliance engine, intel cards, viewing brief, market analysis, seed scripts, RLS policies. Estimated 3-4 full sessions of migration with high regression risk. What to do NOW: every new column added to properties must be commented as either -- ASSET LAYER (physical fact: never changes) or -- LISTING LAYER (commercial fact: changes per mandate). This makes the eventual split a mechanical operation rather than an architectural puzzle. Cross-validated by Gemini + ChatGPT as the #1 future backfill risk.",
+      "files": "All files touching properties table",
+      "tag": "compliance",
+      "added": "2026-03-06"
     }
   ],
   "bugs": [
@@ -545,7 +623,42 @@ const DATA = {
   ],
   "done": [
     {
-      "id": "D-82",
+      "id": "D-88",
+      "title": "BL-45 Document-Contact Linking",
+      "desc": "DocsTab full rewrite: upload flow adds \"Who is this doc for?\" contact picker with role selector + auto-suggest by document_type, entity_parties insert after upload, linked parties badges on doc rows (red=buyer, blue=seller, gray=other), inline \"+ Link contact\" per row. ContactDetailPage: new Documents tab with entity_parties→property_documents two-step query, role/primary/signature badges, download + view property actions, empty state. useDocuments.ts handleFileUpload returns DocumentRecord or null. useContactDetail.ts DetailTab extended with 'documents'.",
+      "completed": "2026-03-07",
+      "tag": "ai"
+    },
+    {
+      "id": "D-87",
+      "title": "BL-44 Record Feedback Modal",
+      "desc": "RecordFeedbackModal with star interest selector, price reaction pills, notes, next step dropdown, visitor count. Wired to 4 surfaces: QuickBrief, ViewingBrief sticky actions, Contact Activity tab (Viewings & Feedback section + refresh on success), Intel Cards viewing_prep CTA. Post-submit: activity_events insert, intel card fire-and-forget if interest≥4 or submit_offer. Next-step routing: submit_offer→deal pipeline toast, second_viewing→schedule pre-filled.",
+      "completed": "2026-03-07",
+      "tag": "admin"
+    },
+    {
+      "id": "D-86",
+      "title": "BL-52 V2 Schema Foundation",
+      "desc": "entity_parties table (polymorphic junction: entity_type + entity_id + contact_id + role, replaces document_contacts + deal_participants). activity_events table (append-only ledger, indexed by entity, contact, deal, org, occurred_at, event_type). viewing_feedback column additions: viewing_id, contact_id, agent_user_id, notes, next_step. All with RLS via get_user_org_id().",
+      "completed": "2026-03-07",
+      "tag": "admin"
+    },
+    {
+      "id": "D-85",
+      "title": "BL-43 Viewing Brief — Full Brief + Actions",
+      "desc": "ViewingBrief.tsx: 7-section full page (Buyer Context, Property Highlights, Market Positioning, Likely Questions, Tour Flow, Closing Strategy, sticky Actions panel). Post-viewing CTAs: Schedule 2nd viewing (pre-filled), Record Feedback → contact activity, Submit Offer → deals pipeline, Draft Follow-up → contact page. 24h cache in viewings.metadata. Parallelised Supabase queries (Promise.all). Pre-warm cache on schedule (fire-and-forget). Dashboard: Today first, Wins→Closed, Show X more, Reschedule on all viewing cards. Fixed: agent_user_id, scheduled_at, Suspense boundary, org-wide prefill queries.",
+      "completed": "2026-03-06",
+      "tag": "admin"
+    },
+    {
+      "id": "D-84",
+      "title": "BL-43 Viewing Brief — Quick Brief + Intel Card wiring",
+      "desc": "QuickBrief.tsx: 30-sec countdown, buyer budget + purpose, key focus tags, price positioning, AI closing strategy. viewingBriefService.ts: assembles 10 data sources. API route: Bearer token auth, Claude generation, cache check. Intel Card viewing_prep CTA → Open Brief. viewing_id in entity_refs for all card generators. viewing_prep cards prioritised to top of Today section.",
+      "completed": "2026-03-06",
+      "tag": "ai"
+    },
+    {
+      "id": "D-83",
       "title": "BL-36 Lead Qualification Form",
       "desc": "Public token-based /q/[token] form (no auth). Typeform-style 4-screen flow: budget bands → buying purpose → timeline → must-haves (140 char). GDPR consent checkbox for EU orgs (FR/CH/IT). Post-submit confirmation screen with answer summary. Agent sends via SendQualificationModal (WhatsApp + email tabs, copy link, pre-filled copy). On submission: lead status → 'qualified' (system-only, removed from manual options), intent_score boosted (+15 budget, +20 ready-now timeline, +10 must-haves, +5 purpose), qualification fields written to leads table. lead_qualified Intel Card generated for assigned agent (green badge, UserCheck icon, \"View Lead\" + \"Send WhatsApp\" CTAs). Qualification data visible in lead detail panel + \"Form submitted\" badge on leads table rows. Send Qualification entry points: admin leads overflow menu, contact detail page (if linked lead exists), lead_followup Intel Card secondary CTA. Seed data reset: fake-qualified leads → nurturing. i18n (4 locales, 20+ keys). New table: lead_qualification_requests.",
       "completed": "2026-03-05",
@@ -1078,6 +1191,16 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-03-07",
+      "title": "BL-52 + BL-44 + BL-45 complete. V2 Schema: entity_parties (generalised junction — replaces document_contacts + deal_participants) + activity_events (append-only event ledger) + viewing_feedback column additions (viewing_id, contact_id, agent_user_id, notes, next_step). BL-44 RecordFeedbackModal wired to 4 surfaces: QuickBrief, ViewingBrief sticky actions, Contact Activity tab (Viewings & Feedback section + refresh on success), Intel Cards viewing_prep CTA. BL-45 Document-Contact linking: DocsTab full rewrite (upload flow with \"Who is this doc for?\" contact picker, auto-suggest by document_type, entity_parties insert, linked parties badges on doc rows, inline \"+ Link contact\"). ContactDetailPage new Documents tab (entity_parties → property_documents query, role/primary/signature badges, download + view property actions).",
+      "decisions": "entity_parties replaces narrower document_contacts — polymorphic entity_type pattern handles docs + deals + viewings + listings; activity_events is append-only — no UPDATE/DELETE RLS policies; viewing_feedback real column names differ from spec (buyer_interest_level, price_feedback, actual_visitors); two-step query required for entity_parties → property_documents (polymorphic FK not known to Supabase)"
+    },
+    {
+      "date": "2026-03-06",
+      "title": "BL-43 Viewing Briefing System — complete. viewings table (scheduled_at, metadata JSONB). viewingBriefService.ts (10 data sources, parallelised Promise.all). API route with Claude generation + 24h cache in viewings.metadata. QuickBrief (30-sec countdown, buyer context, key focus tags, AI strategy). ViewingBrief (7 sections: Buyer Context, Property Highlights, Market Positioning, Likely Questions, Tour Flow, Closing Strategy, sticky Actions panel). Intel Card CTA → Open Brief. Pre-warm cache on schedule (fire-and-forget). Dashboard UX: Today first → Urgent → This Week → Closed. Wins → Closed. Show X more expandable. Reschedule CTA on all viewing cards. Schedule 2nd viewing pre-fill fixed (Suspense boundary + agent_user_id + org-wide properties/contacts query). All viewing_date+start_time → scheduled_at across 7 files. user_id → agent_user_id across 6 files. Identified BL-44 (Record Feedback) + BL-45 (Document-Contact linking) as critical data model gaps.",
+      "decisions": "agent_user_id not user_id on viewings; Suspense boundary required for useSearchParams in Next.js App Router; prefill effect must wait for dropdown data before setting IDs; cache in viewings.metadata JSONB \u003e new table; pre-warm on schedule \u003e on-demand; doc-contact many-to-many is a foundational CRM requirement caught early"
+    },
     {
       "date": "2026-03-05",
       "title": "BL-36 Lead Qualification Form — complete. Cross-validated form design with Gemini + ChatGPT before building. Typeform-style 4-screen public form (/q/[token]). 4 questions: budget bands, buying purpose, investor vs end-user, timeline, must-haves. Progressive disclosure model (Round 1 cold form → Round 2 post-viewing for financing). SendQualificationModal with WhatsApp/email tabs. lead_qualified Intel Card for assigned agent. Status taxonomy fix: 'qualified' is now system-only (set by form submission API only, removed from manual agent options). Seed data reset. Entry points: admin leads, contact detail, lead_followup Intel Card. Forgot Password added to backlog (BL-37).",
