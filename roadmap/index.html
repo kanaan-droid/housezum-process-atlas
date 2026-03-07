@@ -37,9 +37,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .filter-chip.active{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-glow)}
 .filter-chip:hover:not(.active){border-color:var(--border-hover);color:var(--text-muted)}
-.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:20px 24px;max-width:1600px;margin:0 auto}
-@media(max-width:1300px){.kanban{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:900px){.kanban{grid-template-columns:repeat(2,1fr)}}
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px;max-width:1400px;margin:0 auto}
+@media(max-width:1100px){.kanban{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.kanban{grid-template-columns:1fr}}
 .column{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden}
 .column-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
@@ -49,12 +48,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .column-body{padding:8px;max-height:70vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--surface-3) transparent}
 .card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
 .card:hover{border-color:var(--border-hover);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.card-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
 .card-id{font-size:10px;font-weight:700;color:var(--text-dim);letter-spacing:0.05em;font-family:'JetBrains Mono',monospace}
-.card-title{font-size:13px;font-weight:700;margin:6px 0 4px;line-height:1.35;color:var(--text)}
-.card-desc{font-size:11px;color:var(--text-dim);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card-title{font-size:13px;font-weight:700;margin:0 0 6px;line-height:1.35;color:var(--text)}
+.card-desc{font-size:11px;color:var(--text-dim);line-height:1.5;margin-bottom:8px}
+.card-files{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.card-file{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--amber);background:var(--amber-glow);padding:2px 6px;border-radius:4px;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.card-file-more{color:var(--text-dim);background:var(--surface-3)}
 .card-meta{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap}
 .card-tag{font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:4px;text-transform:uppercase}
-.card-date{font-size:10px;color:var(--text-dim);margin-left:auto;font-family:'JetBrains Mono',monospace}
+.card-date{font-size:10px;color:var(--text-dim);font-family:'JetBrains Mono',monospace}
 .tag-comms{color:var(--cyan);background:var(--cyan-glow)}
 .tag-compliance{color:var(--rose);background:var(--rose-glow)}
 .tag-admin{color:var(--purple);background:var(--purple-glow)}
@@ -80,23 +83,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tl-content{flex:1}.tl-content h4{font-size:13px;font-weight:700;margin-bottom:3px}
 .tl-content p{font-size:11px;color:var(--text-dim);line-height:1.5}
 .sessions{max-width:900px;margin:0 auto;padding:20px 24px}
-.session-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;transition:all .2s}
+.session-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;transition:all .2s}
 .session-item:hover{border-color:var(--border-hover)}
-.session-date{font-size:12px;font-weight:700;color:var(--indigo);font-family:'JetBrains Mono',monospace}
-.session-title{font-size:14px;font-weight:700;margin:6px 0 4px}
-.session-decisions{font-size:11px;color:var(--text-dim);line-height:1.6}
-.session-decisions strong{color:var(--text-muted);font-weight:600}
+.session-date{font-size:12px;font-weight:700;color:var(--indigo);font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.session-title{font-size:15px;font-weight:800;margin:4px 0 10px;line-height:1.4;color:var(--text)}
+.session-decisions{font-size:12px;color:var(--text-muted);line-height:1.7;padding:12px 14px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--indigo)}
+.session-decisions strong{color:var(--indigo);font-weight:700}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:1000;justify-content:center;align-items:center;padding:24px}
 .modal-overlay.active{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:560px;width:100%;max-height:80vh;overflow-y:auto;position:relative}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;position:relative}
 .modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px}
 .modal-close:hover{background:var(--surface-2);color:var(--text)}
-.modal h3{font-size:16px;font-weight:800;margin-bottom:4px;padding-right:32px}
-.modal .card-id{margin-bottom:8px}
-.modal .full-desc{font-size:12px;color:var(--text-muted);line-height:1.7;margin:12px 0}
-.modal .detail-row{display:flex;gap:8px;margin:6px 0;font-size:11px}
-.modal .detail-label{color:var(--text-dim);min-width:60px;font-weight:600}
-.modal .detail-value{color:var(--text)}
+.modal h3{font-size:17px;font-weight:800;margin-bottom:4px;padding-right:32px;line-height:1.3}
+.modal .card-id{margin-bottom:6px}
+.modal .full-desc{font-size:12px;color:var(--text-muted);line-height:1.8;margin:12px 0;padding:12px 14px;background:var(--surface-2);border-radius:8px}
+.modal .detail-row{display:flex;gap:8px;margin:8px 0;font-size:11px;align-items:flex-start}
+.modal .detail-label{color:var(--text-dim);min-width:70px;font-weight:700;padding-top:2px;text-transform:uppercase;font-size:10px;letter-spacing:0.05em}
+.modal .detail-value{color:var(--text);flex:1}
+.modal-files{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.modal-file{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--amber);background:var(--amber-glow);padding:3px 8px;border-radius:4px;line-height:1.6}
+.modal-decisions{font-size:12px;color:var(--text-muted);line-height:1.7;margin-top:10px;padding:12px 14px;background:var(--surface-2);border-radius:8px;border-left:3px solid var(--indigo)}
+.modal-decisions strong{color:var(--indigo);font-weight:700}
 .footer{text-align:center;padding:40px 24px;color:var(--text-dim);font-size:11px}
 .card,.session-item,.tl-item{animation:slideUp .3s ease both}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -1333,20 +1340,154 @@ const DATA = {
 };
 const TAGS={comms:{label:'Comms',color:'cyan'},compliance:{label:'Compliance',color:'rose'},admin:{label:'Admin',color:'purple'},core:{label:'Core',color:'blue'},infra:{label:'Infra',color:'amber'},ai:{label:'AI',color:'green'},ux:{label:'UX',color:'indigo'},integrations:{label:'Integrations',color:'integrations'}};
 let activeView='kanban',activeFilter='all';
-function renderStats(){const e=document.getElementById('stats'),c={'In Progress':DATA.inProgress.length,'Next Up':DATA.nextUp.length,'Backlog':DATA.backlog.length,'Done':DATA.done.length};e.innerHTML=Object.entries(c).map(([l,v])=>`<div class="stat"><div class="stat-val">${v}</div><div class="stat-label">${l}</div></div>`).join('')}
-function renderFilters(){const e=document.getElementById('filterBar'),a=['all',...Object.keys(TAGS)];e.innerHTML=a.map(t=>`<button class="filter-chip ${t===activeFilter?'active':''}" data-filter="${t}">${t==='all'?'All':TAGS[t].label}</button>`).join('')}
-function filterItems(items){if(activeFilter==='all')return items;return items.filter(i=>i.tag===activeFilter)}
-function renderCard(item,status){const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const date=item.completed||item.added||'';return `<div class="card" onclick="showModal('${item.id}','${status}')"><div class="card-id">${item.id}</div><div class="card-title">${item.title}</div><div class="card-desc">${item.desc}</div><div class="card-meta"><span class="card-tag tag-${tag.color}">${tag.label}</span>${item.files?`<span class="card-tag tag-infra" style="opacity:0.6">📁</span>`:''}<span class="card-date">${date}</span></div></div>`}
-function renderKanban(){const e=document.getElementById('kanbanView'),blSorted=[...DATA.backlog].sort((a,b)=>(b.added||'').localeCompare(a.added||'')),blItems=filterItems(blSorted),cols=[{key:'progress',title:'In Progress',items:filterItems(DATA.inProgress),status:'progress'},{key:'next',title:'Next Up',items:filterItems(DATA.nextUp),status:'next'},{key:'backlog',title:'Backlog',items:blItems,status:'backlog'},{key:'debt',title:'Tech Debt & Bugs',items:filterItems([...DATA.techDebt,...DATA.bugs]),status:'debt'},{key:'done',title:'Done',items:filterItems(DATA.done).slice(0,15),status:'done'}];e.innerHTML=cols.map(c=>{const count=c.key==='done'?DATA.done.length:c.items.length;return `<div class="column col-${c.key}"><div class="column-header"><div class="column-dot"></div><div class="column-title">${c.title}</div><div class="column-count">${count}${c.key==='done'?'+':''}</div></div><div class="column-body">${c.items.map(i=>renderCard(i,c.status)).join('')}${c.items.length===0?'<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11px">No items</div>':''}</div></div>`}).join('')}
-function renderTimeline(){const e=document.getElementById('timelineView'),allDone=[...DATA.done].sort((a,b)=>b.completed.localeCompare(a.completed)),months={},monthNames={'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};allDone.forEach(i=>{const m=i.completed.substring(0,7);if(!months[m])months[m]=[];months[m].push(i)});DATA.inProgress.forEach(i=>{const m='In Progress';if(!months[m])months[m]=[];months[m].push({...i,_status:'progress'})});let html='';if(months['In Progress']){html+=`<div class="tl-month"><div class="tl-month-label" style="color:var(--amber)">🔨 In Progress</div>${months['In Progress'].map(i=>{const tag=TAGS[i.tag]||{label:i.tag,color:'blue'};return `<div class="tl-item progress"><div class="tl-date">${i.added}</div><div class="tl-content"><h4>${i.id} — ${i.title}</h4><p>${i.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p></div></div>`}).join('')}</div>`;delete months['In Progress']}Object.keys(months).sort().reverse().forEach(m=>{const[y,mo]=m.split('-');const label=`${monthNames[mo]} ${y}`;const items=filterItems(months[m]);if(items.length===0)return;html+=`<div class="tl-month"><div class="tl-month-label">${label}</div>${items.map(i=>{const tag=TAGS[i.tag]||{label:i.tag,color:'blue'};return `<div class="tl-item done"><div class="tl-date">${i.completed}</div><div class="tl-content"><h4>${i.id} — ${i.title}</h4><p>${i.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p></div></div>`}).join('')}</div>`});e.innerHTML=html}
-function renderSessions(){const e=document.getElementById('sessionsView');e.innerHTML=DATA.sessions.map(s=>`<div class="session-item"><div class="session-date">${s.date}</div><div class="session-title">${s.title}</div><div class="session-decisions"><strong>Key decisions:</strong> ${s.decisions}</div></div>`).join('')}
-function showModal(id,status){const allItems=[...DATA.inProgress,...DATA.nextUp,...DATA.backlog,...DATA.techDebt,...DATA.bugs,...DATA.done];const item=allItems.find(i=>i.id===id);if(!item)return;const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const statusLabels={progress:'In Progress',next:'Next Up',debt:'Tech Debt / Bug',done:'Done',backlog:'Backlog'};document.getElementById('modalContent').innerHTML=`<div class="card-id">${item.id}</div><h3>${item.title}</h3><div class="card-meta" style="margin:8px 0 16px"><span class="card-tag tag-${tag.color}">${tag.label}</span><span class="card-tag" style="color:var(--text-muted);background:var(--surface-2)">${statusLabels[status]||status}</span></div><div class="full-desc">${item.desc}</div>${item.files?`<div class="detail-row"><div class="detail-label">Files</div><div class="detail-value mono" style="font-size:11px">${item.files}</div></div>`:''}<div class="detail-row"><div class="detail-label">${item.completed?'Completed':'Added'}</div><div class="detail-value mono" style="font-size:11px">${item.completed||item.added}</div></div>`;document.getElementById('modal').classList.add('active')}
-function closeModal(){document.getElementById('modal').classList.remove('active')}
-document.querySelectorAll('.view-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeView=btn.dataset.view;document.getElementById('kanbanView').style.display=activeView==='kanban'?'':'none';document.getElementById('timelineView').style.display=activeView==='timeline'?'':'none';document.getElementById('sessionsView').style.display=activeView==='sessions'?'':'none';render()})});
-document.getElementById('filterBar').addEventListener('click',e=>{if(e.target.classList.contains('filter-chip')){activeFilter=e.target.dataset.filter;render()}});
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-function render(){renderStats();renderFilters();renderKanban();renderTimeline();renderSessions();document.getElementById('lastUpdated').textContent=LAST_UPDATED}
+
+function renderStats(){
+  var e=document.getElementById('stats');
+  var c={'In Progress':DATA.inProgress.length,'Next Up':DATA.nextUp.length,'Backlog':DATA.backlog.length,'Done':DATA.done.length};
+  e.innerHTML=Object.entries(c).map(function(x){return '<div class="stat"><div class="stat-val">'+x[1]+'</div><div class="stat-label">'+x[0]+'</div></div>';}).join('');
+}
+
+function renderFilters(){
+  var e=document.getElementById('filterBar');
+  var a=['all'].concat(Object.keys(TAGS));
+  e.innerHTML=a.map(function(t){return '<button class="filter-chip '+(t===activeFilter?'active':'')+'" data-filter="'+t+'">'+(t==='all'?'All':TAGS[t].label)+'</button>';}).join('');
+}
+
+function filterItems(items){
+  if(activeFilter==='all')return items;
+  return items.filter(function(i){return i.tag===activeFilter;});
+}
+
+function renderCard(item,status){
+  var tag=TAGS[item.tag]||{label:item.tag,color:'blue'};
+  var date=item.completed||item.added||'';
+  var filesHtml='';
+  if(item.files){
+    var parts=item.files.split(',').map(function(f){return f.trim();}).filter(Boolean);
+    var chips=parts.slice(0,3).map(function(f){
+      var short=f.replace(/^src\/features\//,'').replace(/^src\/app\//,'').replace(/^src\/components\//,'').replace(/^src\/lib\//,'').replace(/\.tsx?$/,'').replace(/\.mjs$/,'');
+      return '<span class="card-file">'+short+'</span>';
+    }).join('');
+    var more=parts.length>3?'<span class="card-file card-file-more">+'+( parts.length-3)+' more</span>':'';
+    filesHtml='<div class="card-files">'+chips+more+'</div>';
+  }
+  return '<div class="card" onclick="showModal(''+item.id+'',''+status+'')">'
+    +'<div class="card-header-row"><div class="card-id">'+item.id+'</div><span class="card-date">'+date+'</span></div>'
+    +'<div class="card-title">'+item.title+'</div>'
+    +'<div class="card-desc">'+item.desc+'</div>'
+    +filesHtml
+    +'<div class="card-meta"><span class="card-tag tag-'+tag.color+'">'+tag.label+'</span></div>'
+    +'</div>';
+}
+
+function renderKanban(){
+  var e=document.getElementById('kanbanView');
+  var cols=[
+    {key:'progress',title:'In Progress',items:filterItems(DATA.inProgress),status:'progress'},
+    {key:'next',title:'Next Up',items:filterItems(DATA.nextUp),status:'next'},
+    {key:'debt',title:'Tech Debt & Bugs',items:filterItems([].concat(DATA.techDebt,DATA.bugs)),status:'debt'},
+    {key:'done',title:'Done',items:filterItems(DATA.done).slice(0,20),status:'done'}
+  ];
+  e.innerHTML=cols.map(function(c){
+    var cards=c.items.map(function(i){return renderCard(i,c.status);}).join('');
+    var empty=c.items.length===0?'<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11px">No items</div>':'';
+    return '<div class="column col-'+c.key+'">'
+      +'<div class="column-header"><div class="column-dot"></div><div class="column-title">'+c.title+'</div><div class="column-count">'+c.items.length+(c.key==='done'?'+':'')+'</div></div>'
+      +'<div class="column-body">'+cards+empty+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function renderTimeline(){
+  var e=document.getElementById('timelineView');
+  var allDone=DATA.done.slice().sort(function(a,b){return b.completed.localeCompare(a.completed);});
+  var months={};
+  var monthNames={'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};
+  allDone.forEach(function(i){var m=i.completed.substring(0,7);if(!months[m])months[m]=[];months[m].push(i);});
+  DATA.inProgress.forEach(function(i){if(!months['__progress'])months['__progress']=[];months['__progress'].push(i);});
+  var html='';
+  if(months['__progress']){
+    html+='<div class="tl-month"><div class="tl-month-label" style="color:var(--amber)">🔨 In Progress</div>';
+    months['__progress'].forEach(function(i){
+      var tag=TAGS[i.tag]||{label:i.tag,color:'blue'};
+      html+='<div class="tl-item progress"><div class="tl-date">'+i.added+'</div><div class="tl-content"><h4>'+i.id+' — '+i.title+'</h4><p>'+i.desc+'</p></div></div>';
+    });
+    html+='</div>';
+    delete months['__progress'];
+  }
+  Object.keys(months).sort().reverse().forEach(function(m){
+    var parts=m.split('-');
+    var label=monthNames[parts[1]]+' '+parts[0];
+    var items=filterItems(months[m]);
+    if(items.length===0)return;
+    html+='<div class="tl-month"><div class="tl-month-label">'+label+'</div>';
+    items.forEach(function(i){
+      var tag=TAGS[i.tag]||{label:i.tag,color:'blue'};
+      html+='<div class="tl-item done"><div class="tl-date">'+i.completed+'</div><div class="tl-content"><h4>'+i.id+' — '+i.title+'</h4><p>'+i.desc+'</p></div></div>';
+    });
+    html+='</div>';
+  });
+  e.innerHTML=html;
+}
+
+function renderSessions(){
+  var e=document.getElementById('sessionsView');
+  e.innerHTML=DATA.sessions.map(function(s){
+    return '<div class="session-item">'
+      +'<div class="session-date">'+s.date+'</div>'
+      +'<div class="session-title">'+s.title+'</div>'
+      +'<div class="session-decisions"><strong>Key decisions:</strong> '+s.decisions+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function showModal(id,status){
+  var allItems=[].concat(DATA.inProgress,DATA.nextUp,DATA.backlog,DATA.techDebt,DATA.bugs,DATA.done);
+  var item=allItems.find(function(i){return i.id===id;});
+  if(!item)return;
+  var tag=TAGS[item.tag]||{label:item.tag,color:'blue'};
+  var statusLabels={progress:'In Progress',next:'Next Up',debt:'Tech Debt / Bug',done:'Done',backlog:'Backlog'};
+  var filesHtml='';
+  if(item.files){
+    var chips=item.files.split(',').map(function(f){return f.trim();}).filter(Boolean).map(function(f){return '<span class="modal-file">'+f+'</span>';}).join('');
+    filesHtml='<div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><div class="modal-files">'+chips+'</div></div></div>';
+  }
+  var session=DATA.sessions.find(function(s){return s.title&&item.title&&(s.title.indexOf(item.id)>-1||s.title.toLowerCase().indexOf(item.title.toLowerCase().substring(0,20))>-1);});
+  var sessionHtml=session
+    ?'<div class="detail-row"><div class="detail-label">Session</div><div class="detail-value" style="color:var(--indigo);font-size:11px">'+session.date+'</div></div><div class="modal-decisions"><strong>Key decisions:</strong> '+session.decisions+'</div>'
+    :'';
+  document.getElementById('modalContent').innerHTML=
+    '<div class="card-id">'+item.id+'</div>'
+    +'<h3>'+item.title+'</h3>'
+    +'<div class="card-meta" style="margin:8px 0 16px"><span class="card-tag tag-'+tag.color+'">'+tag.label+'</span>&nbsp;<span class="card-tag" style="color:var(--text-muted);background:var(--surface-2)">'+(statusLabels[status]||status)+'</span></div>'
+    +'<div class="full-desc">'+item.desc+'</div>'
+    +filesHtml
+    +'<div class="detail-row"><div class="detail-label">'+(item.completed?'Completed':'Added')+'</div><div class="detail-value mono" style="font-size:11px">'+(item.completed||item.added)+'</div></div>'
+    +sessionHtml;
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('active');}
+
+document.querySelectorAll('.view-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.view-btn').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    activeView=btn.dataset.view;
+    document.getElementById('kanbanView').style.display=activeView==='kanban'?'':'none';
+    document.getElementById('timelineView').style.display=activeView==='timeline'?'':'none';
+    document.getElementById('sessionsView').style.display=activeView==='sessions'?'':'none';
+    render();
+  });
+});
+
+document.getElementById('filterBar').addEventListener('click',function(e){
+  if(e.target.classList.contains('filter-chip')){activeFilter=e.target.dataset.filter;render();}
+});
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===document.getElementById('modal'))closeModal();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
+function render(){renderStats();renderFilters();renderKanban();renderTimeline();renderSessions();document.getElementById('lastUpdated').textContent=LAST_UPDATED;}
 render();
 </script>
 </body>
