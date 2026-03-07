@@ -420,15 +420,15 @@ const DATA = {
       "added": "2026-03-04"
     },
     {
-      "id": "~~BL-35~~",
-      "title": "~~Listing Intelligence Engine~~",
+      "id": "BL-35",
+      "title": "Listing Intelligence Engine",
       "desc": "DONE → D-77 through D-81",
       "tag": "ai",
       "added": "2026-03-04"
     },
     {
-      "id": "~~BL-36~~",
-      "title": "~~Lead Qualification Form~~",
+      "id": "BL-36",
+      "title": "Lead Qualification Form",
       "desc": "DONE → D-82",
       "tag": "admin",
       "added": "2026-03-05"
@@ -476,43 +476,43 @@ const DATA = {
       "added": "2026-03-04"
     },
     {
-      "id": "~~BL-43~~",
-      "title": "~~Viewing Briefing System~~",
+      "id": "BL-43",
+      "title": "Viewing Briefing System",
       "desc": "DONE → D-84, D-85",
       "tag": "core",
       "added": "2026-03-06"
     },
     {
-      "id": "~~BL-52~~",
-      "title": "~~V2 Schema Foundation~~",
+      "id": "BL-52",
+      "title": "V2 Schema Foundation",
       "desc": "DONE → D-86",
       "tag": "core",
       "added": "2026-03-07"
     },
     {
-      "id": "~~BL-44~~",
-      "title": "~~Record Feedback — Viewing Feedback Form~~",
+      "id": "BL-44",
+      "title": "Record Feedback — Viewing Feedback Form",
       "desc": "DONE → D-87",
       "tag": "core",
       "added": "2026-03-07"
     },
     {
-      "id": "~~BL-45~~",
-      "title": "~~Document-Contact Linking~~",
+      "id": "BL-45",
+      "title": "Document-Contact Linking",
       "desc": "DONE → D-88",
       "tag": "core",
       "added": "2026-03-07"
     },
     {
-      "id": "~~BL-50~~",
-      "title": "~~activity_events — Wire Up~~",
+      "id": "BL-50",
+      "title": "activity_events — Wire Up",
       "desc": "DONE → D-89",
       "tag": "core",
       "added": "2026-03-08"
     },
     {
-      "id": "~~BL-46~~",
-      "title": "~~Deal Timeline — Viewings + Docs Unified~~",
+      "id": "BL-46",
+      "title": "Deal Timeline — Viewings + Docs Unified",
       "desc": "DONE → D-90",
       "tag": "admin",
       "added": "2026-03-08"
@@ -525,8 +525,8 @@ const DATA = {
       "added": "2026-03-06"
     },
     {
-      "id": "~~BL-48~~",
-      "title": "~~Buyer Journey View~~",
+      "id": "BL-48",
+      "title": "Buyer Journey View",
       "desc": "DONE → D-91",
       "tag": "core",
       "added": "2026-03-08"
@@ -539,8 +539,8 @@ const DATA = {
       "added": "2026-03-06"
     },
     {
-      "id": "~~BL-50~~",
-      "title": "~~activity_events — Wire Up~~",
+      "id": "BL-50",
+      "title": "activity_events — Wire Up",
       "desc": "DONE → D-89",
       "tag": "core",
       "added": "2026-03-06"
@@ -1445,6 +1445,9 @@ function showModal(id,status){
   var allItems=[].concat(DATA.inProgress,DATA.nextUp,DATA.backlog,DATA.techDebt,DATA.bugs,DATA.done);
   var item=allItems.find(function(i){return i.id===id;});
   if(!item)return;
+  // If backlog desc says DONE→D-xx, show the richer done entry instead
+  var doneRef=item.desc&&item.desc.match(/DONE[^D]*(D-d+)/i);
+  if(doneRef){var doneItem=DATA.done.find(function(i){return i.id===doneRef[1];});if(doneItem){item=Object.assign({},doneItem,{id:id,title:item.title.replace(/^(BL-d+s*—?s*)/,'')});status='done';}}
   var tag=TAGS[item.tag]||{label:item.tag,color:'blue'};
   var statusLabels={progress:'In Progress',next:'Next Up',debt:'Tech Debt / Bug',done:'Done',backlog:'Backlog'};
   var filesHtml='';
