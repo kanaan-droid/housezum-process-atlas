@@ -504,11 +504,11 @@ const DATA = {
       "added": "2026-03-08"
     },
     {
-      "id": "BL-46",
-      "title": "Deal Timeline — Viewings + Docs Unified",
-      "desc": "Single timeline on deal detail: all viewings (with feedback) + all documents for deal's property + contacts. Powered by activity_events. Depends on BL-44 + BL-45 + BL-52.",
+      "id": "~~BL-46~~",
+      "title": "~~Deal Timeline — Viewings + Docs Unified~~",
+      "desc": "DONE → D-90",
       "tag": "admin",
-      "added": "2026-03-06"
+      "added": "2026-03-08"
     },
     {
       "id": "BL-47",
@@ -629,6 +629,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-90",
+      "title": "BL-46 Deal Timeline",
+      "desc": "DealTimelineTab.tsx: 4 parallel data sources (deal events, property+contact events, property docs, viewing feedback), merged + deduped, sorted by date. 12 event types with coloured icon dots on vertical rail. Actor name resolution from agent_profiles. Loading skeletons, empty state. Deal detail page at /admin/deals/[id]: Summary",
+      "completed": "Timeline tabs, --hz-violet underline indicator, contact_id resolved from linked lead. i18n 4 locales, 20 keys each.",
+      "tag": "admin"
+    },
     {
       "id": "D-89",
       "title": "BL-50 activity_events — Wire Up",
@@ -1207,8 +1214,8 @@ const DATA = {
   "sessions": [
     {
       "date": "2026-03-08",
-      "title": "BL-50 + BL-46 in progress. BL-50 complete: activity_events wired from 13 sources across 9 files. trackEvent (client) + trackEventServer (API routes) in src/lib/activityEvents.ts. BL-46 Deal Timeline in progress.",
-      "decisions": "fire-and-forget pattern via void trackEvent() — never blocks main operation; two helpers needed (client vs server) due to Supabase client initialization differences"
+      "title": "BL-50 + BL-46 complete. BL-50: activity_events wired from 13 sources across 9 files. trackEvent (client) + trackEventServer (API routes) in src/lib/activityEvents.ts. BL-46: DealTimelineTab with 4 parallel data sources, 12 event types, vertical rail UI, actor name resolution, i18n 4 locales. Deal detail page now has Summary",
+      "decisions": "Timeline tabs."
     },
     {
       "date": "2026-03-07",
