@@ -551,6 +551,20 @@ const DATA = {
       "desc": "Multiple buyers, sellers, guarantors, notaries per deal. Covered by entity_parties (BL-52). Needed for France/Switzerland co-ownership + UAE investor groups.",
       "tag": "admin",
       "added": "2026-03-06"
+    },
+    {
+      "id": "BL-53",
+      "title": "Portal Publishing Simulator",
+      "desc": "DONE → D-93",
+      "tag": "integrations",
+      "added": "2026-03-07"
+    },
+    {
+      "id": "BL-54",
+      "title": "Photo Quality AI for Portal Listings",
+      "desc": "AI checks each listing photo for: dark/underexposed, blurry, watermarks, wrong orientation, duplicate frames. Flags at listing level before portal submission (\"3 photos may be rejected by Bayut\"). Integrates into BL-53 Field Coverage tab as quality signal. Future: pre-publish gate in BL-4 (real portal push). Agencies with 50+ listings can catch systemic photo quality problems across their portfolio.",
+      "tag": "ai",
+      "added": "2026-03-08"
     }
   ],
   "techDebt": [
@@ -636,6 +650,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-93",
+      "title": "BL-53 Portal Publishing Simulator",
+      "desc": "Full-screen \"Preview on Portals\" modal on listing detail page. Field Coverage tab: 🔴/🟡/🟢 issue list, readiness % + ranking quality % per portal, Fix → deep-link back to edit modal. Bayut + Property Finder preview tabs: listing card, title preview, photo order strip. DB-driven validation rules (portal_field_requirements table, 38 UAE rules). Community name mapping (portal_community_mappings, 40 Dubai entries). Pure TS validation service (portalValidationService.ts) reusable for future cron bulk health checks. New properties columns: property_reference_id, rent_frequency, security_deposit, project_name, listing_metadata JSONB. Header action row redesigned: 6 icon buttons (Edit, Preview on Portals, Share, WhatsApp, Email, Map) — overflow menu removed. Fix → returns to simulator after edit.",
+      "completed": "2026-03-08",
+      "tag": "comms"
+    },
     {
       "id": "D-91",
       "title": "BL-48 Buyer Journey View",
