@@ -135,7 +135,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-03-07';
+const LAST_UPDATED = '2026-03-08';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -562,8 +562,15 @@ const DATA = {
     {
       "id": "BL-54",
       "title": "Photo Quality AI for Portal Listings",
-      "desc": "AI checks each listing photo for: dark/underexposed, blurry, watermarks, wrong orientation, duplicate frames. Flags at listing level before portal submission (\"3 photos may be rejected by Bayut\"). Integrates into BL-53 Field Coverage tab as quality signal. Future: pre-publish gate in BL-4 (real portal push). Agencies with 50+ listings can catch systemic photo quality problems across their portfolio.",
+      "desc": "AI checks each listing photo for: dark/underexposed, blurry, watermarks, wrong orientation, duplicate frames. Flags at listing level before portal submission. Integrates into BL-53 Field Coverage tab as quality signal. Future: pre-publish gate in BL-4. Agencies with 50+ listings can catch systemic photo quality problems across portfolio.",
       "tag": "ai",
+      "added": "2026-03-08"
+    },
+    {
+      "id": "BL-55",
+      "title": "Portal Publishing Engine",
+      "desc": "Full portal publishing engine to the network edge — everything except the final transport call. Canonical listing model v2 (internationally ready: unit-safe area, multi-language content, Europe-ready location, energy class). Portal adapters (BayutAdapter, PropertyFinderAdapter). Feed serializer (XML + JSON). Bulk feed runner (mock). Admin bulk dashboard: portal status, feed health per listing, common failure aggregation, feed URL copy. DB: portal_integrations, portal_listing_simulations, portal_listing_overrides, portal_feed_runs, portal_feed_listing_results. Builds ON TOP of BL-53 — adapters wrap existing validation service. Spec v2.0 cross-validated ChatGPT + Gemini 2026-03-08.",
+      "tag": "admin",
       "added": "2026-03-08"
     }
   ],
@@ -625,6 +632,14 @@ const DATA = {
       "added": "2026-02-28"
     },
     {
+      "id": "TD-13",
+      "title": "⚠️ New country checklist for portal expansion",
+      "desc": "When adding FR/CH/IT portal support: (1) Seed portal_field_requirements for new portal + market (energy_class is legally required for FR/IT); (2) Seed portal_community_mappings for new market; (3) Implement PortalAdapter (validate + transform + simulate); (4) Update canonicalMapper for new compliance fields; (5) Add i18n keys for new locale. Canonical model v2 handles all of this without architecture changes — purely additive. Cross-validated ChatGPT + Gemini 2026-03-08.",
+      "files": "Portal simulator files",
+      "tag": "compliance",
+      "added": "2026-03-08"
+    },
+    {
       "id": "TD-12",
       "title": "⚠️ HIGH STAKES: properties → assets + listings split",
       "desc": "This is the single biggest architectural risk in the codebase. Do not attempt until post-v1 but plan every new column carefully. Current properties table conflates two distinct concepts: (1) assets — the physical real estate object (address, size, rooms, building, cadastral ID — never changes); (2) listings — the commercial mandate (price, status, agent, commission, token, photos, compliance snapshot — changes every time a property is re-listed). Why this will break: same villa listed for rent in 2025, rented, re-listed for sale in 2027 — one properties row cannot model this without overwriting history. AI loses all previous price reactions, viewer feedback, and market positioning data. Historical reporting becomes impossible. Scope of the future refactor: 50+ .from('properties') queries across hooks, components, API routes, services, compliance engine, intel cards, viewing brief, market analysis, seed scripts, RLS policies. Estimated 3-4 full sessions of migration with high regression risk. What to do NOW: every new column added to properties must be commented as either -- ASSET LAYER (physical fact: never changes) or -- LISTING LAYER (commercial fact: changes per mandate). This makes the eventual split a mechanical operation rather than an architectural puzzle. Cross-validated by Gemini + ChatGPT as the #1 future backfill risk.",
@@ -651,9 +666,16 @@ const DATA = {
   ],
   "done": [
     {
+      "id": "D-94",
+      "title": "Energy class + year built columns",
+      "desc": "Added energy_class (A-G enum), energy_efficiency_index (kWh/m²/year), year_built to properties table. Added to EditPropertyModal under \"Listing & Portal Fields\" section. EU portal readiness — legally required to advertise in France (DPE) and Italy (APE).",
+      "completed": "2026-03-08",
+      "tag": "integrations"
+    },
+    {
       "id": "D-93",
       "title": "BL-53 Portal Publishing Simulator",
-      "desc": "Full-screen \"Preview on Portals\" modal on listing detail page. Field Coverage tab: 🔴/🟡/🟢 issue list, readiness % + ranking quality % per portal, Fix → deep-link back to edit modal. Bayut + Property Finder preview tabs: listing card, title preview, photo order strip. DB-driven validation rules (portal_field_requirements table, 38 UAE rules). Community name mapping (portal_community_mappings, 40 Dubai entries). Pure TS validation service (portalValidationService.ts) reusable for future cron bulk health checks. New properties columns: property_reference_id, rent_frequency, security_deposit, project_name, listing_metadata JSONB. Header action row redesigned: 6 icon buttons (Edit, Preview on Portals, Share, WhatsApp, Email, Map) — overflow menu removed. Fix → returns to simulator after edit.",
+      "desc": "Full-screen \"Preview on Portals\" modal on listing detail page. Field Coverage tab: 🔴/🟡/🟢 issue list, readiness % + ranking quality % per portal, Fix → deep-link returns to simulator after edit. Bayut + Property Finder preview tabs: listing card, title preview, photo order strip. DB-driven validation rules (portal_field_requirements, 38 UAE rules). Community name mapping (portal_community_mappings, 40 Dubai entries). Pure TS validation service (portalValidationService.ts) reusable for future cron bulk health checks. New properties columns: property_reference_id, rent_frequency, security_deposit, project_name, listing_metadata JSONB. Header action row redesigned: 6 icon buttons (Edit, Preview on Portals, Share, WhatsApp, Email, Map) — overflow menu removed.",
       "completed": "2026-03-08",
       "tag": "comms"
     },
