@@ -135,7 +135,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-03-08';
+const LAST_UPDATED = '2026-03-09';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -560,6 +560,13 @@ const DATA = {
       "added": "2026-03-07"
     },
     {
+      "id": "BL-56",
+      "title": "Portal Live Publish Status Column",
+      "desc": "Add \"Published On\" column to Admin Portals Feed Health table: BY ✅/❌",
+      "tag": "admin",
+      "added": "PF ✅/❌ per listing row. Pulls from getStatus() adapter call + portal_integrations live mode. Blocked until Bayut/PF live credentials arrive. Pattern: green checkmark = live on portal, red cross = not published, grey dash = mock mode."
+    },
+    {
       "id": "BL-54",
       "title": "Photo Quality AI for Portal Listings",
       "desc": "AI checks each listing photo for: dark/underexposed, blurry, watermarks, wrong orientation, duplicate frames. Flags at listing level before portal submission. Integrates into BL-53 Field Coverage tab as quality signal. Future: pre-publish gate in BL-4. Agencies with 50+ listings can catch systemic photo quality problems across portfolio.",
@@ -569,8 +576,22 @@ const DATA = {
     {
       "id": "BL-55",
       "title": "Portal Publishing Engine",
-      "desc": "Full portal publishing engine to the network edge — everything except the final transport call. Canonical listing model v2 (internationally ready: unit-safe area, multi-language content, Europe-ready location, energy class). Portal adapters (BayutAdapter, PropertyFinderAdapter). Feed serializer (XML + JSON). Bulk feed runner (mock). Admin bulk dashboard: portal status, feed health per listing, common failure aggregation, feed URL copy. DB: portal_integrations, portal_listing_simulations, portal_listing_overrides, portal_feed_runs, portal_feed_listing_results. Builds ON TOP of BL-53 — adapters wrap existing validation service. Spec v2.0 cross-validated ChatGPT + Gemini 2026-03-08.",
+      "desc": "DONE → D-95",
+      "tag": "integrations",
+      "added": "2026-03-08"
+    },
+    {
+      "id": "BL-58",
+      "title": "AI Assistant Persona & Few-Shot Prompt Engine",
+      "desc": "Replace generic Claude responses in the AI assistant (viewing mode, listing questions) with a real-estate-expert persona grounded in market-specific Q&A pairs. Architecture: (1) system prompt = role + tone + market context; (2) few-shot examples = ~200 corrected Q&A pairs from team review (HouseZoom_QA_Review_v2.xlsx — market/legal/process + property-specific sheets); (3) live property data injected per conversation. Claude generalises from examples — covers exact matches AND similar questions it hasn't seen. Blocked on: team completing the Q&A review spreadsheet. Once returned, spec + build in 1-2 sessions.",
       "tag": "admin",
+      "added": "2026-03-09"
+    },
+    {
+      "id": "BL-57",
+      "title": "Universal Inbound Signal Pipeline",
+      "desc": "DONE → D-96, D-97",
+      "tag": "core",
       "added": "2026-03-08"
     }
   ],
@@ -632,6 +653,14 @@ const DATA = {
       "added": "2026-02-28"
     },
     {
+      "id": "TD-14",
+      "title": "org_members full_name query 400",
+      "desc": "Something in admin layout/sidebar queries org_members selecting full_name + filtering status=eq.active. Neither column exists on org_members — full_name lives on agent_profiles/public.users. Causes 400 on every admin page load. Likely AdminSidebar user display. Non-blocking but noisy.",
+      "files": "Various admin components",
+      "tag": "admin",
+      "added": "2026-03-08"
+    },
+    {
       "id": "TD-13",
       "title": "⚠️ New country checklist for portal expansion",
       "desc": "When adding FR/CH/IT portal support: (1) Seed portal_field_requirements for new portal + market (energy_class is legally required for FR/IT); (2) Seed portal_community_mappings for new market; (3) Implement PortalAdapter (validate + transform + simulate); (4) Update canonicalMapper for new compliance fields; (5) Add i18n keys for new locale. Canonical model v2 handles all of this without architecture changes — purely additive. Cross-validated ChatGPT + Gemini 2026-03-08.",
@@ -665,6 +694,27 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-97",
+      "title": "BL-57 EU Portal Adapters",
+      "desc": "SeLoger (FR), Homegate (CH), Idealista (IT/ES), Immobiliare.it (IT). 4 adapters normalizing portal-specific payloads. SeLoger captures financingStatus + profil (EU buyer profile fields). Homegate handles DE/FR/IT language detection. Idealista covers Italy + Spain. 4 webhook routes + 4 env var placeholders + SQL migration (3 CHECK constraint updates: inbound_sources, inbound_signals, portal_listing_links). SignalSource type updated. Test guide written (seed SQL + curl commands).",
+      "completed": "2026-03-09",
+      "tag": "admin"
+    },
+    {
+      "id": "D-96",
+      "title": "BL-57 Inbound Signal Pipeline — Phase 2",
+      "desc": "Fuzzy contact matching (surname + initial + same property + 24h window, isSoftMergeCandidate flag). buyerProfileService: investor vs end-user detection from keywords + cross-property behavioral count. scoreDecayService: exponential decay (hot 3d / warm 7d / nurturing 21d half-lives, min score 1, skips sessions \u003c1d old). /api/cron/decay-scores route (2 AM UTC, matches purge-events auth pattern). vercel.json updated. signalProcessorService wired with buyer profile detection (fire-and-forget). Admin Signal Resolution Queue (/admin/signals): 3 stat cards, 3 tabs (Unresolved Signals / Shadow Listings / Soft Merges), Link Property modal with property dropdown, dismiss/confirm_merge/keep_separate actions, role guard (owner/admin/manager). 2 API routes. AdminNav Signals link + badge + i18n (4 locales: Signals/Signaux/Signale/Segnali). SQL: soft_merge_candidate + soft_merge_contact_id on lead_sessions + 2 indexes.",
+      "completed": "2026-03-09",
+      "tag": "admin"
+    },
+    {
+      "id": "D-95",
+      "title": "BL-55 Portal Publishing Engine",
+      "desc": "Full engine to network edge. src/features/portal-engine/: CanonicalListing v2 types, canonicalMapper (DB row → canonical, auto-detects market from city), communityNormalizer, BayutAdapter (XML, DB-driven validation, ranking score, simulation persistence), PropertyFinderAdapter (JSON, PF field codes), adapter registry, feedSerializer (bulk XML merge + JSON), feedRunService (portal_feed_runs CRUD), portalEngine orchestrator (simulate/runFeed/generateFeed). Feed API route /api/feeds/[orgId]/[portal] (XML/JSON, 1h cache). Admin Portals Dashboard /admin/portals: portal status cards (Inactive/Mock/Live badges, Run Feed/Generate XML/Copy URL), common failure aggregation (top 5 blockers across all listings), feed health table (per-listing Bayut+PF status, photo count, sortable, Preview → PortalSimulatorModal), feed preview modal (dark XML preview, download). AdminSidebar Portals link. BL-53 usePortalReadiness wired to engine adapters (shape-compatible, portalValidationService left intact). 5 new DB tables with RLS.",
+      "completed": "2026-03-08",
+      "tag": "admin"
+    },
     {
       "id": "D-94",
       "title": "Energy class + year built columns",
@@ -1269,6 +1319,31 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-03-09",
+      "title": "BL-57 End-to-End Testing complete. Fixed 7 bugs found during testing: (1) contacts insert using wrong column names (full_name/type → first_name/last_name/contact_type), (2) property agent column wrong (agent_user_id → user_id), (3) contact_aliases missing table guard, (4) fire-and-forget processSignal killed by Vercel serverless — added await to all 7 inbound routes, (5) agentUserId not passed to contact insert (user_id NOT NULL), (6) .maybeSingle() returning null on multiple rows — added .limit(1), (7) service role RLS bypasses missing on 4 tables (contacts, lead_sessions, inbound_signals, lead_source_events). Also: removed lead_hot from BL-57 to avoid duplicate cards with Intel Engine, added lead_hot to cardGeneratorService for intent_score \u003e 70, added 🔥 HOT LEAD badge to IntelCardItem, added 4 DB indexes (intel_cards x3, lead_source_events x1).",
+      "decisions": "fire-and-forget doesn't work on Vercel serverless — always await async pipeline calls; service_role client needs RLS bypass policies on every table it queries; .maybeSingle() returns null on multiple rows — always use .limit(1)"
+    },
+    {
+      "date": "2026-03-09",
+      "title": "BL-57 EU Adapters complete. SeLoger (FR), Homegate (CH), Idealista (IT/ES), Immobiliare.it (IT). 4 adapters + 4 webhook routes + SQL migration (3 constraint updates). SignalSource type updated. tsc clean. Test guide written (seed SQL + curl commands).",
+      "decisions": "Same adapter pattern as Bayut — additive, no architecture changes; EU adapters make multi-market pitch credible in demos"
+    },
+    {
+      "date": "2026-03-09",
+      "title": "BL-57 Phase 2 complete. Fuzzy contact matching (surname + initial + same property + 24h window). buyerProfileService (investor vs end-user detection). scoreDecayService (exponential decay: hot 3d / warm 7d / nurturing 21d). /api/cron/decay-scores (2 AM UTC). Admin Signal Resolution Queue (/admin/signals): 3 stat cards, 3 tabs (Unresolved/Shadow Listings/Soft Merges), Link Property modal, all actions wired. 2 API routes. AdminNav Signals link + i18n (4 locales). soft_merge_candidate + soft_merge_contact_id columns added.",
+      "decisions": "Soft merge surfaces to agent, not auto-resolved; properties community/city join simplified to count-only (TODO: BL-58); score decay skips sessions \u003c1 day old"
+    },
+    {
+      "date": "2026-03-08",
+      "title": "BL-57 Universal Inbound Signal Pipeline — spec complete. Cross-validated architecture with Gemini + ChatGPT. 6-layer pipeline spec: source adapters → InboundSignal ledger → entity resolution → lead session engine → intent scoring → Intel Cards. 8 new DB tables. Key decisions from xval: shadow_listings for unlinked portal leads, signal_resolutions for audit trail, lead_sessions to prevent contact fragmentation, dual scores (contact-level + session-level), exponential decay (3d/7d/21d half-lives), investor pattern = neutral not negative, temp_owner_id vs agent_user_id for vacation routing.",
+      "decisions": "Canonical signal type first \u003e portal-specific objects; not every signal → CRM object; not every signal → Intel Card; proxy numbers never become contact phones; portal payload ≠ truth"
+    },
+    {
+      "date": "2026-03-08",
+      "title": "BL-55 Portal Publishing Engine complete. Canonical model v2, BayutAdapter + PropertyFinderAdapter, feedSerializer, feedRunService, portalEngine orchestrator, feed API route, Admin Portals Dashboard, BL-53 simulator wired to engine adapters. 5 new DB tables.",
+      "decisions": "Dry-run (dryRun=true) safe for page load — no DB writes; \"Run Feed (Mock)\" writes real feed_run records; BL-53 usePortalReadiness shape-preserved via ValidationResult→PortalReadinessResult mapping"
+    },
     {
       "date": "2026-03-08",
       "title": "BL-50 + BL-46 + BL-48 complete. BL-50: activity_events wired from 13 sources. BL-46: Deal Timeline tab (4 parallel sources, 12 event types, vertical rail). BL-48: Buyer Journey tab (5 parallel sources, phase grouping, summary bar). Contact detail now has 6 tabs.",
