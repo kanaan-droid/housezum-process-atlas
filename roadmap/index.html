@@ -128,7 +128,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-03-10';
+const LAST_UPDATED = '2026-03-11';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -571,10 +571,17 @@ const DATA = {
       "title": "~~Portal Publishing Engine~~",
       "desc": "DONE → D-95",
       "tag": "integrations",
-      "added": "2026-03-08"
+      "added": "docs/specs/BL-55-PORTAL-PUBLISHING-ENGINE-SPEC-v2.md"
     },
     {
-      "id": "BL-59",
+      "id": "~~BL-59~~",
+      "title": "~~Lead-to-Contact Conversion + Requirements Model~~",
+      "desc": "DONE → D-100",
+      "tag": "admin",
+      "added": "docs/specs/BL-59-LEAD-CONVERSION-SPEC.md"
+    },
+    {
+      "id": "BL-61",
       "title": "Off-Plan Deal Type",
       "desc": "Add sale_offplan to deal_type enum. Requires: developer, project name, payment plan (% on milestones), Oqood registration, SPA document type. Deferred from BL-58.",
       "tag": "admin",
@@ -592,7 +599,35 @@ const DATA = {
       "title": "~~Deal Entity Foundation~~",
       "desc": "DONE → D-98, D-99",
       "tag": "admin",
-      "added": "2026-03-10"
+      "added": "docs/specs/BL-58-DEAL-ENTITY-V2-SPEC.md"
+    },
+    {
+      "id": "~~BL-59b~~",
+      "title": "~~Buyer/Seller Profile Consolidation~~",
+      "desc": "DONE → D-100",
+      "tag": "core",
+      "added": "docs/specs/BL-59b-PROFILE-CONSOLIDATION-SPEC.md"
+    },
+    {
+      "id": "BL-61",
+      "title": "Buyer Pipeline + Requirements CRM Visibility",
+      "desc": "Surface buyer requirements at admin/broker level. 3 surfaces: (1) Admin Contact Detail — Requirements section with full fields; (2) Contacts table — filterable columns: budget, areas, stage, urgency, financing, pre_approved, next_follow_up; (3) Buyer Pipeline board — visual stage board (Lead→Searching→Qualified→Viewing→Offer→Under Contract→Closed) distinct from Deal Pipeline. Cross-validated ChatGPT + Gemini 2026-03-11. Prereq for BL-62 + BL-63.",
+      "tag": "admin",
+      "added": "2026-03-11"
+    },
+    {
+      "id": "BL-62",
+      "title": "Reverse Match — Potential Buyers on Property Detail",
+      "desc": "On Property detail page (admin), add \"Potential Buyers\" tab. Queries requirements org-wide, scores match against property attributes (area, budget, bedrooms, property type). Shows ranked buyer list with match score + agent owner. Massive value-add for seller pitch: \"We have 12 active buyers matching your property.\" Used by PropSpace, Rex CRM. Prereq: BL-61.",
+      "tag": "admin",
+      "added": "2026-03-11"
+    },
+    {
+      "id": "BL-63",
+      "title": "Demand Map",
+      "desc": "Aggregate buyer requirements by area + budget into broker intelligence view. Dashboard widget: \"45 buyers in Dubai Marina, only 5 listings.\" Area-level demand vs inventory gap. Almost no CRM does this well — AI-native differentiator. Cross-validated ChatGPT + Gemini 2026-03-11.",
+      "tag": "ai",
+      "added": "2026-03-11"
     }
   ],
   "techDebt": [
@@ -683,6 +718,14 @@ const DATA = {
       "files": "All files touching properties table",
       "tag": "compliance",
       "added": "2026-03-06"
+    },
+    {
+      "id": "TD-16",
+      "title": "Seed data integrity — orphaned contacts",
+      "desc": "3 contacts with buyer_profiles rows (Yuki Tanaka, Sarah Mitchell, Hans Weber) are invisible in UI under any agent login. Likely created with user_id pointing to a non-existent or wrong agent. Audit and fix before BL-62 (Reverse Match) and BL-63 (Demand Map) depend on clean data.",
+      "files": "2026-03-11",
+      "tag": "infra",
+      "added": ""
     }
   ],
   "bugs": [
@@ -699,9 +742,30 @@ const DATA = {
       "desc": "Fingerprint used for evaluation caching doesn't include document count. Uploading a required document won't update the banner until page reload",
       "tag": "compliance",
       "added": "2026-02-28"
+    },
+    {
+      "id": "BG-4",
+      "title": "Contacts full-name search broken",
+      "desc": "Searching \"Elena Johnson\" returns 0 results but \"Elena\" works. Search likely queries first_name only, not concatenated first_name + last_name.",
+      "tag": "core",
+      "added": "2026-03-11"
     }
   ],
   "done": [
+    {
+      "id": "D-100",
+      "title": "BL-59b Buyer/Seller Profile Consolidation",
+      "desc": "Merged buyer_profiles into requirements as single buyer demand profile. Added 6 fields to requirements table: stage, pre_approved, pre_approval_amount, urgency, nice_to_haves, next_follow_up. Data migrated from buyer_profiles (urgency values normalized from dashes to underscores, org_id resolved via contacts join). Buyer tab removed from Contact Detail. Tab order: Info",
+      "completed": "Seller",
+      "tag": "admin"
+    },
+    {
+      "id": "D-100",
+      "title": "BL-59 Lead-to-Contact Conversion + Requirements Model",
+      "desc": "New requirements table, converted status on leads, ConvertLeadModal (3-step), Requirements tab on contact detail, /api/leads/convert endpoint.",
+      "completed": "2026-03-10",
+      "tag": "admin"
+    },
     {
       "id": "D-97",
       "title": "BL-57 EU Portal Adapters",
@@ -1327,6 +1391,21 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-03-11",
+      "title": "BL-59 complete + tested end-to-end. BL-59b specced: buyer_profiles consolidation into requirements, retire Buyer tab, keep Seller tab pending TD-12. Gotcha: buyer_profiles and seller_profiles ARE real DB tables (not UI-only) — always check DB before retiring UI.",
+      "decisions": "buyer_profiles and requirements overlap significantly; consolidate demand profile into requirements; seller_profiles stays (asset-side, different concern); TD-12 (properties→assets+listings split) is the real seller fix"
+    },
+    {
+      "date": "2026-03-10 eve",
+      "title": "BL-59 complete. requirements table, leads.converted_at/converted_by/requirement_id, POST /api/leads/convert, ConvertLeadModal (3-step: Contact→Requirement→Confirm), RequirementList + RequirementForm components, Requirements tab on contact detail, converted leads hidden from queue by default. Fixed: lead detail page [id] action buttons hidden for converted leads, i18n converted status all 4 locales.",
+      "decisions": "lead detail page is /admin/leads/[id]/page.tsx not the list; CC needs explicit push commands every time"
+    },
+    {
+      "date": "2026-03-10",
+      "title": "Seed script rewrite + BL-59 spec. Gmail alias emails for all agents (will+name-gh@housezoom.ai) and contacts. BL-58 deal relationships fully seeded (deal_participants, deal_assets, deal_stage_history, deal_commissions). DLD-backed properties from market_transactions. Multiple schema fixes during seeding (close_outcome, deal_assets.asset_role, deal_stage_history columns, deals_stage_check constraint, viewings columns). BL-59 Lead-to-Contact Conversion specced: new requirements table, converted status on leads, 3-step ConvertLeadModal, Requirements tab on contact detail.",
+      "decisions": "Password: HouseZoom2026!; deals_stage_check constraint dropped (other orgs had legacy stages); contact type 'owner' maps to 'seller' in DB — seed cache path must reverse-map; seller participants were silently skipped due to idempotency threshold too low"
+    },
     {
       "date": "2026-03-10",
       "title": "BL-58 Deal Entity Foundation — complete + tested. Schema: 4 new tables (deal_participants, deal_assets, deal_stage_history, deal_commissions), 6 universal stage enum, deal_type/status enums, 20+ new columns on deals. TypeScript: DealV2 types, dealService, useDealsV2, full kanban rewrite (6 columns, probability badges, stage dots). DealDetailPanel: stage progress bar, advance/close actions, history, parties (buyers/sellers/agents grouped), property, financials edit, commissions, notes. Bugs fixed during testing: contact name (first_name+last_name not name), commission recipient resolution (user→contact→external fallback), history label (null from_stage → \"Initial stage: X\"), financials float rounding. Seed data gaps identified and backfilled via SQL (see seed fixes below).",
