@@ -128,7 +128,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-03-11';
+const LAST_UPDATED = '2026-03-13';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -427,10 +427,10 @@ const DATA = {
       "added": "2026-03-05"
     },
     {
-      "id": "BL-37",
-      "title": "Forgot Password flow",
-      "desc": "\"Forgot password?\" link on login page → sends reset email via Supabase Auth. Currently users must reset via Supabase dashboard.",
-      "tag": "comms",
+      "id": "~~BL-37~~",
+      "title": "~~Forgot Password flow~~",
+      "desc": "DONE — already implemented",
+      "tag": "admin",
       "added": "2026-03-05"
     },
     {
@@ -581,7 +581,7 @@ const DATA = {
       "added": "docs/specs/BL-59-LEAD-CONVERSION-SPEC.md"
     },
     {
-      "id": "BL-61",
+      "id": "BL-64",
       "title": "Off-Plan Deal Type",
       "desc": "Add sale_offplan to deal_type enum. Requires: developer, project name, payment plan (% on milestones), Oqood registration, SPA document type. Deferred from BL-58.",
       "tag": "admin",
@@ -609,25 +609,60 @@ const DATA = {
       "added": "docs/specs/BL-59b-PROFILE-CONSOLIDATION-SPEC.md"
     },
     {
-      "id": "BL-61",
-      "title": "Buyer Pipeline + Requirements CRM Visibility",
-      "desc": "Surface buyer requirements at admin/broker level. 3 surfaces: (1) Admin Contact Detail — Requirements section with full fields; (2) Contacts table — filterable columns: budget, areas, stage, urgency, financing, pre_approved, next_follow_up; (3) Buyer Pipeline board — visual stage board (Lead→Searching→Qualified→Viewing→Offer→Under Contract→Closed) distinct from Deal Pipeline. Cross-validated ChatGPT + Gemini 2026-03-11. Prereq for BL-62 + BL-63.",
+      "id": "~~BL-61~~",
+      "title": "~~Agent Profile Settings Redesign + Currency Fix~~",
+      "desc": "DONE — complete rewrite of profile page (accordion layout, 6 sections, per-section save), useAgentProfile hook, setAgentCurrency singleton, country-aware license labels, admin row role-gated, phone prefix dedup, loading guard fix.",
       "tag": "admin",
-      "added": "2026-03-11"
+      "added": "docs/specs/BL-61-AGENT-PROFILE-SETTINGS-SPEC.md"
     },
     {
-      "id": "BL-62",
-      "title": "Reverse Match — Potential Buyers on Property Detail",
-      "desc": "On Property detail page (admin), add \"Potential Buyers\" tab. Queries requirements org-wide, scores match against property attributes (area, budget, bedrooms, property type). Shows ranked buyer list with match score + agent owner. Massive value-add for seller pitch: \"We have 12 active buyers matching your property.\" Used by PropSpace, Rex CRM. Prereq: BL-61.",
-      "tag": "admin",
-      "added": "2026-03-11"
+      "id": "~~BL-62~~",
+      "title": "~~Reverse Match on Property Detail~~",
+      "desc": "DONE → D-101",
+      "tag": "ai",
+      "added": "docs/specs/BL-62-REVERSE-MATCH-SPEC.md"
     },
     {
       "id": "BL-63",
       "title": "Demand Map",
-      "desc": "Aggregate buyer requirements by area + budget into broker intelligence view. Dashboard widget: \"45 buyers in Dubai Marina, only 5 listings.\" Area-level demand vs inventory gap. Almost no CRM does this well — AI-native differentiator. Cross-validated ChatGPT + Gemini 2026-03-11.",
-      "tag": "ai",
+      "desc": "Visual map of buyer demand — heatmap or cluster pins by preferred_areas. Overlay on property map. Helps agents spot undersupplied zones. Data from requirements table aggregation. Deferred. Spec: TBD",
+      "tag": "ux",
       "added": "2026-03-11"
+    },
+    {
+      "id": "~~BL-68~~",
+      "title": "~~Role-Based Deal Permissions~~",
+      "desc": "DONE → D-102",
+      "tag": "admin",
+      "added": "docs/specs/BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md"
+    },
+    {
+      "id": "~~BL-70~~",
+      "title": "~~Deal Document Architecture~~",
+      "desc": "DONE → D-104",
+      "tag": "admin",
+      "added": "docs/specs/BL-70-DEAL-DOCUMENT-ARCHITECTURE-SPEC.md"
+    },
+    {
+      "id": "BL-69",
+      "title": "Event-Driven Deal Stage Progression",
+      "desc": "Partial → D-103 — Steps 1–3 + 4–6 done. Step 4 pending: Intel Card stage_suggestion card type (org-configurable agent confirmation).",
+      "tag": "admin",
+      "added": "docs/specs/BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md"
+    },
+    {
+      "id": "BL-71",
+      "title": "Deal Health Score",
+      "desc": "Once BL-69 stage suggestions are flowing: compute deal health score from days-in-stage vs benchmark, suggestion response time, stale deal detection (no activity + no suggestion in 7d). Surface on deal cards. Feeds into Deal Orchestrator Agent (BL-38). Depends on BL-69.",
+      "tag": "admin",
+      "added": "2026-03-13"
+    },
+    {
+      "id": "BL-80",
+      "title": "Contact KYC Upload via Public Link",
+      "desc": "Allow contacts to upload their own identity/KYC documents via a public link (similar to enrichment form pattern). Agent-only upload for now (v1). Deferred post-launch.",
+      "tag": "core",
+      "added": "2026-03-13"
     }
   ],
   "techDebt": [
@@ -690,7 +725,7 @@ const DATA = {
     {
       "id": "TD-15",
       "title": "⚠️ Deal seed data gaps — fix on next reseed",
-      "desc": "Current seed script missing: (1) seller contact in property_contacts for each property → backfill as deal_participants seller role; (2) buyer_agent contact in property_contacts → backfill as deal_participants buyer_agent role; (3) deal_commissions: buy-side commission must go to buyer_agent (NOT buyer), sell-side to listing_agent; (4) interested_buyer in property_contacts → maps to buyer in deal_participants; (5) deal_stage_history seed entries for deals already in later stages (qualified→negotiation, negotiation→under_contract, etc. with realistic timestamps). Without this, deals look empty in the panel and buyer gets mistakenly assigned a commission.",
+      "desc": "9 gaps: (1) seller contact missing from property_contacts → backfill as deal_participants seller role; (2) buyer_agent missing from deal_participants; (3) buy-side commission goes to buyer not buyer_agent — must go to buyer_agent, sell-side to listing_agent; (4) interested_buyer not mapped to buyer in deal_participants; (5) deal_stage_history missing transition entries for deals in later stages; (6) duplicate agent users — both name@gulfhorizon.demo and will+name@housezoom.ai exist, consolidate to will+name@housezoom.ai only; (7) listing agent shows Unknown in DealDetailPanel for some deals; (8) deal participants not cross-linked to agent contact list; (9) agent_profiles schema mismatch in DB-SCHEMA.md (was first_name/last_name, actually full_name).",
       "files": "scripts/seed-dubai.mjs",
       "tag": "admin",
       "added": "2026-03-10"
@@ -752,6 +787,34 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-104",
+      "title": "BL-70 Deal Document Architecture",
+      "desc": "Polymorphic documents table (entity_type/entity_id), DealDocumentsTab (5 category groups), ContactDocsTab (KYC + deal cross-ref), DocumentUploadModal (shared portal-based), document type taxonomy (DealDocumentType, ContactDocumentType, PropertyDocumentType), DOCUMENT_STAGE_TRIGGERS map. Tabbed DealDetailPanel (Overview",
+      "completed": "Documents). Migration ready (not yet applied). Spec: docs/specs/BL-70-DEAL-DOCUMENT-ARCHITECTURE-SPEC.md",
+      "tag": "admin"
+    },
+    {
+      "id": "D-103",
+      "title": "BL-69 Event-Driven Stage Progression",
+      "desc": "deal_stage_suggestions table, stageSuggestionService (fire-and-forget from document upload, dedup gate, stage order validation), confirm/reject API (/api/deals/[id]/confirm-stage), admin Confirmations page (/admin/confirmations), AdminNav Confirmations link + pending badge count, i18n (4 locales). Migration ready (not yet applied). Step 4 pending: Intel Card stage_suggestion card type (org-configurable agent confirmation). Spec: docs/specs/BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md",
+      "completed": "2026-03-13",
+      "tag": "admin"
+    },
+    {
+      "id": "D-102",
+      "title": "BL-68 Role-Based Deal Permissions",
+      "desc": "Org settings toggle (deal_permissions JSONB) + useDealPermissions hook + DealDetailPanel canEditDeal prop + admin settings UI. Default: agents read-only. Configurable: agent_can_edit_stage, agent_can_edit_value, agent_can_upload_docs. No schema changes. Spec: docs/specs/BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md",
+      "completed": "2026-03-13",
+      "tag": "admin"
+    },
+    {
+      "id": "D-101",
+      "title": "BL-62 Reverse Match on Property Detail",
+      "desc": "Matching Buyers section on SummaryTab. Two-query approach (requirements + contacts, no joins). Client-side scoring across 4 dimensions (budget 40%, bedrooms 25%, area 25%, property type 10%). Org-wide matching. Top 10 results, threshold ≥40. Strong (≥70) / Partial (40–69) tiers. Pre-filled WhatsApp + email outreach. No DB changes. Spec: docs/specs/BL-62-REVERSE-MATCH-SPEC.md",
+      "completed": "2026-03-12",
+      "tag": "comms"
+    },
     {
       "id": "D-100",
       "title": "BL-59b Buyer/Seller Profile Consolidation",
@@ -1391,6 +1454,41 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-03-13",
+      "title": "Dashboard UX density sprint + BL-68/69/70 specs. Dashboard: compact Intel Cards (whole card tappable, inline badges, truncate body, tighter padding). Deal cards left border in stage color. AppShell rightActions slot — profile + refresh icons in org header row. Uniform px-4 padding across all dashboard sections. AssistantBar compact icons. Win category padding wrapper removed (uniform card width). BL-66 fixup: Intel Card \"View Deal\" opens DealDetailPanel via IntelDealPanel wrapper. BL-68 (Role-Based Deal Permissions), BL-69 (Event-Driven Stage Progression), BL-70 (Deal Document Architecture) specced, cross-validated with ChatGPT + Gemini. BL-71 (Deal Health Score) + BL-80 (Contact KYC public upload) added to backlog. Field research synthesis: agents default read-only on deals; back office confirms stage changes; CRM should infer state from actions not manual updates.",
+      "decisions": "Whole card tap = primary CTA (remove expand/collapse); createPortal to document.body is the permanent pattern for all slide-over panels; deal stage ≠ property listing status (independent); documents are linked not copied (document_last_verified_at flags stale references); agent uploading docs ≠ editing deal (upload feeds system data, back office confirms stage); stage rank map required for deterministic progression — never compare stages lexically; dedupe_key prevents notification fatigue from repeated signal triggers; confidence threshold 0.65 for message-based stage triggers"
+    },
+    {
+      "date": "2026-03-12",
+      "title": "BL-61 Agent Profile Settings Redesign + Currency Fix. Complete rewrite of settings/profile/page.tsx (~1225 lines → clean accordion). 6 sections: Personal Information, Professional Details, Marketing Profile, Preferences, Security, Connected Apps. Per-section Save buttons. Identity header always visible. Country-aware license label/prefix via LICENSE_META lookup map (RERA/UAE, CPI/France, BF/Switzerland, Pat./Italy). useAgentProfile hook. setAgentCurrency singleton in lib/utils.ts — fixes CHF bug. \"Switch to CRM Admin\" row (role-gated: owner/admin/manager only) between identity header and accordion. Admin button removed from AppShell entirely — profile page row is the sole entry point. Bug fixes: phone prefix dedup, password button colour, isAdminRole moved after loading guard (was evaluating before orgLoading resolved → always null). Country-agnostic architecture principle added to WAYS-OF-WORKING.",
+      "decisions": "isAdminRole must be computed after loading guard — hooks resolve async, evaluating role before orgLoading=false always gives null; admin navigation must have a single entry point — never duplicate in AppShell; LICENSE_META lookup map pattern is the template for all country-specific UI labels"
+    },
+    {
+      "date": "2026-03-11",
+      "title": "Admin nav moved to top header. Removed Admin from BottomNav (restored to 5 items: Dashboard, Listings, Viewing, Contacts, Agent Tools). Added fixed top header bar to AppShell: logo (left) + Admin shield button + Profile initials button (right). Nav Placement Rule added to WAYS-OF-WORKING.",
+      "decisions": "BottomNav max 5 items is now a hard rule; Admin access lives in top header not bottom nav; role gating on Admin button deferred"
+    },
+    {
+      "date": "2026-03-11",
+      "title": "BL-37 Forgot Password — confirmed already built. Forgot password flow was already implemented. Struck from backlog.",
+      "decisions": "—"
+    },
+    {
+      "date": "2026-03-11",
+      "title": "BL-61 Cleanup. Removed /buyers kanban page, /admin/buyers page, BottomNav Buyers item, AdminSidebar Buyers link, Contacts list Buyers/Sellers tabs, Seller tab from all Contact Detail pages. Requirements tab now shown only for Buyer contacts. Over-engineering from BL-61 — a buyer is a contact, Deal Pipeline handles progression.",
+      "decisions": "Seller tab deferred to TD-12 (assets/listings split); contact_type drives tab visibility"
+    },
+    {
+      "date": "2026-03-11",
+      "title": "BL-61 Buyer Pipeline complete. Agent /buyers kanban (5 stage columns, BuyerCard with urgency/pre-approval/follow-up, MoveStageSheet). Contacts page All",
+      "decisions": "Buyers"
+    },
+    {
+      "date": "2026-03-11",
+      "title": "Living documentation foundation. Generated DB-SCHEMA.md (all tables, columns, constraints, RLS, enums, migration history), ARCHITECTURE.md (domain model, data flow, 9 key systems, debugging patterns, iOS/Capacitor notes), updated WAYS-OF-WORKING.md with Living Documentation Protocol.",
+      "decisions": "DB-SCHEMA.md and ARCHITECTURE.md must be kept current every session — stale = blind debugging"
+    },
     {
       "date": "2026-03-11",
       "title": "BL-59 complete + tested end-to-end. BL-59b specced: buyer_profiles consolidation into requirements, retire Buyer tab, keep Seller tab pending TD-12. Gotcha: buyer_profiles and seller_profiles ARE real DB tables (not UI-only) — always check DB before retiring UI.",
