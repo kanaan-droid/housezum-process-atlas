@@ -128,7 +128,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-03-13';
+const LAST_UPDATED = '2026-03-14';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -644,9 +644,9 @@ const DATA = {
       "added": "docs/specs/BL-70-DEAL-DOCUMENT-ARCHITECTURE-SPEC.md"
     },
     {
-      "id": "BL-69",
-      "title": "Event-Driven Deal Stage Progression",
-      "desc": "Partial → D-103 — Steps 1–3 + 4–6 done. Step 4 pending: Intel Card stage_suggestion card type (org-configurable agent confirmation).",
+      "id": "~~BL-69~~",
+      "title": "~~Event-Driven Deal Stage Progression~~",
+      "desc": "DONE → D-103",
       "tag": "admin",
       "added": "docs/specs/BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md"
     },
@@ -796,9 +796,9 @@ const DATA = {
     },
     {
       "id": "D-103",
-      "title": "BL-69 Event-Driven Stage Progression",
-      "desc": "deal_stage_suggestions table, stageSuggestionService (fire-and-forget from document upload, dedup gate, stage order validation), confirm/reject API (/api/deals/[id]/confirm-stage), admin Confirmations page (/admin/confirmations), AdminNav Confirmations link + pending badge count, i18n (4 locales). Migration ready (not yet applied). Step 4 pending: Intel Card stage_suggestion card type (org-configurable agent confirmation). Spec: docs/specs/BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md",
-      "completed": "2026-03-13",
+      "title": "BL-69 Event-Driven Stage Progression (all 4 steps complete)",
+      "desc": "deal_stage_suggestions table, stageSuggestionService (fire-and-forget from document upload, dedup gate, stage order validation, Intel Card generation for agents when agent_can_confirm_stages enabled), confirm/reject API (/api/deals/[id]/confirm-stage — owner/admin/manager always allowed, agents allowed when org setting agent_can_confirm_stages is true), admin Confirmations page (/admin/confirmations), AdminNav Confirmations link + pending badge count, stage_suggestion Intel Card type with purple/violet accent + full-width Confirm button (44px tap target) + confirm_stage CTA action with Bearer token auth, canConfirmStages in useDealPermissions, admin toggle for agent_can_confirm_stages, i18n (4 locales). 2 migrations ready (not yet applied). Spec: docs/specs/BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md",
+      "completed": "2026-03-14",
       "tag": "admin"
     },
     {
@@ -1454,6 +1454,16 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-03-14",
+      "title": "BL-69 Step 4 — Stage Suggestion Intel Card. Added stage_suggestion to IntelCardType + card_type CHECK. Admin toggle agent_can_confirm_stages in settings. canConfirmStages in useDealPermissions. stageSuggestionService generates Intel Card after suggestion insert (org setting gated). IntelCardItem handles stage_suggestion with purple/violet accent + arrow icon + confirm_stage CTA action. Migration file created (not applied).",
+      "decisions": "Intel Cards for agents are opt-in per org (agent_can_confirm_stages default OFF); card fires via service layer not API route; confirm_stage CTA calls existing /api/deals/[id]/confirm-stage endpoint"
+    },
+    {
+      "date": "2026-03-14",
+      "title": "Intel Card whole-card tap UX fix + detail page navigation. IntelCardItem — entire card tappable for primary CTA, secondary actions use stopPropagation. Back button navigation on property + contact detail pages (AppShell leftActions pattern — Back replaces logo on detail pages, action icons in rightActions). Fixed intel_cards card_type CHECK constraint missing stage_suggestion.",
+      "decisions": "AppShell leftActions replaces logo+orgName when provided (detail pages use for Back button); action icons moved from sticky page header to AppShell rightActions; whole card tap = primary CTA with e.stopPropagation() on secondary actions"
+    },
     {
       "date": "2026-03-13",
       "title": "Dashboard UX density sprint + BL-68/69/70 specs. Dashboard: compact Intel Cards (whole card tappable, inline badges, truncate body, tighter padding). Deal cards left border in stage color. AppShell rightActions slot — profile + refresh icons in org header row. Uniform px-4 padding across all dashboard sections. AssistantBar compact icons. Win category padding wrapper removed (uniform card width). BL-66 fixup: Intel Card \"View Deal\" opens DealDetailPanel via IntelDealPanel wrapper. BL-68 (Role-Based Deal Permissions), BL-69 (Event-Driven Stage Progression), BL-70 (Deal Document Architecture) specced, cross-validated with ChatGPT + Gemini. BL-71 (Deal Health Score) + BL-80 (Contact KYC public upload) added to backlog. Field research synthesis: agents default read-only on deals; back office confirms stage changes; CRM should infer state from actions not manual updates.",
