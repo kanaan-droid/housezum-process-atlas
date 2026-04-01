@@ -128,7 +128,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-03-14';
+const LAST_UPDATED = '2026-04-01';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -171,9 +171,287 @@ const DATA = {
       "files": "scripts/refresh-dubai.mjs",
       "tag": "admin",
       "added": "2026-02-28"
+    },
+    {
+      "id": "~~NU-7~~",
+      "title": "~~Document Signing — E2E Spec~~",
+      "desc": "DONE → D-145",
+      "files": "2026-03-23",
+      "tag": "core",
+      "added": ""
+    },
+    {
+      "id": "~~NU-8~~",
+      "title": "~~PDF proxy route~~",
+      "desc": "DONE → D-146",
+      "files": "2026-03-24",
+      "tag": "core",
+      "added": ""
+    },
+    {
+      "id": "NU-9",
+      "title": "AcroForm field validation",
+      "desc": "Date fields reject non-dates, number/% fields reject letters. Basic input type enforcement on AcroForm native inputs in PDFFormEditor",
+      "files": "src/components/signing/PDFFormEditor.tsx",
+      "tag": "core",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "~~NU-10~~",
+      "title": "~~Fix PDF flatten on recipient page~~",
+      "desc": "DONE → D-147",
+      "files": "2026-03-24",
+      "tag": "core",
+      "added": ""
+    },
+    {
+      "id": "~~NU-11~~",
+      "title": "~~Hide overlay badges for AcroForm-covered fields~~",
+      "desc": "DONE → D-147",
+      "files": "2026-03-24",
+      "tag": "ux",
+      "added": ""
+    },
+    {
+      "id": "NU-12",
+      "title": "Seller signature greyed out (no assigned_contact_id)",
+      "desc": "Seller signature field has no assigned_contact_id so it passes the recipient filter as unassigned — shows as tappable instead of greyed out. Need role-based detection for other-party fields",
+      "files": "src/app/sign/[token]/page.tsx",
+      "tag": "core",
+      "added": "2026-03-24"
+    },
+    {
+      "id": "~~NU-13~~",
+      "title": "~~Copy signing link UI~~",
+      "desc": "DONE → D-148",
+      "files": "2026-03-25",
+      "tag": "ux",
+      "added": ""
+    },
+    {
+      "id": "NU-14",
+      "title": "Agent view locking in Step 2",
+      "desc": "recipient_fill fields should be non-interactive for agent in DocumentPrepareModal Step 2",
+      "files": "src/features/signing/components/DocumentPrepareModal.tsx",
+      "tag": "ux",
+      "added": "2026-03-24"
+    },
+    {
+      "id": "NU-15",
+      "title": "recipient_can_override flag",
+      "desc": "DB migration + template canvas UI for per-field override permission",
+      "files": "DB migration, template canvas",
+      "tag": "infra",
+      "added": "2026-03-24"
+    },
+    {
+      "id": "~~NU-16~~",
+      "title": "~~CRM auto-fill property source fix~~",
+      "desc": "DONE → D-149",
+      "files": "2026-03-25",
+      "tag": "core",
+      "added": ""
+    },
+    {
+      "id": "~~NU-17~~",
+      "title": "~~Recipient selection step redesign~~",
+      "desc": "DONE → D-150",
+      "files": "2026-03-25",
+      "tag": "ux",
+      "added": ""
+    },
+    {
+      "id": "~~NU-18~~",
+      "title": "~~Agent auto-sign + fully executed logic~~",
+      "desc": "DONE → D-151",
+      "files": "2026-03-25",
+      "tag": "core",
+      "added": ""
+    },
+    {
+      "id": "~~NU-19~~",
+      "title": "~~Download signed PDF fix~~",
+      "desc": "DONE → D-152",
+      "files": "2026-03-25",
+      "tag": "core",
+      "added": ""
+    },
+    {
+      "id": "~~NU-20~~",
+      "title": "~~AcroForm fill + full signing refactor~~",
+      "desc": "DONE → D-153",
+      "files": "2026-03-26",
+      "tag": "core",
+      "added": ""
+    },
+    {
+      "id": "NU-21",
+      "title": "Buyer Agent on New Deal form",
+      "desc": "Add optional Buyer Agent contact search to New Deal modal. External buyer agents must be contacts not external_party_info orphans. Fix seed script too",
+      "files": "src/features/deals/components/NewDealModal.tsx, scripts/seed-dubai.mjs",
+      "tag": "admin",
+      "added": "2026-03-25"
+    },
+    {
+      "id": "NU-22",
+      "title": "MOU template with Buyer Agent signature field",
+      "desc": "Current MOU has no Buyer Agent sig field. Need new template for 4-party signing flow",
+      "files": "template canvas / base PDF",
+      "tag": "core",
+      "added": "2026-03-25"
+    },
+    {
+      "id": "NU-23",
+      "title": "Sign page UI split",
+      "desc": "Split src/app/sign/[token]/page.tsx (882 lines) into focused components + hooks. ChatGPT ZIP refactor available. Pure refactor — zero behavior changes.",
+      "files": "src/app/sign/[token]/page.tsx, src/features/signing/components/, src/features/signing/hooks/",
+      "tag": "ai",
+      "added": "2026-03-26"
+    },
+    {
+      "id": "~~NU-24~~",
+      "title": "~~Fix DirectSendSheet field assignment~~",
+      "desc": "DONE → D-153 — role-aware contact_id resolution using normalised role_label lookup (Seller/Buyer/Agent → seller/buyer/listing_agent)",
+      "files": "src/features/deals/components/DealDocumentsTab.tsx",
+      "tag": "core",
+      "added": "2026-03-26"
+    },
+    {
+      "id": "~~NU-25~~",
+      "title": "~~Fix signature accumulation~~",
+      "desc": "DONE → D-154 — submit route now uses existing signed_file_path as source PDF so signatures stack across signers. Final PDF contains all parties' signatures",
+      "files": "src/app/api/signing/[token]/submit/route.ts",
+      "tag": "ai",
+      "added": "2026-03-26"
+    },
+    {
+      "id": "~~NU-26~~",
+      "title": "~~Humanise role labels in ExecutionPanel~~",
+      "desc": "DONE → D-155 — listing_agent → Listing Agent, buyer → Buyer, seller → Seller",
+      "files": "src/features/deals/components/DealDocumentsTab.tsx",
+      "tag": "core",
+      "added": "2026-03-26"
+    },
+    {
+      "id": "~~NU-26~~",
+      "title": "~~Seed Data Overhaul (Gulf Horizon Realty)~~",
+      "desc": "DONE — 4 bug fixes (deal_assets property randomisation, deal_commissions same fix, viewing_feedback enum fix, price_feedback enum fix). Full wipe + reseed. SEED-INSTRUCTIONS.md updated with complete FK-ordered wipe SQL. DB-SCHEMA.md updated with activity_log + esign_envelopes gotchas.",
+      "files": "scripts/seed-dubai.mjs",
+      "tag": "admin",
+      "added": "2026-03-26"
+    },
+    {
+      "id": "~~NU-27~~",
+      "title": "~~Listing Agent Verify & Sign Flow~~",
+      "desc": "DONE — Agent signs in-app only (no external link). ExecutionPanel shows locked/Verify&Sign/Signed states. Verify page at /deals/[id]/verify/[documentId] with PDF preview + signature preset. Agent-verify-sign API route bakes signature via buildSigningPdf. Signature preset setup in Settings → Profile. RLS fix: listing agent check via service role API.",
+      "files": "src/app/deals/[id]/verify/, src/app/api/signing/agent-verify-sign/, src/app/settings/profile/page.tsx",
+      "tag": "admin",
+      "added": "2026-03-27"
+    },
+    {
+      "id": "~~NU-27a~~",
+      "title": "~~Signer text fields not rendered in PDF~~",
+      "desc": "DONE 2026-03-29 — Root cause: handleSubmit stale closure (fieldValues missing from useCallback deps) meant text fields never submitted. Also: cumulative PDF stacking broke signer 2+ because AcroForm widgets stripped after signer 1 — fixed by rebuilding from base PDF on every submission with all accumulated signer data merged.",
+      "files": "src/app/sign/[token]/page.tsx, src/app/api/signing/[token]/submit/route.ts, src/features/signing/pdf/engine.ts, src/features/signing/pdf/types.ts, src/features/signing/pdf/acro.ts",
+      "tag": "ux",
+      "added": "2026-03-29"
+    },
+    {
+      "id": "~~NU-28~~",
+      "title": "~~Update signing template field label~~",
+      "desc": "DONE 2026-03-28",
+      "files": "signing_template_fields DB",
+      "tag": "core",
+      "added": "2026-03-26"
+    },
+    {
+      "id": "BL-82",
+      "title": "Document Intelligence Foundation",
+      "desc": "Proprietary labeled dataset for real estate document AI. document_intelligence_events table captures AI-suggestion vs human-correction deltas on AcroForm field annotations. Covers doc_type, country_code, field_role, field_type, position, error_type. Admin UI (/admin/document-intelligence) specced but deferred. Build after BL-71.",
+      "files": "docs/specs/BL-82-DOCUMENT-INTELLIGENCE-SPEC.md",
+      "tag": "admin",
+      "added": "2026-03-26"
+    },
+    {
+      "id": "~~BL-84~~",
+      "title": "~~Photo Catalog Expansion~~",
+      "desc": "DONE 2026-03-29 — Pexels + Pixabay API keys registered. fetch-photo-urls.mjs built. photo-data.mjs expanded to 731 URLs across 8 room types (HERO:80, LIVING_ROOM:75, BEDROOM:148, KITCHEN:70, BATHROOM:62, VIEW:96, AMENITY:116, DINING:86). Filename generation fixed to use URL-derived numeric photo ID instead of sort index. Max duplication down from 110→3 copies across 110 properties. seed-corpus.mjs built with adapter pattern (Unsplash/Pexels/Pixabay), --source flag, idempotent via (photo_source, source_photo_id) unique constraint. 3,962 corpus photos seeded. Gallery page updated with Listings/Corpus/All toggle. Annotation queue updated with ?mode=corpus path — pulls directly from property_photos (no eval needed). Thumbnail unoptimized fix.",
+      "files": "scripts/photo-data.mjs, scripts/fetch-photo-urls.mjs, scripts/seed-corpus.mjs, src/app/admin/photo-intelligence/gallery/page.tsx, src/app/api/photos/annotate/queue/route.ts",
+      "tag": "ai",
+      "added": "2026-03-28"
+    },
+    {
+      "id": "~~BL-85~~",
+      "title": "~~AI Listing Walkthrough~~",
+      "desc": "DONE 2026-03-30 — Ken Burns + fade CSS player. Room-ordered sequencing via BL-54 eval results. Multi-photo per room (up to 2, quality ≥55). Untagged fallback (sort_order when \u003c50% tagged). WalkthroughPlayer (z-[500]), WalkthroughTrigger, walkthroughService. 2026-03-31 bugfixes (D-156): X button z-index overlap, quality threshold for unevaluated photos, removed MAX_PER_ROOM + MAX_SLIDES caps.",
+      "files": "src/features/walkthrough/, src/app/api/walkthrough/[propertyId]/route.ts",
+      "tag": "ai",
+      "added": "2026-03-30"
+    },
+    {
+      "id": "~~BL-86~~",
+      "title": "~~Auto Room Detection on Upload~~",
+      "desc": "DONE 2026-03-30 — Claude Vision Haiku classifies room on every agent upload. Fire-and-forget. ~$0.0003/photo.",
+      "files": "src/app/api/photos/detect-room/route.ts, src/features/properties/components/PhotoGallery.tsx",
+      "tag": "admin",
+      "added": "2026-03-30"
+    },
+    {
+      "id": "~~BL-87~~",
+      "title": "~~Media Intelligence — Walkthrough Reorder & Cover Photo~~",
+      "desc": "DONE 2026-03-31 (D-157) — Drag-and-drop walkthrough reorder grid (WalkthroughReorderGrid), walkthrough_orderings table, training delta capture (AI vs agent order), buildSlidesOrdered for saved sequences. BL-87b: cover photo selection from gallery (star button on grid + lightbox), clearer labels. Media event tracking (viewed, play_started, progress, completed, dwelled). 3 new DB tables (media_variants, media_events, listing_outcomes). Specs: docs/specs/BL-87-MEDIA-INTELLIGENCE-SPEC.md, docs/specs/BL-87-WALKTHROUGH-REORDER-SPEC.md",
+      "files": "src/features/walkthrough/, src/features/media/services/mediaTrackingService.ts, src/lib/mediaSession.ts, src/app/api/media/track/route.ts",
+      "tag": "ai",
+      "added": "2026-03-31"
+    },
+    {
+      "id": "~~BL-88~~",
+      "title": "~~Photo Optimization Pipeline~~",
+      "desc": "DONE 2026-04-01 (D-159) — Phase 1: sharp pipeline, 15+ portal presets, market defaults, server-side upload, original preservation, 7 new DB columns. Phase 2: portal photo transform proxy (/api/photos/transform) — Bayut/PF feed URLs reference on-the-fly optimized photos. Phase 2b/2c: originals compressed at 92% quality, maxWidth 2400px — ~75% storage saving (2.4MB → 600KB). Fix: await fetchAll() after upload ensures new photos appear immediately. Key files: src/config/portalPresets.ts, src/config/marketDefaults.ts, src/lib/imageOptimizer.ts, src/lib/buildTransformUrl.ts, src/app/api/photos/upload/route.ts, src/app/api/photos/transform/route.ts, src/features/portal-engine/adapters/BayutAdapter.ts, src/features/properties/components/PhotoGallery.tsx",
+      "files": "2026-03-31",
+      "tag": "ai",
+      "added": ""
+    },
+    {
+      "id": "BL-83",
+      "title": "ML Training Infrastructure & Human Labeling Pipeline",
+      "desc": "Cut 6–12 months off BL-54d (Proprietary Model) by acquiring a labeled photo corpus now. Three phases: (1) corpus acquisition — scrape 26k RE photos from Bayut/SeLoger/Homegate + open datasets; (2) human labeling tool at /admin/labeling — keyboard-driven, 20–30s/photo, inter-rater agreement tracking; (3) training pipeline — EfficientNet/ViT fine-tune on Modal.com, model registry in Supabase Storage, A/B vs Gemini Vision. Same infra feeds BL-82 (document labels) and BL-34 (intent detection).",
+      "files": "docs/specs/BL-83-ML-TRAINING-SPEC.md",
+      "tag": "admin",
+      "added": "2026-03-26"
+    },
+    {
+      "id": "~~BL-73b~~",
+      "title": "~~Client-Shareable Checklist~~",
+      "desc": "DONE → D-123",
+      "files": "2026-03-15",
+      "tag": "core",
+      "added": ""
+    },
+    {
+      "id": "~~BL-38b~~",
+      "title": "~~Deal Orchestrator Phase 2~~",
+      "desc": "DONE → D-109",
+      "files": "2026-03-15",
+      "tag": "admin",
+      "added": ""
     }
   ],
   "backlog": [
+    {
+      "id": "BL-90",
+      "title": "Portal Signal → Lead → Deal Flow Review",
+      "desc": "End-to-end review of the full inbound signal pipeline now that all pieces are wired (BL-57 signals, BL-59 lead conversion, BL-89 walkthrough share, signing flow, deal pipeline). Check for gaps: Intel Card UX, lead-to-contact conversion friction, deal creation trigger, agent assignment correctness, fuzzy matching edge cases. Likely produces a set of targeted fixes rather than new features.",
+      "tag": "admin",
+      "added": "All BL-57 + BL-59 files"
+    },
+    {
+      "id": "BL-81g",
+      "title": "Signing UX polish",
+      "desc": "Agent self-signing flow, signed PDF includes text field values embedded, field suggestions via Claude",
+      "tag": "ai",
+      "added": "src/app/sign/[token]/page.tsx, src/components/signing/"
+    },
     {
       "id": "BL-1",
       "title": "Migrate iOS to local Capacitor build (Option B)",
@@ -434,10 +712,10 @@ const DATA = {
       "added": "2026-03-05"
     },
     {
-      "id": "BL-38",
-      "title": "Deal Orchestrator Agent",
-      "desc": "\"What should I do today?\" — daily plan based on deal health, compliance state, comms recency. Layer 3 Planning Agent. Build after Pub/Sub webhooks.",
-      "tag": "comms",
+      "id": "~~BL-38~~",
+      "title": "~~Deal Orchestrator Agent~~",
+      "desc": "DONE → D-106",
+      "tag": "admin",
       "added": "2026-03-04"
     },
     {
@@ -560,11 +838,32 @@ const DATA = {
       "added": "PF ✅/❌ per listing row. Pulls from getStatus() adapter call + portal_integrations live mode. Blocked until Bayut/PF live credentials arrive. Pattern: green checkmark = live on portal, red cross = not published, grey dash = mock mode."
     },
     {
-      "id": "BL-54",
-      "title": "Photo Quality AI for Portal Listings",
-      "desc": "AI checks each listing photo for: dark/underexposed, blurry, watermarks, wrong orientation, duplicate frames. Flags at listing level before portal submission. Integrates into BL-53 Field Coverage tab as quality signal. Future: pre-publish gate in BL-4. Agencies with 50+ listings can catch systemic photo quality problems across portfolio.",
+      "id": "~~BL-54a~~",
+      "title": "~~Photo Set Evaluator (Phase 1)~~",
+      "desc": "DONE — Claude Vision per-photo evaluation + set-level analysis. PhotoEvaluationService, 3 API routes, PhotoEvaluator component, PhotoGallerySection composition wrapper, Admin CRM page. Hero photo recommendation applied on accept. 3 new DB tables.",
+      "tag": "admin",
+      "added": "src/features/photos/"
+    },
+    {
+      "id": "~~BL-54b~~",
+      "title": "~~Photo Annotation Tool~~",
+      "desc": "DONE — Human annotation UI at /admin/photo-intelligence/annotate. Set mode (property grid) + Queue mode (one-at-a-time). AI suggestion blocks with confidence colouring. photo_annotations table stores ground truth training data with ai_was_correct flag.",
+      "tag": "admin",
+      "added": "src/app/admin/photo-intelligence/annotate/, src/features/photos/services/photoAnnotationService.ts"
+    },
+    {
+      "id": "BL-54c",
+      "title": "Targeted Enhancement Pipeline (Phase 3)",
+      "desc": "Enhancement only where evaluation says needed. OpenCV deterministic → Real-ESRGAN restoration → Cloudinary/Gemini generative → QA gate. Never blanket filters.",
+      "tag": "core",
+      "added": "docs/specs/BL-54-PHOTO-INTELLIGENCE-SPEC.md"
+    },
+    {
+      "id": "BL-54d",
+      "title": "Proprietary Vision Model (Phase 4)",
+      "desc": "LoRA-adapted room classifier + quality scorer + hero predictor trained on HouseZoom-labeled data. Replace Gemini API with own model. The moat.",
       "tag": "ai",
-      "added": "2026-03-08"
+      "added": "docs/specs/BL-54-PHOTO-INTELLIGENCE-SPEC.md"
     },
     {
       "id": "~~BL-55~~",
@@ -581,9 +880,9 @@ const DATA = {
       "added": "docs/specs/BL-59-LEAD-CONVERSION-SPEC.md"
     },
     {
-      "id": "BL-64",
-      "title": "Off-Plan Deal Type",
-      "desc": "Add sale_offplan to deal_type enum. Requires: developer, project name, payment plan (% on milestones), Oqood registration, SPA document type. Deferred from BL-58.",
+      "id": "~~BL-64~~",
+      "title": "~~Off-Plan Deal Type~~",
+      "desc": "Note: BL-64 number reused for Agent Detail Page (DONE 2026-03-14). Off-plan deal type deferred — add as BL-81.",
       "tag": "admin",
       "added": "2026-03-10"
     },
@@ -651,9 +950,9 @@ const DATA = {
       "added": "docs/specs/BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md"
     },
     {
-      "id": "BL-71",
-      "title": "Deal Health Score",
-      "desc": "Once BL-69 stage suggestions are flowing: compute deal health score from days-in-stage vs benchmark, suggestion response time, stale deal detection (no activity + no suggestion in 7d). Surface on deal cards. Feeds into Deal Orchestrator Agent (BL-38). Depends on BL-69.",
+      "id": "~~BL-71~~",
+      "title": "~~Deal Health Score~~",
+      "desc": "DONE → D-122",
       "tag": "admin",
       "added": "2026-03-13"
     },
@@ -663,6 +962,62 @@ const DATA = {
       "desc": "Allow contacts to upload their own identity/KYC documents via a public link (similar to enrichment form pattern). Agent-only upload for now (v1). Deferred post-launch.",
       "tag": "core",
       "added": "2026-03-13"
+    },
+    {
+      "id": "~~BL-72b~~",
+      "title": "~~Playwright Phase 2 — Admin flows~~",
+      "desc": "DONE → D-121",
+      "tag": "admin",
+      "added": "2026-03-15"
+    },
+    {
+      "id": "BL-38b",
+      "title": "Deal Orchestrator Phase 2 — Interactions",
+      "desc": "Mark Done (writes activity_events), Snooze N hours, auto-refresh on new message/offer/viewing, end-of-day reflection card at 6 PM.",
+      "tag": "admin",
+      "added": "2026-03-15"
+    },
+    {
+      "id": "~~BL-73b~~",
+      "title": "~~Property Checklist Phase 2 — Client Sharing~~",
+      "desc": "DONE → D-123",
+      "tag": "core",
+      "added": "2026-03-16"
+    },
+    {
+      "id": "BL-73c",
+      "title": "Property Checklist Phase 3 — Co-broke + Conflict Detection",
+      "desc": "Read-only view for non-owning agents (buyer agent sees listing agent steps). Conflict detection warnings when system data contradicts manual mark. Override data flagged for AI training.",
+      "tag": "ai",
+      "added": "2026-03-16"
+    },
+    {
+      "id": "~~BL-74~~",
+      "title": "~~Playwright Performance Test Suite~~",
+      "desc": "DONE → D-124",
+      "tag": "ux",
+      "added": "2026-03-18"
+    },
+    {
+      "id": "~~BL-75~~",
+      "title": "~~Performance Audit & Fixes~~",
+      "desc": "DONE → D-125",
+      "tag": "core",
+      "added": "2026-03-18"
+    },
+    {
+      "id": "~~BL-76~~",
+      "title": "~~Jest Unit Test Suite~~",
+      "desc": "DONE → D-126",
+      "tag": "ux",
+      "added": "2026-03-18"
+    },
+    {
+      "id": "~~BL-77~~",
+      "title": "~~Playwright E2E Phase 3~~",
+      "desc": "DONE → D-128",
+      "tag": "core",
+      "added": "2026-03-18"
     }
   ],
   "techDebt": [
@@ -723,10 +1078,10 @@ const DATA = {
       "added": "2026-02-28"
     },
     {
-      "id": "TD-15",
-      "title": "⚠️ Deal seed data gaps — fix on next reseed",
-      "desc": "9 gaps: (1) seller contact missing from property_contacts → backfill as deal_participants seller role; (2) buyer_agent missing from deal_participants; (3) buy-side commission goes to buyer not buyer_agent — must go to buyer_agent, sell-side to listing_agent; (4) interested_buyer not mapped to buyer in deal_participants; (5) deal_stage_history missing transition entries for deals in later stages; (6) duplicate agent users — both name@gulfhorizon.demo and will+name@housezoom.ai exist, consolidate to will+name@housezoom.ai only; (7) listing agent shows Unknown in DealDetailPanel for some deals; (8) deal participants not cross-linked to agent contact list; (9) agent_profiles schema mismatch in DB-SCHEMA.md (was first_name/last_name, actually full_name).",
-      "files": "scripts/seed-dubai.mjs",
+      "id": "~~TD-15~~",
+      "title": "~~Deal seed data gaps~~",
+      "desc": "DONE 2026-03-14",
+      "files": "scripts/seed-dubai.mjs, SEED-INSTRUCTIONS.md",
       "tag": "admin",
       "added": "2026-03-10"
     },
@@ -761,6 +1116,22 @@ const DATA = {
       "files": "2026-03-11",
       "tag": "infra",
       "added": ""
+    },
+    {
+      "id": "TD-18",
+      "title": "Domain ownership incremental cleanup",
+      "desc": "95 files import @/lib/supabase directly in hooks/components. Clean up incrementally — fix each file when touched for a feature. ESLint warns on new violations.",
+      "files": "Various hooks + components",
+      "tag": "ai",
+      "added": "2026-03-19"
+    },
+    {
+      "id": "TD-19",
+      "title": "properties.user_id naming inconsistency",
+      "desc": "properties table uses legacy user_id for the listing agent instead of agent_user_id (used consistently everywhere else: viewings, walkthrough_orderings, etc.). Purely a naming issue — functionally correct. Fix requires: ALTER TABLE rename, update RLS policies, update 20+ files + seed script. Do as an isolated refactor session, not bundled with features.",
+      "files": "properties table, RLS policies, entityResolutionService.ts, scripts/seed-dubai.mjs",
+      "tag": "infra",
+      "added": "2026-04-02"
     }
   ],
   "bugs": [
@@ -784,9 +1155,457 @@ const DATA = {
       "desc": "Searching \"Elena Johnson\" returns 0 results but \"Elena\" works. Search likely queries first_name only, not concatenated first_name + last_name.",
       "tag": "core",
       "added": "2026-03-11"
+    },
+    {
+      "id": "BG-5",
+      "title": "Deal detail panel showing wrong party names",
+      "desc": "FIXED 2026-03-23: fetchDeal/fetchDeals were not resolving agent names for user_id participants. Fixed via separate agent_profiles query after fetchDeal. getParticipantName now checks agentProfileMap[p.user_id] first.",
+      "tag": "admin",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-6",
+      "title": "Agent signature name not resolving",
+      "desc": "FIXED 2026-03-23: PII overlay filter excluded agent fields; agentProfiles empty at selectTemplate time. Moved to reactive useEffect. Added legacy agent assigned_to.",
+      "tag": "core",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-7",
+      "title": "AcroForm fields require repeated keystrokes",
+      "desc": "FIXED 2026-03-23: input listener caused re-render loop overwriting focused field. Switched to change-only listener + hydrateFromPropsSkipFocused.",
+      "tag": "ux",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-8",
+      "title": "Modal header hidden + Next over-gating",
+      "desc": "FIXED 2026-03-23: z-index 200→500; allAgentPrepFilled always true (recipients fill own fields).",
+      "tag": "ux",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-9",
+      "title": "Modal trapped in drawer stacking context",
+      "desc": "FIXED 2026-03-23: createPortal to document.body.",
+      "tag": "integrations",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-10",
+      "title": "Signing create: document_id required",
+      "desc": "FIXED 2026-03-23: removed from validation for template-first flow.",
+      "tag": "ux",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-11",
+      "title": "Placeholder document insert failing",
+      "desc": "FIXED 2026-03-23: used entity_type/entity_id, added file_type/file_size, removed nonexistent columns.",
+      "tag": "ai",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-12",
+      "title": "Placeholder document empty file_path",
+      "desc": "FIXED 2026-03-23: fetch base_documents.storage_path via template, store with base-documents/ prefix.",
+      "tag": "core",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-13",
+      "title": "Recipient signing page wrong bucket",
+      "desc": "FIXED 2026-03-23: bucket detection from file_path prefix.",
+      "tag": "core",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-14",
+      "title": "Submit route wrong bucket",
+      "desc": "FIXED 2026-03-23: same bucket detection pattern.",
+      "tag": "core",
+      "added": "2026-03-23"
+    },
+    {
+      "id": "BG-15",
+      "title": "All fields sent to every recipient",
+      "desc": "FIXED 2026-03-23: filter fields per recipient in create route.",
+      "tag": "core",
+      "added": "2026-03-23"
     }
   ],
   "done": [
+    {
+      "id": "D-160",
+      "title": "BL-89 — Walkthrough Public Share URL + Portal Distribution",
+      "desc": "Public /w/[token] page (no auth, full player, \"Powered by HouseZoom\" branding). Share button in WalkthroughPlayer (native share sheet / clipboard fallback). Token in listing_metadata JSONB — no migration. topOffset prop for button clearance below branding bar. BayutAdapter \u003cVirtualTourURL\u003e, PF virtual_tour_url wired via canonicalMapper. X button → window.history.back().",
+      "completed": "2026-04-02",
+      "tag": "admin"
+    },
+    {
+      "id": "D-159",
+      "title": "BL-88 — Photo Optimization Pipeline (Complete)",
+      "desc": "Phase 1: sharp pipeline, portal presets, server-side upload, original preservation. Phase 2: portal photo transform proxy — Bayut/PF feeds reference on-the-fly optimized photos via /api/photos/transform. Phase 2b/2c: originals compressed at 92% quality, maxWidth 2400px (~75% storage saving). Fix: await fetchAll() ensures gallery updates after upload. Spec: docs/specs/BL-88-PHOTO-OPTIMIZATION-SPEC.md",
+      "completed": "2026-04-01",
+      "tag": "ai"
+    },
+    {
+      "id": "D-158",
+      "title": "BL-88 Phase 1 — Photo Optimization Pipeline",
+      "desc": "Sharp-based server-side image optimization. Portal presets (15+ portals: max dimensions, quality, aspect ratio, EXIF strip). Market defaults (UAE/France/Switzerland/Italy/US). optimizeImage() wrapper. Server-side upload API route replaces client-side direct upload. Original preserved alongside optimized. DB migration adds width/height/file_size/original_url/optimized_url columns to property_photos.",
+      "completed": "2026-03-31",
+      "tag": "infra"
+    },
+    {
+      "id": "D-157",
+      "title": "BL-87 — Media Intelligence: Walkthrough Reorder + Cover Photo",
+      "desc": "Drag-and-drop reorder grid overlay in WalkthroughPlayer. walkthrough_orderings table persists agent sequence. Training delta capture (AI order vs agent order). buildSlidesOrdered bypasses AI re-sort for saved sequences. BL-87b: cover photo selection via star button (grid cards + lightbox), clearer labels/tooltips. Media event tracking: viewed, play_started, progress (25/50/75/100%), completed, dwelled.",
+      "completed": "2026-03-31",
+      "tag": "ai"
+    },
+    {
+      "id": "D-156",
+      "title": "BL-85 Bugfixes — Walkthrough Player",
+      "desc": "X button unresponsive (z-index conflict with tap zones — close button z-20, tap zones top-16). Only 1 photo per room (MIN_QUALITY_SECOND=55 vs BL-86 default 50 — lowered to 0). MAX_PER_ROOM loop fix to actually iterate. Removed MAX_PER_ROOM + MAX_SLIDES caps — all room photos included.",
+      "completed": "2026-03-31",
+      "tag": "ux"
+    },
+    {
+      "id": "D-152",
+      "title": "NU-19 — Download Signed PDF",
+      "desc": "handleDownload uses createSignedUrl for signed_file_path when is_signed=true.",
+      "completed": "2026-03-25",
+      "tag": "core"
+    },
+    {
+      "id": "D-151",
+      "title": "NU-18 — Agent Auto-Sign + Fully Executed",
+      "desc": "Listing agent auto-signs at send time (value_type='agent_auto'). Fully executed requires all recipients signed + agent_auto sig. documents.is_signed as UI source of truth. 7 sub-fixes (18a-g).",
+      "completed": "2026-03-25",
+      "tag": "ux"
+    },
+    {
+      "id": "D-150",
+      "title": "NU-17 — Recipient Selection Step",
+      "desc": "4-step flow: Template → Recipient → Prepare → Send. Single recipient from deal participants. Send buttons conditional on phone/email. Auto-select if only one recipient.",
+      "completed": "2026-03-25",
+      "tag": "comms"
+    },
+    {
+      "id": "D-149",
+      "title": "NU-16 — CRM Auto-fill Property Source Fix",
+      "desc": "Property lookup via deal_assets (source of truth) with fallback to deals.property_id.",
+      "completed": "2026-03-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-148",
+      "title": "NU-13 — Copy Signing Link",
+      "desc": "Copy link button on pending recipient rows in ExecutionPanel. Clipboard API + textarea fallback.",
+      "completed": "2026-03-25",
+      "tag": "ux"
+    },
+    {
+      "id": "D-147",
+      "title": "NU-10 + NU-11 — Clean Signer Route + Overlay Suppression",
+      "desc": "PDF proxy rewritten: draws static AcroForm values directly onto page content (respecting /Q alignment, /Ff multiline, baseline nudge), strips all Widget annotations + /AcroForm catalog. No form.flatten(). Recipient-owned fields excluded from baking. agent_prepare overlays return null. Text field overlays: flex centering, boxSizing, correct padding. Double-text eliminated.",
+      "completed": "2026-03-24",
+      "tag": "core"
+    },
+    {
+      "id": "D-146",
+      "title": "NU-8 — PDF Proxy Route + AcroForm Pre-fill",
+      "desc": "PDF proxy route (/api/signing/[token]/pdf) fetches PDF server-side using service role, applies acroform_values via pdf-lib (setText/check + flatten), streams filled PDF to browser. Eliminates client-side bucket detection. AcroForm values now saved on send. Other-party fields greyed out on recipient page. Per-recipient field filtering.",
+      "completed": "2026-03-24",
+      "tag": "core"
+    },
+    {
+      "id": "D-145",
+      "title": "NU-7 — Document Signing E2E Spec",
+      "desc": "Full spec for manual + electronic signing paths. Template creation story, agent prepare flow, recipient locking, CRM pre-fill gaps. Saved to docs/specs/NU-7-SIGNING-SPEC.md.",
+      "completed": "2026-03-23",
+      "tag": "core"
+    },
+    {
+      "id": "D-144",
+      "title": "BL-81m — Agent Signature Preset Cleanup",
+      "desc": "Removed generic 'Agent Signature' preset (no role_label, can't resolve name). Replaced with 'Listing Agent Signature/Initial/Date/Name' (role_label: 'Agent' → maps to listing_agent participant). Buyer's Agent presets unchanged.",
+      "completed": "2026-03-23",
+      "tag": "core"
+    },
+    {
+      "id": "D-143",
+      "title": "BL-81l — Signature Field Contact Names",
+      "desc": "Signature/initial overlay fields now show resolved contact name (e.g. \"Dina Mansour\") instead of just role label in agent prepare view. Also resolves agent participants (user_id) for phone/email in text fields.",
+      "completed": "2026-03-23",
+      "tag": "comms"
+    },
+    {
+      "id": "D-142",
+      "title": "BL-81k — Wire CRM Auto-fill into AcroForm Inputs",
+      "desc": "CRM API values were going into overlay fieldValues (UUID-keyed) but needed to go into acroFormValues (AcroForm field names). Added CRM_KEY_TO_ACROFORM mapping (verified against generate-base-documents.py). AcroForm fields now pre-populated with property/financial/org data.",
+      "completed": "2026-03-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-141",
+      "title": "BL-81j — CRM Auto-fill RLS Fix",
+      "desc": "Moved CRM auto-fill to server-side API route (/api/signing/crm-autofill) using service_role to bypass RLS on cross-agent properties. Fixed crm_auto_fill_key not persisting in templateService create/update.",
+      "completed": "2026-03-23",
+      "tag": "infra"
+    },
+    {
+      "id": "D-140",
+      "title": "BL-81i — Recipient CRM Pre-fill + Signing Page Fixes",
+      "desc": "getRecipientCrmPreFillValues resolves name/phone/email for recipient_fill fields from deal participants. Wired into createSigningRequest. Progress counter excludes agent_prepare/agent_sign fields. Auto-scroll excludes locked fields.",
+      "completed": "2026-03-23",
+      "tag": "comms"
+    },
+    {
+      "id": "D-139",
+      "title": "BL-81h Part B — PDF Finalization API",
+      "desc": "pdf-lib finalization endpoint (POST /api/signing/finalize): fetches base PDF, fills AcroForm fields, embeds signature PNGs, flattens, uploads to storage, inserts documents row (entity_type='deal', is_signed=true), updates original signed_file_path. PDFFormEditorMultiPage: Finalize button, aggregates multi-page values, triggers browser download.",
+      "completed": "2026-03-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-138",
+      "title": "BL-devtools Internal Dev Tool",
+      "desc": "/devtools page + /api/devtools/generate proxy route. 3 tabs: CC Prompt generator, Spec drafter, DB Schema reviewer. WOW-rules baked into system prompts. Dark theme. Claude Sonnet 4.5.",
+      "completed": "2026-03-22",
+      "tag": "ai"
+    },
+    {
+      "id": "D-137",
+      "title": "BL-81g Document Preparation & Execution",
+      "desc": "3-way field assignment (agent_prepare/recipient_fill/agent_sign). CRM auto-fill from deals (property/financial/org). AgentPrepareCanvas. DocumentPrepareModal (4-step). 17 agent_prepare field presets.",
+      "completed": "2026-03-21",
+      "tag": "admin"
+    },
+    {
+      "id": "D-136",
+      "title": "BL-81f patch — Base Documents",
+      "desc": "base_documents table, upload UI, template-PDF linking. TemplateCanvas renders real PDF via PDF.js. 3 AcroForm PDFs generated.",
+      "completed": "2026-03-21",
+      "tag": "ux"
+    },
+    {
+      "id": "D-135",
+      "title": "BL-81f Signing Templates",
+      "desc": "signing_templates + signing_template_fields tables. 55 role-specific field presets. TemplateCanvas with preset autocomplete. TemplateSendModal (3-step). Admin pages: list/create/edit. Template-aware send in DealDocumentsTab.",
+      "completed": "2026-03-21",
+      "tag": "admin"
+    },
+    {
+      "id": "D-134",
+      "title": "BL-81e Universal Fill & Sign Layer",
+      "desc": "Text field type replaces name. Label step in context menu. CRM auto-fill from contact data (name/email/phone). document_field_values table. Text fields editable on signing page with bottom sheet input. Pre-filled values shown in cyan.",
+      "completed": "2026-03-20",
+      "tag": "comms"
+    },
+    {
+      "id": "D-133",
+      "title": "BL-81d Per-Field Recipient Assignment",
+      "desc": "3-step context menu with party picker. assigned_contact_id on fields. Reordered flow: Signatories→Fields→Preview→Send. Preview filtered by assigned_contact_id. Signing page filters fields to recipient.",
+      "completed": "2026-03-20",
+      "tag": "core"
+    },
+    {
+      "id": "D-132",
+      "title": "BL-81c Multi-Party Signing & Execution Tracking",
+      "desc": "Pre-populate signatories from deal participants. role_label/prefill_name on requests. Multi-recipient API. Execution panel in DealDocumentsTab (per-party status, FULLY EXECUTED badge). checkAndMarkFullyExecuted on sign completion.",
+      "completed": "2026-03-20",
+      "tag": "admin"
+    },
+    {
+      "id": "D-131",
+      "title": "BL-81b Manual Signing Field Placement + Assignment",
+      "desc": "Tap→2-step context menu (field type → recipient/agent). Drag/resize (document-level events, all 4 corners). Delete. Colour-coded fields. AGENT/RECIPIENT badges. Count-only AI detection (hint banner). Multi-page recipient page (per-page canvas→img, fields filtered by page). Agent fields locked on recipient side. Date picker modal. Copy Link button. assigned_to on all fields. DB: assigned_to column on document_signature_fields.",
+      "completed": "2026-03-20",
+      "tag": "ai"
+    },
+    {
+      "id": "D-130",
+      "title": "BL-81b AI Signature Field Detection",
+      "desc": "Claude Vision auto-detects signature/initial/date fields in uploaded PDFs. Agent sees pre-placed fields with \"✨ N fields detected\" banner. Can adjust before sending.",
+      "completed": "2026-03-19",
+      "tag": "ai"
+    },
+    {
+      "id": "D-129",
+      "title": "BL-81 Guided Signing",
+      "desc": "WhatsApp-native zero-login document signing. Agent places fields on uploaded PDF, sends link via WhatsApp/email. Recipient signs with finger on mobile. Signed PDF generated via pdf-lib and stored back. Intel Card on completion. 3 DB tables.",
+      "completed": "2026-03-19",
+      "tag": "comms"
+    },
+    {
+      "id": "D-128",
+      "title": "BL-77 Playwright E2E Phase 3",
+      "desc": "12 new E2E tests across 5 spec files. Deal detail (DD-1 to DD-3): panel opens from kanban, tabs render, health badge visible. Lead flow (LC-1 to LC-3): list loads, detail page, convert CTA. Qualification form (QF-1 to QF-3): public form loads/advances/completes (TEST_QUAL_TOKEN). Intel Cards (IC-1 to IC-2): section renders, dismiss works. Public checklist (CS-1): page loads with token. Added data-testid: deal-health-badge, convert-lead-btn, intel-cards-section, intel-card, card-dismiss-btn.",
+      "completed": "2026-03-19",
+      "tag": "admin"
+    },
+    {
+      "id": "D-127",
+      "title": "BL-76b GitHub Actions CI Pipeline",
+      "desc": "GitHub Actions workflow at .github/workflows/ci.yml. Triggers on push to main and PRs. Runs all Jest unit tests with npm test -- --ci. Node 22, permissions: contents: read.",
+      "completed": "2026-03-19",
+      "tag": "admin"
+    },
+    {
+      "id": "D-126",
+      "title": "BL-76 Jest Unit Test Suite",
+      "desc": "34 unit tests across 4 test files. Supabase mock at tests/unit/__mocks__/supabase.ts. dealHealthService (10 tests, 100% coverage), analyticsService pure functions (11 tests), aiInsightsService types (3 tests), scoreDecayService formula (10 tests). Jest + ts-jest installed, config in package.json. npm test / npm run test:coverage.",
+      "completed": "2026-03-19",
+      "tag": "admin"
+    },
+    {
+      "id": "D-125",
+      "title": "BL-75 Performance Audit & Fixes",
+      "desc": "Analytics page 4735ms → 2957ms. Root cause: 8+ serial Supabase queries in fetchKpis + 4x duplicate deal_participants fetches. Fix: fetchAllAnalytics single entry point — fetches shared data once, fans out in parallel. New pure compute functions: computePipelineByStage, computeRevenueOverTime, computeDealsByAgent. Admin Overview threshold raised to 4000ms, Analytics to 3500ms (Vercel cold start tolerance).",
+      "completed": "2026-03-19",
+      "tag": "admin"
+    },
+    {
+      "id": "D-124",
+      "title": "BL-74 Playwright Performance Test Suite",
+      "desc": "11 performance tests: 5 agent pages + 6 admin pages. 3000ms default threshold with per-page overrides (Admin Overview: 4000ms, Analytics: 3500ms). agentAuth.ts fixture (mirrors adminAuth.ts). Playwright config: agent setup + perf-agent + perf-admin projects.",
+      "completed": "2026-03-19",
+      "tag": "admin"
+    },
+    {
+      "id": "D-123",
+      "title": "BL-73b Client-Shareable Transaction Checklist",
+      "desc": "Public /c/[token] page (no auth required, server-rendered). checklist_share_tokens table (migration: 20260318_bl73b_checklist_share_tokens.sql). POST /api/checklist/[dealId]/share — generates/returns non-expired token. Public page: HouseZoom logo, property address, agent name, progress bar, phase accordion with client-friendly labels, agent contact CTA. ContactCTA client component (WhatsApp + Email buttons). Email button copies address to clipboard + shows \"Email copied!\" toast for desktop users. WhatsApp uses wa.me with stripped phone number. Agent email fallback: agent_profiles.email → auth.users via admin.getUserById(). \"Share with Client\" button on checklist page copies URL to clipboard.",
+      "completed": "2026-03-18",
+      "tag": "comms"
+    },
+    {
+      "id": "D-122",
+      "title": "BL-71 Deal Health Score",
+      "desc": "Pure client-side health score (0–100) on deal cards. Three penalty signals: days-in-stage vs benchmark (0–40pts), pending suggestion ignored 3+ days (20pts), stale activity (0–40pts). DealHealth type + DealHealthBand. dealHealthService.ts (computeDealHealth, isDealActive). DealHealthBadge.tsx (green/amber/red pill). Wired into admin deals kanban + agent dashboard DashboardDealsSection. Two extra queries on page load (pending suggestions + last activity per deal). Badge hidden for won/lost/withdrawn deals. No DB migrations.",
+      "completed": "2026-03-18",
+      "tag": "admin"
+    },
+    {
+      "id": "D-121",
+      "title": "BL-72b Playwright Phase 2 — Admin E2E Tests",
+      "desc": "12 new admin smoke tests across 4 spec files (admin-auth, admin-members, admin-deals, admin-compliance). adminAuth.ts fixture with separate storageState. playwright.config.ts updated with admin setup + admin projects. data-testid=\"deal-card\", \"member-row\", \"compliance-rule\" added to production components. TEST-REGISTRY.md created and verified by CC. Final result: 35/36 passing, 1 flaky (P-1 timing under parallel load). TEST_ADMIN_EMAIL/PASSWORD added to .env.local.",
+      "completed": "2026-03-18",
+      "tag": "comms"
+    },
+    {
+      "id": "D-120",
+      "title": "Fix: ViewingMode viewings scope + seed staggered times",
+      "desc": "ViewingMode.tsx viewings query was org-scoped for admin users — showed all org viewings instead of agent's own. Fixed to always use agent_user_id scope: agents see only their scheduled viewings during walkthroughs. Seed: upcoming viewings now seeded with staggered time slots (9AM–6PM cycling) so sort order is meaningful. Removed forced Fatima priority viewing — no artificial data. Result: Viewings tab 1:1 matches Schedule a Viewing upcoming list, chronologically ordered.",
+      "completed": "2026-03-17",
+      "tag": "admin"
+    },
+    {
+      "id": "D-119",
+      "title": "Seed: createPropertyItems() — Viewing Mode room data",
+      "desc": "Added createPropertyItems() to seed-dubai.mjs. Rooms derived from property_photos.room tags via ROOM_CATEGORY_MAP. Systems based on property type + bedrooms (AC units with brand/BTU/year, water heater, intercom, smart home panel for villa/penthouse, security for larger properties). Features linked to rooms via room_name: Kitchen (oven, fridge, dishwasher, kitchen island), Living Room (floor-to-ceiling windows, ceiling height), Master Bedroom (wardrobes, en-suite), Bedroom 2 (wardrobes), Bathroom (shower, vanity), Balcony (flooring). Exterior: pool + garden for villas, parking, storage. Room sizes proportional to actual square_footage. 2,455 items seeded across 100 properties (~25/property). Idempotent — skips if 200+ items exist. Key fix: room_name uses spaces not underscores ('living room' not 'living_room') to match ViewingMode.tsx key comparison.",
+      "completed": "2026-03-17",
+      "tag": "ai"
+    },
+    {
+      "id": "D-118",
+      "title": "Fix: Admin AI Alerts — duplicate messages + text truncation + bullet alignment",
+      "desc": "lockedStageRisk alerts were all identical (\"A deal workflow is stuck...\") because message had no deal title. Fixed: lockedStageRisks() now accepts deals array, looks up deal.title, passes dealTitle to messageParams. i18n updated in all 4 locales: \"{dealTitle}\" is stuck at a locked stage: {stageName}. Alert text changed from truncate to line-clamp-2. Alert row changed from items-center to items-start + mt-1 on bullet dot for correct 2-line alignment.",
+      "completed": "2026-03-17",
+      "tag": "admin"
+    },
+    {
+      "id": "D-117",
+      "title": "Fix: AdminNav mobile header safe-area + layout offset",
+      "desc": "AdminNav mobile header: sticky → fixed top-0 left-0 right-0 z-[300], height calc(56px + env(safe-area-inset-top, 0px)), fully opaque background. admin/layout.tsx \u003cmain\u003e got pt-14 lg:pt-0 to offset fixed header. AdminNav sidebar overlay got paddingTop: env(safe-area-inset-top, 0px) for WKWebView. Root cause: sticky → fixed change requires explicit page content offset.",
+      "completed": "2026-03-17",
+      "tag": "admin"
+    },
+    {
+      "id": "D-116",
+      "title": "Seed Integrity Suite",
+      "desc": "audit-seed.mjs + fix-seed-integrity.mjs + seed-dubai.mjs ensureSeedIntegrity() patch. 26 SD-XX checks, 24/26 passing (2 accepted WARNs). Fixes: SD-03/09/11/12/13/18/21 data gaps, SD-24 compliance rules (61 rules added). Test coverage plan: HouseZoom_Test_Coverage_Plan.xlsx (82 tests across E2E/Integration/Unit).",
+      "completed": "2026-03-17",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-115",
+      "title": "Fix: AppShell height covers safe-area zone",
+      "desc": "AppShell outer div height changed from 52 to calc(52px + env(safe-area-inset-top, 0px)). This covers the transparent gap above the inner 52px bar in WKWebView (Capacitor iOS), preventing page content from scrolling through the safe-area zone. Root cause identified via ChatGPT: outer fixed shell must be tall enough to paint an opaque background over the entire top region including safe-area.",
+      "completed": "2026-03-16",
+      "tag": "ai"
+    },
+    {
+      "id": "D-114",
+      "title": "Fix: ComplianceBanner stacking context",
+      "desc": "Added isolation: 'isolate' + zIndex: 1 to banner outer div. Removed transition-transform class from chevron, moved to inline style.",
+      "completed": "2026-03-16",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-113",
+      "title": "Fix: All hardcoded currency codes",
+      "desc": "Replaced hardcoded 'AED', 'CHF', 'USD', 'EUR' with orgCurrency from useOrg() across 9 files: admin/deals/page.tsx, ListingCardPreview.tsx, ViewingMode.tsx, RequirementForm.tsx, RequirementList.tsx, EditPropertyModal.tsx, ContactDetailPage.tsx, DealDetailPanel.tsx, ScanDocumentModal.tsx.",
+      "completed": "2026-03-16",
+      "tag": "admin"
+    },
+    {
+      "id": "D-112",
+      "title": "Fix: Property detail header hardcoded CHF",
+      "desc": "PropertyDetailPage.tsx line 214 had CHF {price.toLocaleString()} hardcoded. Replaced with formatCurrency(price, orgCurrency). Also fixed _agentCurrency singleton not being updated on org load — added setAgentCurrency(settings.currency) call in OrgProvider.tsx.",
+      "completed": "2026-03-16",
+      "tag": "admin"
+    },
+    {
+      "id": "D-111",
+      "title": "Fix: Sticky property header z-index",
+      "desc": "Bumped sticky property header from z-50 to z-[200] and AppShell from z-50 to z-[300].",
+      "completed": "2026-03-16",
+      "tag": "core"
+    },
+    {
+      "id": "D-110",
+      "title": "Fix: Dashboard greeting shows agent first name",
+      "desc": "dashboard/page.tsx was using user.email.split('@')[0] for the greeting. Added full_name to profile query, extracted first name via full_name.split(' ')[0], stored in agentName state.",
+      "completed": "2026-03-16",
+      "tag": "comms"
+    },
+    {
+      "id": "D-109",
+      "title": "BL-38b Deal Orchestrator Phase 2",
+      "desc": "Full plan page (/daily-plan): task cards with rank circles + emoji icons, Mark Done (green toast, optimistic UI), Snooze inline picker (1h/4h/tomorrow), secondary tasks collapsed, completed/snoozed count footer with \"View completed\" toggle (strikethrough), \"All done\" empty state, purple \"Plan updated\" banner + Reload. 5-min polling for plan changes on dashboard + full page. Auto-generate if no plan exists. Auto-refresh triggers: gmail/sync → new_message, deals/confirm-stage → offer_received. Bug fixes: deals use assigned_user_id not agent_user_id; /deals/[id] agent-accessible route created (re-exports admin page outside AdminGuard); dashboard greeting uses agent_profiles.full_name not auth email; time-aware greeting (Good morning/afternoon/evening) + agent first name in narrative.",
+      "completed": "2026-03-16",
+      "tag": "comms"
+    },
+    {
+      "id": "D-108",
+      "title": "TD-17 Onboarding redirect bug",
+      "desc": "Fixed post-login redirect that was landing agents on wrong page after onboarding completion.",
+      "completed": "2026-03-15",
+      "tag": "admin"
+    },
+    {
+      "id": "D-107",
+      "title": "BL-73 Property Transaction Checklist Phase 1",
+      "desc": "End-to-end transaction checklist on deal detail. Checklist items per deal stage, check/uncheck, progress indicator. Foundation for BL-73b (client-shareable public URL).",
+      "completed": "2026-03-15",
+      "tag": "admin"
+    },
+    {
+      "id": "D-106",
+      "title": "BL-38 Deal Orchestrator Agent",
+      "desc": "\"What should I do today?\" daily game plan on agent dashboard. AI-generated priority actions based on deal health, compliance state, comms recency. 1 AM UTC cron via Vercel. Layer 3 Planning Agent — fills the missing orchestration layer above Signal Agents + Intelligence Engine.",
+      "completed": "2026-03-15",
+      "tag": "comms"
+    },
+    {
+      "id": "D-105",
+      "title": "BL-72 Playwright E2E Suite",
+      "desc": "11/11 tests passing. Automated end-to-end test coverage for critical agent flows.",
+      "completed": "2026-03-15",
+      "tag": "ux"
+    },
     {
       "id": "D-104",
       "title": "BL-70 Deal Document Architecture",
@@ -1454,6 +2273,211 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-03-30",
+      "title": "BL-85 AI Listing Walkthrough complete. Ken Burns + fade CSS player. Room-ordered sequencing via BL-54 eval results. Multi-photo per room (up to 2, quality threshold 55). Untagged fallback: sort_order sequence when \u003c50% photos have room tags. WalkthroughPlayer (z-[500]), WalkthroughTrigger, walkthroughService, GET /api/walkthrough/[propertyId]. Phase 1b (MP4 via MediaRecorder) deferred.",
+      "decisions": "hasRoomData threshold must be 50% not \u003e0 — 1 tagged photo triggers grouped path and collapses all untagged to 1 slide; Ken Burns is pure CSS keyframes; z-index must be 500+ to clear AppShell sticky header"
+    },
+    {
+      "date": "2026-03-30",
+      "title": "BL-86 Auto Room Detection on Upload complete. Claude Vision Haiku classifies room type on every agent photo upload. Fire-and-forget POST /api/photos/detect-room. Writes to property_photos.room directly. ~$0.0003/photo. Silent failure.",
+      "decisions": "Annotation queue uses human labels — completely separate flow; fire-and-forget requires insert to return id; hasRoomData bug in BL-85 was root cause of untagged photos collapsing"
+    },
+    {
+      "date": "2026-03-30",
+      "title": "BL-54b annotation queue pagination + UX fixes. offset param on queue API, 200 photos per batch, total_corpus + total_annotated counts, dual counters in UI, default queue mode, end-of-batch advances offset.",
+      "decisions": "Queue was looping same 50 photos; corpus counter was querying photo_evaluation_results not property_photos"
+    },
+    {
+      "date": "2026-03-30",
+      "title": "Photo gallery delete confirmation + lightbox z-index fix. deleteTarget state, confirmation modal at z-[600]. Lightbox raised to z-[500]. Cover photo deletion deferred.",
+      "decisions": "Lightbox was hidden behind AppShell z-[200]; cover photo id='primary' is a prop placeholder not a real DB row"
+    },
+    {
+      "date": "2026-03-29",
+      "title": "NU-27 E2E signing bug fixes complete. Three root causes found and fixed: (1) NU-27a: LABEL_TO_ACROFORM_KEY map added to submit route — signer-entered text fields (passport, nationality) now mapped to AcroForm keys and saved correctly. (2) NU-27b/c: Cumulative PDF stacking abandoned — rebuilt approach: every submission rebuilds PDF from original base document (widgets always intact), fetches ALL field values + signatures across ALL signing requests, merges and draws in one pass. Net -80 lines. (3) NU-27d: handleSubmit useCallback missing fieldValues dependency — stale closure meant text field values always submitted as empty array. Final PDF now contains all party data: passport, nationality, signatures for all signers.",
+      "decisions": "Always check useCallback deps when state isn't submitting; cumulative PDF stacking is fragile — rebuild from base is simpler and more robust; AcroForm widgets stripped after first signer so second signer can never use widget-based drawing"
+    },
+    {
+      "date": "2026-03-29",
+      "title": "BL-84 complete. Pexels + Pixabay API keys. photo-data.mjs expanded to 731 URLs (8 room types). Filename generation fixed (URL numeric ID not sort index). Max duplication 110→3. seed-corpus.mjs built with multi-source adapter pattern + idempotent dedup. 3,962 corpus photos seeded (Pexels:1797, Pixabay:1557, Unsplash:608). Gallery Listings/Corpus/All toggle. Annotation queue corpus mode (?mode=corpus) bypasses eval pipeline. Thumbnail unoptimized fix. DB: photo_source + source_photo_id columns added to property_photos.",
+      "decisions": "Pexels URLs are stable CDN links — use numeric photo ID for filename hash not URL basename; corpus queue needs no Claude eval — seed room label is sufficient hint; unoptimized required for all external image domains in Next.js Image component"
+    },
+    {
+      "date": "2026-03-28",
+      "title": "BL-54b photo pipeline overhaul + seed fixes. Fixed annotation queue save (unique constraint on photo_annotations). Fixed blank image in queue (key prop on Image). Added photo gallery page at /admin/photo-intelligence/gallery. Built catalog allocator (photo-data.catalog.mjs) for global photo assignment — no resets. Fixed pool exhaustion (refill on empty). Fixed propertyIds empty bug (fetch from DB fallback). Fixed skip guard to count only storage_path IS NOT NULL photos. Fixed user_id null constraint on corpus properties. Grayed out Property Set tab. Built dedup script (filename-keyed). Built bulk eval script. Corpus seeder (seed-unsplash-corpus.mjs) confirmed separate from listing seeder (seed-dubai.mjs). NU-28 done (SQL). BL-84 added to backlog.",
+      "decisions": "seed-dubai.mjs feeds agent app listings (storage_path set); seed-unsplash-corpus.mjs feeds annotation corpus (storage_path null); skip guard must filter storage_path IS NOT NULL; catalog allocator pool must refill on exhaustion; propertyIds is empty on re-runs — always fetch from DB as fallback; corpus properties have null user_id — patch before reseed"
+    },
+    {
+      "date": "2026-03-28",
+      "title": "BL-54b annotation tool bug fixes. Save button stuck on photo 2: try/finally + pre-populate queueAnnotation with ai_room_type. RLS 503 on photo_annotations/photo_evaluation_results: policies recreated with auth.uid()→org_members join. Queue API: empty photos filtered, deduplication by photo_id. Hero No button: visible red selected state. Room types: added window_view, balcony_view, rooftop, garden; removed duplicate pool. DB cleaned: duplicate photo_evaluation_results rows removed.",
+      "decisions": "get_user_org_id() can fail silently → use auth.uid()→org_members join for RLS; pre-populate form state from AI suggestion to keep Save enabled; deduplicate evaluation results before building queue"
+    },
+    {
+      "date": "2026-03-27",
+      "title": "NU-27 Listing Agent Verify & Sign flow complete. Agent row in ExecutionPanel: locked→Verify&Sign→Signed state machine. Verify page with PDF preview, signatory status, signature preset display. Agent-verify-sign API route bakes signature into cumulative PDF. Signature preset (draw/type) added to Settings Profile. RLS fix: deal_participants check moved to service role API. BL-54b Photo Annotation Tool complete: set + queue modes, AI suggestion blocks, photo_annotations table.",
+      "decisions": "Agent never gets external signing link; verify page is authenticated only; signature preset stored as JSONB on agent_profiles; deal_participants requires service role for cross-user reads"
+    },
+    {
+      "date": "2026-03-27",
+      "title": "BL-54a fully complete — gallery instant update, admin nav, i18n fix. PhotoGallerySection: lifted primaryPhotoUrl to local state, onHeroAccepted callback updates gallery instantly on accept. AdminNav: Photo Intelligence added to Intelligence section with Camera icon. i18n: photoIntelligence key added to all 4 locales (en/fr/de/it). DB-SCHEMA: property_photos columns documented. Chrome extension connected for live browser testing.",
+      "decisions": "Modular composition pattern: lift state to wrapper, pass callbacks down — never modify existing components; property_photos uses sort_order not display_order"
+    },
+    {
+      "date": "2026-03-26 PM",
+      "title": "BL-54 Photo Intelligence Engine — full 4-phase strategy + Phase 1 built. Strategy: Evaluate → Orchestrate → Enhance → Own the model. Phase 1 (BL-54a): Claude Vision evaluates photo sets, detects room types, flags missing rooms, recommends hero photo, scores set 0-100. PhotoGallerySection modular composition pattern. Hero photo recommendation actually sets is_primary=true in DB on accept. 3 new tables: photo_evaluations, photo_evaluation_results, photo_evaluation_feedback. Tested live — working.",
+      "decisions": "Agent app = thin layer (button + result card); Admin CRM = intelligence layer; Manual trigger only until accuracy validated; Every evaluation logged as training data; modular composition pattern (PhotoGallerySection) prevents mega-files"
+    },
+    {
+      "date": "2026-03-26 PM",
+      "title": "BL-82 Document Intelligence Foundation specced. document_intelligence_events table created. Captures AI-suggestion vs human-correction deltas on AcroForm field annotations. country_code, doc_type, field_role, field_type, error_type. Future admin UI at /admin/document-intelligence. Build after BL-71.",
+      "decisions": "Store both AI guess and human answer always; was_correct boolean for quick accuracy queries"
+    },
+    {
+      "date": "2026-03-26 PM",
+      "title": "NU-26 Seed Data Overhaul complete. 4 bug fixes in seed script: deal_assets + deal_commissions used find() instead of filter()+pick() causing same property recycled per agent; viewing_feedback used integer instead of enum for buyer_interest_level; price_feedback contained invalid 'willing_to_negotiate' value. Full wipe + reseed. SEED-INSTRUCTIONS.md rewritten with complete 3-step wipe process. DB-SCHEMA.md updated with activity_log (no org_id, use property_id subquery) and esign_envelopes (no org_id, use property_id subquery) gotchas.",
+      "decisions": "Always run FK dependency query before attempting org wipe; activity_log and esign_envelopes have no org_id column"
+    },
+    {
+      "date": "2026-03-26",
+      "title": "NU-20 complete — full signing pipeline refactor. PDF engine extracted to shared module (src/features/signing/pdf/). Service layer split into focused modules with facade. form.flatten() permanently replaced with draw-then-strip. Dancing Script font for typed signatures. Agent auto-sign removed — listing_agent now signs manually like other parties. Fully executed gating now requires all deal participants (buyer + seller + listing_agent) to have signed. ExecutionPanel shows all deal signatories with direct send sheet (skip all 4 modal steps). DB: recipient_contact_id nullable, requested_for_user_id added, documents.template_id added.",
+      "decisions": "draw-then-strip is the only safe AcroForm baking approach; agent recipients use user_id not contact_id; template_id on documents enables direct send flow; fully executed requires all 3 parties"
+    },
+    {
+      "date": "2026-03-25",
+      "title": "Signing flow redesign + agent auto-sign + fully executed. NU-13: copy signing link on pending rows. NU-16: CRM auto-fill property via deal_assets. NU-17: 4-step flow (Template→Recipient→Prepare→Send), removed old Assign Signatories step. NU-18(a-g): agent auto-sign with listing_agent from deal_participants, value_type='agent_auto', documents.is_signed as source of truth for fully executed badge. NU-19: download signed PDF via createSignedUrl. NU-20: instanceof fix for submit route AcroForm fill.",
+      "decisions": "agent_auto value_type distinguishes agent sigs from recipient typed sigs; documents.is_signed is the single source of truth — never recompute fully_executed client-side; deal_assets is source of truth for property not deals.property_id; listing_agent from deal_participants not logged-in user for auto-sign"
+    },
+    {
+      "date": "2026-03-24 PM2",
+      "title": "Signing flow — recipient page complete. PDF proxy route fully rewritten as clean signer route: draws static AcroForm values directly onto page content (respecting /Q alignment, /Ff multiline, baseline nudge), strips all Widget annotations and /AcroForm catalog entry, no form.flatten(). Recipient-owned fields excluded from PDF baking (fetched via document_field_values). Overlay text fields styled with flex centering, boxSizing: border-box, correct padding. Double-text eliminated. Section 4 Buyer fields editable. All sections pre-filled correctly. External feedback from Gemini + ChatGPT was critical to resolving pdf-lib flatten issues and overlay positioning.",
+      "decisions": "pdf-lib flatten silently fails on reportlab/pdfrw PDFs — always draw+strip instead; constructor.name mangled in production — use instanceof; forceFlattenByDrawing x+2 offset causes overlay drift — use BASELINE_NUDGE = 0.08; always exclude recipient-owned AcroForm values from PDF baking"
+    },
+    {
+      "date": "2026-03-24",
+      "title": "Signing flow fixes (session 2). NU-8 resolved via Option C: PDF proxy route (/api/signing/[token]/pdf) fetches PDF server-side using service role, applies acroform_values via pdf-lib, streams filled PDF to browser — eliminates all client-side bucket detection. AcroForm values now correctly saved on send (was missing from POST body in handleSend). Other-party signature fields greyed out on recipient page. Per-recipient field filtering and signableFields count fixed. form.flatten() not yet working — tracked as NU-10/NU-11.",
+      "decisions": "pdf-lib instanceof check required (constructor.name mangled in production build); form.flatten() silently fails on this PDF — needs investigation; AcroForm values were never in POST body (root cause of empty Sections 1&2); bucket detection belongs server-side only"
+    },
+    {
+      "date": "2026-03-23 pm",
+      "title": "BG-6 through BG-15 — E2E Signing Flow Debugged and Working. Fixed agent signature name resolution (timing fix — moved PII overlay to useEffect). Fixed AcroForm keystroke re-render loop (change listener only + skip focused field on hydration). Fixed modal hidden behind app shell (createPortal + z-[500]). Fixed Next button over-gating (allAgentPrepFilled=true). Fixed placeholder document creation (missing columns, wrong bucket, empty file_path). Fixed per-recipient field filtering (all fields were sent to every recipient). Fixed bucket detection in signing page and submit route. E2E flow now working: agent prepare → send → recipient signs → deal status updates to Partial/Signed.",
+      "decisions": "assigned_to: 'agent' is legacy value in MOU template — must be included in all filters alongside agent_sign/agent_prepare; createPortal required for any full-screen modal inside a fixed drawer; per-recipient field filtering must happen in route not service; never hydrate focused AcroForm field"
+    },
+    {
+      "date": "2026-03-23",
+      "title": "NU-7 spec + BL-81i/j/k/l/m — Electronic Signing flow hardened. NU-7: Full E2E signing spec (template creation, manual path, electronic path, 5 gaps). BL-81i: recipient CRM pre-fill (name/phone/email from deal participants) + progress counter bug fix (agent_prepare fields excluded). BL-81j: CRM auto-fill moved server-side via /api/signing/crm-autofill (service_role bypasses RLS on cross-agent properties) + fixed crm_auto_fill_key not persisting from template canvas. BL-81k: CRM values wired into AcroForm native inputs via CRM_KEY_TO_ACROFORM translation map. BL-81l: contact names displayed on signature/initial overlay fields in agent prepare view. BL-81m: agent signature presets cleaned up (Listing Agent replaces generic Agent). BG-5: deal detail wrong party names fixed. CRM hydration root cause: contacts query limit(200) silently dropping contacts.",
+      "decisions": "Key gotchas: getCrmAutoFillValues was client-side — RLS blocks agents from reading properties they don't own; crm_auto_fill_key was silently dropped in templateService create/update; CRM values go into acroFormValues (field-name-keyed) not fieldValues (UUID-keyed); never use limit() on contacts query when IDs are known"
+    },
+    {
+      "date": "2026-03-20",
+      "title": "BL-81c/d/e complete. BL-81c: Multi-party signing — deal participant pre-population, execution tracking, ExecutionPanel in DealDocumentsTab. BL-81d: Per-field recipient assignment with 3-step party picker, reordered flow (Signatories first). BL-81e: Universal fill & sign — text field type replaces name, label step in context menu, CRM auto-fill from contacts, document_field_values table for text responses, editable text fields on signing page.",
+      "decisions": "BL-81f (Signing Templates) next; 'name' field migrated to 'text'; auto-fill is server-side snapshot not live"
+    },
+    {
+      "date": "2026-03-22",
+      "title": "BL-81h Part A COMPLETE — AcroForm leak fixed. Root cause: PDF.js positions AcroForm widgets from annotation rect values directly — malformed rects with negative x produce negative left positions. No amount of overflow:hidden/clipPath/contain:paint can clip them because they escape before layout. Fix: filterRenderableAnnotations() filters annotations using page.view bounds BEFORE passing to AnnotationLayer.render() — bad rects never enter the DOM. Also: useInjectMinimalAnnotationCss() injects 10 lines of essential PDF.js annotation CSS via runtime style tag (avoids Turbopack build failure from pdf_viewer.css import). Also added: hydrateAcroFormValues(), disableFormControls()/enableFormControls(), proper checkbox/radio handling. BL-devtools: Internal dev tool deployed at housezoom.ai/devtools. Three tabs: CC Prompt generator, Spec drafter, DB Schema reviewer. All WOW rules baked into system prompts. Next.js API route proxies Anthropic API (key stays server-side).",
+      "decisions": "Key gotchas: overflow:hidden does NOT clip PDF.js annotation widgets with negative rects — must filter at source using page.view before render. pdf_viewer.css breaks Turbopack — inject minimal CSS at runtime instead."
+    },
+    {
+      "date": "2026-03-21",
+      "title": "BL-81f/g complete, BL-81h Part A core working. BL-81f: signing templates + base documents + field registry (55 presets). BL-81g: 3-way field assignment, CRM auto-fill, DocumentPrepareModal. BL-81h Part A: browser-embedded PDF form editor — first in any RE CRM. 3-layer model (PDF.js canvas + AnnotationLayer + HouseZoom overlay), 21 AcroForm inputs editable. pdfjs-dist v3 instance API, renderInteractiveForms flag.",
+      "decisions": "BL-81h overlay alignment needs fixing; Part B (finalization) next session"
+    },
+    {
+      "date": "2026-03-20",
+      "title": "BL-81f patch — base_documents table, upload UI, template-PDF linking. TemplateCanvas now renders real PDF via PDF.js. Admin base documents page. Template create/edit picks base document before placing fields.",
+      "decisions": "Storage bucket 'base-documents' must be created manually in Supabase Dashboard"
+    },
+    {
+      "date": "2026-03-20",
+      "title": "BL-81b complete — Manual signing field placement with 2-step context menu (type→assignment). Full drag/resize/delete UX with document-level events. Multi-page recipient signing page. Agent fields locked on recipient side. Date picker modal. Copy Link button. AI repurposed to count-only hint. Vision approach retired. BL-81c (template system) next.",
+      "decisions": "Recipient page UX polish deferred to BL-81d; agent self-signing flow not yet built"
+    },
+    {
+      "date": "2026-03-19",
+      "title": "BL-77 Playwright E2E Phase 3 complete (12 tests). BL-81 Guided Signing complete — full end-to-end mobile signing flow working on iPhone with real DLD documents. BL-81b AI field detection in progress — Stage 1 (Claude label detection) working, Stage 2 (PDF.js positioning) needs y-offset tuning.",
+      "decisions": "BL-81b y-offset still off — Seller sig overlaps SELLER header; one field below footer; fix next session"
+    },
+    {
+      "date": "2026-03-19",
+      "title": "BL-81 Guided Signing — complete (3 sessions). Session 1: types, signingService, 3 API routes (create, [token] GET/PATCH, [token]/submit POST), pdf-lib install, vercel.json maxDuration. Session 2: FieldPlacementCanvas (PDF.js + tap-to-place), RequestSignatureModal (3-step: place fields → pick recipient → send), SignatureStatusBadge, useSigningRequest hook, wired into DealDocumentsTab + deal detail Documents tab. Session 3: public /sign/[token] page — mobile-first, no auth, PDF with field overlays, signature bottom sheet (draw + type tabs, bezier smoothing), auto-scroll, submit flow, confirmation screen.",
+      "decisions": "Coordinates stored as % for resolution independence; pdf-lib for server-side PDF embedding (pure JS, Vercel-safe); token IS the auth — no login ever; PDF.js loaded from CDN to avoid SSR issues; touch-action: none mandatory on signature canvas for iOS Safari; public page uses hardcoded colors (no CSS variables — outside HouseZoom theme)"
+    },
+    {
+      "date": "2026-03-19",
+      "title": "BL-74 Perf Tests + BL-75 Analytics Fix + BL-76 Jest + BL-76b CI + TD-16 Domain Enforcement. BL-74: 11 perf tests (5 agent + 6 admin), per-page thresholds, agentAuth.ts fixture. BL-75: analytics 4735ms→2957ms via fetchAllAnalytics single entry point + shared data. BL-76: 34 Jest unit tests, dealHealthService 100% coverage. BL-76b: GitHub Actions CI on push/PR. TD-16: ESLint no-restricted-imports (warn), noImplicitReturns, BOUNDED-CONTEXTS.md, 95 violations tracked as TD-18.",
+      "decisions": "Vercel cold starts are infrastructure not code — raise threshold; ESLint violations warn not error for incremental cleanup; CC must clean up supabase imports when touching files; pure compute functions enable testability without DB mocks"
+    },
+    {
+      "date": "2026-03-18",
+      "title": "BL-71 Deal Health Score + BL-73b Client-Shareable Checklist complete. BL-71: dealHealthService (3 penalty signals), DealHealthBadge (green/amber/red pill), wired into admin kanban + agent dashboard. BL-73b: checklist_share_tokens table, POST share API, public /c/[token] page, ContactCTA client component, Email copy-to-clipboard fallback, WhatsApp wa.me fix. BL-74/75/76/77 added to backlog.",
+      "decisions": "Deal health score is client-side only — no new DB table; closed/won/lost deals show no badge; agent email fallback needed (agent_profiles.email can be NULL — fall back to auth.users); mailto: does nothing on desktop without email client — copy-to-clipboard is the right fallback; wa.me requires stripped phone number (no + or spaces)"
+    },
+    {
+      "date": "2026-03-18",
+      "title": "BL-72b complete + TEST-REGISTRY.md. Fixed auth fixture redirect (waitForURL away from /auth/login). Switched agent test account to Lena Fischer (owner redirect issue). Fixed admin setup project testMatch (testDir override). Fixed AM-2 (Invitations tab click), AM-3 (member-row testid + Promise.all navigation), AC-2 (compliance-rule testid). Increased auth timeout to 30s. Final: 35/36 passing, 1 flaky (P-1 timing). TEST-REGISTRY.md created, verified by CC (7 corrections), committed. BL-74 + BL-75 added to backlog.",
+      "decisions": "Agent test account must be non-owner role (owner redirects to /admin not /dashboard); admin setup project needs explicit testDir override to find fixtures; invite button only renders on Invitations tab; data-testid is the reliable selector pattern for dynamic content"
+    },
+    {
+      "date": "2026-03-17",
+      "title": "BL-72b Playwright Phase 2 — Admin E2E Tests complete. 12 new admin smoke tests: adminAuth.ts fixture, admin-auth.spec.ts (3), admin-members.spec.ts (3), admin-deals.spec.ts (3), admin-compliance.spec.ts (3). playwright.config.ts admin project added. data-testid=\"deal-card\" on deal kanban. 23 total E2E tests.",
+      "decisions": "Separate admin fixture file (adminAuth.ts) keeps agent + admin sessions independent; owner role used for admin tests to avoid role hierarchy edge cases; smoke level only — no CRUD tests (Phase 3); data-testid=\"deal-card\" is the only production code change"
+    },
+    {
+      "date": "2026-03-17",
+      "title": "Admin CRM iOS fixes + Seed data overhaul (Viewing Mode). D-117: AdminNav mobile header safe-area fix (fixed positioning, calc height, sidebar overlay padding). D-118: Admin AI Alerts — locked stage alerts now show deal title, text wraps, bullet top-aligned. D-119: createPropertyItems() added to seed — 2,455 items across 100 properties with rooms from photo tags, systems (AC/water heater/intercom), features linked to rooms via room_name (kitchen appliances, wardrobes, en-suite, shower, balcony flooring), exterior (pool/parking/storage), proportional room sizes. D-120: ViewingMode scoped to agent_user_id (was org-wide for admins), seed viewings staggered 9AM–6PM. Key architectural clarification: ViewingMode (eye icon) = live inspection tool showing agent's own scheduled viewings; Schedule a Viewing (Tools) = appointment management. These must match 1:1.",
+      "decisions": "property_items.room_name must use spaces not underscores to match ViewingMode buildRoomCards key comparison; ViewingMode viewings always agent-scoped regardless of role; never force/hardcode seed data for specific users — let natural assignment drive it; Vercel cold start can cause false 15-20s slowness immediately after deploy"
+    },
+    {
+      "date": "2026-03-16",
+      "title": "Bug fix session — currency, AppShell, greeting, compliance banner. Fixed: hardcoded CHF in property header (PropertyDetailPage line 214); _agentCurrency singleton not synced from OrgProvider; dashboard greeting using email instead of agent first name; sticky header z-index; 9 files with hardcoded currency codes replaced with orgCurrency; AppShell height now includes safe-area-inset-top (root cause: outer fixed shell was only 52px leaving transparent gap for WKWebView scroll bleed-through).",
+      "decisions": "AppShell fix = change height not z-index — transparent gap above inner bar was the real issue; ChatGPT correctly identified root cause after ~15 failed attempts; never hardcode currency codes in components"
+    },
+    {
+      "date": "2026-03-16",
+      "title": "BL-38b bug fixes + dashboard greeting fix. Fixed: deals scored using wrong column (assigned_user_id not agent_user_id). Created /deals/[id] agent-accessible route outside AdminGuard. Dashboard greeting now shows agent first name from agent_profiles.full_name. Narrative greeting is time-aware (Good morning/afternoon/evening + first name).",
+      "decisions": "Two Fatima accounts in auth.users caused confusion during testing; orchestrator was correct all along — disconnect was between dashboard greeting and Game Plan card narrative"
+    },
+    {
+      "date": "2026-03-16",
+      "title": "BL-38b Deal Orchestrator Phase 2 complete. Full plan page with Mark Done, Snooze (1h/4h/tomorrow), secondary tasks collapsed, completed/snoozed footer, Plan Updated banner, 5-min polling. Auto-refresh triggers in gmail/sync + deals/confirm-stage.",
+      "decisions": "WhatsApp trigger skipped — no agent_id available in webhook context; optimistic UI on Done/Snooze for instant feedback"
+    },
+    {
+      "date": "2026-03-15",
+      "title": "BL-72 + BL-38 + BL-73 + TD-17 complete. BL-72: Playwright E2E suite (11/11 tests passing). BL-38: Deal Orchestrator Agent live on dashboard — AI daily game plan, 1 AM UTC Vercel cron. BL-73: Property Transaction Checklist Phase 1 end-to-end. TD-17: Onboarding redirect bug fixed. Multiple UI fixes (nav icons, overflow scroll, modal, profile button).",
+      "decisions": "Check 1 AM UTC cron ran for Deal Orchestrator — first real test of nightly automation; BL-73b (client-shareable checklist) is quick win next; BL-38b (Mark Done + Snooze + auto-refresh) is Phase 2"
+    },
+    {
+      "date": "2026-03-16",
+      "title": "BL-73 Property Transaction Checklist Phase 1 — complete. checklist_step_overrides + checklist_share_tokens tables, 4 new compliance rules (UAE trustee, FR preemption, CH cantonal tax, IT codice fiscale), checklistService.ts (auto-derives step statuses from deals/docs/viewings/portals/photos), /api/checklist/[dealId] GET+POST, checklist page with deal selector, role toggle, progress bar, phase accordion, manual override modal with conflict detection. Fixed: deals null property_id (seed gap), modal z-index and button visibility.",
+      "decisions": "Phase 2 (client share /c/[token]) = BL-73b"
+    },
+    {
+      "date": "2026-03-15",
+      "title": "BL-38 Deal Orchestrator Agent — complete. agent_daily_plans table, deterministic scoring engine (9 task types), generate API + nightly cron (1 AM UTC via vercel.json), dashboard summary card (1-sentence narrative, pill tasks with emojis + chevrons, View Full Plan button), /daily-plan full page. Claude Haiku narrative only — never invents tasks. Market-aware scoring (UAE 7-day, EU weekday-only). Fixed: duplicate dedup, compliance rationale, card UI polish.",
+      "decisions": "Phase 2 (Mark Done/Snooze/auto-refresh) logged as BL-38b"
+    },
+    {
+      "date": "2026-03-15",
+      "title": "BL-72 Playwright E2E Testing Suite — complete. 11 smoke tests passing (4 auth, 3 properties, 2 contacts, 2 viewings). Playwright config targeting housezoom.ai prod. HTML reporter. Auth fixture with reusable loginAs(). data-testid added to property-card, create-property-btn, contact-card, logout-btn. Fatima's role changed to agent in DB.",
+      "decisions": "Key decisions: tests run against prod by default; no CI gate yet; seed data dependency is intentional; never write to DB in smoke tests"
+    },
+    {
+      "date": "2026-03-15",
+      "title": "Admin page audit + fixes (session 2). Fixed 5 issues found during live verification: (1) Admin overview Active Deals used wrong column stage → current_stage_key, showing 20 instead of 18. (2) Admin overview Recent Activity queried non-existent audit_log table — replaced with activity_events. Added formatActivityLabel() helper for human-readable labels (e.g. \"Viewing scheduled (private) — 15 Mar at 11:00\"). (3) aiInsightsService — same column issues as analyticsService: stage → current_stage_key, removed assigned_user_id, removed org_members status filter + cross-RLS agent_profiles join. Insights now accurate: 6 genuine critical alerts (locked workflow stages MOU Signed/NOC Applied), 0 false positives. (4) Signal Resolution Queue verified working via test SQL insert. (5) DealDetailPanel action buttons (Add Party, Edit, Add Commission) restyled as visible pill buttons.",
+      "decisions": "audit_log is seeded fake data — activity_events is the real audit trail; always verify page data with SQL before assuming accuracy; aiInsightsService had same column bugs as analyticsService — fix both together next time; locked workflow stage alerts are genuine (workflow_templates.stages[].is_locked = true for MOU Signed + NOC Applied)"
+    },
+    {
+      "date": "2026-03-14",
+      "title": "BL-64 Agent Detail Page + BL-65 Analytics wiring. BL-64: Clickable team member rows navigate to /admin/members/[userId]. Full agent profile page: header (avatar, name, email, role badge, joined date), Profile Information (view/edit mode, upsert via service_role PATCH route), Preferences (read-only grid), Account Management (deactivate/reactivate + remove, hidden for self + owner). Two service_role API routes: GET /api/admin/members/[userId] (fetch member + profile bypassing RLS) + PATCH (update agent_profiles bypassing RLS). data-no-nav pattern for role dropdown + Remove button. BL-65: Analytics service rewrite — fixed 6 issues: removed non-existent status filter on org_members, stage → current_stage_key everywhere, assigned_user_id → deal_participants join, commission from deal_commissions table, viewings from viewings.agent_user_id, agent names via service_role API route /api/admin/analytics/agents. Analytics page now fully wired with real data.",
+      "decisions": "RLS blocks admin reading other users' agent_profiles — always use service_role API route pattern; org_members has joined_at not created_at, also has status/team_id/updated_at columns (schema was stale); agent→deal relationship is via deal_participants not assigned_user_id on deals; commission_earned = sum of deal_commissions regardless of status (pending commissions are valid pipeline data)"
+    },
+    {
+      "date": "2026-03-14",
+      "title": "TD-15 seed data gaps + UI fixes. (1) PageHeader double-header removed from Listings + Contacts pages — both now use AppShell leftActions/rightActions pattern. (2) TD-15: 7 seed data gaps fixed in seed-dubai.mjs — buyer_agent on every deal (50% internal/50% external), buy-side commission routes correctly to internal_agent or external_broker, every property gets a seller in property_contacts via cycling, dealBuyerMap cross-links deal buyers to interested_buyer property_contacts, deal_stage_history idempotency threshold bumped to 80, legacy @gulfhorizon.demo users cleaned up, agent contact records created in ensureMembership(). Photo upload retry logic added (fetchWithRetry, 3 attempts, 1s delay). SEED-INSTRUCTIONS.md fully rewritten with complete FK-ordered wipe SQL + org id hardcoded. (3) DealDetailPanel agent name fix — resolvedMembers state fallbacks to agent_profiles query for any user_id not in members prop, fixes \"Unknown\" listing agent when panel opened from contact detail context. New Gulf Horizon org id: 4c08163d-6839-46a9-9183-b9bd4e62ae56.",
+      "decisions": "PageHeader is legacy — AppShell leftActions is the correct pattern for all pages; FK deletion order matters (deals before leads, commissions/participants/history/assets before deals); buyer contacts must be owned by listing agent (user_id match) for agent to see them in their contact list; resolvedMembers pattern needed because DealDetailPanel is rendered from multiple contexts with different members prop completeness"
+    },
     {
       "date": "2026-03-14",
       "title": "BL-69 Step 4 — Stage Suggestion Intel Card. Added stage_suggestion to IntelCardType + card_type CHECK. Admin toggle agent_can_confirm_stages in settings. canConfirmStages in useDealPermissions. stageSuggestionService generates Intel Card after suggestion insert (org setting gated). IntelCardItem handles stage_suggestion with purple/violet accent + arrow icon + confirm_stage CTA action. Migration file created (not applied).",
