@@ -455,6 +455,13 @@ const DATA = {
       "added": "All BL-57 + BL-59 files"
     },
     {
+      "id": "BL-91",
+      "title": "As-Built Spec Generation",
+      "desc": "When team scales: CC reads source files for a completed feature and generates an \"as-built\" spec — what the code actually does today vs. original design intent. Committed as BL-XX-SPEC-AS-BUILT.md alongside original spec. Invaluable for engineer onboarding. Delta between original and as-built = record of how design evolved. SPEC_INDEX in roadmap generator extended to link both specs on roadmap cards. Low priority, high value at team scale.",
+      "tag": "admin",
+      "added": "2026-04-02"
+    },
+    {
       "id": "BL-81g",
       "title": "Signing UX polish",
       "desc": "Agent self-signing flow, signed PDF includes text field values embedded, field suggestions via Claude",
@@ -2282,6 +2289,11 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-04-02",
+      "title": "AI Infrastructure Strategy — architecture doc, cross-validation, Process Atlas pages. Drafted HouseZoom AI Architecture Strategy v1.0, cross-validated with Gemini + ChatGPT, updated to v1.1. Key outcomes: behavior-first backlog reorder (Daily Plan ships before logging infra), Planning Agent design requirements (specificity, alert fatigue, dismiss/snooze in v1), deal outcome capture added, agent performance layer added, portal threat named as existential risk, data gravity rule for AWS migration, GDPR portability requirement, multilingual communication graph, priority queue rule. WOW updated with AWS migration readiness rules (thin route handlers, no Vercel coupling, storage path portability). Process Atlas: architecture and tech-stack pages added at /architecture/ and /tech-stack/, nav fixed with absolute URLs across all pages, nav injected into roadmap generator. Spec links added to roadmap cards and modals (spec ↗ badge + GitHub link). SPEC_INDEX expanded to 50 entries. Fixed spec matching for D-xxx done items (extracts BL number from title). BL-91 added to backlog: as-built spec generation for engineer onboarding at team scale.",
+      "decisions": "No code changes — docs + atlas only"
+    },
     {
       "date": "2026-03-30",
       "title": "BL-85 AI Listing Walkthrough complete. Ken Burns + fade CSS player. Room-ordered sequencing via BL-54 eval results. Multi-photo per room (up to 2, quality threshold 55). Untagged fallback: sort_order sequence when \u003c50% photos have room tags. WalkthroughPlayer (z-[500]), WalkthroughTrigger, walkthroughService, GET /api/walkthrough/[propertyId]. Phase 1b (MP4 via MediaRecorder) deferred.",
