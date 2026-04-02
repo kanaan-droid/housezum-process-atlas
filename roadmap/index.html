@@ -294,9 +294,17 @@ const DATA = {
       "added": ""
     },
     {
+      "id": "BL-93",
+      "title": "Property Seller Contact Linking",
+      "desc": "Add seller_contact_id FK to properties table. Every property has an owner who is the seller — currently only stored as owner_name (plain text), not linked to contacts. Required before NU-21 can auto-populate seller in New Deal modal. Touches: DB migration, property listing/edit flow (seller contact picker), enrichment flow, seed script backfill.",
+      "files": "2026-04-03",
+      "tag": "admin",
+      "added": ""
+    },
+    {
       "id": "NU-21",
       "title": "Buyer Agent on New Deal form",
-      "desc": "Add optional Buyer Agent contact search to New Deal modal. External buyer agents must be contacts not external_party_info orphans. Fix seed script too",
+      "desc": "BLOCKED BY BL-93. Add optional Buyer Agent contact search to New Deal modal. Also: auto-generate Deal Title from property+buyer, auto-fill Assigned Agent from property selection, auto-fill Currency from org settings. External buyer agents must be contacts. If not found, show \"Not found? Add as contact →\" link. Fix seed script too.",
       "files": "src/features/deals/components/NewDealModal.tsx, scripts/seed-dubai.mjs",
       "tag": "admin",
       "added": "2026-03-25"
@@ -448,11 +456,25 @@ const DATA = {
   ],
   "backlog": [
     {
-      "id": "BL-90",
-      "title": "Portal Signal → Lead → Deal Flow Review",
-      "desc": "End-to-end review of the full inbound signal pipeline now that all pieces are wired (BL-57 signals, BL-59 lead conversion, BL-89 walkthrough share, signing flow, deal pipeline). Check for gaps: Intel Card UX, lead-to-contact conversion friction, deal creation trigger, agent assignment correctness, fuzzy matching edge cases. Likely produces a set of targeted fixes rather than new features.",
+      "id": "~~BL-90~~",
+      "title": "~~Portal Signal → Lead → Deal Flow Review~~",
+      "desc": "DONE 2026-04-03 (D-161) — Live end-to-end test. 3 bugs fixed: property resolution column name, lead auto-creation, Intel Card constraint. BL-90b: maybeCreateLeadFromSignal(), portal_new_lead guaranteed card, all portal card types in constraint. Docs: curl test guide + pipeline spec.",
       "tag": "admin",
       "added": "All BL-57 + BL-59 files"
+    },
+    {
+      "id": "BL-92",
+      "title": "Security & Compliance Hardening",
+      "desc": "Rate limiting on all public/webhook routes (Upstash Redis on Vercel → API Gateway on AWS). Zod input validation on all API routes. GDPR data export + deletion flow (required for FR/CH/IT). Consistent webhook secret validation across all portal routes. CSP + security headers in next.config.js. Auth event audit log. Field-level encryption for PII post-funding.",
+      "tag": "compliance",
+      "added": "2026-04-03"
+    },
+    {
+      "id": "BL-90c",
+      "title": "Deal Creation CTA from Lead Flow",
+      "desc": "\"Create Deal\" button at end of ConvertLeadModal flow. \"Create Deal\" shortcut from Admin Signals Queue. Deferred from BL-90b — UX improvement, not blocking.",
+      "tag": "admin",
+      "added": "src/features/deals/components/ConvertLeadModal.tsx, src/app/admin/signals/page.tsx"
     },
     {
       "id": "BL-91",
@@ -1251,6 +1273,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-161",
+      "title": "BL-90 — Portal Signal → Lead → Deal Flow Review",
+      "desc": "Live E2E test of inbound signal pipeline. 3 bugs fixed: external_reference → property_reference_id, lead auto-creation from resolved signals, Intel Card constraint for all portal card types. BL-90b: maybeCreateLeadFromSignal(), portal_new_lead guaranteed card. Verified: signal → contact → property → lead → Intel Card. Docs: curl test guide + pipeline spec.",
+      "completed": "2026-04-03",
+      "tag": "admin"
+    },
     {
       "id": "D-160",
       "title": "BL-89 — Walkthrough Public Share URL + Portal Distribution",
@@ -2289,6 +2318,11 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-04-03",
+      "title": "BL-90 Portal Signal Pipeline — live E2E test + 3 bug fixes. (1) external_reference → property_reference_id in entityResolutionService — property resolution was always failing. (2) maybeCreateLeadFromSignal() added — linked_lead_id was always NULL. (3) portal_new_lead + all portal card types added to intel_cards constraint. Guaranteed Intel Card for every resolved signal. BL-93 logged (seller contact FK blocks NU-21). BL-92 logged (security hardening). BL-90c logged (deal creation CTA from lead flow). Curl test guide + pipeline spec committed.",
+      "decisions": "property_reference_id is the portal match key, not internal UUID; always query existing card_type values before CHECK migration"
+    },
     {
       "date": "2026-04-02",
       "title": "AI Infrastructure Strategy — architecture doc, cross-validation, Process Atlas pages. Drafted HouseZoom AI Architecture Strategy v1.0, cross-validated with Gemini + ChatGPT, updated to v1.1. Key outcomes: behavior-first backlog reorder (Daily Plan ships before logging infra), Planning Agent design requirements (specificity, alert fatigue, dismiss/snooze in v1), deal outcome capture added, agent performance layer added, portal threat named as existential risk, data gravity rule for AWS migration, GDPR portability requirement, multilingual communication graph, priority queue rule. WOW updated with AWS migration readiness rules (thin route handlers, no Vercel coupling, storage path portability). Process Atlas: architecture and tech-stack pages added at /architecture/ and /tech-stack/, nav fixed with absolute URLs across all pages, nav injected into roadmap generator. Spec links added to roadmap cards and modals (spec ↗ badge + GitHub link). SPEC_INDEX expanded to 50 entries. Fixed spec matching for D-xxx done items (extracts BL number from title). BL-91 added to backlog: as-built spec generation for engineer onboarding at team scale.",
