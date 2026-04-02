@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Tech Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --red:#d94a4a;--red2:#aa2d2d;--red3:#2a1010;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all 0.15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+
+.page-header{padding:48px 32px 32px;max-width:1200px;margin:0 auto}
+.page-header h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
+.page-header p{font-size:15px;color:var(--text2);max-width:600px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);background:var(--purple3);color:var(--purple);border:1px solid var(--purple2);padding:3px 10px;border-radius:20px;margin-bottom:16px}
+
+main{max-width:1200px;margin:0 auto;padding:0 32px 80px}
+
+.section-title{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* TOOL TABLE */
+.tool-group{margin-bottom:48px}
+.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tool-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;display:flex;flex-direction:column;gap:8px;transition:border-color 0.15s}
+.tool-card:hover{border-color:var(--border2)}
+.tool-header{display:flex;align-items:center;gap:10px}
+.tool-name{font-size:14px;font-weight:600}
+.tool-status{font-size:10px;font-family:var(--mono);font-weight:600;letter-spacing:0.6px;padding:2px 8px;border-radius:4px}
+.status-live{background:var(--teal3);color:var(--teal);border:1px solid var(--teal2)}
+.status-planned{background:var(--amber3);color:var(--amber);border:1px solid var(--amber2)}
+.status-future{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+.status-deprecated{background:var(--red3);color:var(--red);border:1px solid var(--red2)}
+.tool-category{font-size:10px;font-family:var(--mono);color:var(--text3);margin-left:auto}
+.tool-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.tool-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.meta-tag{font-size:11px;font-family:var(--mono);background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:2px 8px;border-radius:4px}
+.tool-note{font-size:11px;color:var(--text3);font-style:italic;margin-top:2px}
+.tool-card.highlight{border-color:var(--purple2);background:linear-gradient(135deg,#1a1728 0%,var(--bg2) 100%)}
+
+/* MIGRATION TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:0;margin-bottom:48px}
+.tl-item{display:flex;gap:20px;padding:16px 0}
+.tl-item+.tl-item{border-top:1px solid var(--border)}
+.tl-period{font-size:11px;font-family:var(--mono);color:var(--text3);min-width:100px;padding-top:2px}
+.tl-content h4{font-size:13px;font-weight:600;margin-bottom:4px}
+.tl-content p{font-size:12px;color:var(--text2);line-height:1.5}
+.tl-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tl-tag{font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:4px}
+
+/* PRINCIPLES */
+.principles{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:48px}
+.principle{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:16px}
+.principle h4{font-size:12px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.principle p{font-size:12px;color:var(--text2);line-height:1.5}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="../roadmap/">Roadmap</a>
+    <a href="../architecture/">Architecture</a>
+    <a href="../tech-stack/" class="active">Tech Stack</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="badge">Living document · updated per session</div>
+  <h1>Tech Stack &amp; Tool Inventory</h1>
+  <p>Every tool, service, and library in use or planned. Status reflects current production state.</p>
+</div>
+
+<main>
+
+  <!-- CORE FRAMEWORK -->
+  <div class="section-title">Core framework</div>
+  <div class="tool-group">
+    <div class="tool-grid">
+      <div class="tool-card highlight">
+        <div class="tool-header">
+          <span class="tool-name">Next.js 14</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">frontend · backend</span>
+        </div>
+        <p class="tool-desc">App Router, Server Components, API Routes. All business logic in service classes — route handlers are thin (auth + call service + return response). Required for AWS Lambda migration compatibility.</p>
+        <div class="tool-meta"><span class="meta-tag">App Router</span><span class="meta-tag">API Routes</span><span class="meta-tag">Server Actions</span><span class="meta-tag">ISR</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">TypeScript</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">language</span>
+        </div>
+        <p class="tool-desc">Strict mode. All new files typed. npx tsc --noEmit runs before every commit. No any casts without explicit comment.</p>
+        <div class="tool-meta"><span class="meta-tag">strict mode</span><span class="meta-tag">pre-commit check</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Tailwind CSS</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">styling</span>
+        </div>
+        <p class="tool-desc">Utility-first. Design tokens via CSS variables. No custom CSS files — all styles via Tailwind classes or inline style for edge cases.</p>
+        <div class="tool-meta"><span class="meta-tag">CSS variables</span><span class="meta-tag">design tokens</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Capacitor</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">ios</span>
+        </div>
+        <p class="tool-desc">iOS wrapper loading from remote Vercel URL. Native plugins limited — camera uses HTML file input (no capture attribute). TestFlight only needed for native changes.</p>
+        <div class="tool-meta"><span class="meta-tag">remote URL mode</span><span class="meta-tag">WKWebView</span><span class="meta-tag">safe-area CSS</span></div>
+        <p class="tool-note">Native build only for: Capacitor config, app icons, splash, native plugins.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKEND & DATABASE -->
+  <div class="section-title">Backend &amp; database</div>
+  <div class="tool-group">
+    <div class="tool-grid">
+      <div class="tool-card highlight">
+        <div class="tool-header">
+          <span class="tool-name">Supabase</span>
+          <span class="tool-status status-live">LIVE → migrating H2 2026</span>
+          <span class="tool-category">db · auth · storage</span>
+        </div>
+        <p class="tool-desc">Postgres + Storage + Auth + RLS. All tables org-scoped via org_id. RLS enforced at DB level. Migration to AWS RDS Aurora planned H2 2026 — migrate last, after compute.</p>
+        <div class="tool-meta"><span class="meta-tag">Postgres 15</span><span class="meta-tag">pgvector</span><span class="meta-tag">RLS</span><span class="meta-tag">Storage buckets</span><span class="meta-tag">Auth</span></div>
+        <p class="tool-note">Key rule: never use FK joins across RLS-protected tables — use two separate queries.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">pgvector</span>
+          <span class="tool-status status-planned">PLANNED</span>
+          <span class="tool-category">embeddings</span>
+        </div>
+        <p class="tool-desc">Already available in Supabase. Will store embeddings for property descriptions, contact notes, deal summaries. Used for semantic search and buyer-property matching.</p>
+        <div class="tool-meta"><span class="meta-tag">text-embedding-3-small</span><span class="meta-tag">cosine similarity</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Vercel</span>
+          <span class="tool-status status-live">LIVE → migrating H2 2026</span>
+          <span class="tool-category">hosting · deploy</span>
+        </div>
+        <p class="tool-desc">Auto-deploy from main branch. Cron jobs via vercel.json. Migration to AWS Lambda/ECS planned H2 2026 — migrate compute before DB. No deep Vercel coupling allowed (no KV, no Edge Config).</p>
+        <div class="tool-meta"><span class="meta-tag">auto-deploy</span><span class="meta-tag">Vercel Cron</span><span class="meta-tag">Edge Functions</span></div>
+        <p class="tool-note">AWS migration rule: no @vercel/kv or @vercel/edge-config imports. Tag all new Vercel crons as aws-migration items.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">AWS (planned)</span>
+          <span class="tool-status status-planned">H2 2026</span>
+          <span class="tool-category">cloud · infra</span>
+        </div>
+        <p class="tool-desc">Post-funding migration. Run Vercel + AWS in parallel per service — no big-bang cutover. Compute first, DB last. Data gravity rule: AI compute must be in same region as DB.</p>
+        <div class="tool-meta"><span class="meta-tag">Lambda / ECS</span><span class="meta-tag">RDS Aurora</span><span class="meta-tag">S3</span><span class="meta-tag">SageMaker</span><span class="meta-tag">CloudFront</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI & MODELS -->
+  <div class="section-title">AI &amp; models</div>
+  <div class="tool-group">
+    <div class="tool-grid">
+      <div class="tool-card highlight">
+        <div class="tool-header">
+          <span class="tool-name">Anthropic Claude</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">LLM · reasoning</span>
+        </div>
+        <p class="tool-desc">Primary LLM for compliance reasoning, communication drafting, document analysis, listing content, Intel Card generation. Always version-pinned.</p>
+        <div class="tool-meta"><span class="meta-tag">claude-sonnet-4-20250514</span><span class="meta-tag">claude-haiku-4-5</span><span class="meta-tag">vision</span></div>
+        <p class="tool-note">All calls must go through central ai_service wrapper — never direct SDK calls in components.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">GPT-4o-mini / Haiku</span>
+          <span class="tool-status status-planned">ROUTING PLANNED</span>
+          <span class="tool-category">LLM · classification</span>
+        </div>
+        <p class="tool-desc">Small, cheap models for intent detection and entity extraction. Target: &lt;300ms latency, ~10% cost of Sonnet. ai_service wrapper handles routing by feature ID.</p>
+        <div class="tool-meta"><span class="meta-tag">intent detection</span><span class="meta-tag">entity extraction</span><span class="meta-tag">classification</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">OpenAI Embeddings</span>
+          <span class="tool-status status-planned">PLANNED</span>
+          <span class="tool-category">embeddings</span>
+        </div>
+        <p class="tool-desc">text-embedding-3-small for generating embeddings stored in pgvector. Used for semantic search, duplicate detection, buyer-property matching.</p>
+        <div class="tool-meta"><span class="meta-tag">text-embedding-3-small</span><span class="meta-tag">1536 dims</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Whisper</span>
+          <span class="tool-status status-planned">PLANNED</span>
+          <span class="tool-category">voice · transcription</span>
+        </div>
+        <p class="tool-desc">Voice transcription for agent voice input. Via API initially, self-hosted on AWS when volume warrants it.</p>
+        <div class="tool-meta"><span class="meta-tag">whisper-1</span><span class="meta-tag">Arabic · English · French</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">CLIP / ViT (HuggingFace)</span>
+          <span class="tool-status status-future">FUTURE</span>
+          <span class="tool-category">vision · ML</span>
+        </div>
+        <p class="tool-desc">Photo room classifier. Fine-tuned on HouseZoom labeled corpus. Requires 5k labeled examples — BL-54b must complete first. Replaces manual room tagging.</p>
+        <div class="tool-meta"><span class="meta-tag">fine-tune on corpus</span><span class="meta-tag">5k labels needed</span><span class="meta-tag">SageMaker training</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">SageMaker</span>
+          <span class="tool-status status-future">FUTURE · AWS H2 2026</span>
+          <span class="tool-category">ML training</span>
+        </div>
+        <p class="tool-desc">ML training pipeline for intent classifier and photo room classifier. Only viable after labeled data thresholds are reached. No self-hosted ML in 2026.</p>
+        <div class="tool-meta"><span class="meta-tag">intent classifier</span><span class="meta-tag">room classifier</span><span class="meta-tag">deal risk predictor</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTEGRATIONS -->
+  <div class="section-title">Integrations &amp; APIs</div>
+  <div class="tool-group">
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Resend</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">email</span>
+        </div>
+        <p class="tool-desc">Transactional email. Invite emails, document notifications, compliance alerts.</p>
+        <div class="tool-meta"><span class="meta-tag">transactional</span><span class="meta-tag">invite flow</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Twilio</span>
+          <span class="tool-status status-live">LIVE (sandbox)</span>
+          <span class="tool-category">whatsapp · sms</span>
+        </div>
+        <p class="tool-desc">WhatsApp Phase 1 (outbound). Currently on sandbox number. Upgrade to verified WhatsApp Business number requires Meta Business verification.</p>
+        <div class="tool-meta"><span class="meta-tag">WhatsApp sandbox</span><span class="meta-tag">REST (not SDK)</span></div>
+        <p class="tool-note">NU-5: upgrade to production WhatsApp number — ~2-5 days Meta verification.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Gmail API + Pub/Sub</span>
+          <span class="tool-status status-live">LIVE (polling)</span>
+          <span class="tool-category">email sync</span>
+        </div>
+        <p class="tool-desc">Gmail OAuth, label-based sync, intent detection, entity linking, Intel Card generation. Currently polling. Real-time Pub/Sub webhook deprioritized pending AWS infra decision.</p>
+        <div class="tool-meta"><span class="meta-tag">OAuth 2.0</span><span class="meta-tag">gmail.readonly</span><span class="meta-tag">HouseZoom label</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">pdf-lib</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">documents · signing</span>
+        </div>
+        <p class="tool-desc">Server-side PDF manipulation for document signing pipeline. Draw-then-strip approach (never form.flatten()). Rebuild from base PDF on every signer submission.</p>
+        <div class="tool-meta"><span class="meta-tag">draw-then-strip</span><span class="meta-tag">AcroForm</span><span class="meta-tag">multi-party signing</span></div>
+        <p class="tool-note">Never use form.flatten() — silently fails on reportlab/pdfrw PDFs.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Bayut Adapter</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">portal · UAE</span>
+        </div>
+        <p class="tool-desc">XML feed generation for Bayut portal. Part of portal publishing engine. Includes VirtualTourURL wiring from walkthrough share tokens.</p>
+        <div class="tool-meta"><span class="meta-tag">XML feed</span><span class="meta-tag">UAE</span><span class="meta-tag">virtual tour</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">PropertyFinder Adapter</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">portal · UAE</span>
+        </div>
+        <p class="tool-desc">JSON feed generation for PropertyFinder. Canonical mapper normalises property data across portal-specific schemas.</p>
+        <div class="tool-meta"><span class="meta-tag">JSON feed</span><span class="meta-tag">UAE</span><span class="meta-tag">virtual_tour_url</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">SeLoger / Leboncoin (planned)</span>
+          <span class="tool-status status-planned">PLANNED · France</span>
+          <span class="tool-category">portal · France</span>
+        </div>
+        <p class="tool-desc">Portal adapters for France expansion. Country-agnostic portal engine already supports multiple adapters — only adapter + canonical mapping needed per portal.</p>
+        <div class="tool-meta"><span class="meta-tag">SeLoger</span><span class="meta-tag">Leboncoin</span><span class="meta-tag">Bien'ici</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Pexels / Pixabay / Unsplash</span>
+          <span class="tool-status status-live">LIVE (seeding)</span>
+          <span class="tool-category">photo corpus</span>
+        </div>
+        <p class="tool-desc">Photo corpus seeding for annotation pipeline (BL-54b). ~3,962 photos seeded. Unsplash hit rate limit mid-run — re-run needed. CDN URLs only, no storage_path.</p>
+        <div class="tool-meta"><span class="meta-tag">~3,962 photos</span><span class="meta-tag">annotation queue</span><span class="meta-tag">CDN URLs</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEV TOOLING -->
+  <div class="section-title">Developer tooling</div>
+  <div class="tool-group">
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Claude Code (CC)</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">AI dev agent</span>
+        </div>
+        <p class="tool-desc">Terminal-based implementation agent. Executes markdown prompt files from ~/Downloads/claude/. Handles all file edits and git operations. Will runs SQL migrations manually.</p>
+        <div class="tool-meta"><span class="meta-tag">~/Downloads/claude/</span><span class="meta-tag">prompt-driven</span><span class="meta-tag">git push</span></div>
+        <p class="tool-note">Workflow: Claude drafts spec → Will reviews → CC executes → Will deploys + tests.</p>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Claude in Chrome (MCP)</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">browser automation</span>
+        </div>
+        <p class="tool-desc">Browser automation for live debugging. Operates as separate Chrome session (independent auth). Preferred pattern: Will tests manually and reports results.</p>
+        <div class="tool-meta"><span class="meta-tag">separate session</span><span class="meta-tag">live debug only</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Process Atlas</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">docs · GitHub Pages</span>
+        </div>
+        <p class="tool-desc">GitHub Pages site at housezum-process-atlas. Roadmap, Architecture, and Tech Stack pages. Regenerated via scripts each session and pushed to main.</p>
+        <div class="tool-meta"><span class="meta-tag">GitHub Pages</span><span class="meta-tag">~/Apps/housezum-process-atlas</span></div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-header">
+          <span class="tool-name">Vercel Cron</span>
+          <span class="tool-status status-live">LIVE</span>
+          <span class="tool-category">scheduled jobs</span>
+        </div>
+        <p class="tool-desc">Daily 3am UTC purge of 90-day old events. vercel.json defines crons. Each new cron must be tagged as aws-migration item in ROADMAP — will need Lambda equivalent on AWS.</p>
+        <div class="tool-meta"><span class="meta-tag">vercel.json</span><span class="meta-tag">CRON_SECRET</span><span class="meta-tag">max 2 on Hobby</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIGRATION TIMELINE -->
+  <div class="section-title">Infrastructure migration timeline</div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-period">Now → H1 2026</div>
+      <div class="tl-content">
+        <h4>Current stack — Vercel + Supabase</h4>
+        <p>Full stack on Vercel + Supabase. No self-hosted ML. Anthropic API for all AI. Build for portability: thin route handlers, no Vercel-specific coupling.</p>
+        <div class="tl-tags">
+          <span class="tl-tag" style="background:var(--teal3);color:var(--teal)">Vercel</span>
+          <span class="tl-tag" style="background:var(--teal3);color:var(--teal)">Supabase</span>
+          <span class="tl-tag" style="background:var(--teal3);color:var(--teal)">Anthropic API</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">H2 2026 (post-funding)</div>
+      <div class="tl-content">
+        <h4>Parallel migration — compute first</h4>
+        <p>Migrate stateless compute to AWS Lambda/ECS. Run Vercel + AWS in parallel per service. Keep Supabase as DB. No big-bang cutover. Data gravity: compute must stay near DB.</p>
+        <div class="tl-tags">
+          <span class="tl-tag" style="background:var(--amber3);color:var(--amber)">Lambda / ECS</span>
+          <span class="tl-tag" style="background:var(--amber3);color:var(--amber)">S3</span>
+          <span class="tl-tag" style="background:var(--teal3);color:var(--teal)">Supabase (still)</span>
+        </div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-period">2027</div>
+      <div class="tl-content">
+        <h4>DB migration + ML infrastructure</h4>
+        <p>Supabase → RDS Aurora (heaviest lift — plan early, execute last). SageMaker for ML training when labeled data thresholds reached. Bedrock as alternative to Anthropic API.</p>
+        <div class="tl-tags">
+          <span class="tl-tag" style="background:var(--purple3);color:var(--purple)">RDS Aurora</span>
+          <span class="tl-tag" style="background:var(--purple3);color:var(--purple)">SageMaker</span>
+          <span class="tl-tag" style="background:var(--purple3);color:var(--purple)">CloudFront</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURAL PRINCIPLES -->
+  <div class="section-title">Non-negotiable architectural rules</div>
+  <div class="principles">
+    <div class="principle">
+      <h4><span style="color:var(--purple)">▸</span> Thin route handlers</h4>
+      <p>API routes: auth + call service + return. Business logic lives in service classes only. Required for Lambda migration compatibility.</p>
+    </div>
+    <div class="principle">
+      <h4><span style="color:var(--purple)">▸</span> No Vercel coupling</h4>
+      <p>No @vercel/kv or @vercel/edge-config. Every new Vercel cron = ROADMAP aws-migration tag. If it only works on Vercel, flag before adding.</p>
+    </div>
+    <div class="principle">
+      <h4><span style="color:var(--purple)">▸</span> Storage paths only</h4>
+      <p>Never store absolute URLs. Always storage_path column. Maps cleanly to S3 on migration. No Supabase-specific URL construction in components.</p>
+    </div>
+    <div class="principle">
+      <h4><span style="color:var(--teal)">▸</span> Country-agnostic</h4>
+      <p>No hardcoded AED, RERA, or single-country values. All market-specific strings in lookup maps. UAE = fallback only, not primary path.</p>
+    </div>
+    <div class="principle">
+      <h4><span style="color:var(--teal)">▸</span> org_id on everything</h4>
+      <p>Every table row has org_id. RLS enforced at DB level. Never filter by org in application code as primary security — DB enforces it.</p>
+    </div>
+    <div class="principle">
+      <h4><span style="color:var(--teal)">▸</span> AI wrapper only</h4>
+      <p>All model calls through central ai_service — never direct Anthropic/OpenAI SDK calls in components. Model routing, cost control, logging in one place.</p>
+    </div>
+    <div class="principle">
+      <h4><span style="color:var(--amber)">▸</span> Behavior before data</h4>
+      <p>Ship features that create agent behavior first. Capture signal from that behavior second. Don't build logging before there's anything to log.</p>
+    </div>
+    <div class="principle">
+      <h4><span style="color:var(--amber)">▸</span> Async always</h4>
+      <p>Planning, scoring, and AI generation run on schedules or in background. Never block a user action on an AI call. Priority queue: real-time &gt; batch.</p>
+    </div>
+    <div class="principle">
+      <h4><span style="color:var(--amber)">▸</span> Outcomes or nothing</h4>
+      <p>A system that tracks activity but not outcomes builds no real ML advantage. Capture deal won/lost/reason from day one.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer style="border-top:1px solid var(--border);padding:24px 32px;font-size:12px;color:var(--text3);display:flex;justify-content:space-between;max-width:1200px;margin:0 auto">
+  <span>HouseZoom.ai Process Atlas</span>
+  <span>Tech Stack Inventory · April 2026</span>
+</footer>
+
+</body>
+</html>
