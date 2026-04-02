@@ -100,6 +100,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .footer{text-align:center;padding:40px 24px;color:var(--text-dim);font-size:11px}
 .card,.session-item,.tl-item{animation:slideUp .3s ease both}
 @keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+a.card-tag:hover{opacity:0.8;text-decoration:none}
 </style>
 </head>
 <body>
@@ -136,7 +137,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-01';
+const LAST_UPDATED = '2026-04-02';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -2688,16 +2689,51 @@ const DATA = {
     }
   ]
 };
+const SPEC_INDEX = {
+  'BL-38': 'BL-38-DEAL-ORCHESTRATOR-SPEC.md',
+  'BL-53': 'BL-53-PORTAL-SIMULATOR-SPEC.md',
+  'BL-54': 'BL-54-PHOTO-INTELLIGENCE-SPEC.md',
+  'BL-55': 'BL-55-PORTAL-PUBLISHING-ENGINE-SPEC.md',
+  'BL-56': 'BL-56-INBOUND-SIGNAL-PIPELINE-SPEC.md',
+  'BL-58': 'BL-58-DEAL-ENTITY-V2-SPEC.md',
+  'BL-59': 'BL-59-LEAD-CONVERSION-SPEC.md',
+  'BL-59b': 'BL-59b-PROFILE-CONSOLIDATION-SPEC.md',
+  'BL-61': 'BL-61-AGENT-PROFILE-SETTINGS-SPEC.md',
+  'BL-68': 'BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md',
+  'BL-69': 'BL-68-69-DEAL-PERMISSIONS-STAGE-PROGRESSION-SPEC.md',
+  'BL-70': 'BL-70-DEAL-DOCUMENT-ARCHITECTURE-SPEC.md',
+  'BL-72b': 'BL-72b-PLAYWRIGHT-ADMIN-SPEC.md',
+  'BL-73': 'BL-73-PROPERTY-CHECKLIST-SPEC.md',
+  'BL-81': 'BL-81-GUIDED-SIGNING-SPEC.md',
+  'BL-81d': 'BL-81d-SPEC.md',
+  'BL-81e': 'BL-81e-SPEC.md',
+  'BL-81f': 'BL-81f-SPEC.md',
+  'BL-81g': 'BL-81g-SPEC.md',
+  'BL-81h': 'BL-81h-SPEC-v1.1.md',
+  'BL-82': 'BL-82-DOCUMENT-INTELLIGENCE-SPEC.md',
+  'BL-83': 'BL-83-ML-TRAINING-SPEC.md',
+  'BL-84': 'BL-84-PHOTO-CATALOG-SPEC.md',
+  'BL-85': 'BL-85-LISTING-WALKTHROUGH-SPEC.md',
+  'BL-86': 'BL-86-AUTO-ROOM-DETECTION-SPEC.md',
+  'BL-87': 'BL-87-MEDIA-INTELLIGENCE-SPEC.md',
+  'BL-88': 'BL-88-PHOTO-OPTIMIZATION-SPEC.md',
+  'NU-7': 'NU-7-SIGNING-SPEC.md',
+  'NU-27': 'NU-27-VERIFY-SIGN-SPEC.md',
+};
+const SPEC_BASE = 'https://github.com/kanaan-droid/HouseZum/blob/main/docs/specs/';
+function specUrl(id) {
+  return SPEC_INDEX[id] ? SPEC_BASE + SPEC_INDEX[id] : null;
+}
 const TAGS={comms:{label:'Comms',color:'cyan'},compliance:{label:'Compliance',color:'rose'},admin:{label:'Admin',color:'purple'},core:{label:'Core',color:'blue'},infra:{label:'Infra',color:'amber'},ai:{label:'AI',color:'green'},ux:{label:'UX',color:'indigo'},integrations:{label:'Integrations',color:'integrations'}};
 let activeView='kanban',activeFilter='all';
 function renderStats(){const e=document.getElementById('stats'),c={'In Progress':DATA.inProgress.length,'Next Up':DATA.nextUp.length,'Backlog':DATA.backlog.length,'Done':DATA.done.length};e.innerHTML=Object.entries(c).map(([l,v])=>`<div class="stat"><div class="stat-val">${v}</div><div class="stat-label">${l}</div></div>`).join('')}
 function renderFilters(){const e=document.getElementById('filterBar'),a=['all',...Object.keys(TAGS)];e.innerHTML=a.map(t=>`<button class="filter-chip ${t===activeFilter?'active':''}" data-filter="${t}">${t==='all'?'All':TAGS[t].label}</button>`).join('')}
 function filterItems(items){if(activeFilter==='all')return items;return items.filter(i=>i.tag===activeFilter)}
-function renderCard(item,status){const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const date=item.completed||item.added||'';return `<div class="card" onclick="showModal('${item.id}','${status}')"><div class="card-id">${item.id}</div><div class="card-title">${item.title}</div><div class="card-desc">${item.desc}</div><div class="card-meta"><span class="card-tag tag-${tag.color}">${tag.label}</span>${item.files?`<span class="card-tag tag-infra" style="opacity:0.6">📁</span>`:''}<span class="card-date">${date}</span></div></div>`}
+function renderCard(item,status){const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const date=item.completed||item.added||'';return `<div class="card" onclick="showModal('${item.id}','${status}')"><div class="card-id">${item.id}</div><div class="card-title">${item.title}</div><div class="card-desc">${item.desc}</div><div class="card-meta"><span class="card-tag tag-${tag.color}">${tag.label}</span>${item.files?`<span class="card-tag tag-infra" style="opacity:0.6">📁</span>`:''}${specUrl(item.id)?`<a href="${specUrl(item.id)}" target="_blank" onclick="event.stopPropagation()" class="card-tag" style="color:#a78bfa;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);text-decoration:none;cursor:pointer">spec ↗</a>`:''}<span class="card-date">${date}</span></div></div>`}
 function renderKanban(){const e=document.getElementById('kanbanView'),cols=[{key:'progress',title:'In Progress',items:filterItems(DATA.inProgress),status:'progress'},{key:'next',title:'Next Up',items:filterItems(DATA.nextUp),status:'next'},{key:'backlog',title:'Backlog',items:filterItems(DATA.backlog),status:'backlog'},{key:'debt',title:'Tech Debt & Bugs',items:filterItems([...DATA.techDebt,...DATA.bugs]),status:'debt'},{key:'done',title:'Done',items:filterItems(DATA.done).slice(0,15),status:'done'}];e.innerHTML=cols.map(c=>`<div class="column col-${c.key}"><div class="column-header"><div class="column-dot"></div><div class="column-title">${c.title}</div><div class="column-count">${c.items.length}${c.key==='done'?'+':''}</div></div><div class="column-body">${c.items.map(i=>renderCard(i,c.status)).join('')}${c.items.length===0?'<div style="padding:20px;text-align:center;color:var(--text-dim);font-size:11px">No items</div>':''}</div></div>`).join('')}
 function renderTimeline(){const e=document.getElementById('timelineView'),allDone=[...DATA.done].sort((a,b)=>b.completed.localeCompare(a.completed)),months={},monthNames={'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};allDone.forEach(i=>{const m=i.completed.substring(0,7);if(!months[m])months[m]=[];months[m].push(i)});DATA.inProgress.forEach(i=>{const m='In Progress';if(!months[m])months[m]=[];months[m].push({...i,_status:'progress'})});let html='';if(months['In Progress']){html+=`<div class="tl-month"><div class="tl-month-label" style="color:var(--amber)">🔨 In Progress</div>${months['In Progress'].map(i=>{const tag=TAGS[i.tag]||{label:i.tag,color:'blue'};return `<div class="tl-item progress"><div class="tl-date">${i.added}</div><div class="tl-content"><h4>${i.id} — ${i.title}</h4><p>${i.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p></div></div>`}).join('')}</div>`;delete months['In Progress']}Object.keys(months).sort().reverse().forEach(m=>{const[y,mo]=m.split('-');const label=`${monthNames[mo]} ${y}`;const items=filterItems(months[m]);if(items.length===0)return;html+=`<div class="tl-month"><div class="tl-month-label">${label}</div>${items.map(i=>{const tag=TAGS[i.tag]||{label:i.tag,color:'blue'};return `<div class="tl-item done"><div class="tl-date">${i.completed}</div><div class="tl-content"><h4>${i.id} — ${i.title}</h4><p>${i.desc} <span class="card-tag tag-${tag.color}" style="display:inline;font-size:9px;padding:2px 6px">${tag.label}</span></p></div></div>`}).join('')}</div>`});e.innerHTML=html}
 function renderSessions(){const e=document.getElementById('sessionsView');e.innerHTML=DATA.sessions.map(s=>`<div class="session-item"><div class="session-date">${s.date}</div><div class="session-title">${s.title}</div><div class="session-decisions"><strong>Key decisions:</strong> ${s.decisions}</div></div>`).join('')}
-function showModal(id,status){const allItems=[...DATA.inProgress,...DATA.nextUp,...DATA.backlog,...DATA.techDebt,...DATA.bugs,...DATA.done];const item=allItems.find(i=>i.id===id);if(!item)return;const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const statusLabels={progress:'In Progress',next:'Next Up',debt:'Tech Debt / Bug',done:'Done',backlog:'Backlog'};document.getElementById('modalContent').innerHTML=`<div class="card-id">${item.id}</div><h3>${item.title}</h3><div class="card-meta" style="margin:8px 0 16px"><span class="card-tag tag-${tag.color}">${tag.label}</span><span class="card-tag" style="color:var(--text-muted);background:var(--surface-2)">${statusLabels[status]||status}</span></div><div class="full-desc">${item.desc}</div>${item.files?`<div class="detail-row"><div class="detail-label">Files</div><div class="detail-value mono" style="font-size:11px">${item.files}</div></div>`:''}<div class="detail-row"><div class="detail-label">${item.completed?'Completed':'Added'}</div><div class="detail-value mono" style="font-size:11px">${item.completed||item.added}</div></div>`;document.getElementById('modal').classList.add('active')}
+function showModal(id,status){const allItems=[...DATA.inProgress,...DATA.nextUp,...DATA.backlog,...DATA.techDebt,...DATA.bugs,...DATA.done];const item=allItems.find(i=>i.id===id);if(!item)return;const tag=TAGS[item.tag]||{label:item.tag,color:'blue'};const statusLabels={progress:'In Progress',next:'Next Up',debt:'Tech Debt / Bug',done:'Done',backlog:'Backlog'};document.getElementById('modalContent').innerHTML=`<div class="card-id">${item.id}</div><h3>${item.title}</h3><div class="card-meta" style="margin:8px 0 16px"><span class="card-tag tag-${tag.color}">${tag.label}</span><span class="card-tag" style="color:var(--text-muted);background:var(--surface-2)">${statusLabels[status]||status}</span></div><div class="full-desc">${item.desc}</div>${item.files?`<div class="detail-row"><div class="detail-label">Files</div><div class="detail-value mono" style="font-size:11px">${item.files}</div></div>`:''}${specUrl(item.id)?`<div class="detail-row"><div class="detail-label">Spec</div><div class="detail-value"><a href="${specUrl(item.id)}" target="_blank" style="color:#a78bfa;font-size:13px;text-decoration:none">View specification on GitHub ↗</a></div></div>`:''}<div class="detail-row"><div class="detail-label">${item.completed?'Completed':'Added'}</div><div class="detail-value mono" style="font-size:11px">${item.completed||item.added}</div></div>`;document.getElementById('modal').classList.add('active')}
 function closeModal(){document.getElementById('modal').classList.remove('active')}
 document.querySelectorAll('.view-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeView=btn.dataset.view;document.getElementById('kanbanView').style.display=activeView==='kanban'?'':'none';document.getElementById('timelineView').style.display=activeView==='timeline'?'':'none';document.getElementById('sessionsView').style.display=activeView==='sessions'?'':'none';render()})});
 document.getElementById('filterBar').addEventListener('click',e=>{if(e.target.classList.contains('filter-chip')){activeFilter=e.target.dataset.filter;render()}});
