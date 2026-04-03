@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-02';
+const LAST_UPDATED = '2026-04-03';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -294,18 +294,18 @@ const DATA = {
       "added": ""
     },
     {
-      "id": "BL-93",
-      "title": "Property Seller Contact Linking",
-      "desc": "Add seller_contact_id FK to properties table. Every property has an owner who is the seller — currently only stored as owner_name (plain text), not linked to contacts. Required before NU-21 can auto-populate seller in New Deal modal. Touches: DB migration, property listing/edit flow (seller contact picker), enrichment flow, seed script backfill.",
+      "id": "~~BL-93~~",
+      "title": "~~Property Seller Contact Linking~~",
+      "desc": "DONE 2026-04-03 (D-162) — seller_contact_id FK on properties, link-seller API (resolve/create/force), EditPropertyModal seller section, seed backfill.",
       "files": "2026-04-03",
-      "tag": "admin",
+      "tag": "infra",
       "added": ""
     },
     {
-      "id": "NU-21",
-      "title": "Buyer Agent on New Deal form",
-      "desc": "BLOCKED BY BL-93. Add optional Buyer Agent contact search to New Deal modal. Also: auto-generate Deal Title from property+buyer, auto-fill Assigned Agent from property selection, auto-fill Currency from org settings. External buyer agents must be contacts. If not found, show \"Not found? Add as contact →\" link. Fix seed script too.",
-      "files": "src/features/deals/components/NewDealModal.tsx, scripts/seed-dubai.mjs",
+      "id": "~~NU-21~~",
+      "title": "~~Buyer Agent on New Deal form~~",
+      "desc": "DONE 2026-04-03 (D-163) — Seller auto-fill from property, buyer agent search, deal title auto-generation, agent + price auto-fill. Seller + buyer_agent deal_participants inserted.",
+      "files": "src/app/admin/deals/page.tsx, src/features/deals/services/dealService.ts",
       "tag": "admin",
       "added": "2026-03-25"
     },
@@ -475,6 +475,13 @@ const DATA = {
       "desc": "\"Create Deal\" button at end of ConvertLeadModal flow. \"Create Deal\" shortcut from Admin Signals Queue. Deferred from BL-90b — UX improvement, not blocking.",
       "tag": "admin",
       "added": "src/features/deals/components/ConvertLeadModal.tsx, src/app/admin/signals/page.tsx"
+    },
+    {
+      "id": "BL-94",
+      "title": "Fix seed-corpus.mjs — corpus property pollution",
+      "desc": "getOrCreateCorpusProperty() creates fake property rows that pollute the Listings page. Fix: remove that function, pass property_id=null to property_photos inserts. Also add --wipe-corpus flag to clean up any existing corpus property rows.",
+      "tag": "infra",
+      "added": "scripts/seed-corpus.mjs"
     },
     {
       "id": "BL-91",
@@ -1273,6 +1280,27 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-164",
+      "title": "NU-21b — Deal Value Auto-Fill",
+      "desc": "Property price auto-populates deal value when property selected. price added to PropertyOption, Supabase query, and auto-fill useEffect.",
+      "completed": "2026-04-03",
+      "tag": "admin"
+    },
+    {
+      "id": "D-163",
+      "title": "NU-21 — New Deal Modal Enhancements",
+      "desc": "Seller auto-fill from property's seller_contact_id (BL-93). Buyer agent searchable contact field with \"Add as contact →\" fallback. Deal title auto-generated as \"Property — Buyer\". Listing agent + price auto-fill on property selection. CreateDealInput extended with sellerId + buyerAgentId. createDeal() inserts seller + buyer_agent as deal_participants.",
+      "completed": "2026-04-03",
+      "tag": "admin"
+    },
+    {
+      "id": "D-162",
+      "title": "BL-93 — Property Seller Contact Linking",
+      "desc": "seller_contact_id FK + index on properties. /api/properties/[id]/link-seller route: resolve by owner_name (single match auto-links, multiple returns candidates, no match auto-creates contact). linkSellerContact() in propertyService. EditPropertyModal: Owner/Seller section with ContactSearchInput + duplicate prompt bottom sheet. Seed script: owner_name on all properties + backfillSellerContacts().",
+      "completed": "2026-04-03",
+      "tag": "infra"
+    },
     {
       "id": "D-161",
       "title": "BL-90 — Portal Signal → Lead → Deal Flow Review",
@@ -2318,6 +2346,11 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-04-03",
+      "title": "BL-93 + NU-21 + NU-21b — Seller contact linking + New Deal modal. BL-93: seller_contact_id FK on properties, link-seller API route (resolve/create/force), EditPropertyModal seller section with ContactSearchInput + duplicate prompt, seed backfill. NU-21: New Deal modal — seller auto-fill from property, buyer agent search field, deal title auto-generation (property — buyer), listing agent + price auto-fill. CreateDealInput extended, createDeal() inserts seller + buyer_agent participants. NU-21b: deal value auto-fills from property price.",
+      "decisions": "seller_contact_id is LISTING LAYER per TD-12; auto-fill only populates empty fields; BL-94 logged for corpus property pollution fix"
+    },
     {
       "date": "2026-04-03",
       "title": "BL-90 Portal Signal Pipeline — live E2E test + 3 bug fixes. (1) external_reference → property_reference_id in entityResolutionService — property resolution was always failing. (2) maybeCreateLeadFromSignal() added — linked_lead_id was always NULL. (3) portal_new_lead + all portal card types added to intel_cards constraint. Guaranteed Intel Card for every resolved signal. BL-93 logged (seller contact FK blocks NU-21). BL-92 logged (security hardening). BL-90c logged (deal creation CTA from lead flow). Curl test guide + pipeline spec committed.",
