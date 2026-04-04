@@ -477,11 +477,18 @@ const DATA = {
       "added": "src/features/leads/components/ConvertLeadModal.tsx, src/app/admin/signals/page.tsx"
     },
     {
-      "id": "BL-90d",
-      "title": "Signal Flow Improvements",
-      "desc": "(1) Fix Bayut/PF webhook adapter to parse real WhatsApp message format and extract portal_listing_id from message body. (2) Auto-match signal to property via portal_listing_links.external_listing_id on inbound — eliminate \"Link Property\" for published listings. (3) Add \"Convert to Lead\" action on signal rows. (4) Show feedback after property link (\"Lead created\" toast). (5) Show linked lead badge on resolved signals. Open question: should \"Add Lead\" button bypass Signals or go through Signals-first?",
-      "tag": "comms",
-      "added": "src/app/api/inbound/bayut/route.ts, src/app/api/inbound/property-finder/route.ts, src/app/admin/signals/page.tsx"
+      "id": "~~BL-90d~~",
+      "title": "~~Signal Flow Improvements~~",
+      "desc": "DONE 2026-04-04 — Adapter regex fallback (Bayut/PF message_text), manual SignalSource type, LogInquiryModal, log-manual API route, Convert to Lead on signal rows, i18n manual source type. DB: source_subtype column, manual added to source_type + leads.source_type constraints. BG-20 open (Lead → badge).",
+      "tag": "admin",
+      "added": "2026-04-04"
+    },
+    {
+      "id": "BG-20",
+      "title": "Signals page \"Lead →\" badge not showing",
+      "desc": "When linked_lead_id is set on inbound_signals, badge should replace \"Convert to Lead\" button. Root cause unconfirmed — run SQL in BG-20-signals-lead-badge.md to diagnose. Likely GET API filter or null DB value.",
+      "tag": "admin",
+      "added": "src/app/api/admin/signals/route.ts, src/app/api/admin/signals/log-manual/route.ts, src/app/admin/signals/page.tsx"
     },
     {
       "id": "~~BL-94~~",
@@ -2455,6 +2462,11 @@ const DATA = {
       "date": "2026-04-03",
       "title": "BL-94 + BL-92 + BG-16 — corpus fix, security hardening, analytics crash. BL-94: removed getOrCreateCorpusProperty, property_id=null, --wipe-corpus. BL-92 Tier 1: validateWebhookSecret fail-closed, Zod on 6 webhook routes + qualification POST, CSP headers + allowlist. BG-16: null user_id crash in analytics (seller/buyer_agent deal_participants). NU-22 closed as N/A.",
       "decisions": "Webhook fail closed \u003e fail open; CSP header-based not meta tags; analytics crash was pre-existing from NU-21"
+    },
+    {
+      "date": "2026-04-04",
+      "title": "BL-90d Signal Flow Improvements complete. Product decision: all leads via Signals, manual = first-class source type. Adapter regex fallback for Bayut/PF WhatsApp message format. LogInquiryModal replaces Add Lead flow. log-manual API creates contact+lead directly (bypasses pipeline). Convert to Lead on signal rows. i18n manual source type. DB: source_subtype column, manual constraint on inbound_signals + leads. BG-20 open: Lead → badge not showing (linked_lead_id not reaching UI).",
+      "decisions": "Manual signals bypass processSignal() — create contact+lead directly; leads.source_type CHECK constraint needed manual too; MCP browser tools unreliable for form submit via coordinate click — use javascript_exec + React synthetic events instead; always use find/ref for button clicks not coordinates"
     },
     {
       "date": "2026-04-04",
