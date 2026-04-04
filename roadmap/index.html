@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-03';
+const LAST_UPDATED = '2026-04-04';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -310,11 +310,11 @@ const DATA = {
       "added": "2026-03-25"
     },
     {
-      "id": "NU-22",
-      "title": "MOU template with Buyer Agent signature field",
-      "desc": "Current MOU has no Buyer Agent sig field. Need new template for 4-party signing flow",
+      "id": "~~NU-22~~",
+      "title": "~~MOU template with Buyer Agent signature field~~",
+      "desc": "CLOSED — N/A. Not a real product need. Agencies upload their own PDFs and place fields via DocumentPrepareModal.",
       "files": "template canvas / base PDF",
-      "tag": "core",
+      "tag": "ux",
       "added": "2026-03-25"
     },
     {
@@ -463,25 +463,46 @@ const DATA = {
       "added": "All BL-57 + BL-59 files"
     },
     {
-      "id": "BL-92",
-      "title": "Security & Compliance Hardening",
-      "desc": "Rate limiting on all public/webhook routes (Upstash Redis on Vercel → API Gateway on AWS). Zod input validation on all API routes. GDPR data export + deletion flow (required for FR/CH/IT). Consistent webhook secret validation across all portal routes. CSP + security headers in next.config.js. Auth event audit log. Field-level encryption for PII post-funding.",
+      "id": "~~BL-92~~",
+      "title": "~~Security & Compliance Hardening (Tier 1)~~",
+      "desc": "DONE 2026-04-03 (D-166) — Tier 1 (public edge): fail-closed webhook secret validator, Zod org_id on 6 portal routes, Zod body on qualification POST, CSP + security headers in next.config.js, Google Fonts + randomuser.me allowlist. Tier 2+ (authenticated routes, GDPR, AI layer) deferred.",
       "tag": "compliance",
       "added": "2026-04-03"
     },
     {
-      "id": "BL-90c",
-      "title": "Deal Creation CTA from Lead Flow",
-      "desc": "\"Create Deal\" button at end of ConvertLeadModal flow. \"Create Deal\" shortcut from Admin Signals Queue. Deferred from BL-90b — UX improvement, not blocking.",
+      "id": "~~BL-90c~~",
+      "title": "~~Deal Creation CTA from Lead Flow~~",
+      "desc": "DONE 2026-04-04 (D-169) — \"View Deal →\" banner in ConvertLeadModal, auto-navigate from leads page, \"Create Deal\" on signal rows.",
       "tag": "admin",
-      "added": "src/features/deals/components/ConvertLeadModal.tsx, src/app/admin/signals/page.tsx"
+      "added": "src/features/leads/components/ConvertLeadModal.tsx, src/app/admin/signals/page.tsx"
     },
     {
-      "id": "BL-94",
-      "title": "Fix seed-corpus.mjs — corpus property pollution",
-      "desc": "getOrCreateCorpusProperty() creates fake property rows that pollute the Listings page. Fix: remove that function, pass property_id=null to property_photos inserts. Also add --wipe-corpus flag to clean up any existing corpus property rows.",
+      "id": "BL-90d",
+      "title": "Signal Flow Improvements",
+      "desc": "(1) Fix Bayut/PF webhook adapter to parse real WhatsApp message format and extract portal_listing_id from message body. (2) Auto-match signal to property via portal_listing_links.external_listing_id on inbound — eliminate \"Link Property\" for published listings. (3) Add \"Convert to Lead\" action on signal rows. (4) Show feedback after property link (\"Lead created\" toast). (5) Show linked lead badge on resolved signals. Open question: should \"Add Lead\" button bypass Signals or go through Signals-first?",
+      "tag": "comms",
+      "added": "src/app/api/inbound/bayut/route.ts, src/app/api/inbound/property-finder/route.ts, src/app/admin/signals/page.tsx"
+    },
+    {
+      "id": "~~BL-94~~",
+      "title": "~~Fix seed-corpus.mjs — corpus property pollution~~",
+      "desc": "DONE 2026-04-03 (D-165) — Removed getOrCreateCorpusProperty(), property_id=null for all corpus inserts, --wipe-corpus flag added.",
       "tag": "infra",
       "added": "scripts/seed-corpus.mjs"
+    },
+    {
+      "id": "BL-96",
+      "title": "Android Kotlin Native App",
+      "desc": "Deferred until BL-95 (Swift) is proven. Use Android Studio + Gemini Agent when ready. Same Supabase DB. Mirror BL-95 feature set.",
+      "tag": "infra",
+      "added": "2026-04-03"
+    },
+    {
+      "id": "BL-95",
+      "title": "Native Swift Agent App",
+      "desc": "Use Xcode 26.3 + Claude Agent (AGENTS.md pattern). Parallel workstream to Next.js web app. Same Supabase DB. Start with auth + property list as proof of concept. Unlocks: native camera, push notifications, biometrics, offline — without the Capacitor remote URL constraints (BL-1).",
+      "tag": "ai",
+      "added": "2026-04-03"
     },
     {
       "id": "BL-91",
@@ -1277,9 +1298,93 @@ const DATA = {
       "desc": "FIXED 2026-03-23: filter fields per recipient in create route.",
       "tag": "core",
       "added": "2026-03-23"
+    },
+    {
+      "id": "BG-16",
+      "title": "Analytics crash on null user_id",
+      "desc": "FIXED 2026-04-03: uid.slice(0,8) on null user_id from seller/buyer_agent deal_participants. Null guards + filter null user_ids from queries.",
+      "tag": "admin",
+      "added": "2026-04-03"
+    },
+    {
+      "id": "BG-17",
+      "title": "Deal delete silent failure",
+      "desc": "FIXED 2026-04-04: anon client delete blocked by 11 FK child tables with no error thrown. New server-side DELETE route with service_role clears children in order.",
+      "tag": "admin",
+      "added": "2026-04-04"
+    },
+    {
+      "id": "BG-18",
+      "title": "Lead menu no dismiss on Escape/click outside",
+      "desc": "FIXED 2026-04-04: useEffect with keydown + mousedown listeners, data-lead-menu boundary attribute.",
+      "tag": "admin",
+      "added": "2026-04-04"
+    },
+    {
+      "id": "BG-19",
+      "title": "Deals menu no dismiss on Escape/click outside",
+      "desc": "FIXED 2026-04-04: same pattern as BG-18, data-deal-menu attribute.",
+      "tag": "admin",
+      "added": "2026-04-04"
     }
   ],
   "done": [
+    {
+      "id": "D-172",
+      "title": "BG-19 — Deals Menu Dismiss",
+      "desc": "Deal card menu now closes on Escape keydown + click outside. Uses data-deal-menu attribute. Same pattern as BG-18.",
+      "completed": "2026-04-04",
+      "tag": "admin"
+    },
+    {
+      "id": "D-171",
+      "title": "BG-18 — Lead Menu Dismiss",
+      "desc": "Lead row menu now closes on Escape keydown + click outside. Uses data-lead-menu attribute for boundary detection.",
+      "completed": "2026-04-04",
+      "tag": "admin"
+    },
+    {
+      "id": "D-170",
+      "title": "BG-17 — Fix Deal Delete",
+      "desc": "deleteDeal was using anon Supabase client — FK constraints (11 child tables) silently blocked delete. New DELETE /api/deals/[id]/delete route uses service_role. Clears all child rows in FK order before deleting deal.",
+      "completed": "2026-04-04",
+      "tag": "admin"
+    },
+    {
+      "id": "D-169",
+      "title": "BL-90c — Deal Creation CTA from Lead Flow",
+      "desc": "ConvertLeadModal: \"Deal created! View Deal →\" blue banner after conversion with deal. onConverted now passes dealId. leads/page.tsx auto-navigates to deal. signals/page.tsx: \"Create Deal\" button on unresolved signal rows navigates to /admin/deals.",
+      "completed": "2026-04-04",
+      "tag": "admin"
+    },
+    {
+      "id": "D-168",
+      "title": "BL-92b — Zod on Authenticated Routes (ZOD-2)",
+      "desc": "Zod schemas on 9 authenticated API routes: confirm-stage, signing/create, agent-verify-sign, gmail/draft-reply, photos/annotate, checklist POST, checklist/share, admin/signals/[id] PATCH, admin/members/[userId] PATCH. All return 400 with field-level errors.",
+      "completed": "2026-04-04",
+      "tag": "comms"
+    },
+    {
+      "id": "D-167",
+      "title": "BG-16 — Analytics null user_id crash fix",
+      "desc": "computeDealsByAgent + fetchAgentPerformance called uid.slice() on null user_id from deal_participants (seller/buyer_agent rows have contact_id not user_id). Null guards + filter null user_ids from all 3 participant queries.",
+      "completed": "2026-04-03",
+      "tag": "admin"
+    },
+    {
+      "id": "D-166",
+      "title": "BL-92 Tier 1 — Security Hardening",
+      "desc": "Fail-closed webhook secret validator (validateWebhookSecret.ts). Applied to 6 portal routes. Zod UUID on org_id. Zod body on qualification POST. CSP + security headers in next.config.js. Google Fonts + randomuser.me allowlist (BL-92b). Spec: docs/specs/BL-92-SECURITY-SPEC.md",
+      "completed": "2026-04-03",
+      "tag": "admin"
+    },
+    {
+      "id": "D-165",
+      "title": "BL-94 — Fix seed-corpus.mjs",
+      "desc": "Removed getOrCreateCorpusProperty() (was creating fake property rows polluting Listings page). All corpus inserts now property_id: null. Added --wipe-corpus flag.",
+      "completed": "2026-04-03",
+      "tag": "infra"
+    },
     {
       "id": "D-164",
       "title": "NU-21b — Deal Value Auto-Fill",
@@ -2346,6 +2451,16 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-04-03",
+      "title": "BL-94 + BL-92 + BG-16 — corpus fix, security hardening, analytics crash. BL-94: removed getOrCreateCorpusProperty, property_id=null, --wipe-corpus. BL-92 Tier 1: validateWebhookSecret fail-closed, Zod on 6 webhook routes + qualification POST, CSP headers + allowlist. BG-16: null user_id crash in analytics (seller/buyer_agent deal_participants). NU-22 closed as N/A.",
+      "decisions": "Webhook fail closed \u003e fail open; CSP header-based not meta tags; analytics crash was pre-existing from NU-21"
+    },
+    {
+      "date": "2026-04-04",
+      "title": "BL-92b + BL-90c + BG-17 + BG-18 + BG-19. ZOD-2: Zod on 9 authenticated routes. BL-90c: \"View Deal →\" CTA in ConvertLeadModal, \"Create Deal\" on signals. BG-17: deal delete fixed (server-side FK cascade). BG-18/19: menu Escape+click-outside on leads and deals pages. Product discussion: Signal→Lead→Deal flow — portals send ref numbers not addresses; auto-matching via portal_listing_links is the fix; \"Convert to Lead\" missing from Signals UI. BL-90d added to backlog.",
+      "decisions": "Zod on authenticated routes = defense-in-depth not primary auth; deal delete always needs service_role for FK-heavy tables; portal webhooks parse WhatsApp message format not JSON body"
+    },
     {
       "date": "2026-04-03",
       "title": "BL-93 + NU-21 + NU-21b — Seller contact linking + New Deal modal. BL-93: seller_contact_id FK on properties, link-seller API route (resolve/create/force), EditPropertyModal seller section with ContactSearchInput + duplicate prompt, seed backfill. NU-21: New Deal modal — seller auto-fill from property, buyer agent search field, deal title auto-generation (property — buyer), listing agent + price auto-fill. CreateDealInput extended, createDeal() inserts seller + buyer_agent participants. NU-21b: deal value auto-fills from property price.",
