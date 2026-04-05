@@ -137,10 +137,18 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-04';
+const LAST_UPDATED = '2026-04-05';
 const DATA = {
   "inProgress": [],
   "nextUp": [
+    {
+      "id": "BL-98",
+      "title": "Founder Dogfooding — Agentic Mode",
+      "desc": "Will to personally use Claude Computer Use + Dispatch at Level 1-2 for 1 week. Goal: build UX intuition for BL-97 from the user's perspective before writing the full spec. Key questions to answer: (1) When does the approval step feel like friction vs. safety? (2) When do you want Level 2 (just do it)? (3) What makes an Action Card trustworthy enough to approve without reading? Outputs: annotated notes → feed directly into BL-97 Action Card spec. Tools to use: Claude Computer Use (via Claude Cowork, Pro/Max subscription), Claude Code Dispatch (async task execution).",
+      "files": "Notes doc",
+      "tag": "ai",
+      "added": "2026-04-05"
+    },
     {
       "id": "NU-2",
       "title": "Wire Scan into Enrichment Wizard",
@@ -456,6 +464,13 @@ const DATA = {
   ],
   "backlog": [
     {
+      "id": "BL-97",
+      "title": "Agentic Mode (\"Autopilot\")",
+      "desc": "Three-level operating model shipped together — Level 0 is default, users adopt upward over time. The 3 levels form a data flywheel: Level 0 (Assisted) generates correction deltas (AI suggests → agent edits → training signal). Level 1 (Supervised) generates approval patterns (approve vs reject → intent signal). Level 2 (Autopilot) generates outcome data (did autonomous action work → reinforcement signal). Each level makes the next smarter — even agents who stay at Level 0 improve the AI for Level 2 users. Level 0 — Assisted (default): AI suggests, agent executes manually. Today's HZ. Level 1 — Supervised: AI prepares and queues Action Cards, agent approves each before execution. Core UI: AI Actions Inbox with Approve / Edit / Reject / Snooze. Level 2 — Autopilot: AI executes, agent sees action log and can undo. Org admin sets ceiling per action type. Agent sets preference up to ceiling. Per-action-type config (\"always ask for signing, auto-send for follow-ups\"). Build order: (1) Action Card UI + Inbox shell, (2) Autonomy settings (org + agent), (3) Wire Deal Orchestrator, (4) Wire lead qualification + comms drafting, (5) Level 2 auto-execute (opt-in, org-gated). Feeds from: portal signals (BL-90), Deal Orchestrator (BL-38), Intel Cards, document pipeline (NU-27), comms graph (BL-41). Strategic: investable platform narrative — compounding intelligence network effect. Inspired by Yariv Adan / Agent Economy framework.",
+      "tag": "comms",
+      "added": "docs/specs/BL-97-AGENTIC-MODE-SPEC.md (to be written)"
+    },
+    {
       "id": "~~BL-90~~",
       "title": "~~Portal Signal → Lead → Deal Flow Review~~",
       "desc": "DONE 2026-04-03 (D-161) — Live end-to-end test. 3 bugs fixed: property resolution column name, lead auto-creation, Intel Card constraint. BL-90b: maybeCreateLeadFromSignal(), portal_new_lead guaranteed card, all portal card types in constraint. Docs: curl test guide + pipeline spec.",
@@ -484,11 +499,25 @@ const DATA = {
       "added": "2026-04-04"
     },
     {
-      "id": "BG-20",
-      "title": "Signals page \"Lead →\" badge not showing",
-      "desc": "When linked_lead_id is set on inbound_signals, badge should replace \"Convert to Lead\" button. Root cause unconfirmed — run SQL in BG-20-signals-lead-badge.md to diagnose. Likely GET API filter or null DB value.",
+      "id": "~~BG-20~~",
+      "title": "~~Signals page \"Lead →\" badge not showing~~",
+      "desc": "FIXED 2026-04-05 — Root cause: GET API filtered pending_listing_resolution = true + excluded partial status. Fixed in signals route.ts.",
       "tag": "admin",
-      "added": "src/app/api/admin/signals/route.ts, src/app/api/admin/signals/log-manual/route.ts, src/app/admin/signals/page.tsx"
+      "added": "2026-04-04"
+    },
+    {
+      "id": "BL-99",
+      "title": "Signal History View",
+      "desc": "Add \"History\" tab or toggle to Signals page showing resolved and dismissed signals. Data already in Supabase, just not surfaced. No schema changes needed. Low priority.",
+      "tag": "infra",
+      "added": "src/app/admin/signals/page.tsx, src/app/api/admin/signals/route.ts"
+    },
+    {
+      "id": "BL-100",
+      "title": "Portal Listing URL Column",
+      "desc": "Add portal_listing_url text to inbound_signals. Wire into InboundSignal type and inboundSignalService. Populate in adapters for portals that include full listing URL in webhook payload. UI uses it over buildPortalUrl() when present. Implement when a portal confirms they send the URL.",
+      "tag": "admin",
+      "added": "src/features/inbound-signals/types/inboundSignal.ts, adapters"
     },
     {
       "id": "~~BL-94~~",
@@ -2462,6 +2491,16 @@ const DATA = {
       "date": "2026-04-03",
       "title": "BL-94 + BL-92 + BG-16 — corpus fix, security hardening, analytics crash. BL-94: removed getOrCreateCorpusProperty, property_id=null, --wipe-corpus. BL-92 Tier 1: validateWebhookSecret fail-closed, Zod on 6 webhook routes + qualification POST, CSP headers + allowlist. BG-16: null user_id crash in analytics (seller/buyer_agent deal_participants). NU-22 closed as N/A.",
       "decisions": "Webhook fail closed \u003e fail open; CSP header-based not meta tags; analytics crash was pre-existing from NU-21"
+    },
+    {
+      "date": "2026-04-05",
+      "title": "BG-20 — Signals Queue Filter Fix. Added partial to resolution_status filter (was only review_queue + unresolved). Removed .eq('pending_listing_resolution', true) which was incorrectly excluding manual signals. Queue now correctly shows all actionable signals.",
+      "decisions": "partial signals are valid — portal proxy contacts have no durable identity yet; resolved signals correctly excluded from queue (they're done)."
+    },
+    {
+      "date": "2026-04-05",
+      "title": "BL-100 — Config-Driven Portal Listing Links. New src/config/portalLinkConfig.ts with PORTAL_LINK_CONFIG map (7 portals: Bayut, Dubizzle, SeLoger, ImmoScout24, Homegate, Immobiliare.it) and buildPortalUrl() helper. Signals page Portal Listing ID column renders clickable violet links when ID is numeric and portal matches config. \"Link Property\" button hidden for manual signals. Adding new portal = one line in config, zero component changes. PF removed (BL-100b) — their ?reference= search URL is ignored by their site, plain text is more honest.",
+      "decisions": "Bayut uses numeric IDs → direct link works. PF uses slug-based URLs not available in webhook payload → plain text. idType: 'numeric' guard prevents non-numeric IDs from generating links."
     },
     {
       "date": "2026-04-04",
