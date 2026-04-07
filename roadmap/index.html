@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-06';
+const LAST_UPDATED = '2026-04-07';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -511,6 +511,13 @@ const DATA = {
       "desc": "Add \"History\" tab or toggle to Signals page showing resolved and dismissed signals. Data already in Supabase, just not surfaced. No schema changes needed. Low priority.",
       "tag": "infra",
       "added": "src/app/admin/signals/page.tsx, src/app/api/admin/signals/route.ts"
+    },
+    {
+      "id": "BL-103",
+      "title": "Data Safety Guardrails",
+      "desc": "photo_annotations FK ON DELETE RESTRICT (prevent cascade delete of training data). Add --dry-run flag to all destructive seed/wipe scripts. Backup verification cron. PITR enablement checklist.",
+      "tag": "ai",
+      "added": "2026-04-07"
     },
     {
       "id": "BL-100",
@@ -1376,9 +1383,51 @@ const DATA = {
       "desc": "FIXED 2026-04-06: BL-92 CSP blocked PDF.js CDN. Added cdnjs.cloudflare.com to script-src, connect-src, worker-src.",
       "tag": "core",
       "added": "2026-04-06"
+    },
+    {
+      "id": "BG-22",
+      "title": "Template canvas only renders page 1",
+      "desc": "FIXED 2026-04-07: TemplateCanvas rewritten for multi-page — all pages stacked vertically, per-page coordinate space, page selector for field placement.",
+      "tag": "core",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-23",
+      "title": "Template card click not advancing in DocumentPrepareModal",
+      "desc": "FIXED 2026-04-07: Added isolate + pointerEvents: auto to portal wrapper. Moved setStep(2) before async fetches. Wrapped entire selectTemplate in try/catch.",
+      "tag": "integrations",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-24",
+      "title": "Signing send hangs indefinitely",
+      "desc": "FIXED 2026-04-07: All fetch calls to API routes missing credentials: 'include'. Also removed duplicate crm-autofill call from selectTemplate that caused deadlock.",
+      "tag": "core",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-25",
+      "title": "Annotation queue showing 0/0",
+      "desc": "FIXED 2026-04-07: Cascade of issues — counter queried photo_evaluations (empty) not corpus, missing credentials: 'include', useCallback stale closure on orgId, loadQueue fired before orgId resolved.",
+      "tag": "admin",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-26",
+      "title": "Next.js dynamic route conflict [requestId] vs [token]",
+      "desc": "FIXED 2026-04-07: Moved void/resend/correct routes from [requestId]/ into existing [token]/ directory. Aliased params.token → requestId in handlers.",
+      "tag": "infra",
+      "added": "2026-04-07"
     }
   ],
   "done": [
+    {
+      "id": "D-176",
+      "title": "BG-22 through BG-26 — Multi-page template canvas, signing flow fixes, annotation queue cascade",
+      "desc": "BG-22: multi-page PDF rendering in TemplateCanvas. BG-23/23b: DocumentPrepareModal click-through fix (isolate + setStep moved before async). BG-24/24b: signing send hanging (credentials:include + remove duplicate crm-autofill). BG-25 series (b/c/e/f/h): annotation queue 0/0 (wrong counter query, missing credentials, stale closure, orgId race). BG-26: [requestId]→[token] dynamic route conflict. Corpus restored: 4,133 photos.",
+      "completed": "2026-04-07",
+      "tag": "admin"
+    },
     {
       "id": "D-175",
       "title": "BG-21 — Fix PDF Background in Template Canvas",
@@ -2526,6 +2575,11 @@ const DATA = {
       "date": "2026-04-03",
       "title": "BL-94 + BL-92 + BG-16 — corpus fix, security hardening, analytics crash. BL-94: removed getOrCreateCorpusProperty, property_id=null, --wipe-corpus. BL-92 Tier 1: validateWebhookSecret fail-closed, Zod on 6 webhook routes + qualification POST, CSP headers + allowlist. BG-16: null user_id crash in analytics (seller/buyer_agent deal_participants). NU-22 closed as N/A.",
       "decisions": "Webhook fail closed \u003e fail open; CSP header-based not meta tags; analytics crash was pre-existing from NU-21"
+    },
+    {
+      "date": "2026-04-07",
+      "title": "BG-21 through BG-26 — 12 bug fixes + corpus restoration. BG-21: CSP CDN allowlist. BG-22: multi-page TemplateCanvas. BG-23/23b: DocumentPrepareModal click-through (isolate + setStep before async). BG-24/24b: signing send hang (credentials:include + remove duplicate crm-autofill). BG-25 series: annotation queue 0/0 (counter table, credentials, stale closure, orgId race). BG-26: [requestId]→[token] route conflict. Corpus: 4,133 photos restored via seed-corpus.mjs. Annotation queue: 0/4,133 fresh start. CORPUS-ANNOTATION-GUIDE.md committed.",
+      "decisions": "credentials: 'include' mandatory on ALL fetch calls to API routes — systemic root cause of multiple bugs; corpus photos must use property_id=NULL; [requestId]/[token] cannot coexist in Next.js; photo_annotations FK should be ON DELETE RESTRICT not CASCADE"
     },
     {
       "date": "2026-04-06",
