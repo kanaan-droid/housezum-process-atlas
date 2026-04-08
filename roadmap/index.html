@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-07';
+const LAST_UPDATED = '2026-04-08';
 const DATA = {
   "inProgress": [],
   "nextUp": [
@@ -513,10 +513,24 @@ const DATA = {
       "added": "src/app/admin/signals/page.tsx, src/app/api/admin/signals/route.ts"
     },
     {
-      "id": "BL-103",
-      "title": "Data Safety Guardrails",
-      "desc": "photo_annotations FK ON DELETE RESTRICT (prevent cascade delete of training data). Add --dry-run flag to all destructive seed/wipe scripts. Backup verification cron. PITR enablement checklist.",
+      "id": "~~BL-103~~",
+      "title": "~~Data Safety Guardrails~~",
+      "desc": "DONE 2026-04-07 (D-177) — photo_annotations FK ON DELETE RESTRICT. --dry-run flag on seed-dubai.mjs + seed-corpus.mjs.",
       "tag": "ai",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BL-104",
+      "title": "Auto-detect crm_auto_fill_key on template field save",
+      "desc": "When template canvas saves fields, auto-infer crm_auto_fill_key from label. Covers Sale MOU, Rental, Form A, SPA. Eliminates need for manual SQL.",
+      "tag": "core",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BL-105",
+      "title": "Fix role_label humanisation in Step 2 recipient picker",
+      "desc": "\"listing_agent\" → \"Listing Agent\". Add humanise() helper.",
+      "tag": "core",
       "added": "2026-04-07"
     },
     {
@@ -1418,9 +1432,86 @@ const DATA = {
       "desc": "FIXED 2026-04-07: Moved void/resend/correct routes from [requestId]/ into existing [token]/ directory. Aliased params.token → requestId in handlers.",
       "tag": "infra",
       "added": "2026-04-07"
+    },
+    {
+      "id": "BG-27",
+      "title": "Signing create 401 — missing Authorization header",
+      "desc": "FIXED 2026-04-07: DocumentPrepareModal fetch calls missing Authorization: Bearer. Added accessToken from session + localStorage fallback.",
+      "tag": "ux",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-28",
+      "title": "Signing create 400 — empty fields race condition",
+      "desc": "FIXED 2026-04-07: selectTemplate() advanced immediately, fetched fields async. Added fieldsReady state gate on Step 3 Next button.",
+      "tag": "ux",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-29",
+      "title": "Step 3 PDF not rendering",
+      "desc": "FIXED 2026-04-07: PDF gated on crmValuesReady. Removed gate, added step===3 crm-autofill useEffect, 2s fallback timeout.",
+      "tag": "core",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-30",
+      "title": "CRM values not visible in Step 3 overlay",
+      "desc": "FIXED 2026-04-07: BG-29 only set acroFormValues. Added setOverlayFieldValues + setCrmFilledFieldIds for agent review.",
+      "tag": "core",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-31",
+      "title": "PII useEffect wiping CRM overlay values",
+      "desc": "FIXED 2026-04-07: setOverlayFieldValues(piiValues) replaced all. Changed to merge with prev.",
+      "tag": "core",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-32",
+      "title": "agent_prepare fields hidden from Step 3 overlay",
+      "desc": "FIXED 2026-04-07: filter removed .filter(f =\u003e f.assigned_to !== 'agent_prepare') — ROOT CAUSE of invisible CRM fields.",
+      "tag": "core",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-33",
+      "title": "Seller/Buyer contacts blocked by RLS",
+      "desc": "FIXED 2026-04-07: New /api/signing/deal-participants route (service_role). Modal replaced 3 client queries with single API call.",
+      "tag": "admin",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-34",
+      "title": "PII timing — Seller/Buyer text fields not showing",
+      "desc": "FIXED 2026-04-07: Removed !selectedTemplate guard, added contacts.length===0 guard.",
+      "tag": "core",
+      "added": "2026-04-07"
+    },
+    {
+      "id": "BG-35",
+      "title": "PII overlay values not displaying in Step 3",
+      "desc": "FIXED 2026-04-08: Multi-part fix — (a) overlayFieldValues prop threaded through PDFFormEditorMultiPage → PDFFormEditor, (b) email-first label matching in autofillService + documentPrepareService + PII effect, (c) phone branch had email extraction (copy-paste error), (d) overlay rendering rewritten with overflow:visible + displayValue replaces label, (e) strict SigningFieldSchema reverted to z.record. PII prefill confirmed working.",
+      "tag": "comms",
+      "added": "2026-04-08"
     }
   ],
   "done": [
+    {
+      "id": "D-178",
+      "title": "BG-35 — PII Overlay Fix (Signing Step 3)",
+      "desc": "Multi-part fix: overlayFieldValues prop threaded through PDFFormEditor chain, email-first label matching in 3 files, phone extraction bug (was reading email), overlay rendering rewrite (overflow:visible, displayValue replaces label), strict Zod schema reverted. Seller/Buyer/Agent names + email + phone now pre-populate in Step 3. E2E send pending.",
+      "completed": "2026-04-08",
+      "tag": "comms"
+    },
+    {
+      "id": "D-177",
+      "title": "BL-103 — Data Safety Guardrails",
+      "desc": "photo_annotations FK changed to ON DELETE RESTRICT (protects annotation training data from cascade deletes). --dry-run flag added to seed-dubai.mjs and seed-corpus.mjs — all destructive operations guarded. SQL migration run and confirmed.",
+      "completed": "2026-04-07",
+      "tag": "ai"
+    },
     {
       "id": "D-176",
       "title": "BG-22 through BG-26 — Multi-page template canvas, signing flow fixes, annotation queue cascade",
@@ -2575,6 +2666,11 @@ const DATA = {
       "date": "2026-04-03",
       "title": "BL-94 + BL-92 + BG-16 — corpus fix, security hardening, analytics crash. BL-94: removed getOrCreateCorpusProperty, property_id=null, --wipe-corpus. BL-92 Tier 1: validateWebhookSecret fail-closed, Zod on 6 webhook routes + qualification POST, CSP headers + allowlist. BG-16: null user_id crash in analytics (seller/buyer_agent deal_participants). NU-22 closed as N/A.",
       "decisions": "Webhook fail closed \u003e fail open; CSP header-based not meta tags; analytics crash was pre-existing from NU-21"
+    },
+    {
+      "date": "2026-04-08",
+      "title": "BG-35 PII overlay fix — multi-part signing Step 3 repair. (a) overlayFieldValues prop threaded through PDFFormEditorMultiPage→PDFFormEditor, (b) email-first label matching in autofillService + documentPrepareService + DocumentPrepareModal PII effect, (c) phone branch copy-paste bug — was extracting email instead of phone, (d) overlay rendering rewrite — overflow:visible, displayValue replaces label, minHeight, left-aligned, (e) strict SigningFieldSchema reverted to z.record (was causing 400). PII prefill confirmed: Seller/Buyer/Agent names + email + phone pre-populate. E2E send blocked — pending next session.",
+      "decisions": "Label matching order matters — \"Email Address\" contains \"name\"; phone branch must extract phone not email; overlay overflow:hidden clips value text in small boxes; strict Zod on signing create breaks field passthrough"
     },
     {
       "date": "2026-04-07",
