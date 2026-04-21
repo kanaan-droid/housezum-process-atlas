@@ -137,10 +137,9 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-08';
+const LAST_UPDATED = '2026-04-21';
 const DATA = {
-  "inProgress": [],
-  "nextUp": [
+  "inProgress": [
     {
       "id": "BL-98",
       "title": "Founder Dogfooding — Agentic Mode",
@@ -148,6 +147,24 @@ const DATA = {
       "files": "Notes doc",
       "tag": "ai",
       "added": "2026-04-05"
+    },
+    {
+      "id": "~~BL-97~~",
+      "title": "~~Agentic Mode — AI Actions Inbox~~",
+      "desc": "DONE 2026-04-15 — All 4 phases complete. L0/L1/L2 fully implemented. Action Log UI (agent + admin). L2 sync auto-execution verified with real WhatsApp delivery.",
+      "files": "2026-04-15",
+      "tag": "comms",
+      "added": ""
+    }
+  ],
+  "nextUp": [
+    {
+      "id": "~~BL-98~~",
+      "title": "~~Founder Dogfooding — Agentic Mode~~",
+      "desc": "MOVED to In Progress 2026-04-13",
+      "files": "2026-04-05",
+      "tag": "core",
+      "added": ""
     },
     {
       "id": "NU-2",
@@ -463,6 +480,20 @@ const DATA = {
     }
   ],
   "backlog": [
+    {
+      "id": "~~BL-97 Phase B~~",
+      "title": "~~Agentic Mode — Phase B~~",
+      "desc": "DONE 2026-04-13 (D-182) — Wire Deal Orchestrator + comms follow-up + compliance deadlines → Action Cards. actionCardGeneratorService with dedup + ceiling check.",
+      "tag": "comms",
+      "added": "2026-04-13"
+    },
+    {
+      "id": "~~BL-97 Phase C~~",
+      "title": "~~Agentic Mode — Phase C~~",
+      "desc": "DONE 2026-04-13 (D-183) — actionExecutorService (WhatsApp, deal stage, checklist), undo route, /settings/autonomy, /admin/autonomy, ceiling enforcement.",
+      "tag": "comms",
+      "added": "2026-04-13"
+    },
     {
       "id": "BL-97",
       "title": "Agentic Mode (\"Autopilot\")",
@@ -1012,9 +1043,9 @@ const DATA = {
     {
       "id": "BL-60",
       "title": "AI Assistant Persona & Few-Shot Prompt Engine",
-      "desc": "Replace generic Claude responses in the AI assistant (viewing mode, listing questions) with a real-estate-expert persona grounded in market-specific Q&A pairs. Architecture: (1) system prompt = role + tone + market context; (2) few-shot examples = ~200 corrected Q&A pairs from team review (HouseZoom_QA_Review_v2.xlsx — market/legal/process + property-specific sheets); (3) live property data injected per conversation. Claude generalises from examples — covers exact matches AND similar questions it hasn't seen. Blocked on: team completing the Q&A review spreadsheet. Once returned, spec + build in 1-2 sessions.",
+      "desc": "Replace generic Claude responses in the AI assistant with a real-estate-expert persona grounded in market-specific Q&A pairs. Architecture: (1) system prompt = role + tone + market context; (2) few-shot examples = 210 corrected Q&A pairs from team review (HouseZoom_QA_Review_v33.xlsx — General Knowledge + Property-Specific tabs); (3) live property data injected per conversation. Critical design requirements: (a) prompt engine must detect WHO IS ASKING (buyer/seller/renter/owner/agent) — inferred from CRM data (deals.deal_type, deal_participants role, properties.listing_category), not hardcoded; (b) CONTEXT detection (sale vs rental, offplan vs resale, property type); (c) polite-correction branches for questions assuming features exist; (d) when Data Source = NOT YET TRACKED, answer pattern must be SHORT and factual — single safe statement + fallback to owner, no branching without data. Audit complete 2026-04-13: v33 spreadsheet ready for team final wording pass. 60 NOT YET TRACKED items documented in BL-60-FEATURE-GAPS.md. Blocked on: team final pass on v33, then spec + build in 1-2 sessions.",
       "tag": "admin",
-      "added": "2026-03-09"
+      "added": "docs/specs/BL-60/"
     },
     {
       "id": "~~BL-58~~",
@@ -1141,6 +1172,83 @@ const DATA = {
       "desc": "DONE → D-128",
       "tag": "core",
       "added": "2026-03-18"
+    },
+    {
+      "id": "BL-108",
+      "title": "Signing Flow Polish (Post-Launch)",
+      "desc": "Remaining items from signing-flow-codex: (1) Signature block layout/positioning in verify page, (2) Template field label cleanup (role humanisation), (3) Duplicate signing request cleanup, (4) PDF font warnings (non-blocking). Low priority — core flow works.",
+      "tag": "ai",
+      "added": "src/components/signing/, src/app/sign/[token]/page.tsx"
+    },
+    {
+      "id": "BL-111",
+      "title": "Seed script: agents must not appear as contacts",
+      "desc": "seed-dubai.mjs creates contact records for agent personas causing dual identity (agent logs in AND appears as CRM contact). Fix: before inserting into contacts, check if user_id exists in org_members for same org — skip if so.",
+      "tag": "admin",
+      "added": "scripts/seed-dubai.mjs"
+    },
+    {
+      "id": "BL-104",
+      "title": "Dashboard Q&A Context Resolution",
+      "desc": "When agent asks from dashboard AssistantBar (not Viewing Mode), no property/deal context — Data Sieve can't ground the answer. v2 options: entity-reference detection, active deal selection, dropdown picker, or non-data-grounded-only fallback. Deferred until BL-60 v1 real usage data.",
+      "tag": "admin",
+      "added": "2026-04-18"
+    },
+    {
+      "id": "BL-105",
+      "title": "Anthropic API Failure Mode Handling",
+      "desc": "When Anthropic API unreachable or returns 4xx (credit depleted, rate limit), engine surfaces generic 500. Improve: distinct 503 for upstream LLM unavailable, UI fallback answer, log underlying Anthropic error code. Discovered 2026-04-18 when credits ran out mid-smoke-test.",
+      "tag": "ai",
+      "added": "src/services/ai/qa-engine.service.ts"
+    },
+    {
+      "id": "~~BL-106~~",
+      "title": "~~AI Q&A Response Caching (Redis / Upstash)~~",
+      "desc": "DONE 2026-04-18 (D-192)",
+      "tag": "ai",
+      "added": "2026-04-18"
+    },
+    {
+      "id": "~~BL-112~~",
+      "title": "~~Ask AI entry point at property level~~",
+      "desc": "DONE 2026-04-20 (D-199 to D-203) — Property detail page + Viewing Mode Screen 2 inline QaInput. Three surfaces: property page, VM Screen 2, VM Screen 3.",
+      "tag": "ai",
+      "added": "2026-04-18"
+    },
+    {
+      "id": "BL-107b",
+      "title": "Intent matcher → Haiku (retry)",
+      "desc": "Revisit Haiku for intent matching when eval corpus expands beyond 50 fixtures. Prior attempt: 49/50 pass (E026 miss). Override mechanism already in place.",
+      "tag": "ai",
+      "added": "src/services/ai/intent-matcher.service.ts"
+    },
+    {
+      "id": "BL-113",
+      "title": "Q&A loading state polish",
+      "desc": "Evaluate loading/thinking state in QaPanel during cold LLM path (~3s). Pulsing \"thinking...\" or skeleton reduces perceived latency. Defer until live dogfooding.",
+      "tag": "ai",
+      "added": "src/features/ai-qa/components/QaPanel.tsx"
+    },
+    {
+      "id": "~~BL-116~~",
+      "title": "~~Seed data hygiene audit~~",
+      "desc": "DONE 2026-04-21 (D-209 to D-213) — Full 4-phase audit: data backfills, CHECK constraints, orphan cleanup, DB-SCHEMA.md sync (100 tables).",
+      "tag": "ai",
+      "added": "2026-04-19"
+    },
+    {
+      "id": "~~BL-117~~",
+      "title": "~~Context-aware fallback messages~~",
+      "desc": "DONE 2026-04-21 (D-205 to D-207) — listing_category_applies filter, seed COL_MAP fix, rent_frequency backfill + seed hardening.",
+      "tag": "infra",
+      "added": "2026-04-19"
+    },
+    {
+      "id": "BL-118",
+      "title": "Real DLD Integration (Dubai Pulse API)",
+      "desc": "Replace broken data.dubai.gov.ae placeholder with real Dubai Pulse OAuth integration. Prereqs: API Key + Secret (~14-day grant), OAuth token rotation, adapter rewrite to CKAN schema, re-enable cron. Blocked on Dubai Pulse API Key grant. Current files retained for build-on.",
+      "tag": "ai",
+      "added": "src/app/api/market/ingest-dld/route.ts, src/features/market-intelligence/*"
     }
   ],
   "techDebt": [
@@ -1233,9 +1341,9 @@ const DATA = {
       "added": "2026-03-06"
     },
     {
-      "id": "TD-16",
-      "title": "Seed data integrity — orphaned contacts",
-      "desc": "3 contacts with buyer_profiles rows (Yuki Tanaka, Sarah Mitchell, Hans Weber) are invisible in UI under any agent login. Likely created with user_id pointing to a non-existent or wrong agent. Audit and fix before BL-62 (Reverse Match) and BL-63 (Demand Map) depend on clean data.",
+      "id": "~~TD-16~~",
+      "title": "~~Seed data integrity — orphaned contacts~~",
+      "desc": "DONE 2026-04-21 (D-208) — BL-116 Phase 2.3 cleanup. 3 contacts + buyer_profiles deleted. 1 orphan property_photo cleaned.",
       "files": "2026-03-11",
       "tag": "infra",
       "added": ""
@@ -1255,6 +1363,54 @@ const DATA = {
       "files": "properties table, RLS policies, entityResolutionService.ts, scripts/seed-dubai.mjs",
       "tag": "infra",
       "added": "2026-04-02"
+    },
+    {
+      "id": "TD-20",
+      "title": "findColumnKey() substring matching fragility",
+      "desc": "scripts/bl60/seed-qa-knowledge-base.mjs uses String.includes() for header-to-field mapping, producing silent mis-routing when one header contains another as a substring. BL-117 was bitten by \"Listing Category Applies\" matching \"Category\" first. Current mitigation: ordering-based (longer patterns first). Long-term fix: replace .includes() with exact match or trimmed equality.",
+      "files": "scripts/bl60/seed-qa-knowledge-base.mjs",
+      "tag": "ai",
+      "added": "2026-04-21"
+    },
+    {
+      "id": "TD-21",
+      "title": "qa-engine.service.ts extra property query for listing_category",
+      "desc": "BL-117 adds a Supabase query per cold-path Q&A request to resolve properties.listing_category for matcher filter. ~50ms overhead. Not critical: 86% of traffic hits Upstash cache (BL-106) and skips this path. Possible consolidation: merge with existing property fetch in context assembler.",
+      "files": "src/services/ai/qa-engine.service.ts",
+      "tag": "infra",
+      "added": "2026-04-21"
+    },
+    {
+      "id": "TD-22",
+      "title": "contacts.nationality column missing from live DB",
+      "desc": "Nationality stored on leads.nationality but not carried to contacts on conversion. Required for UAE MOU, Form F at DLD, AML/KYC scoring, European residency permit disclosure. Needs migration + lead-to-contact conversion update. Medium priority — blocking when MOU generation feature ships.",
+      "files": "contacts table, lead conversion service",
+      "tag": "admin",
+      "added": "2026-04-21"
+    },
+    {
+      "id": "TD-23",
+      "title": "BL-116 audit script regex parser too aggressive",
+      "desc": "scripts/bl116/audit-seed-data.mjs Category B grep produces false positives for Supabase relation syntax (properties(address)) and self-referential matches. Mitigation: manual verification (done in Phase 2.1). Long-term: AST-based parser or more precise regex. Low urgency — internal tooling.",
+      "files": "scripts/bl116/audit-seed-data.mjs",
+      "tag": "infra",
+      "added": "2026-04-21"
+    },
+    {
+      "id": "TD-24",
+      "title": "3 junk properties in Gulf Horizon blocking on FK",
+      "desc": "Properties e78d26b9, 0ecb61fc, c7636b82 cannot be deleted due to deals_property_id_fkey. year_built nulled in Phase 2.2 but rows remain as junk. Low priority — not user-visible. Clean up during next full reseed.",
+      "files": "properties table",
+      "tag": "admin",
+      "added": "2026-04-21"
+    },
+    {
+      "id": "TD-25",
+      "title": "Upgrade backup workflow to Node 24 actions",
+      "desc": "GitHub Actions warning: actions/checkout@v4 runs on Node.js 20 which is deprecated. Node 20 forced to Node 24 by default starting June 2 2026, removed from runners Sept 16 2026. Bump to actions/checkout@v5 or later when available.",
+      "files": "housezum-backups/.github/workflows/backup.yml",
+      "tag": "admin",
+      "added": "2026-04-21"
     }
   ],
   "bugs": [
@@ -1495,9 +1651,324 @@ const DATA = {
       "desc": "FIXED 2026-04-08: Multi-part fix — (a) overlayFieldValues prop threaded through PDFFormEditorMultiPage → PDFFormEditor, (b) email-first label matching in autofillService + documentPrepareService + PII effect, (c) phone branch had email extraction (copy-paste error), (d) overlay rendering rewritten with overflow:visible + displayValue replaces label, (e) strict SigningFieldSchema reverted to z.record. PII prefill confirmed working.",
       "tag": "comms",
       "added": "2026-04-08"
+    },
+    {
+      "id": "BG-36",
+      "title": "Signature field role binding — wrong recipient assignment",
+      "desc": "Seller is being asked to sign in 2 places (their own block + agent block). Same for Buyer. Root cause: signature field role assignment in signing create route is not correctly mapping fields to their intended recipient — fields assigned to one role are leaking to other recipients. Needs dedicated debug session. Files: src/app/api/signing/create/route.ts, src/features/signing/services/requestService.ts",
+      "tag": "infra",
+      "added": "2026-04-11"
+    },
+    {
+      "id": "BG-36b",
+      "title": "agent_profiles.email NULL",
+      "desc": "FIXED 2026-04-13: Backfill + INSERT/UPDATE trigger from auth.users. Shared helper getAgentByEmail.mjs for all seed scripts.",
+      "tag": "comms",
+      "added": "2026-04-13"
+    },
+    {
+      "id": "BG-37",
+      "title": "Action card routes 401 Unauthorized",
+      "desc": "FIXED 2026-04-13: (a) Client used localStorage for token — fixed to supabase.auth.getSession(). (b) Server routes used anon browser client for auth.getUser() — fixed to service role supabaseAdmin.",
+      "tag": "admin",
+      "added": "2026-04-13"
+    },
+    {
+      "id": "BG-45",
+      "title": "Action Log expanded view missing execution details",
+      "desc": "sid, phone, channel present in DB and API but not rendered in expanded card view. Fix: render all execution_result keys in detail section of both /action-log and /admin/action-log.",
+      "tag": "admin",
+      "added": "2026-04-15"
+    },
+    {
+      "id": "BG-46",
+      "title": "ViewingMode.tsx multi-return modal safety",
+      "desc": "QaPanel render block must live inside EACH screen's return tree (not just one). Consider hoisting to component root or refactoring 3-screen returns into single return that switches on screen state. Avoids \"modal lives in only one screen's return\" bug class discovered in BL-112 Pass 2.",
+      "tag": "ux",
+      "added": "2026-04-20"
     }
   ],
   "done": [
+    {
+      "id": "D-218",
+      "title": "BG-48c Backup workflow push permissions",
+      "desc": "Added permissions: contents: write at job level so default GITHUB_TOKEN can push backup commits back to repo. Full pipeline verified green end-to-end (2m 19s).",
+      "completed": "2026-04-21",
+      "tag": "admin"
+    },
+    {
+      "id": "D-217",
+      "title": "BG-48b Backup workflow pg_dump v17 upgrade",
+      "desc": "Installed postgresql-client-17 from official PGDG apt repo. Supabase upgraded server to Postgres 17, default Ubuntu 24.04 pg_dump 16 refused to connect with version mismatch. Logs pg_dump --version for future debugging.",
+      "completed": "2026-04-21",
+      "tag": "admin"
+    },
+    {
+      "id": "D-216",
+      "title": "BG-48 Backup workflow Supabase pooler migration",
+      "desc": "Migrated nightly DB backup from direct IPv6-only host to Session Pooler aws-1-eu-west-1.pooler.supabase.com. GitHub Actions runners are IPv4-only. DB password rotated + GitHub secret updated.",
+      "completed": "2026-04-21",
+      "tag": "admin"
+    },
+    {
+      "id": "D-215",
+      "title": "BG-47b DLD ingest cron parked",
+      "desc": "Removed /api/market/ingest-dld cron from vercel.json. Underlying service fetches from non-existent data.dubai.gov.ae. Real integration scoped as BL-118. Route file + service retained.",
+      "completed": "2026-04-21",
+      "tag": "ai"
+    },
+    {
+      "id": "D-214",
+      "title": "BG-47 Vercel cron force-dynamic fix",
+      "desc": "All 6 cron routes missing force-dynamic, causing silent cache-served no-ops. Fixed query in orchestrator (.eq + .or dead code → .in). Bumped maxDuration for 3 heavy crons. Now generates 13 plans vs 8.",
+      "completed": "2026-04-21",
+      "tag": "infra"
+    },
+    {
+      "id": "D-213",
+      "title": "BL-116 closeout",
+      "desc": "All four phases complete. Tracking docs updated across ROADMAP, CHANGELOG, SOS-NEXT. 3 new TD items added.",
+      "completed": "2026-04-21",
+      "tag": "core"
+    },
+    {
+      "id": "D-212",
+      "title": "BL-116 Phase 2.4 — DB-SCHEMA.md sync",
+      "desc": "Synchronized DB-SCHEMA.md with live information_schema. Added 28 undocumented tables, ~305 missing columns (properties: 37→100). Rewrote activity_events (wrong schema). Removed document_intelligence_events. 4 type corrections. Snapshot generator: scripts/bl116/generate-schema-snapshot.mjs.",
+      "completed": "2026-04-21",
+      "tag": "ai"
+    },
+    {
+      "id": "D-211",
+      "title": "BL-116 Phase 2.3 — Orphan cleanup",
+      "desc": "TD-16 orphaned contacts resolved as no-op (rows already cleaned by prior reseed). Cleanup migration ran clean. TD-16 closed.",
+      "completed": "2026-04-21",
+      "tag": "infra"
+    },
+    {
+      "id": "D-210",
+      "title": "BL-116 Phase 2.2 — Data quality fixes",
+      "desc": "Backfilled bad year_built/sqft/bedrooms to NULL. 5 CHECK constraints on properties (year_built 1900-2030, sqft 0-50000, bedrooms 0-20, bathrooms 0-20, rent_frequency required on rentals). Seed script hardened with range clamps by property type.",
+      "completed": "2026-04-21",
+      "tag": "ai"
+    },
+    {
+      "id": "D-209",
+      "title": "BL-116 Phase 2.1 — Category B investigation",
+      "desc": "All 151 \"live DB bugs\" resolved as false positives from audit script regex parser. activity_events.related_property_id and deals.property_id both exist in live DB. No code changes required.",
+      "completed": "2026-04-21",
+      "tag": "admin"
+    },
+    {
+      "id": "D-208",
+      "title": "BL-116 Phase 2.3 — Orphan cleanup + TD-16 closeout",
+      "desc": "Deleted 3 orphaned contacts (Yuki Tanaka, Sarah Mitchell, Hans Weber) with buyer_profiles pointing to non-existent auth.users. Deleted 1 orphan property_photo from D-204 corpus shell deletion. Defensive cleanup of any deal_participants/property_contacts/requirements refs. TD-16 closed.",
+      "completed": "2026-04-21",
+      "tag": "admin"
+    },
+    {
+      "id": "D-207",
+      "title": "Data hygiene — rent_frequency backfill + seed hardening",
+      "desc": "Backfilled rent_frequency='yearly' for 58 rental properties in Gulf Horizon where field was null. Seed script seed-dubai.mjs hardened: rental properties now get rent_frequency: 'yearly' by default.",
+      "completed": "2026-04-21",
+      "tag": "ai"
+    },
+    {
+      "id": "D-206",
+      "title": "BL-117 seed COL_MAP ordering fix",
+      "desc": "findColumnKey() used .includes() and mis-routed \"Listing Category Applies\" header to category field. Reordered COL_MAP: longer patterns first.",
+      "completed": "2026-04-21",
+      "tag": "infra"
+    },
+    {
+      "id": "D-205",
+      "title": "BL-117 — listing_category_applies filter shipped",
+      "desc": "New column on qa_knowledge_base (sale/rent/null). Matcher corpus cache refactored to Map keyed by listing_category. 3 sale-scoped deflect rows, 3 rent-scoped rows. 6 eval fixtures (E064-E069). Migration: 20260421_bl117_listing_category_filter.sql.",
+      "completed": "2026-04-21",
+      "tag": "infra"
+    },
+    {
+      "id": "D-204",
+      "title": "Data hygiene: 10 garbage corpus property shells deleted",
+      "desc": "10 placeholder properties (\"Unsplash Corpus — ...\") from botched 2026-04-07 corpus seed run. Detached 380 photos via SET property_id=NULL (preserves annotations), deleted shells. Corpus unattached count: 3,772 → 4,152.",
+      "completed": "2026-04-20",
+      "tag": "infra"
+    },
+    {
+      "id": "D-203",
+      "title": "BL-112 polish — QaInput auto-focus on mount",
+      "desc": "150ms delayed focus on inputRef when QaPanel opens. Keyboard pops up immediately on all surfaces.",
+      "completed": "2026-04-20",
+      "tag": "ai"
+    },
+    {
+      "id": "D-202",
+      "title": "BL-112 Pass 2 v2 — Inline QaInput in Viewing Mode",
+      "desc": "Replaced AssistantBar trigger with real QaInput in Screen 2. Added initialQuestion + autoAsk props to QaPanel. Type → Enter → panel slides up already loading the answer.",
+      "completed": "2026-04-20",
+      "tag": "ai"
+    },
+    {
+      "id": "D-201",
+      "title": "BL-112 Pass 2 v1 — Viewing Mode Screen 2 Ask AI",
+      "desc": "Deleted voice navigation bar from Screen 2. Inserted AssistantBar + QaPanel render block in Screen 2's return tree. Hotfix: QaPanel was only in Screen 3's return — duplicated to Screen 2.",
+      "completed": "2026-04-20",
+      "tag": "ai"
+    },
+    {
+      "id": "D-200",
+      "title": "BL-112 Pass 1 hotfix — surface allowlist",
+      "desc": "Added 'property_detail' to API route VALID_SURFACES array and QaRequest.surface type union.",
+      "completed": "2026-04-20",
+      "tag": "ai"
+    },
+    {
+      "id": "D-199",
+      "title": "BL-112 Pass 1 — Property page Ask AI bar",
+      "desc": "Reused AssistantBar on PropertyDetailPage between title row and tab strip. Opens QaPanel with propertyId + surface='property_detail'. i18n: assistant.propertyPlaceholder in 4 locales.",
+      "completed": "2026-04-20",
+      "tag": "ai"
+    },
+    {
+      "id": "D-198",
+      "title": "BL-115a — Schema fallback classifier tightened",
+      "desc": "Added ~25 synonym mappings to CLASSIFIER_SYSTEM in property-schema-fallback.service.ts (e.g., \"how big\" → size_sqm, \"when built\" → year_built, \"lease duration\" → lease_term_months). Live-verified: \"how big is the property\" now returns size_sqm via fallback.",
+      "completed": "2026-04-19",
+      "tag": "ux"
+    },
+    {
+      "id": "D-197",
+      "title": "BL-115 — Q&A engine schema fallback",
+      "desc": "New src/services/ai/property-schema-fallback.service.ts: Haiku column classifier (26-column whitelist of properties.*) → DB read → Haiku formatter. Triggers when matcher returns qa_id === null AND property_id is set. Adds 'schema_fallback' to MatchSource union in types.ts. 5 new eval fixtures (E059-E063). No cache writes from fallback path. Live-verified end-to-end.",
+      "completed": "2026-04-19",
+      "tag": "ai"
+    },
+    {
+      "id": "D-196",
+      "title": "BL-115b — 20 missing property-attribute KB rows",
+      "desc": "Added 20 Property-Specific rows to scripts/bl60/HouseZoom_QA_Review_v33.xlsx (price, bedrooms, address, floor, furnished, etc.) all reading properties.* directly. Re-seeded → 230 rows in qa_knowledge_base (was 210). Live-verified: \"what's the price\" returns \"The asking price is AED 1,370,000.\"",
+      "completed": "2026-04-19",
+      "tag": "infra"
+    },
+    {
+      "id": "D-195",
+      "title": "BL-114 — Q&A engine: first-class property-only context",
+      "desc": "Replaced 2-branch contextHints with 4-branch logic in src/services/ai/intent-matcher.service.ts (property+deal, property-only, deal-only, neither). Verbatim instruction for property-only branch tells Sonnet to match aggressively on property attributes. 8 new eval fixtures (E051-E058). Live-verified: \"what's the price\" with property_id only went from confidence 0.0 → matching successfully.",
+      "completed": "2026-04-19",
+      "tag": "admin"
+    },
+    {
+      "id": "D-194",
+      "title": "BL-107a — LLM Model Override Pattern",
+      "desc": "Added process.env.\u003cFEATURE\u003e_MODEL_OVERRIDE pattern to intent matcher + answer polisher. Observability fix: log resolved model, not default constant. Enables env-var-only A/B testing.",
+      "completed": "2026-04-18",
+      "tag": "ai"
+    },
+    {
+      "id": "D-193",
+      "title": "BL-107a — Answer polisher → Haiku 4.5",
+      "desc": "MODEL_POLISH default changed from Sonnet 4.6 → Haiku 4.5. Eval: 50/50 pass held. Latency: data_grounded cold avg -483ms.",
+      "completed": "2026-04-18",
+      "tag": "ai"
+    },
+    {
+      "id": "D-192",
+      "title": "BL-106 — Q&A response cache (Upstash Redis)",
+      "desc": "SHA-256 key, light normalization, TTL 15min scoped / 24h org-only. Guardrails: skip clarification_needed + stale. Warm hit rate 86%. Cold→warm latency: p50 4,277ms→761ms, avg 3,783ms→1,342ms.",
+      "completed": "2026-04-18",
+      "tag": "admin"
+    },
+    {
+      "id": "D-191",
+      "title": "BL-107b investigation — Intent matcher → Haiku (REVERTED)",
+      "desc": "A/B tested Haiku 4.5 via env override. Eval: 49/50 (E026 regression). Reverted by deleting env var. Override mechanism retained.",
+      "completed": "2026-04-18",
+      "tag": "ai"
+    },
+    {
+      "id": "D-190",
+      "title": "BL-60 role_source CHECK migration applied",
+      "desc": "ai_qa_interactions.role_source CHECK updated for Path 1 values (deal_participant, deal_type_default, unresolved). Applied via Supabase SQL Editor.",
+      "completed": "2026-04-18",
+      "tag": "admin"
+    },
+    {
+      "id": "D-189",
+      "title": "BL-60 Eval Harness",
+      "desc": "scripts/eval-qa-engine.mjs — authenticates as test agent, runs fixtures CSV against /api/ai/qa, writes results CSV with pass/fail per spec §9.2 + forbidden-phrase lint. 50 starter fixtures across 9 categories. Baseline: 50/50 pass (100%).",
+      "completed": "2026-04-18",
+      "tag": "ai"
+    },
+    {
+      "id": "D-188",
+      "title": "BL-60 Viewing Mode Q&A UI",
+      "desc": "src/features/ai-qa/ — QaPanel (slide-up, dark theme, 85vh), QaAnswer (role badge, freshness dot, fallback indicator, sources), QaFeedbackRow (thumbs + edit), QaEditModal, QaInput, QaModeToggle (prose/bullets). useQaAsk hook, qaClient service. ViewingMode Room Chat gets Ask AI entry point.",
+      "completed": "2026-04-18",
+      "tag": "ai"
+    },
+    {
+      "id": "D-187",
+      "title": "BL-60 Q&A Engine Phase C",
+      "desc": "9 service files + keyword-matcher + country-filter + /api/ai/qa + /api/ai/feedback. Deterministic Data Sieve hard-gates on null/NYT/stale before LLM. Sonnet 4.6 for match + polish with prompt caching. Keyword short-circuit \u003c200ms for exact matches.",
+      "completed": "2026-04-18",
+      "tag": "ai"
+    },
+    {
+      "id": "D-186",
+      "title": "BL-60 Q&A corpus seeded",
+      "desc": "210 rows upserted to qa_knowledge_base from team-approved XLSX v33. 105 General Knowledge + 105 Property-Specific. 60 NYT, 9 role-sensitive, 63 with required_fields, 103 slash-brackets stripped. Seed script: scripts/bl60/seed-qa-knowledge-base.mjs.",
+      "completed": "2026-04-17",
+      "tag": "admin"
+    },
+    {
+      "id": "D-185",
+      "title": "BL-60 migrations applied",
+      "desc": "3 tables created: qa_knowledge_base, ai_qa_interactions, ai_feedback. RLS: qa_kb SELECT for authenticated, interactions + feedback org-scoped via org_members. ai_qa_interactions named to avoid conflict with BL-97 ai_interactions.",
+      "completed": "2026-04-17",
+      "tag": "admin"
+    },
+    {
+      "id": "D-184",
+      "title": "BL-60 Q&A Audit — v31 structural review",
+      "desc": "6-point audit on HouseZoom_QA_Review v31: 66 bracket-leak rows, 14 polite-correction gaps, 17 context-ambiguity flags, 1 terminology inconsistency, 0 empty cells, 60 NOT YET TRACKED feature gaps documented. Artifacts committed to docs/specs/BL-60/: audit report, feature-gaps roadmap, reviewed spreadsheet. Blocked on team final wording pass before spec + build.",
+      "completed": "2026-04-16",
+      "tag": "admin"
+    },
+    {
+      "id": "D-181",
+      "title": "BG-37/37b — Action Card Routes 401 Fix",
+      "desc": "Client used localStorage for token (fixed to getSession), server routes used anon client for auth (fixed to service role supabaseAdmin). All 4 action card routes fixed.",
+      "completed": "2026-04-13",
+      "tag": "admin"
+    },
+    {
+      "id": "D-180",
+      "title": "BG-36 — Agent Profile Email Sync",
+      "desc": "Backfill NULL agent_profiles.email from auth.users. INSERT + UPDATE trigger keeps them in sync. Shared helper getAgentByEmail.mjs for seed scripts.",
+      "completed": "2026-04-13",
+      "tag": "comms"
+    },
+    {
+      "id": "D-179",
+      "title": "BL-97 Phase A — AI Actions Inbox Foundation",
+      "desc": "3 tables (ai_action_cards, ai_autonomy_settings, ai_interactions). ActionCard + ActionInbox UI. Dashboard tab switcher with badge count. API routes: list, generate, approve, reject, snooze. Seed script. 13 files, 829 insertions.",
+      "completed": "2026-04-13",
+      "tag": "ai"
+    },
+    {
+      "id": "D-178",
+      "title": "BL-81 — Electronic Signing Flow — FULLY EXECUTED on Production",
+      "desc": "End-to-end signing flow shipped to production. Buyer ✅, Seller ✅, Listing Agent (Verify & Sign) ✅, Buyer's Agent ✅. CRM autofill working. Fully Executed status fires correctly. Verify page renders all field values + signatures. Merged from signing-flow-codex branch (72233f6) + cherry-pick 61a56f5 (verify text overlays). 16 files changed, 1,533 insertions.",
+      "completed": "src/app/api/signing/, src/app/sign/[token]/page.tsx, src/components/signing/, src/features/signing/",
+      "tag": "core"
+    },
+    {
+      "id": "~~BG-35e~~",
+      "title": "~~Buyer Agent contact binding~~",
+      "desc": "DONE 2026-04-11 — Fixed buyer_agent resolution in signing create route. Handles contact_id, user_id, and external_party_info gracefully.",
+      "completed": "2026-04-11",
+      "tag": "core"
+    },
     {
       "id": "D-178",
       "title": "BG-35 — PII Overlay Fix (Signing Step 3)",
@@ -2662,6 +3133,26 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-04-15",
+      "title": "BL-97 Phase D — L2 Sync Execution + Action Log UI. Implemented L2 immediate auto-execution in generate route (no cron). Built agent /action-log and admin /admin/action-log pages with filters, summary strip, agent dropdown, Auto badge. Verified E2E with real WhatsApp delivery (SID confirmed). Logged BG-45 (execution details not shown in expanded view) and BL-111 (seed agent/contact dual identity quirk).",
+      "decisions": "max_level not level in ai_autonomy_settings; absent org ceiling = no org restriction (default ceilingLevel to 2 not 0); admin dropdown populated from cards in view not all org members"
+    },
+    {
+      "date": "2026-04-13 pm",
+      "title": "BL-97 Phases B+C complete. BG-38 fixes. actionCardGeneratorService, Deal Orchestrator wiring with contact resolution, comms follow-up + compliance cron, execution dispatcher (real Twilio WhatsApp), undo route, autonomy settings pages (agent + admin). Dashboard crash fixed (dynamic import pattern). Verified end-to-end: real WhatsApp sent, Twilio SID returned.",
+      "decisions": "Server-only modules (supabaseAdmin) must use dynamic import() when called from files that touch client components; contact_id must come from deal_participants not deal directly; dedup prevents duplicate cards until existing card consumed"
+    },
+    {
+      "date": "2026-04-13",
+      "title": "BL-97 Phase A — Agentic Mode Foundation + BG-36 + BG-37. BL-97 spec v2 rewritten (Gmail analogy, Yariv Adan framework). Phase A: ai_action_cards/ai_autonomy_settings/ai_interactions tables, ActionCard + ActionInbox UI, dashboard tab switcher with badge, 5 API routes, seed script. BG-36: agent_profiles.email backfill + sync trigger from auth.users, shared getAgentByEmail helper. BG-37/37b: action card routes 401 fix — localStorage→getSession on client, anon→service role on server. Verified on production: Approve/Reject/Snooze functional.",
+      "decisions": "agent_profiles.email is NOT reliable — always use auth.users via getAgentByEmail(); API routes must use service role createClient for auth.getUser(token), never the anon browser client; localStorage does not store Supabase tokens — use supabase.auth.getSession(); BL-97 Phase A is approval-only — no execution dispatch yet (Phase B after dogfooding)"
+    },
+    {
+      "date": "2026-04-11",
+      "title": "BL-81 Electronic Signing Flow — SHIPPED TO PRODUCTION. Full E2E signing flow: Buyer, Seller, Buyer's Agent, Listing Agent (Verify & Sign). CRM autofill, field locking, PDF generation, Fully Executed status. Merged signing-flow-codex (72233f6) to main. Cherry-picked 61a56f5 (verify text overlays fix). Sofia Petrov made Admin. BL-107 seed property cleanup parked (deadline May 10, Supabase storage at 1.35GB).",
+      "decisions": "Codex drift is real — reset to known good commit rather than chase regressions; Vercel preview deployments are a lifesaver for finding clean baseline; cherry-pick surgical commits rather than merging everything; never merge a Codex branch with 50+ commits without careful diff review"
+    },
     {
       "date": "2026-04-03",
       "title": "BL-94 + BL-92 + BG-16 — corpus fix, security hardening, analytics crash. BL-94: removed getOrCreateCorpusProperty, property_id=null, --wipe-corpus. BL-92 Tier 1: validateWebhookSecret fail-closed, Zod on 6 webhook routes + qualification POST, CSP headers + allowlist. BG-16: null user_id crash in analytics (seller/buyer_agent deal_participants). NU-22 closed as N/A.",
