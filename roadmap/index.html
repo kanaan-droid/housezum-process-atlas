@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-21';
+const LAST_UPDATED = '2026-04-22';
 const DATA = {
   "inProgress": [
     {
@@ -480,6 +480,20 @@ const DATA = {
     }
   ],
   "backlog": [
+    {
+      "id": "BG-50",
+      "title": "Agent Context Propagation: Currency, Measurement, Locale",
+      "desc": "HIGH — top of next session. Comprehensive i18n pass replacing BG-48 + BG-49 (merged). Estimate 6-8 hours across 6 phases. Acceptance: Pierre/Hans/Marco see correct locale + currency + units across all 12 UI surfaces; Fatima/Will see no regression. Surgical sample shipped under BG-47 (D-221).",
+      "tag": "admin",
+      "added": "docs/specs/BG-50-Spec-Agent-Context-Propagation.md"
+    },
+    {
+      "id": "BL-119",
+      "title": "Canton-based default language for Swiss orgs",
+      "desc": "LOW — defer until 3+ Swiss orgs in production. Add canton field to organizations, lookup map → default_language (DE/FR/IT depending on canton).",
+      "tag": "admin",
+      "added": "docs/specs/BL-119-Swiss-Canton-Language-Default.md"
+    },
     {
       "id": "~~BL-97 Phase B~~",
       "title": "~~Agentic Mode — Phase B~~",
@@ -1689,6 +1703,41 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-223",
+      "title": "BL-EU-SEED Step 4 — Italy properties + photos",
+      "desc": "Seeded 5 Italy properties (€930k-€1.678M base) for Milano Prestige + 134 optimized webp photos via seed-it-properties.mjs. Idempotent. Total IT storage ~22 MB.",
+      "completed": "2026-04-22",
+      "tag": "infra"
+    },
+    {
+      "id": "D-222",
+      "title": "BL-EU-SEED Step 3 — Switzerland properties + photos",
+      "desc": "Seeded 5 Switzerland properties (CHF 1.35M-CHF 3.19M) for Zürich Premium Realty + 41 optimized webp photos via seed-ch-properties.mjs. Idempotent. Total CH storage ~8.3 MB.",
+      "completed": "2026-04-22",
+      "tag": "infra"
+    },
+    {
+      "id": "D-221",
+      "title": "BG-47 Agent listing card currency + measurement",
+      "desc": "Surgical fix. Extended formatCurrency() and formatCurrencyCompact() in src/lib/utils.ts to accept full country names (not just 2-letter codes). PropertyCard in src/app/properties/page.tsx now consumes measurementUnit from agent profile and prefers property.currency first. Pierre Durand's Notre Dame des Champs now renders €3 150 000 · 141 m². Comprehensive cross-app fix tracked under BG-50 (next session).",
+      "completed": "2026-04-22",
+      "tag": "admin"
+    },
+    {
+      "id": "D-220",
+      "title": "BL-EU-SEED Step 2 — France properties + photos",
+      "desc": "Seeded 5 France properties (€1.645M-€3.45M) for Saint Germain Immobilier + 76 optimized webp photos via seed-fr-properties.mjs. Added 9 new properties columns (flooring_type, heating_type, cooling_type, window_type, kitchen_type, condition, last_renovation_year, ceiling_height_m, finishings jsonb). Relaxed year_built constraint to 1700-2030 (was 1900-2030, blocked Paris 1892 listings). Added seed/portal_sync to properties_source_check. New indexes idx_properties_condition, idx_properties_finishings_gin.",
+      "completed": "2026-04-22",
+      "tag": "ai"
+    },
+    {
+      "id": "D-219",
+      "title": "BL-EU-SEED Step 1 — 3 EU orgs + 21 users + 3 teams",
+      "desc": "Seeded Saint Germain Immobilier (FR), Zürich Premium Realty (CH), Milano Prestige (IT) + 3 admins / 3 managers / 15 agents + Paris/Zürich/Milano Sales teams. Idempotent script via Supabase Admin API. Discovered + worked around sync_agent_profile_email trigger blocking bulk auth.users INSERT (drop trigger during seed, re-add after). Installed BEFORE INSERT OR UPDATE lowercasing trigger on agent_profiles.email.",
+      "completed": "2026-04-22",
+      "tag": "comms"
+    },
     {
       "id": "D-218",
       "title": "BG-48c Backup workflow push permissions",
