@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-22';
+const LAST_UPDATED = '2026-04-23';
 const DATA = {
   "inProgress": [
     {
@@ -1700,9 +1700,93 @@ const DATA = {
       "desc": "QaPanel render block must live inside EACH screen's return tree (not just one). Consider hoisting to component root or refactoring 3-screen returns into single return that switches on screen state. Avoids \"modal lives in only one screen's return\" bug class discovered in BL-112 Pass 2.",
       "tag": "ux",
       "added": "2026-04-20"
+    },
+    {
+      "id": "BG-51",
+      "title": "Send menu bottom sheet clipped at viewport bottom",
+      "desc": "Property detail → tap 📧 envelope icon in header → \"Send\" bottom sheet opens; content below the \"Select a form...\" dropdown (SEND A FORM section + everything after) is cut off at viewport bottom. User cannot access full functionality. NOT SendEnrichmentModal — this is the multi-action menu (Share Listing / Enrichment Request / Viewing Invitation / Custom Message). Likely cause: max-height: 100vh without render-context accounting, or missing inner overflow-y: auto scroll container. Pre-existing, NOT a BG-50 regression. Medium severity.",
+      "tag": "ai",
+      "added": "2026-04-23"
+    },
+    {
+      "id": "BG-52",
+      "title": "ShareListingModal rendered beneath page header (z-index)",
+      "desc": "Property detail → tap Share icon (upload arrow, 3rd header icon) → ShareListingModal opens but renders BEHIND the property page header + tabs row. Modal title (\"Share Listing\") and × close button are occluded. Likely cause: missing/incorrect z-index on modal container, OR modal portal rendering inside a stacking-context parent with lower z-index than sticky property header. Pre-existing, NOT a BG-50 regression. High severity (user cannot see title or × close button).",
+      "tag": "ai",
+      "added": "2026-04-23"
     }
   ],
   "done": [
+    {
+      "id": "D-233",
+      "title": "BG-50K — i18n: Properties surface mop-up (6 files)",
+      "desc": "Wired 26 of 27 flagged strings across SendEnrichmentModal.tsx (10), PublicSharePage.tsx (10, incl. t.rich() for Shared via \u003clink\u003eHouseZum\u003c/link\u003e), useProperty.ts (3 — Approach B, reused propertiesHooks.imageTypeError/imageSizeError from BG-50H), ShareListingModal.tsx (1 — L171; L162 &times; symbol intentionally skipped), admin/listings/page.tsx (1 — {bedrooms}bd / {bathrooms}ba interpolated fragment), ListingCardPreview.tsx (1). New namespaces: sendEnrichment.*, publicShare.*, portalSimulator.*. Brand name \"HouseZum\" shipped as literal inside translated strings; L99 standalone brand uses publicShare.brand key to clear audit. Audit CLEAN for all 6 files (except L162 symbol skip); overall coverage 71.2% → 72.0%. Remaining Properties surface: EnrichmentPage (55 strings, BG-50L — final task).",
+      "completed": "2026-04-24",
+      "tag": "admin"
+    },
+    {
+      "id": "D-232",
+      "title": "BG-50J — i18n: EditPropertyModal + m² unhardcoding",
+      "desc": "Wired 24 hardcoded strings (22 unique keys, L574 fragment dedup'd into one {name}-interpolated key) in EditPropertyModal.tsx. Second Commandment #1 fix: m² at L407 now consumes measurementUnit from useAgentPreferences() via inline ternary (sqft → ft², sqm → m²); did not add symbol helper to utils — formatArea() already embeds the symbol for its own return, and 11 more hardcoded-sqft surfaces are flagged for Phase 4 follow-up. L574 uses plain t() with smart-quotes embedded in locale strings (not t.rich() — no \u003cstrong\u003e wrap in source). UAE-biased placeholder examples (e.g. Burj Khalifa District, e.g. Dubai Creek Harbour) ship as-is per Risk #2 — deferred to BG-50Z. Flagged 10+ hardcoded labels on custom Field/Accordion components that the audit's attr whitelist misses (label=\"Owner Name\", title=\"Listing & Portal Fields\" was caught, but similar sibling labels weren't) — follow-up. Audit shows ZERO missing for EditPropertyModal; overall coverage 70.5% → 71.2%.",
+      "completed": "2026-04-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-231",
+      "title": "BG-50I — i18n: property detail tabs cleanup (6 files)",
+      "desc": "Wired 19 hardcoded strings across SummaryTab.tsx (2), DetailsTab.tsx (6 — spec listed 5, audit missed L143 Safe dropdown option; translated all 4 safety-rating options for coherence), PhotoGallery.tsx (5), ConnectionsTab.tsx (4), DocsTab.tsx (1), ItemModal.tsx (1). All files already had useTranslations bindings — all 19 keys reused existing propertyDetails.* sub-namespaces (no new namespaces). Const-map Pattern A on PhotoGallery: PLATFORM_SHORT kept module-level (other 6 values are proper nouns); added component-level platformLabel(platform) helper returning t('aspectIgStory') for instagram-story. L150 &amp; stored as literal & in en.json per prompt note. Audit shows ZERO missing for all 6 files; overall coverage 69.7% → 70.5%.",
+      "completed": "2026-04-23",
+      "tag": "ai"
+    },
+    {
+      "id": "D-230",
+      "title": "BG-50H — i18n: listings entry-point surface (5 files)",
+      "desc": "Wired 8 hardcoded strings across properties/page.tsx (2, count + badge interp), PropertyDetailPage.tsx (1), prop-detail.tsx (1, same key as PropertyDetailPage), usePropertiesList.ts (2 alerts), usePropertyItems.ts (2 confirm/alert). Reused existing properties.* + propertyDetails.* namespaces; new propertiesHooks.* for the 2 hooks (Approach B — useTranslations inside hook). Sub-component PropertyActivityTab needed its own binding in both detail files. ⚠️ prop-detail.tsx is not imported anywhere — likely dead code; flagged for Will. Audit shows ZERO missing for all 5 files; overall coverage 69.4% → 69.7%.",
+      "completed": "2026-04-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-229",
+      "title": "BG-50G — i18n: Requirements tab + AED unhardcoding",
+      "desc": "Wired 38 hardcoded strings across RequirementForm.tsx (22) and RequirementList.tsx (16) into 42 keys under new requirements.* namespace (form, list, list.urgency, list.stage). First Commandment #1 fix: removed hardcoded 'AED' from 3 budget labels — now interpolate {currency} from useAgentPreferences() (first consumer of the hook). Const-map remap layer (URGENCY_KEYS/STAGE_KEYS) replaced with template-literal t(urgency.${r.urgency}) + KNOWN_URGENCY/KNOWN_STAGE Set whitelists; JSON keys mirror DB enums verbatim. Audit shows ZERO missing for both files; overall coverage 68.3% → 69.4%.",
+      "completed": "2026-04-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-228",
+      "title": "BG-50F — i18n: 4 remaining contact files cleanup (closes Contacts surface)",
+      "desc": "Wired 6 hardcoded strings across ContactDocsTab.tsx (3), ContactDealsTab.tsx (1, ICU select on filter), useContactDetail.ts hook (1, approach B — called useTranslations inside the hook), ContactCTA.tsx (1, name interp). All 4 files had zero i18n infra before. New namespaces: contactDocs, contactDeals, contactSeller, contactCta. Audit shows ZERO missing rows for all 4 files; overall coverage 68.1% → 68.3%. Together with BG-50C/D/E this closes the Contacts surface — every contact-related UI surface is now i18n-wired.",
+      "completed": "2026-04-23",
+      "tag": "admin"
+    },
+    {
+      "id": "D-227",
+      "title": "BG-50E — i18n: ContactImportModal hardcoded string cleanup",
+      "desc": "Wired 25 hardcoded occurrences (18 unique keys) in src/components/shared/ContactImportModal.tsx — file had zero i18n infrastructure before. First use of t.rich() in the codebase (for L344/L350 iOS Settings instructions with bold \u003cstrong\u003e...\u003c/strong\u003e path emphasis). Used ICU plural for \"Imported {count} contacts\" (L560) and \"Select All ({count} contacts)\" (L412) — replaced JS count !== 1 ? 's' : '' which couldn't translate. New contactImport.* namespace (permission/list/classify/complete sub-groups) added to all 4 locale JSONs. Audit shows ZERO missing rows for the file; overall coverage 67.4% → 68.1%.",
+      "completed": "2026-04-23",
+      "tag": "infra"
+    },
+    {
+      "id": "D-226",
+      "title": "BG-50D — i18n: ContactDetailPage hardcoded string cleanup",
+      "desc": "Wired 27 hardcoded occurrences in src/features/contacts/pages/ContactDetailPage.tsx to t() calls (25 unique keys after deduping L187/L368 + combining L370 two-fragment delete-confirmation into one interpolated key with {name}). New contactDetail.* namespace (5 sub-groups: actions, additionalInfo, sellerProfile, interactions, linkedProperty) added to all 4 locale JSONs as English placeholders. useTranslations('contactDetail') binding added in 6 in-file components (ContactDetailPage, EditContactModal, InfoTab, SellerTab, SellerProfileCard, ActivityTab, SellerModal). Audit shows ZERO missing rows for the file; overall coverage 66.6% → 67.4%. Validates i18n migration loop on a moderate-scale file (26 keys vs BG-50C's 7).",
+      "completed": "2026-04-23",
+      "tag": "ai"
+    },
+    {
+      "id": "D-225",
+      "title": "BG-50C — i18n: dashboard hardcoded string cleanup",
+      "desc": "Wired 8 hardcoded JSX strings on src/app/dashboard/page.tsx (7 unique keys: dashboard.gamePlan.{title,emptyState,updatedBadge,viewFullPlan} + dashboard.intelSection.{intelCards,aiActions,history}) to t() calls. Added to all 4 locale JSONs (fr/de/it as English placeholders). Re-run of i18n-coverage-full.mjs shows ZERO missing rows for the dashboard file; overall coverage 66.3% → 66.6%. Test run validating the i18n migration loop on a single file before scaling to ~10 larger files.",
+      "completed": "2026-04-23",
+      "tag": "ai"
+    },
+    {
+      "id": "D-224",
+      "title": "BG-50A — i18n: 16 missing translation keys",
+      "desc": "Added fieldMode.* namespace (15 keys, entire component had been rendering raw key names) + tools.list-property.step5.score (1) to all 4 locale JSONs. fr/de/it mirror en as English placeholders pending translation polish. The audit's initial 21-key estimate included 5 false positives (dashboard.section{Today,Urgent,Week,Wins} + dashboard.showMore exist as intel.section*); fixed scripts/audit/i18n-audit.mjs in-place to handle multi-binding namespace resolution. Audit confirms MISSING_IN_EN: 0. Browser spot-checks pending.",
+      "completed": "2026-04-22",
+      "tag": "ux"
+    },
     {
       "id": "D-223",
       "title": "BL-EU-SEED Step 4 — Italy properties + photos",
