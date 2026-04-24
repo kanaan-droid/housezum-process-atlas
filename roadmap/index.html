@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-23';
+const LAST_UPDATED = '2026-04-24';
 const DATA = {
   "inProgress": [
     {
@@ -1714,9 +1714,72 @@ const DATA = {
       "desc": "Property detail → tap Share icon (upload arrow, 3rd header icon) → ShareListingModal opens but renders BEHIND the property page header + tabs row. Modal title (\"Share Listing\") and × close button are occluded. Likely cause: missing/incorrect z-index on modal container, OR modal portal rendering inside a stacking-context parent with lower z-index than sticky property header. Pre-existing, NOT a BG-50 regression. High severity (user cannot see title or × close button).",
       "tag": "ai",
       "added": "2026-04-23"
+    },
+    {
+      "id": "BG-54",
+      "title": "admin.nav.autonomy missing i18n key",
+      "desc": "Admin sidebar nav references a translation key that doesn't exist in messages/en.json. Fires MISSING_MESSAGE console error on every admin nav re-render (70+ errors per session observed). Pre-existing, confirmed through BG-50L/M/N commits today — NOT a regression. Low severity (console noise, no visible user impact). Fix: add the missing key to messages/en.json + fr/de/it.",
+      "tag": "admin",
+      "added": "2026-04-24"
+    },
+    {
+      "id": "BG-55",
+      "title": "Financials row labels longer than pre-CC baseline (BG-50L artifact)",
+      "desc": "DealDetailPanel Financials section display-mode rows show \"Deposit Amount/Financing Type/Commission Rate (%)\" instead of pre-CC shorter \"Deposit/Financing/Commission Rate\". Caused by Claude drafting error in BG-50L prompt — instructed CC to reuse edit-mode keys for display rows. Low priority — rows are functional and readable. Fix: add short-label keys under admin.deals.financials.displayLabels.* or similar, update 3 display-mode cells.",
+      "tag": "admin",
+      "added": "2026-04-24"
+    },
+    {
+      "id": "BG-56",
+      "title": "Full-page Deal Detail view (/admin/deals/[id]/page.tsx) i18n audit",
+      "desc": "Separate UI from DealDetailPanel slide-in — has its own 3-tab layout (Summary/Documents/Timeline), Stage Progress visualization, Deal Information grid, and \"← Back to Deals\"/\"Change Stage\"/\"Reassign\" buttons. Visual audit shows ~15+ hardcoded-looking strings but audit script flagged only 4 typography entities. Likely either (a) strings already localized via different namespace, or (b) audit blind spots apply. Dependency: BG-57 first so audit detects gaps properly. Also spot-check DealTimelineTab.tsx.",
+      "tag": "admin",
+      "added": "2026-04-24"
+    },
+    {
+      "id": "BG-57",
+      "title": "Extend i18n audit script to close 4 blind-spot patterns",
+      "desc": "scripts/audit/i18n-coverage-full.mjs misses 4 pattern categories: (1) JSX text adjacent to child spans (e.g. Buyer Agent \u003cspan\u003e(optional)\u003c/span\u003e → script only sees span content), (2) top-level page \u003ch1\u003e/\u003ch2\u003e headings in non-component pages, (3) status-label ternaries (x ? 'A' : 'B'), (4) setError('...') / setter string literals. These ship unwired despite \"clean\" audit — BG-50N scoping found 8 missed strings this way. Recommend fixing BEFORE more BG-50 prompts — compounding cost of manual visual audits.",
+      "tag": "ux",
+      "added": "2026-04-24"
+    },
+    {
+      "id": "BL-PAGE-META",
+      "title": "Page metadata standardization (PAGE_META export + file headers)",
+      "desc": "Add file-level JSDoc headers + PAGE_META exports to every page.tsx/layout.tsx/route.ts under src/app/. Solves the \"which page.tsx is market-analysis?\" problem. Sets up future auto-generated feature registry for Phase 2 agency RBAC. Scoped to routes only (~50–70 files, ~45min CC execution). Execute AFTER BG-50 migration completes. Spec drafted during 2026-04-24 Session 2 (not yet saved to docs/specs/).",
+      "tag": "admin",
+      "added": "2026-04-24"
+    },
+    {
+      "id": "BG-53",
+      "title": "\"Run Market Analysis\" from property Summary doesn't pre-populate the form",
+      "desc": "Property detail → Summary tab → tap \"Run Market Analysis\" card. Current: redirects to /tools/market-analysis with only the Property reference pre-filled; Area, Building, Type, Bedrooms, Size, Floor, Asking Price all blank → forces agent to re-enter everything + re-tap Run Analysis. Expected: from property context, auto-populate ALL form values (area, building, type, bedrooms, size, floor, price) from properties.* AND skip straight to analysis result. Implementation hint: propertyId query-param passthrough + autorun flag. UX issue, NOT an i18n regression. Medium-High severity. Confirmed via user screenshots during 2026-04-23 EOS testing.",
+      "tag": "ai",
+      "added": "2026-04-23"
     }
   ],
   "done": [
+    {
+      "id": "D-236",
+      "title": "BG-50N — i18n: Deals surface mop-up (closes Deals surface)",
+      "desc": "Wired 26 strings across 2 files: src/app/admin/deals/page.tsx (8 strings in NewDealModal — placeholders, Seller label, t.rich() Buyer Agent \u003coptSpan\u003e wrap, \"Not found?\"/\"Add as contact →\") + src/app/deals/[id]/verify/[documentId]/page.tsx (18 strings, greenfield — added useTranslations('admin.deals') binding + KNOWN_VERIFY_ROLES Set guard; covers page title Verify & Sign, error states, SIGNATORY STATUS / DOCUMENT PREVIEW / YOUR SIGNATURE headers, signer ternary, preview states, signature CTAs). REUSED from BG-50L: searchPropertyPlaceholder, participantRole.*. New nested sub-namespaces: admin.deals.newDealModal.*, admin.deals.verify.*. Visual audit caught 8 strings the audit script missed (h1/h2 headings, status ternaries, setError('...') literals) — documented as BG-57. Audit CLEAN on both files (7 typography glyphs remain on admin/deals, all scoped out per convention); overall coverage 74.9% → 75.5%. Deals surface of BG-50 migration FULLY CLOSED.",
+      "completed": "2026-04-24",
+      "tag": "admin"
+    },
+    {
+      "id": "D-235",
+      "title": "BG-50M — i18n: DealDocumentsTab (3 sub-components)",
+      "desc": "Wired ~47 strings across 3 rendering components in src/features/deals/components/DealDocumentsTab.tsx (1,035 lines, greenfield — zero existing i18n infra). Three separate useTranslations('admin.deals') bindings (one per sub-component: DealDocumentsTab main / ExecutionPanel / DirectSendSheet) per BG-50D lesson. Nested sub-namespace admin.deals.documents.* with child groups category.*, emptyState.*, status.*, banner.*, signer.*, menu.*, void.*, history.*, send.*. DOC_CATEGORIES const-map refactored (label → labelKey) with dynamic t(documents.category.${labelKey})/t(documents.emptyState.${labelKey}). REUSED from BG-50L: admin.deals.cancel (void modal), admin.deals.participantRole.* (signer + DirectSend role labels, guarded by KNOWN_SIGNER_ROLES/KNOWN_PARTICIPANT_ROLES Sets). t.rich() x2: Void modal body \u003cstrong\u003e{docName}\u003c/strong\u003e, DirectSendSheet recipient label \u003cnameWrap\u003e/\u003croleWrap\u003e. Commit hygiene lesson applied: used explicit git add paths instead of -A to prevent accidental re-commit of gitignored scratchpad (root-caused from BG-50L). Audit clean except 1 typography glyph (&#8943; overflow menu); overall coverage 73.8% → 74.9%.",
+      "completed": "2026-04-24",
+      "tag": "admin"
+    },
+    {
+      "id": "D-234",
+      "title": "BG-50L — i18n: DealDetailPanel (slide-in, 47 strings)",
+      "desc": "Wired 47 strings across 6 sections (Stage/Parties/Property/Financials/Commissions/Notes) of src/features/deals/components/DealDetailPanel.tsx (971 lines). Dropped file-level PARTICIPANT_ROLE_LABELS const-map entirely — replaced 3 call sites with t(participantRole.${role}) using KNOWN_PARTICIPANT_ROLES whitelist guard (DB enum keys mirror JSON keys 1:1: buyer, seller, listing_agent, buyer_agent, notary, bank, trustee, developer_rep, guarantor). Added nested sub-namespaces participantRole.*, financingType.*, commRecipientType.*, commSide.* under admin.deals. Reused 6 keys from common.* via new tc binding. t.rich() x1 for \"Initial stage: {label}\" bold span. Merge required resetting Codex branch to commit 72233f6 and cherry-picking 61a56f5 separately due to significant drift. One minor drafting error — display-mode labels for Financials rows came out longer than pre-CC baseline (Deposit Amount/Financing Type/Commission Rate vs Deposit/Financing/Commission Rate); logged as BG-55 (low-priority). Audit clean for functional strings (7 typography entities remain); overall coverage 72.0% → 73.8%.",
+      "completed": "2026-04-24",
+      "tag": "comms"
+    },
     {
       "id": "D-233",
       "title": "BG-50K — i18n: Properties surface mop-up (6 files)",
