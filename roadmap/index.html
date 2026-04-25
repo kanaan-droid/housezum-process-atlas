@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-24';
+const LAST_UPDATED = '2026-04-25';
 const DATA = {
   "inProgress": [
     {
@@ -158,6 +158,14 @@ const DATA = {
     }
   ],
   "nextUp": [
+    {
+      "id": "BL-107",
+      "title": "DEADLINE 2026-05-10 — Seed property cleanup (storage limit)",
+      "desc": "Supabase storage at limit. Hard deadline. Parked since 2026-04-11 BL-81 ship. Need to identify + delete unused seed property photos / blob entries.",
+      "files": "Storage, seed scripts",
+      "tag": "infra",
+      "added": "2026-04-25"
+    },
     {
       "id": "~~BL-98~~",
       "title": "~~Founder Dogfooding — Agentic Mode~~",
@@ -1718,7 +1726,7 @@ const DATA = {
     {
       "id": "BG-54",
       "title": "admin.nav.autonomy missing i18n key",
-      "desc": "Admin sidebar nav references a translation key that doesn't exist in messages/en.json. Fires MISSING_MESSAGE console error on every admin nav re-render (70+ errors per session observed). Pre-existing, confirmed through BG-50L/M/N commits today — NOT a regression. Low severity (console noise, no visible user impact). Fix: add the missing key to messages/en.json + fr/de/it.",
+      "desc": "Admin sidebar nav references a translation key that doesn't exist in messages/en.json. Fires MISSING_MESSAGE console error on every admin nav re-render (70+ errors per session observed). Pre-existing, confirmed through BG-50L/M/N commits today — NOT a regression. Low severity (console noise, no visible user impact). Fix: add the missing key to messages/en.json + fr/de/it. CLOSED 2026-04-25 → D-248 (commit d69f51b, wired in BG-50X Batch 2).",
       "tag": "admin",
       "added": "2026-04-24"
     },
@@ -1739,9 +1747,30 @@ const DATA = {
     {
       "id": "BG-57",
       "title": "Extend i18n audit script to close 4 blind-spot patterns",
-      "desc": "scripts/audit/i18n-coverage-full.mjs misses 4 pattern categories: (1) JSX text adjacent to child spans (e.g. Buyer Agent \u003cspan\u003e(optional)\u003c/span\u003e → script only sees span content), (2) top-level page \u003ch1\u003e/\u003ch2\u003e headings in non-component pages, (3) status-label ternaries (x ? 'A' : 'B'), (4) setError('...') / setter string literals. These ship unwired despite \"clean\" audit — BG-50N scoping found 8 missed strings this way. Recommend fixing BEFORE more BG-50 prompts — compounding cost of manual visual audits.",
+      "desc": "scripts/audit/i18n-coverage-full.mjs misses 4 pattern categories: (1) JSX text adjacent to child spans (e.g. Buyer Agent \u003cspan\u003e(optional)\u003c/span\u003e → script only sees span content), (2) top-level page \u003ch1\u003e/\u003ch2\u003e headings in non-component pages, (3) status-label ternaries (x ? 'A' : 'B'), (4) setError('...') / setter string literals. These ship unwired despite \"clean\" audit — BG-50N scoping found 8 missed strings this way. Recommend fixing BEFORE more BG-50 prompts — compounding cost of manual visual audits. DONE 2026-04-25 → D-237.",
       "tag": "ux",
       "added": "2026-04-24"
+    },
+    {
+      "id": "BG-58",
+      "title": "useAgentPreferences() returns locale defaults on Tools subset (HIGH, deferred)",
+      "desc": "Hook returns wrong currency/locale on /tools/market-analysis + /tools/list-property only; does NOT affect /properties, /d/{token}, /admin/settings. Diagnosis sharpened 2026-04-25: ✅ /properties (AED), ❌ /tools/market-analysis (EUR Milan), ❌ /tools/list-property Step 5a (CHF Swiss), ✅ /d/{token} (AED), ✅ /admin/settings (AE). Hypothesis: OrgProvider hydration ordering issue specific to Tools wizard pages. Single PR will fix every previously-migrated page retroactively.",
+      "tag": "admin",
+      "added": "2026-04-25"
+    },
+    {
+      "id": "BG-50Z",
+      "title": "Country-specific placeholder variants (~20 strings)",
+      "desc": "Requires extending useAgentPreferences() hook to expose phoneCountryCode (currently exposes only currency, measurementUnit, locale). Affected surfaces flagged with // TODO BG-50Z markers — confirmed in admin/members/[userId] (+971 placeholder). Also UAE-biased examples like e.g. Burj Khalifa District, e.g. Dubai Creek Harbour from BG-50J need country-aware variants.",
+      "tag": "admin",
+      "added": "2026-04-25"
+    },
+    {
+      "id": "BG-59",
+      "title": "Audit script: 5 detection blind spots — (a) dynamic_t enumerable runtime set, (b) setError fallback in `",
+      "desc": "",
+      "tag": "core",
+      "added": "scripts/audit/i18n-coverage-full.mjs misses 5 sibling patterns; together they hide ~20 user-facing strings in already wired-clean files. (a) dynamic_t with closed enumerable runtime set: flagged unresolvable:type_is_string when var in t(prefix.${var}) is TS-typed as string even though the runtime set is closed and fully enumerable from local data flow. Confirmed: AdminNav.tsx:153 (21 keys via navGroups[].items[].key literals), ComplianceBanner.tsx:245 (7 keys via groupByCategory() if/else + default). (b) setter expression-fallback `setError(err.message"
     },
     {
       "id": "BL-PAGE-META",
@@ -1759,6 +1788,111 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-251",
+      "title": "BG-50W MCP-verified live on housezoom.ai",
+      "desc": "Admin surface CLOSED 4/4 (signing-templates list/new/edit, base-documents, confirmations). All 14 strings + 8 cross-file dedupe keys render correctly on signing-templates new/edit pair. Confirmations card states (t.rich) deferred — no seed data path; saving label Unicode ellipsis fix not exercised (would require prod template write). Admin surface (BG-50T/U/V/W) officially closed.",
+      "completed": "2026-04-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-250",
+      "title": "BG-59 filed and expanded across 5 audit blind-spot patterns (LOW)",
+      "desc": "Pattern (a) dynamic_t with closed enumerable runtime set [AdminNav L153, ComplianceBanner L245]; (b) setError fallback in `",
+      "completed": "",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-249",
+      "title": "BG-50X Phase 1 complete — Shared Components surface",
+      "desc": "5 batches, 4 commits + 1 deliberate skip, 5 wired files + 11 no-op verified + 2 piggyback-commented = 18 files touched. 67 unique keys wired across Button/AppShell/AdminNav/ContactImport/DocumentUpload/EmailCompose/SendQualification/ScanDocumentModal. Coverage 78.0% → 79.9% (+1.9pp). Files: Button.tsx (reuses common.loading), AppShell.tsx (new shared.appShell.brandAlt), AdminNav.tsx (shared.adminNav.adminPill ×2 + closes BG-54), ContactImportModal.tsx (BG-50E namespace cleanup, 9 keys), DocumentUploadModal.tsx (new shared.documentUploadModal.*, 8 keys), EmailComposeModal.tsx (new shared.emailComposeModal.*, 9 keys; kept tp = useTranslations('sendPicker')), SendQualificationModal.tsx (new shared.sendQualificationModal.*, 10 keys including tab_email piggybacked), ScanDocumentModal.tsx (new shared.scanDocumentModal.*, 26 keys sub-grouped by step; reuses common.saving). Phase 2 deferred: ViewingMode + AutocompleteSelect (9 strings, BG-46 multi-return concern warrants dedicated session). Commits: 86e3fc4, d69f51b, e9010b2, f69d76c.",
+      "completed": "2026-04-25",
+      "tag": "comms"
+    },
+    {
+      "id": "D-248",
+      "title": "BG-54 closed — admin.nav.autonomy MISSING_MESSAGE noise dead",
+      "desc": "Console error was firing 70+ times per admin nav re-render. Wired in BG-50X Batch 2 by adding admin.nav.autonomy = \"Autonomy\" to en.json — runtime now resolves cleanly even though static audit still shows L153 dynamic_t as unresolvable:type_is_string (BG-59 pattern a). MCP-verified clean console after cache-busted reload. Closing commit: d69f51b.",
+      "completed": "2026-04-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-247",
+      "title": "BG-50W — i18n: signing-templates trio + base-documents + confirmations (CLOSES Admin surface 4/4)",
+      "desc": "Wired 52 strings across 5 admin files: signing-templates/page.tsx (6), signing-templates/new/page.tsx (14), signing-templates/[id]/edit/page.tsx (11), base-documents/page.tsx (11), confirmations/page.tsx (10). 8 cross-file form-key dedupes between new + edit (nameLabel, backToTemplates, categoryLabel, baseDocumentLabel, blankCanvasOption, fieldLayoutLabel, savingLabel, errors.nameRequired — verified 1 ref per file). 6 cross-namespace reuses verified (admin.nav.signingTemplates, admin.nav.baseDocuments, properties.description ×2, admin.workflows.editTemplate, common.saveChanges, admin.deals.documents.void.reasonPlaceholder). common.saving mismatch detected (3-dot Saving... vs source Unicode Saving…) → fallback shared key admin.signingTemplates.form.savingLabel = \"Saving…\" used in both new + edit. t.rich() for confirmations.card.dealLine = \"Deal: \u003cb\u003e{title}\u003c/b\u003e\" preserving inline span styling; simple interpolation for byLine = \"By: {name}\". Audit ZERO missing across all 5 files; overall coverage 76.5% → 78.0%. Admin surface CLOSED 4/4 (BG-50T/U/V/W). Commits: 5f714be + 4e3d913.",
+      "completed": "2026-04-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-246",
+      "title": "BG-50V — i18n: admin batch (settings + autonomy + 8 smaller files)",
+      "desc": "63 strings across 10 files: settings (21), autonomy (12), leads (4 real + glyphs), members (3 — modal merged via t.rich()), compliance (3 debug labels), members/[userId] (1 left static with TODO BG-50Z), deals/[id] (1 wired via rateEquals ICU + 3 arrow glyphs left), and skip-only files deals (7 glyphs), workflows (4 country flag emojis 🇦🇪🇨🇭🇫🇷🇮🇹), analytics (1 Tailwind FP). ACTION_LABELS const-map → getAutonomyActionLabel(key, t, tActionLog) switch; cross-namespace reuse for portal_publish via tActionLog. ICU keys: systemMaxLevel = \"System max: L{level}\", admin.deals.rateEquals = \"{rate}% = {amount}\". admin.confirmations.card.dealLine uses t.rich() preserving bold span. 18 residuals (typography glyphs + flags + Tailwind FP + +971 deferred to BG-50Z). 75.3% → 76.5%. Commits: f63290a + 7d8ce4c.",
+      "completed": "2026-04-25",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-245",
+      "title": "BG-50U — i18n: admin batch (action-log + portals + signals)",
+      "desc": "68 strings across 3 files. 8 cross-namespace reuses verified (admin.nav.actionLog, docusign.document, contacts.qualification_section, propertyDetails.summary.publishedOn, admin.leads.leadCreated, propertyDetails.connections.linking, tools.listing-generator.review.copied ×2, tools.property-checklist.selectProperty). Const-map refactors for STATUS_LABELS + ACTION_TYPE_LABELS via getStatusLabel(key, t) / getActionTypeLabel(key, t, tDocusign, tContacts) helpers. Single ICU key for portals XML preview summary `\"{included} listings included",
+      "completed": "{blocked} blocked and excluded\"`. 4 typography glyph residuals (ldquo, rdquo, mdash ×2). 73.5% → 75.3%. Commits: 498d22d + 5ae5835.",
+      "tag": "admin"
+    },
+    {
+      "id": "D-244",
+      "title": "BG-50T — i18n: admin/photo-intelligence (3 files)",
+      "desc": "44 strings across annotate/page.tsx (27), page.tsx dashboard (9), gallery/page.tsx (8). 5 cross-namespace reuses (common.loading, common.saving ×2, propertyDetails.details.selectPlaceholder ×2, admin.nav.photoIntelligence). 3 internal dedupes (Photo Gallery ×2, e.g. Staircase, Attic, Gym... ×2, YOUR RATING ×2). ICU keys for confidence: \"{pct}% confidence\", missingRoomsLabel: \"Missing: {rooms}\", inBatchSuffix: \" / {total} in batch\". AiBlock + PhotoCard sub-components got their own useTranslations bindings. 1 emoji residual (★ glyph). 72.3% → 73.5%. Commits: ba69c32 + 04f968f.",
+      "completed": "2026-04-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-243",
+      "title": "BG-50Y — i18n: features/properties/EnrichmentPage",
+      "desc": "64 strings across the largest single file yet — 10 sub-component bindings. 4-part agent-name interpolation pattern shipped (intro.greeting + fromAgency + bodyWithAgent + yourAgentFallback). Commandment #1 fixes for {currency}/month ×4 dedupe and renovation cost range {currency}10,000 - {currency}15,000. CLOSES Properties surface. 70.1% → 72.3%. Commits: 1710dad + df58cbf.",
+      "completed": "2026-04-25",
+      "tag": "admin"
+    },
+    {
+      "id": "D-242",
+      "title": "BG-50S — i18n: Tools surface mop-up (4 files, CLOSES Tools surface)",
+      "desc": "19 strings: listing-generator (7), form-generator (5), media-library (4 with PLATFORM_LABELS reused), viewing-brief (3). CLOSES Tools surface 6/6 (BG-50O/P/Q/R/S). 69.6% → 70.1%.",
+      "completed": "2026-04-25",
+      "tag": "ux"
+    },
+    {
+      "id": "D-241",
+      "title": "BG-50R — i18n: tools/schedule-viewing",
+      "desc": "18 strings, 5 reuses including 3× ← Back via forms.back. 69.1% → 69.6%.",
+      "completed": "2026-04-25",
+      "tag": "ux"
+    },
+    {
+      "id": "D-240",
+      "title": "BG-50Q — i18n: tools/property-checklist",
+      "desc": "26 strings, 4 emoji residual. STATUS_LABELS const deleted as zero-call-sites dead code. 68.5% → 69.1%. Commits: 34ee4c3 + ecfd635.",
+      "completed": "2026-04-25",
+      "tag": "ux"
+    },
+    {
+      "id": "D-239",
+      "title": "BG-50P — i18n: tools/list-property",
+      "desc": "36 strings, 5 sub-component bindings, DETAIL_LABELS const-map → getDetailLabel(key, tRoot) helper pattern, Commandment #1 fix L720 ft² → useAgentPreferences().measurementUnit. 67.6% → 68.5%. Commits: e79f6ed + 68f3274.",
+      "completed": "2026-04-25",
+      "tag": "ai"
+    },
+    {
+      "id": "D-238",
+      "title": "BG-50O — i18n: tools/market-analysis",
+      "desc": "37 strings, 3 sub-component bindings, ICU plural, Commandment #1 wiring on PositioningScoreCard. 66.5% → 67.6%. Commits: b14a6fb + bae2076.",
+      "completed": "2026-04-25",
+      "tag": "ux"
+    },
+    {
+      "id": "D-237",
+      "title": "BG-57 — i18n audit script blind-spot fixes",
+      "desc": "4 detection patterns (JSX text adjacent to children, page h1/h2, status-label ternaries, setError/setSuccess setter literals) + classifyHardcoded value-collision bug. Audit baseline corrected from 75.5% to true 66.5%, surfaces matched_en_key column for reuse identification. Total rows 3366→3573 (+207), Missing 820→1188 (+368). Commits: 8c3e564 (script) + 5c1e53e (CSV regen).",
+      "completed": "2026-04-25",
+      "tag": "ux"
+    },
     {
       "id": "D-236",
       "title": "BG-50N — i18n: Deals surface mop-up (closes Deals surface)",
