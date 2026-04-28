@@ -63,6 +63,8 @@ main{max-width:880px;margin:0 auto;padding:32px}
 .content strong{color:var(--text);font-weight:600}
 .content em{color:var(--text2)}
 .content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
 footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
 footer a{color:var(--text2)}
 </style>
@@ -83,6 +85,160 @@ footer a{color:var(--text2)}
 <blockquote><p><strong>Last verified:</strong> 2026-04-28 (skeleton — content TBD in BG-79b) <strong>Status:</strong> Living (skeleton) <strong>Update triggers:</strong> src/services/ai/agentic/<strong>, src/app/action-log/</strong>, src/app/admin/action-log/<strong>, ai<em>autonomy</em>settings/ai<em>action</em>cards migrations </strong>Owner:** Will (solo) — review on every commit touching update triggers</p></blockquote>
 <blockquote><p>⚠ <strong>Skeleton only.</strong> This file is an outline created in BG-79. Substantive content is filled in collaboratively in BG-79b (the absorption pass). Each section below lists candidate tickets and code paths from a mechanical match — Will decides relevance during BG-79b.</p></blockquote>
 <hr/>
+<!-- arch-diagram start -->
+<svg class="arch-diagram" viewBox="0 0 680 580" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>Three autonomy levels — Yariv inversion</title>
+<desc>Three side-by-side columns showing Level 0 Assisted, Level 1 Supervised, and Level 2 Autopilot, mapped to where the human sits relative to the AI execution path.</desc>
+
+<text x="40" y="32" font-size="12" fill="#888780">The agentic inversion — same UI, three operating modes</text>
+
+<rect x="40" y="48" width="195" height="420" rx="12" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="137" y="74" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#042C53">L0 — Assisted</text>
+<text x="137" y="94" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0C447C">Today's HZ · default for all</text>
+<line x1="56" y1="110" x2="219" y2="110" stroke="#185FA5" stroke-width="0.5" opacity="0.4"/>
+<text x="56" y="132" font-size="12" fill="#0C447C">Human position</text>
+<text x="56" y="150" font-size="12" font-weight="500" fill="#042C53">In the execution path</text>
+<text x="56" y="180" font-size="12" fill="#0C447C">AI behavior</text>
+<text x="56" y="198" font-size="12" font-weight="500" fill="#042C53">Suggests when asked</text>
+<text x="56" y="228" font-size="12" fill="#0C447C">Surface</text>
+<text x="56" y="246" font-size="12" font-weight="500" fill="#042C53">Intel cards on dashboard</text>
+<text x="56" y="276" font-size="12" fill="#0C447C">Decision gate</text>
+<text x="56" y="294" font-size="12" font-weight="500" fill="#042C53">Agent does everything</text>
+<text x="56" y="324" font-size="12" fill="#0C447C">Training signal</text>
+<text x="56" y="342" font-size="12" font-weight="500" fill="#042C53">Correction delta</text>
+<text x="56" y="358" font-size="12" font-weight="500" fill="#042C53">— what did agent change</text>
+<text x="56" y="388" font-size="12" fill="#0C447C">Admin mode</text>
+<text x="56" y="406" font-size="12" font-weight="500" fill="#042C53">Manages agents directly</text>
+<text x="56" y="436" font-size="12" fill="#0C447C">Compliance fit</text>
+<text x="56" y="454" font-size="12" font-weight="500" fill="#042C53">All markets · low risk</text>
+
+<rect x="245" y="48" width="195" height="420" rx="12" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="342" y="74" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#26215C">L1 — Supervised</text>
+<text x="342" y="94" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#3C3489">Inversion begins</text>
+<line x1="261" y1="110" x2="424" y2="110" stroke="#534AB7" stroke-width="0.5" opacity="0.4"/>
+<text x="261" y="132" font-size="12" fill="#3C3489">Human position</text>
+<text x="261" y="150" font-size="12" font-weight="500" fill="#26215C">In the approval path</text>
+<text x="261" y="180" font-size="12" fill="#3C3489">AI behavior</text>
+<text x="261" y="198" font-size="12" font-weight="500" fill="#26215C">Prepares + queues actions</text>
+<text x="261" y="228" font-size="12" fill="#3C3489">Surface</text>
+<text x="261" y="246" font-size="12" font-weight="500" fill="#26215C">AI Actions Inbox</text>
+<text x="261" y="276" font-size="12" fill="#3C3489">Decision gate</text>
+<text x="261" y="294" font-size="12" font-weight="500" fill="#26215C">Approve · Edit · Reject · Snooze</text>
+<text x="261" y="324" font-size="12" fill="#3C3489">Training signal</text>
+<text x="261" y="342" font-size="12" font-weight="500" fill="#26215C">Approval pattern</text>
+<text x="261" y="358" font-size="12" font-weight="500" fill="#26215C">— what does agent trust</text>
+<text x="261" y="388" font-size="12" fill="#3C3489">Admin mode</text>
+<text x="261" y="406" font-size="12" font-weight="500" fill="#26215C">Configures rules · AI enforces</text>
+<text x="261" y="436" font-size="12" fill="#3C3489">Compliance fit</text>
+<text x="261" y="454" font-size="12" font-weight="500" fill="#26215C">UAE · France sweet spot</text>
+
+<rect x="450" y="48" width="190" height="420" rx="12" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<text x="545" y="74" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#4A1B0C">L2 — Autopilot</text>
+<text x="545" y="94" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#712B13">Full inversion · org-gated</text>
+<line x1="466" y1="110" x2="624" y2="110" stroke="#993C1D" stroke-width="0.5" opacity="0.4"/>
+<text x="466" y="132" font-size="12" fill="#712B13">Human position</text>
+<text x="466" y="150" font-size="12" font-weight="500" fill="#4A1B0C">Out of execution path</text>
+<text x="466" y="180" font-size="12" fill="#712B13">AI behavior</text>
+<text x="466" y="198" font-size="12" font-weight="500" fill="#4A1B0C">Executes autonomously</text>
+<text x="466" y="228" font-size="12" fill="#712B13">Surface</text>
+<text x="466" y="246" font-size="12" font-weight="500" fill="#4A1B0C">Action log + undo window</text>
+<text x="466" y="276" font-size="12" fill="#712B13">Decision gate</text>
+<text x="466" y="294" font-size="12" font-weight="500" fill="#4A1B0C">Allowlisted types · 15min undo</text>
+<text x="466" y="324" font-size="12" fill="#712B13">Training signal</text>
+<text x="466" y="342" font-size="12" font-weight="500" fill="#4A1B0C">Outcome signal</text>
+<text x="466" y="358" font-size="12" font-weight="500" fill="#4A1B0C">— did action work</text>
+<text x="466" y="388" font-size="12" fill="#712B13">Admin mode</text>
+<text x="466" y="406" font-size="12" font-weight="500" fill="#4A1B0C">Manages system, not people</text>
+<text x="466" y="436" font-size="12" fill="#712B13">Compliance fit</text>
+<text x="466" y="454" font-size="12" font-weight="500" fill="#4A1B0C">Low-stakes types only</text>
+
+<text x="40" y="504" font-size="12" fill="#888780">All three signals feed back — agents who stay at L0 still improve L2 for everyone (the flywheel)</text>
+
+<rect x="40" y="516" width="600" height="44" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="340" y="538" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">ai_interactions table captures correction deltas + approvals + outcomes</text>
+<text x="340" y="554" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">→ network effect compounds inside the product</text>
+</svg>
+<p class="arch-diagram-caption">The agentic inversion. As autonomy rises, the human moves from the execution path to the approval path to outside the loop entirely.</p>
+<!-- arch-diagram end -->
+<!-- arch-diagram start -->
+<svg class="arch-diagram" viewBox="0 0 680 530" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>Action types and autonomy ceiling</title>
+<desc>Eight action types mapped to their maximum autonomy level. Two types are permanently locked regardless of org settings.</desc>
+<defs>
+<pattern id="locked-stripe" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+<line x1="0" y1="0" x2="0" y2="6" stroke="#5F5E5A" stroke-width="1" opacity="0.25"/>
+</pattern>
+</defs>
+
+<text x="40" y="32" font-size="12" fill="#888780">Autonomy is configured per action type, not globally</text>
+
+<text x="40" y="76" font-size="14" font-weight="500" fill="#2C2C2A" dominant-baseline="central">Action type</text>
+<text x="380" y="76" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">L0</text>
+<text x="465" y="76" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">L1</text>
+<text x="550" y="76" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">L2</text>
+<text x="630" y="76" text-anchor="end" dominant-baseline="central" font-size="14" font-weight="500" fill="#2C2C2A">Lock</text>
+<line x1="40" y1="90" x2="640" y2="90" stroke="#888780" stroke-width="0.5" opacity="0.5"/>
+
+<text x="40" y="116" font-size="14" fill="#2C2C2A" dominant-baseline="central">Follow-up message</text>
+<rect x="345" y="102" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="430" y="102" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="515" y="102" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="630" y="116" text-anchor="end" dominant-baseline="central" font-size="12" fill="#444441">—</text>
+
+<text x="40" y="152" font-size="14" fill="#2C2C2A" dominant-baseline="central">Viewing reminder</text>
+<rect x="345" y="138" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="430" y="138" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="515" y="138" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="630" y="152" text-anchor="end" dominant-baseline="central" font-size="12" fill="#444441">—</text>
+
+<text x="40" y="188" font-size="14" fill="#2C2C2A" dominant-baseline="central">Lead qualification send</text>
+<rect x="345" y="174" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="430" y="174" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="515" y="174" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="630" y="188" text-anchor="end" dominant-baseline="central" font-size="12" fill="#444441">—</text>
+
+<text x="40" y="224" font-size="14" fill="#2C2C2A" dominant-baseline="central">Checklist task create</text>
+<rect x="345" y="210" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="430" y="210" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<rect x="515" y="210" width="70" height="28" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="630" y="224" text-anchor="end" dominant-baseline="central" font-size="12" fill="#444441">—</text>
+
+<text x="40" y="260" font-size="14" fill="#2C2C2A" dominant-baseline="central">Document send</text>
+<rect x="345" y="246" width="70" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<rect x="430" y="246" width="70" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<rect x="515" y="246" width="70" height="28" rx="4" fill="url(#locked-stripe)" stroke="#888780" stroke-width="0.5"/>
+<text x="630" y="260" text-anchor="end" dominant-baseline="central" font-size="12" fill="#444441">—</text>
+
+<text x="40" y="296" font-size="14" fill="#2C2C2A" dominant-baseline="central">Deal stage advance</text>
+<rect x="345" y="282" width="70" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<rect x="430" y="282" width="70" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<rect x="515" y="282" width="70" height="28" rx="4" fill="url(#locked-stripe)" stroke="#888780" stroke-width="0.5"/>
+<text x="630" y="296" text-anchor="end" dominant-baseline="central" font-size="12" fill="#444441">—</text>
+
+<text x="40" y="332" font-size="14" fill="#2C2C2A" dominant-baseline="central">Portal publish</text>
+<rect x="345" y="318" width="70" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<rect x="430" y="318" width="70" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<rect x="515" y="318" width="70" height="28" rx="4" fill="url(#locked-stripe)" stroke="#888780" stroke-width="0.5"/>
+<text x="630" y="332" text-anchor="end" dominant-baseline="central" font-size="12" fill="#A32D2D">L1 max</text>
+
+<text x="40" y="368" font-size="14" fill="#2C2C2A" dominant-baseline="central">Signing request create</text>
+<rect x="345" y="354" width="70" height="28" rx="4" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<rect x="430" y="354" width="70" height="28" rx="4" fill="url(#locked-stripe)" stroke="#888780" stroke-width="0.5"/>
+<rect x="515" y="354" width="70" height="28" rx="4" fill="url(#locked-stripe)" stroke="#888780" stroke-width="0.5"/>
+<text x="630" y="368" text-anchor="end" dominant-baseline="central" font-size="12" fill="#A32D2D">L0 only</text>
+
+<text x="40" y="416" font-size="12" fill="#888780">Legend</text>
+<rect x="40" y="424" width="22" height="14" rx="3" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="70" y="431" font-size="12" fill="#444441" dominant-baseline="central">Allowed up to L2 — autopilot eligible</text>
+<rect x="40" y="446" width="22" height="14" rx="3" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="70" y="453" font-size="12" fill="#444441" dominant-baseline="central">Allowed up to L1 — supervised only</text>
+<rect x="40" y="468" width="22" height="14" rx="3" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+<text x="70" y="475" font-size="12" fill="#444441" dominant-baseline="central">L0 only — always manual</text>
+<rect x="40" y="490" width="22" height="14" rx="3" fill="url(#locked-stripe)" stroke="#888780" stroke-width="0.5"/>
+<text x="70" y="497" font-size="12" fill="#444441" dominant-baseline="central">Permanently locked — org admin cannot raise</text>
+</svg>
+<p class="arch-diagram-caption">Autonomy is configured per action type. Two types are permanently locked regardless of org settings.</p>
+<!-- arch-diagram end -->
 <h2>Why agentic mode exists</h2>
 <blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97, BL-98 (founder dogfooding for UX intuition) <strong>Likely files:</strong> <code>docs/specs/BL-97-AGENTIC-MODE-SPEC.md</code></p></blockquote>
 <h2>The three autonomy levels (L0 / L1 / L2)</h2>
