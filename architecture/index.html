@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HouseZoom.ai — Architecture</title>
+<title>HouseZoom.ai — Architecture Index</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -21,110 +21,53 @@
   --sans:'DM Sans',sans-serif;
   --r:8px;--r2:12px;--r3:16px;
 }
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
 a{color:var(--purple);text-decoration:none}
 a:hover{text-decoration:underline}
-
-/* NAV */
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
 .nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
 .nav-brand span{color:var(--purple)}
 .nav-links{display:flex;gap:4px;margin-left:auto}
-.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all 0.15s}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
 .nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
 .nav-links a.active{color:var(--purple);background:var(--purple3)}
-
-/* HEADER */
-.page-header{padding:48px 32px 32px;max-width:1200px;margin:0 auto}
-.page-header h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px}
-.page-header p{font-size:15px;color:var(--text2);max-width:600px}
-.badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono);background:var(--purple3);color:var(--purple);border:1px solid var(--purple2);padding:3px 10px;border-radius:20px;margin-bottom:16px}
-.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--purple);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-
-/* MAIN LAYOUT */
-main{max-width:1200px;margin:0 auto;padding:0 32px 80px}
-
-/* SECTION TITLES */
-.section-title{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--border)}
-
-/* ARCHITECTURE DIAGRAM */
-.arch-diagram{position:relative;margin-bottom:48px}
-.arch-diagram svg{width:100%;height:auto}
-
-/* LAYER CARDS */
-.layers{display:flex;flex-direction:column;gap:2px;margin-bottom:48px}
-.layer{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:border-color 0.2s}
-.layer:hover{border-color:var(--border2)}
-.layer-header{padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer}
-.layer-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.layer-name{font-size:14px;font-weight:600;flex:1}
-.layer-tag{font-size:11px;font-family:var(--mono);padding:2px 8px;border-radius:4px;opacity:0.8}
-.layer-status{font-size:11px;font-family:var(--mono);color:var(--text3)}
-.layer-body{padding:0 20px 20px;border-top:1px solid var(--border)}
-.layer-desc{font-size:13px;color:var(--text2);margin:16px 0 12px}
-.layer-components{display:flex;flex-wrap:wrap;gap:8px}
-.component{font-size:12px;font-family:var(--mono);background:var(--bg3);border:1px solid var(--border);padding:4px 10px;border-radius:var(--r)}
-
-/* UX layer */
-.layer.ux{background:linear-gradient(90deg,var(--bg2) 0%,var(--bg3) 100%)}
-.layer.ux .layer-dot{background:#9999aa}
-.layer.ux .layer-tag{background:var(--bg4);color:var(--text2)}
-
-/* Brain layer */
-.layer.brain{background:linear-gradient(90deg,#1a1728 0%,var(--bg2) 100%)}
-.layer.brain .layer-dot{background:var(--purple)}
-.layer.brain .layer-tag{background:var(--purple3);color:var(--purple)}
-
-/* Signal layer */
-.layer.signal{background:linear-gradient(90deg,#1a1218 0%,var(--bg2) 100%)}
-.layer.signal .layer-dot{background:var(--coral)}
-.layer.signal .layer-tag{background:var(--coral3);color:var(--coral)}
-
-/* Data layer */
-.layer.data{background:linear-gradient(90deg,#101820 0%,var(--bg2) 100%)}
-.layer.data .layer-dot{background:var(--blue)}
-.layer.data .layer-tag{background:var(--blue3);color:var(--blue)}
-
-/* AI PIPELINE */
-.pipeline{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px}
-.pipeline-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px}
-.pipeline-card h3{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.pipeline-card h3 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.pipeline-card p{font-size:12px;color:var(--text2);line-height:1.6}
-.pipeline-card .steps{margin-top:12px;display:flex;flex-direction:column;gap:4px}
-.step{font-size:11px;font-family:var(--mono);color:var(--text2);padding:4px 8px;background:var(--bg3);border-radius:4px;display:flex;align-items:center;gap:6px}
-.step-n{color:var(--text3);min-width:14px}
-
-/* MOAT GRID */
-.moat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:48px}
-.moat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px}
-.moat-card.strong{border-color:var(--teal2)}
-.moat-card.building{border-color:var(--amber2)}
-.moat-card.future{border-color:var(--border)}
-.moat-status{font-size:10px;font-family:var(--mono);font-weight:600;letter-spacing:0.8px;margin-bottom:8px}
-.moat-card.strong .moat-status{color:var(--teal)}
-.moat-card.building .moat-status{color:var(--amber)}
-.moat-card.future .moat-status{color:var(--text3)}
-.moat-card h4{font-size:13px;font-weight:600;margin-bottom:6px}
-.moat-card p{font-size:12px;color:var(--text2);line-height:1.5}
-
-/* CONNECTORS */
-.connector-row{display:flex;align-items:center;justify-content:center;height:24px;gap:0}
-.connector-line{width:2px;height:24px;background:var(--border2);margin:0 auto}
-
-/* THREAT */
-.threat-box{background:var(--bg2);border:1px solid #5a2020;border-radius:var(--r2);padding:20px;margin-bottom:48px;display:flex;gap:16px;align-items:flex-start}
-.threat-icon{font-size:20px;flex-shrink:0;margin-top:2px}
-.threat-box h3{font-size:13px;font-weight:600;color:#e05050;margin-bottom:6px}
-.threat-box p{font-size:13px;color:var(--text2);line-height:1.6}
-
-/* FOOTER */
-footer{border-top:1px solid var(--border);padding:24px 32px;font-size:12px;color:var(--text3);display:flex;justify-content:space-between;max-width:1200px;margin:0 auto}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
 </style>
 </head>
 <body>
-
 <nav>
   <span class="nav-brand">House<span>Zoom</span>.ai</span>
   <div class="nav-links">
@@ -133,247 +76,63 @@ footer{border-top:1px solid var(--border);padding:24px 32px;font-size:12px;color
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
   </div>
 </nav>
-
-<div class="page-header">
-  <div class="badge">v1.1 · April 2026 · cross-validated</div>
-  <h1>AI Architecture</h1>
-  <p>System design, data moat, and AI orchestration strategy for HouseZoom.ai. Updated after cross-validation with Gemini and ChatGPT.</p>
-</div>
-
 <main>
-
-  <!-- NORTH STAR -->
-  <div class="section-title">North star</div>
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px;margin-bottom:48px">
-    <p style="font-size:16px;font-weight:500;line-height:1.7;color:var(--text)">
-      HouseZoom is not an AI company that sells real estate software.<br>
-      It's a <span style="color:var(--purple)">real estate workflow company</span> with proprietary AI built on CRM ground truth.
-    </p>
-    <p style="font-size:13px;color:var(--text2);margin-top:12px">The moat is not the models. The moat is accumulated workflow, compliance, correction, and communication data that compounds over time. A standalone LLM wrapper has none of it.</p>
-  </div>
-
-  <!-- SYSTEM LAYERS -->
-  <div class="section-title">System layers</div>
-  <div class="layers">
-
-    <div class="layer ux">
-      <div class="layer-header">
-        <div class="layer-dot"></div>
-        <span class="layer-name">Agent &amp; Admin UX</span>
-        <span class="layer-tag">presentation</span>
-        <span class="layer-status">LIVE</span>
-      </div>
-      <div class="layer-body">
-        <p class="layer-desc">Two interfaces provisioned from the same backend. Agent App is mobile-first (Capacitor iOS + Vercel web). Admin CRM is desktop-first. Like Salesforce org → Salesforce mobile.</p>
-        <div class="layer-components">
-          <span class="component">Next.js 14 App Router</span>
-          <span class="component">Tailwind CSS</span>
-          <span class="component">Capacitor iOS</span>
-          <span class="component">TypeScript</span>
-          <span class="component">i18n: en / fr / de / it</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="connector-line"></div>
-
-    <div class="layer brain">
-      <div class="layer-header">
-        <div class="layer-dot"></div>
-        <span class="layer-name">Brain — Intelligence + Planning</span>
-        <span class="layer-tag">ai · orchestration</span>
-        <span class="layer-status">PARTIAL</span>
-      </div>
-      <div class="layer-body">
-        <p class="layer-desc">Consumes events, updates scores, generates Intel Cards (Intelligence — built). Generates ranked daily action lists per agent (Planning — not yet built). Runs async on schedule — never blocks user actions. Priority queue: real-time leads bypass batch jobs.</p>
-        <div class="layer-components">
-          <span class="component">Claude Sonnet (reasoning)</span>
-          <span class="component">Haiku (classification)</span>
-          <span class="component">P = U×0.4 + V×0.3 + C×0.3</span>
-          <span class="component">Exponential decay scoring</span>
-          <span class="component">Daily Plan agent ⬡ TODO</span>
-          <span class="component">Deal risk alerts ⬡ TODO</span>
-          <span class="component">Buyer-Seller matching</span>
-          <span class="component">Compliance monitor</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="connector-line"></div>
-
-    <div class="layer signal">
-      <div class="layer-header">
-        <div class="layer-dot"></div>
-        <span class="layer-name">Signal Layer</span>
-        <span class="layer-tag">ingestion · events</span>
-        <span class="layer-status">PARTIAL</span>
-      </div>
-      <div class="layer-body">
-        <p class="layer-desc">Detects and normalises inbound events from all channels. Stateless, fast, cheap models. Emits typed events to the activity_events bus with priority tiering. Rate-limited per org to prevent event storms.</p>
-        <div class="layer-components">
-          <span class="component">Portal signals (Bayut · PF)</span>
-          <span class="component">Gmail sync + Pub/Sub</span>
-          <span class="component">WhatsApp (Twilio)</span>
-          <span class="component">CRM events</span>
-          <span class="component">inbound_signals table</span>
-          <span class="component">lead_sessions (72h windows)</span>
-          <span class="component">shadow_listings</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="connector-line"></div>
-
-    <div class="layer data">
-      <div class="layer-header">
-        <div class="layer-dot"></div>
-        <span class="layer-name">Data Layer</span>
-        <span class="layer-tag">persistence · moat</span>
-        <span class="layer-status">LIVE → AWS H2 2026</span>
-      </div>
-      <div class="layer-body">
-        <p class="layer-desc">Supabase (Postgres + Storage + Auth + RLS) today. Planned AWS migration H2 2026: Lambda/ECS for compute, RDS Aurora for DB, S3 for storage, SageMaker for ML. Data gravity rule: compute must migrate alongside DB — not before.</p>
-        <div class="layer-components">
-          <span class="component">Supabase Postgres</span>
-          <span class="component">Supabase Storage</span>
-          <span class="component">pgvector (embeddings)</span>
-          <span class="component">activity_events</span>
-          <span class="component">ai_interactions ⬡ TODO</span>
-          <span class="component">ai_feedback ⬡ TODO</span>
-          <span class="component">communication_graph ⬡ TODO</span>
-          <span class="component">deal_outcomes ⬡ TODO</span>
-          <span class="component">agent_performance ⬡ TODO</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- AI PIPELINE -->
-  <div class="section-title">AI pipeline — how a signal becomes an action</div>
-  <div class="pipeline" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:48px">
-    <div class="pipeline-card">
-      <h3><span class="dot" style="background:var(--coral)"></span>1 · Detect</h3>
-      <p>Raw event arrives from portal, Gmail, WhatsApp, or CRM action.</p>
-      <div class="steps">
-        <div class="step"><span class="step-n">→</span> inbound_signals</div>
-        <div class="step"><span class="step-n">→</span> entity resolution</div>
-        <div class="step"><span class="step-n">→</span> lead_sessions</div>
-      </div>
-    </div>
-    <div class="pipeline-card">
-      <h3><span class="dot" style="background:var(--amber)"></span>2 · Score</h3>
-      <p>Intelligence engine scores the signal: urgency, value, confidence.</p>
-      <div class="steps">
-        <div class="step"><span class="step-n">→</span> P = U×V×C</div>
-        <div class="step"><span class="step-n">→</span> decay applied</div>
-        <div class="step"><span class="step-n">→</span> intel_cards</div>
-      </div>
-    </div>
-    <div class="pipeline-card">
-      <h3><span class="dot" style="background:var(--purple)"></span>3 · Plan</h3>
-      <p>Planning agent assembles ranked daily action list. Specific, contextual, actionable.</p>
-      <div class="steps">
-        <div class="step"><span class="step-n">→</span> daily 7am batch</div>
-        <div class="step"><span class="step-n">→</span> real-time triggers</div>
-        <div class="step"><span class="step-n">→</span> dismiss/snooze loop</div>
-      </div>
-    </div>
-    <div class="pipeline-card">
-      <h3><span class="dot" style="background:var(--teal)"></span>4 · Learn</h3>
-      <p>Agent action (or inaction) feeds back. Corrections captured. Model improves.</p>
-      <div class="steps">
-        <div class="step"><span class="step-n">→</span> ai_feedback</div>
-        <div class="step"><span class="step-n">→</span> delta capture</div>
-        <div class="step"><span class="step-n">→</span> ranking update</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DATA MOAT -->
-  <div class="section-title">Data moat — status</div>
-  <div class="moat-grid">
-    <div class="moat-card strong">
-      <div class="moat-status">STRONG</div>
-      <h4>Compliance graph</h4>
-      <p>Country × property type × deal stage → required docs and checks. High value, expensive to maintain, hard to replicate.</p>
-    </div>
-    <div class="moat-card strong">
-      <div class="moat-status">STRONG</div>
-      <h4>Deal graph</h4>
-      <p>Who is involved, in what role, at what stage, with what documents. Real durations per stage — no public dataset has this.</p>
-    </div>
-    <div class="moat-card building">
-      <div class="moat-status">BUILDING</div>
-      <h4>Communication graph</h4>
-      <p>Who talks to whom, how fast, in what language. Captured but not yet scored. Strongest latent asset — nobody in RE uses it properly.</p>
-    </div>
-    <div class="moat-card building">
-      <div class="moat-status">BUILDING</div>
-      <h4>Agent correction data</h4>
-      <p>Delta between AI draft and what agent actually sent. Delta capture table not yet built — every day without it loses signal.</p>
-    </div>
-    <div class="moat-card future">
-      <div class="moat-status">FUTURE</div>
-      <h4>Deal outcomes</h4>
-      <p>Won/lost reasons, time-to-close per stage. Ground truth for all future ML. Nothing works without this — must be captured from day one.</p>
-    </div>
-    <div class="moat-card future">
-      <div class="moat-status">FUTURE</div>
-      <h4>Cross-org intelligence</h4>
-      <p>"Marina deals close 18% faster with X pricing." Anonymized benchmarks across agencies. Network effect moat — requires scale.</p>
-    </div>
-  </div>
-
-  <!-- THREAT -->
-  <div class="section-title">Existential threat</div>
-  <div class="threat-box">
-    <div class="threat-icon">⚠</div>
-    <div>
-      <h3>Portals moving upstream</h3>
-      <p>PropertyFinder, Bayut, and SeLoger already own distribution AND data exhaust. They see: lead → click → contact → conversion. We only see: lead → agent actions. If they ship "AI CRM-lite," the top-of-funnel moat compresses fast.</p>
-      <p style="margin-top:8px"><strong style="color:var(--text)">Defense:</strong> our moat must be <em>inside the deal</em> — compliance, document workflow, multi-party signing, deal orchestration. Portals cannot easily follow here. Double down on this layer.</p>
-    </div>
-  </div>
-
-  <!-- AUTONOMY MODEL -->
-  <div class="section-title">Autonomy model</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:48px">
-    <div style="background:var(--teal3);border:1px solid var(--teal2);border-radius:var(--r2);padding:20px">
-      <div style="font-size:11px;font-weight:600;letter-spacing:0.8px;color:var(--teal);margin-bottom:12px">AUTONOMOUS</div>
-      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text2)">
-        <span>Intel Card generation</span>
-        <span>Daily plan generation</span>
-        <span>Compliance recalculation</span>
-        <span>Document reminder sends</span>
-        <span>Calendar scheduling (confirmed)</span>
-      </div>
-    </div>
-    <div style="background:var(--amber3);border:1px solid var(--amber2);border-radius:var(--r2);padding:20px">
-      <div style="font-size:11px;font-weight:600;letter-spacing:0.8px;color:var(--amber);margin-bottom:12px">HUMAN-IN-THE-LOOP</div>
-      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text2)">
-        <span>All client-facing comms</span>
-        <span>Contract document generation</span>
-        <span>Listing content</span>
-        <span>Price recommendations</span>
-      </div>
-    </div>
-    <div style="background:#2a1010;border:1px solid #5a2020;border-radius:var(--r2);padding:20px">
-      <div style="font-size:11px;font-weight:600;letter-spacing:0.8px;color:#e05050;margin-bottom:12px">NEVER AUTONOMOUS</div>
-      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--text2)">
-        <span>Financial commitments</span>
-        <span>Document signature initiation</span>
-        <span>Deal stage advancement</span>
-        <span>Contact deletion</span>
-      </div>
-    </div>
-  </div>
-
+  
+  
+  <div class="content"><h1>Architecture Index</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 <strong>Status:</strong> Living <strong>Update triggers:</strong> new architecture file added; module map changes; invariant changes <strong>Owner:</strong> Will (solo) — review on every commit touching update triggers</p></blockquote>
+<h2>What HouseZoom is (one paragraph)</h2>
+<p>HouseZoom.ai is an AI-powered, multi-tenant real estate CRM for agents. Multi-market: UAE (primary), France, Switzerland, Italy. Built on Next.js 14 (App Router) + TypeScript + Tailwind, with Supabase (Postgres + Storage + Auth + RLS) as the backend, deployed on Vercel. iOS distribution via Capacitor in remote URL mode (loads the live Vercel build). AI features run on Anthropic Claude (Sonnet + Haiku) via a central <code>ai_service</code> wrapper. The product positions itself as a real-estate workflow company with proprietary AI built on CRM ground truth — not an AI company that sells real-estate software (see <a href="strategy.html"><code>STRATEGY.md</code></a>).</p>
+<h2>Stack at a glance</h2>
+<table><thead><tr><th>Layer</th><th>Tech</th><th>Notes</th></tr></thead><tbody><tr><td>Frontend</td><td>Next.js 14 App Router, TypeScript, Tailwind CSS</td><td>Mobile-first; agents use this in the field</td></tr><tr><td>Backend</td><td>Next.js API routes (Vercel serverless)</td><td>Thin route handlers; business logic in service classes</td></tr><tr><td>Database</td><td>Supabase (Postgres 15 + RLS)</td><td>Org-scoped via <code>org_id</code> everywhere; pgvector available</td></tr><tr><td>Storage</td><td>Supabase Storage</td><td>Always <code>storage_path</code> columns — never absolute URLs</td></tr><tr><td>AI</td><td>Anthropic Claude (Sonnet, Haiku) via <code>ai_service</code> wrapper</td><td>See <a href="agentic.html"><code>agentic.md</code></a>, <a href="qa-engine.html"><code>qa-engine.md</code></a></td></tr><tr><td>Cache</td><td>Upstash Redis (Vercel ↔ Upstash integration)</td><td>See <a href="cache.html"><code>cache.md</code></a></td></tr><tr><td>i18n</td><td>next-intl, 4 locales (EN / FR / DE / IT), AR pending BL-121</td><td>See <a href="i18n.html"><code>i18n.md</code></a></td></tr><tr><td>iOS</td><td>Capacitor (remote URL mode, WKWebView)</td><td>TestFlight only for native config / icons / native plugins</td></tr><tr><td>Email</td><td>Resend (<code>noreply@housezoom.ai</code>)</td><td>Transactional</td></tr><tr><td>WhatsApp</td><td>Twilio (sandbox)</td><td>Production number pending Meta verification (NU-5)</td></tr><tr><td>E-Signature</td><td>DocuSign (sandbox)</td><td></td></tr><tr><td>Hosting</td><td>Vercel (project <code>house-zum</code>)</td><td>AWS migration tracked H2 2026 — see <a href="strategy.html"><code>STRATEGY.md</code></a></td></tr></tbody></table>
+<h2>High-level data flow</h2>
+<pre><code>┌──────────────────────────────────────────────────────────────────────┐
+│ Client (Next.js App Router pages, Capacitor iOS via remote URL mode) │
+└───────────────────────────────────┬──────────────────────────────────┘
+                                    │
+                              auth + org context
+                                    │
+                                    ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│ Next.js API routes (thin: auth + service call + response)            │
+│   src/app/api/**                                                     │
+└───────────────────────────────────┬──────────────────────────────────┘
+                                    │
+                       ┌────────────┼─────────────┐
+                       ▼            ▼             ▼
+                  ┌────────┐  ┌─────────┐   ┌──────────┐
+                  │Supabase│  │ AI      │   │ External │
+                  │ + RLS  │  │ service │   │ adapters │
+                  │        │  │ wrapper │   │ (Resend, │
+                  │ org_id │  │         │   │  Twilio, │
+                  │ on all │  │ Claude  │   │  DocuSign│
+                  │ tables │  │ Sonnet/ │   │  Gmail,  │
+                  │        │  │ Haiku   │   │  portals)│
+                  └────────┘  └────┬────┘   └──────────┘
+                                   │
+                              ┌────┴─────┐
+                              ▼          ▼
+                        ┌─────────┐ ┌──────────┐
+                        │ Upstash │ │ Action   │
+                        │ Redis   │ │ Cards    │
+                        │ (Q&amp;A    │ │ (BL-97)  │
+                        │  cache) │ │          │
+                        └─────────┘ └──────────┘</code></pre>
+<!-- TODO: verify with Will — diagram is generated from current code knowledge; refresh in BG-79b. -->
+<h2>Module map</h2>
+<table><thead><tr><th>Doc</th><th>What it covers</th></tr></thead><tbody><tr><td><a href="strategy.html"><code>STRATEGY.md</code></a></td><td>Strategic "why" — extracted 2026-04-02 thinking on AI strategy, AWS migration, GDPR, autonomy levels, data moat</td></tr><tr><td><a href="agentic.html"><code>agentic.md</code></a></td><td>BL-97 Agentic Mode — L0 / L1 / L2 autonomy, Action Cards, AI Actions Inbox</td></tr><tr><td><a href="qa-engine.html"><code>qa-engine.md</code></a></td><td>BL-60 / BL-114 / BL-115 / BL-115b Q&amp;A engine pipeline</td></tr><tr><td><a href="cache.html"><code>cache.md</code></a></td><td>BL-106 Upstash Redis cache + extension patterns</td></tr><tr><td><a href="i18n.html"><code>i18n.md</code></a></td><td>BL-120 i18n architecture — locale matrix, integration surfaces, browser auto-translate guard</td></tr><tr><td><a href="multi-tenancy.html"><code>multi-tenancy.md</code></a></td><td>RLS, <code>org_id</code>, RBAC, tenant isolation, security boundary patterns</td></tr><tr><td><a href="signing.html"><code>signing.md</code></a></td><td>Signing subsystem — template canvas, multi-recipient routing, draw-then-strip PDF rendering, signature accumulation, fully-executed lifecycle</td></tr><tr><td><a href="crm.html"><code>crm.md</code></a></td><td>Deals + contacts + leads + viewings + Intel Cards (V2 <code>entity_parties</code> + <code>activity_events</code> polymorphic foundation)</td></tr><tr><td><a href="photo-intelligence.html"><code>photo-intelligence.md</code></a></td><td>Photo annotation pipeline, room detection (Vision → planned CLIP/ViT), walkthrough subsystem, corpus catalog</td></tr><tr><td><a href="portal.html"><code>portal.md</code></a></td><td>Country-agnostic portal subsystem — adapter pattern + canonical mapper, simulator, signal pipeline</td></tr></tbody></table>
+<h2>Invariants (the rules that never change)</h2>
+<p>These come from <code>WAYS-OF-WORKING.md</code> (the canonical home for non-negotiable rules). Changes belong there first; this section mirrors.</p>
+<ul><li><strong><code>org_id</code> on everything.</strong> Every table has <code>org_id</code>. RLS enforced at the DB level. Never filter by org in application code as primary security — the DB enforces it.</li><li><strong>No hardcoded market-specific values.</strong> Currency codes, country names, license labels, API URLs — all via lookup maps or <code>useOrg()</code>. UAE values are fallback only, never the primary path.</li><li><strong>Service-layer DB access.</strong> Components and hooks never import <code>supabase</code> directly. All DB access goes through service files in <code>src/features/{domain}/services/</code> or <code>src/services/</code>.</li><li><strong>Thin route handlers.</strong> API routes do auth + service call + response. Business logic lives in service classes — required for AWS Lambda migration compatibility.</li><li><strong>All AI calls go through the central wrapper.</strong> No direct Anthropic/OpenAI SDK calls in components. Model routing, cost control, and logging in one place.</li><li><strong>Fail-open for AI / cache / external services.</strong> If Claude or Upstash or Twilio is down, the user-facing surface degrades gracefully — never blocks an agent action.</li><li><strong>Storage paths only.</strong> Never store absolute URLs in DB. Always <code>storage_path</code> columns. Maps cleanly to S3 on AWS migration.</li></ul>
+<!-- TODO: verify completeness with Will in BG-79b — these are pulled from WAYS-OF-WORKING.md's "Country-Agnostic Architecture" + "No Hardcoding Principle" + Process Atlas v1.1 architectural rules. -->
+<h2>Where to read next</h2>
+<ul><li><strong>New to the codebase?</strong> Read <code>PROJECT-STRUCTURE.md</code>, then this file, then <a href="strategy.html"><code>STRATEGY.md</code></a>.</li><li><strong>Working on AI features?</strong> Read <a href="agentic.html"><code>agentic.md</code></a> and <a href="qa-engine.html"><code>qa-engine.md</code></a>.</li><li><strong>Working on auth / RLS / tenancy?</strong> Read <a href="multi-tenancy.html"><code>multi-tenancy.md</code></a>.</li><li><strong>Working on translations?</strong> Read <a href="i18n.html"><code>i18n.md</code></a>.</li><li><strong>Working on cache?</strong> Read <a href="cache.html"><code>cache.md</code></a>. Operational procedures (flushing, inspecting keys) live in <code>WAYS-OF-WORKING.md</code> § "Cache Invalidation Mental Model (BL-106)".</li></ul>
+<h2>Document governance</h2>
+<p>This folder is governed by the Documentation Governance Protocol in <code>WAYS-OF-WORKING.md</code> § "Documentation Governance". Each doc has an <code>Update triggers:</code> line in its header — when a commit touches a triggering file path, the corresponding doc must be updated in the same commit (or the commit message must say <code>Docs impact: none</code>). Enforced by <code>scripts/docs-check.mjs</code> in CI.</p></div>
 </main>
-
-<footer style="border-top:1px solid var(--border);padding:24px 32px;font-size:12px;color:var(--text3);display:flex;justify-content:space-between">
-  <span>HouseZoom.ai Process Atlas</span>
-  <span>Architecture v1.1 · April 2026 · cross-validated with Gemini + ChatGPT</span>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/INDEX.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
 </footer>
-
 </body>
 </html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Cache Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / cache.md</div>
+  
+  <div class="content"><h1>Cache Architecture</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 <strong>Status:</strong> Living <strong>Update triggers:</strong> src/services/ai/qa-cache.service.ts, future src/services/*-cache.service.ts files, Upstash provisioning changes <strong>Owner:</strong> Will (solo) — review on every commit touching update triggers</p></blockquote>
+<blockquote><p>Canonical reference for response/data caches in HouseZoom. Operational procedures (flushing, inspecting keys, invalidation triggers) live in <code>WAYS-OF-WORKING.md</code> § "Cache Invalidation Mental Model (BL-106)".</p></blockquote>
+<hr/>
+<h2>What's cached today</h2>
+<p>A single cache use case as of 2026-04: the <strong>Q&amp;A engine response cache</strong> (BL-106, shipped 2026-04-18).</p>
+<ul><li><strong>Backend:</strong> Upstash Redis, provisioned via the Vercel ↔ Upstash integration. Frankfurt region, 256MB with eviction enabled, 500k commands/month on the free tier.</li><li><strong>Client:</strong> <code>@upstash/redis</code> REST client, instantiated via <code>Redis.fromEnv()</code>.</li><li><strong>Implementation:</strong> <code>src/services/ai/qa-cache.service.ts</code></li><li><strong>Wired into:</strong> <code>src/services/ai/qa-engine.service.ts</code> (top-level engine entry point)</li></ul>
+<hr/>
+<h2>Q&amp;A response cache (BL-106)</h2>
+<h3>Why it exists</h3>
+<p>The Q&amp;A engine's cold path runs intent matcher → context assembler → data sieve → answer polisher, all of which involve LLM calls. Cold avg latency was ~3.3s. The cache is a pure memoization layer over the engine's top-level entry point — same input, same output, returned in &lt;50ms instead of seconds.</p>
+<p>Measured impact at ship:</p>
+<ul><li>Warm hit rate: <strong>86%</strong></li><li>p50 latency: 4,277ms → <strong>761ms</strong></li><li>avg latency: 3,783ms → <strong>1,342ms</strong></li></ul>
+<h3>Cache key</h3>
+<p>Algorithm: <code>SHA-256</code> hex over a canonical JSON of the input tuple.</p>
+<p>Key shape: <code>qa:v1:{sha256-hex}</code></p>
+<p>Inputs hashed: | Field | Source | Empty value | |-------|--------|-------------| | <code>q</code> | normalized question | — | | <code>p</code> | <code>property_id</code> | <code>''</code> | | <code>d</code> | <code>deal_id</code> | <code>''</code> | | <code>c</code> | <code>org_country_default</code> | — |</p>
+<p>The <code>v1:</code> prefix is a deliberate version namespace. If we change normalization, key inputs, or response shape, bump to <code>v2:</code> and old keys age out via TTL — no flush required.</p>
+<h3>Why light normalization (not stemming, not filler-word stripping)</h3>
+<p>Question normalization is deliberately minimal: <code>lowercase</code> + <code>trim</code> + collapse internal whitespace. Nothing else.</p>
+<p>Aggressive normalization (stemming, removing "the"/"a"/"is", synonym substitution) risks collapsing semantically-different questions onto the same cache key. "What is the price?" and "What was the price?" are different questions with different correct answers in the deal-history context.</p>
+<p>The cache is a <strong>memoization layer, not a semantic similarity layer</strong>. Synonym handling is the intent matcher's job upstream. The cache only catches identical (or near-identical) re-asks.</p>
+<h3>TTL strategy</h3>
+<table><thead><tr><th>Scope</th><th>TTL</th><th>Rationale</th></tr></thead><tbody><tr><td><strong>Scoped</strong> (<code>deal_id</code> or <code>property_id</code> present)</td><td>15 min</td><td>Deal/property data mutates; bounded staleness window keeps cached answers from drifting too far from reality</td></tr><tr><td><strong>Org-only</strong> (no deal/property)</td><td>24h</td><td>Org-level KB and country defaults are effectively static within a day</td></tr></tbody></table>
+<p>TTL is selected by <code>pickTtl()</code> based on whether either scope ID is present in the input.</p>
+<h3>What's NOT cached (guardrails)</h3>
+<p>The <code>isCacheable()</code> predicate gates all cache writes. Two response shapes are skipped:</p>
+<ul><li><strong><code>answer_type === 'clarification_needed'</code></strong> — these are low-confidence misses where the engine is asking the user for more info. Caching them locks in the bad classification: every future asker of the same question gets the same "I need more context" response, even after the underlying data improves.</li><li><strong><code>data_gap_flag === 'stale'</code></strong> — staleness is a signal that the data has moved past its freshness window. Caching a stale answer defeats the entire freshness model.</li></ul>
+<p>Everything else is cacheable, including <code>fallback/null</code> and <code>fallback/nyt</code> (not-yet-tracked) responses. Those are legitimate, deterministic outputs of the engine's data sieve.</p>
+<p>The schema fallback path (BL-115) also writes nothing to the cache by design — it's an escape hatch for column-level reads where caching the wrong shape early would be hard to invalidate.</p>
+<h3>Pipeline placement</h3>
+<p>The cache check sits at the <strong>very top</strong> of the engine entry point (<code>handleQaRequest</code> in <code>qa-engine.service.ts</code>) — before the intent matcher, before context assembly, before any LLM call. On hit, the response returns immediately with <code>match_source</code> overridden to <code>'cache'</code> so downstream observability can distinguish cache hits from cold runs.</p>
+<p>The cache write sits at the <strong>very bottom</strong> — after the answer polisher has produced the final user-facing string. We cache the polished response, not intermediate state.</p>
+<pre><code>┌─────────────────────────────────────┐
+│ POST /api/ai/qa                     │
+└──────────────┬──────────────────────┘
+               │
+       ┌───────▼────────┐
+       │ buildCacheKey  │
+       └───────┬────────┘
+               │
+       ┌───────▼─────────────────┐
+       │ getCachedResponse(key)  │
+       └───────┬─────────────────┘
+               │
+       ┌───────▼─────────┐    HIT    ┌──────────────────────────┐
+       │ cached?         ├───────────► return {...resp,         │
+       └───────┬─────────┘           │   match_source:'cache'}  │
+               │ MISS                └──────────────────────────┘
+               │
+       ┌───────▼──────────────────────┐
+       │ handleQaRequest cold path:   │
+       │ intent → ctx → sieve → polish│
+       └───────┬──────────────────────┘
+               │
+       ┌───────▼─────────────────┐
+       │ isCacheable(response)?  │
+       └───────┬─────────────────┘
+               │ YES
+       ┌───────▼─────────────────┐
+       │ setCachedResponse(...,  │
+       │ pickTtl(input))         │
+       └───────┬─────────────────┘
+               │
+               ▼  return response</code></pre>
+<h3>Failure mode</h3>
+<p><strong>Fail open.</strong> Both <code>getCachedResponse()</code> and <code>setCachedResponse()</code> wrap their Redis calls in try/catch, log a warning on failure, and return <code>null</code>/<code>void</code>. Redis being slow, unreachable, or rate-limited must never break a Q&amp;A request — the engine just runs cold.</p>
+<p>This is enforced at the primitive level: nothing in the call site needs to know about cache failures.</p>
+<h3>Invalidation</h3>
+<p><strong>v1 has no active invalidation. TTL is the only safety net.</strong> This is a deliberate v1 simplicity choice.</p>
+<p>Operational consequence: if a deal is updated (price change, new participant, status flip), cached answers reflecting the old state remain valid for up to 15 minutes. For most Q&amp;A surfaces (viewing mode, property page assistant) this is acceptable — agents are not in the loop at sub-15-minute latency.</p>
+<p>When to add active invalidation, plus the recommended Supabase Database Webhook → <code>/api/internal/cache-invalidate</code> → <code>redis.del(pattern)</code> flow, is documented in <code>WAYS-OF-WORKING.md</code> § "Cache Invalidation Mental Model (BL-106)".</p>
+<hr/>
+<h2>Environment &amp; infrastructure</h2>
+<table><thead><tr><th>Var</th><th>Purpose</th><th>Used by</th></tr></thead><tbody><tr><td><code>KV_REST_API_URL</code></td><td>Upstash REST endpoint</td><td><code>Redis.fromEnv()</code></td></tr><tr><td><code>KV_REST_API_TOKEN</code></td><td>Read/write token</td><td><code>Redis.fromEnv()</code></td></tr><tr><td><code>KV_REST_API_READ_ONLY_TOKEN</code></td><td>Read-only token</td><td>(unused today)</td></tr><tr><td><code>KV_URL</code></td><td><code>redis://</code> URL</td><td>(unused by app; useful for redis-cli)</td></tr><tr><td><code>REDIS_URL</code></td><td>Same as <code>KV_URL</code></td><td>redis-cli snippets in WAYS-OF-WORKING</td></tr></tbody></table>
+<p>All five are auto-injected by the Vercel ↔ Upstash integration. They are present in <code>.env.local</code> and Vercel Production env.</p>
+<p>Free tier ceiling: 256MB storage with eviction, 500k commands/month. No paid plan today. Monitored manually via the Upstash console.</p>
+<hr/>
+<h2>Extending the cache to new features</h2>
+<p>When adding caching to a new service (BL-97 action card resolution, market analysis, anything slow + idempotent):</p>
+<ol><li><strong>Don't reuse <code>qa-cache.service.ts</code></strong> — it's tightly typed to <code>QaResponse</code>. Create a sibling service (<code>action-card-cache.service.ts</code>, etc.).</li><li><strong>Reuse the patterns</strong>:  - <code>Redis.fromEnv()</code> client — same Upstash instance, no new provisioning needed  - SHA-256 key with versioned prefix (<code>{feature}:v1:</code>)  - Fail-open get/set (try/catch → log + return <code>null</code>/<code>void</code>)  - <code>isCacheable(resp)</code> guard for low-confidence or stale results  - TTL picked by scope, not hardcoded at the call site</li><li><strong>Pick TTLs deliberately.</strong> The cache is a correctness/freshness tradeoff. Default to short.</li><li><strong>Add a section to this doc</strong> mirroring the BL-106 structure (Why / Key / Normalization / TTL / Guardrails / Placement / Failure / Invalidation).</li><li><strong>Update <code>WAYS-OF-WORKING.md</code></strong> with new operational notes — flush command if the key prefix differs, invalidation trigger if applicable.</li></ol>
+<hr/>
+<h2>What to watch</h2>
+<ul><li><strong>Free tier ceiling.</strong> 500k commands/month and 256MB. Current Q&amp;A volume is well within budget, but adding cache use cases multiplies command volume. Upgrade trigger: monthly commands cross ~80% of the limit, OR eviction starts firing visibly (cold rate climbing without TTL expiry).</li><li><strong>Active invalidation pressure.</strong> The 15-min scoped TTL is fine today. The first user-visible "I edited the deal but the assistant still says the old price" complaint is the signal to ship the webhook-based invalidation pattern from WAYS-OF-WORKING.</li><li><strong>Cache stampede.</strong> No single-flight protection today. If a popular question's TTL expires under load, every concurrent request runs the engine cold. Acceptable at v1 traffic; revisit at scale.</li><li><strong>Single-region latency.</strong> Frankfurt-only. UAE users hit transatlantic latency on every Redis op (~80–100ms). Still beats cold engine runs, so acceptable today. Revisit if/when we provision a UAE-regional Upstash instance, or if the multi-region story for the broader app firms up.</li><li><strong>Locale-keyed responses.</strong> Cache key currently includes <code>org_country_default</code> but NOT user locale. With BL-120 i18n shipped and BL-121 (AR) in flight, this becomes wrong as soon as Q&amp;A responses start being locale-aware (BG-72). Add <code>locale</code> to the key inputs and bump to <code>qa:v2:</code> when BG-72 lands.</li></ul>
+<hr/>
+<p><em>Last updated: 2026-04-28 — BG-74 (architecture doc backfill for BL-106)</em></p></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/cache.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

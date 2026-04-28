@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Photo Intelligence Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / photo-intelligence.md</div>
+  
+  <div class="meta-banner">
+    <span class="meta-pill meta-status-stable">Status: stable</span>
+    <span class="meta-pill">Last updated: 2026-04-28</span>
+    <span class="meta-pill">Absorbed tickets: 7</span>
+  </div>
+  <div class="content"><h1>Photo Intelligence Architecture</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 <strong>Status:</strong> Living <strong>Update triggers:</strong> src/features/walkthrough/<strong>, src/app/api/photos/</strong>, src/app/api/walkthrough/<strong>, src/app/admin/photo-intelligence/</strong>, scripts/seed-corpus.mjs, scripts/photo-data.mjs, scripts/photo-data.catalog.mjs, scripts/dedup-photos.mjs, scripts/run-bulk-eval.mjs <strong>Owner:</strong> Will (solo) — review on every commit touching update triggers</p></blockquote>
+<h2>Scope</h2>
+<p>Photo annotation pipeline (corpus-based labeling for ML training), room detection (Claude Vision today, planned CLIP/ViT migration per <a href="strategy.html"><code>STRATEGY.md</code></a>), walkthrough subsystem (reorder, share, branded public URL), corpus catalog (curated URLs, property-pollution discipline), photo optimization pipeline (planned: portal presets via sharp).</p>
+<p><strong>Doesn't cover:</strong> Q&amp;A over photos (see <a href="qa-engine.html"><code>qa-engine.md</code></a>); deal-side document linking (see <code>crm.md § Documents</code>); signing-PDF rendering (see <a href="signing.html"><code>signing.md</code></a>).</p>
+<h2>Annotation pipeline</h2>
+<p><strong>BG-25</strong> — annotation queue cascade fixes. The headline bug ("queue shows 0/0") had four overlapping causes that surfaced as a single symptom; the fix is canonical for several React/state patterns.</p>
+<ul><li><strong>Counter query target.</strong> <code>photo_evaluations</code> (empty in dev) ≠ <code>photo_annotations</code> corpus. The counter must query the same table the loader reads — naming-similar but distinct tables silently agree on emptiness.</li><li><strong><code>credentials: 'include'</code> on the queue API call.</strong> Same systemic pattern as BG-24 in signing — Vercel same-origin auth cookies don't propagate without explicit credentials. See WAYS-OF-WORKING § "Fetch Credentials Rule".</li><li><strong><code>useCallback</code> stale closure on <code>orgId</code>.</strong> <code>loadQueue</code> was bound to a stale <code>orgId</code> because the dep array didn't include it. <strong>Pattern:</strong> <code>useCallback</code>/<code>useEffect</code> deps must include every value used inside; stale closures silently submit/load against <code>undefined</code> or prior values.</li><li><strong><code>loadQueue</code> fired before <code>orgId</code> resolved.</strong> OrgProvider resolves async; effects that depend on <code>orgId</code> must guard <code>if (!orgId) return</code> or wait for <code>orgLoading=false</code>.</li></ul>
+<p><strong>Architectural significance:</strong> these four are general patterns, not annotation-specific. The same shape recurs in any "load-on-mount, requires auth + org context" component. BG-25's checklist is the canonical diagnostic when an admin loader silently shows zero.</p>
+<h2>Room detection</h2>
+<p><strong>BL-86</strong> — auto room detection on photo upload via Claude Vision (Haiku model).</p>
+<ul><li>Fire-and-forget: room classification fires after upload completes, doesn't block the agent. ~$0.0003/photo at Haiku pricing.</li><li>API route: <code>src/app/api/photos/detect-room/route.ts</code>. Component integration: <code>PhotoGallery.tsx</code>.</li><li>Result writes a <code>room_type</code> tag onto the photo row.</li><li><strong>Architectural significance: the classifier is a swappable boundary.</strong> Today it calls Claude Vision via the central <code>ai_service</code> wrapper (per STRATEGY.md "AI wrapper only" rule). Tomorrow's CLIP/ViT migration (also per STRATEGY.md, gated on 5k labeled examples from BL-54b) swaps the implementation behind the same route boundary — the rest of the app cares only that <code>detect-room</code> returns a room tag. <strong>Don't leak Claude/Anthropic-specific shape into callers.</strong></li></ul>
+<h2>Walkthrough subsystem</h2>
+<p><strong>BL-87</strong> (D-157) — Media Intelligence: Walkthrough Reorder &amp; Cover Photo. <strong>BL-89</strong> (D-160) — Walkthrough Public Share URL + Portal Distribution.</p>
+<ul><li><strong><code>walkthrough_orderings</code> table</strong> persists the agent's saved slide sequence (migration <code>20260331_bl87_walkthrough_orderings.sql</code>). The default order is AI-derived; agents can drag-reorder, and the saved order is delta-tracked against the AI baseline (training-signal capture).</li><li><strong><code>buildSlidesOrdered</code></strong> (in <code>walkthroughService.ts</code>) bypasses the AI re-sort when a saved order exists. <strong>Invariant:</strong> when a saved ordering exists, never re-run the AI sorter — that erases the agent's choice and silently overrides their training signal. The walkthrough has its own ordering invariant separate from photo gallery ordering (which doesn't persist).</li><li><strong>Cover photo selection</strong> (BL-87b): star button on grid cards + lightbox. The star is the only entry point — don't add cover-toggle UI elsewhere; this is the canonical surface.</li><li><strong>Media event tracking</strong>: viewed, play_started, progress (25/50/75/100%), completed, dwelled. Persisted in <code>media_events</code> table. Training-signal capture for engagement-based reordering downstream.</li><li><strong>BL-89 — Public share URL</strong>. Public <code>/w/[token]</code> page (no auth, full player, "Powered by HouseZoom" branding). Share button in <code>WalkthroughPlayer</code> (native share sheet / clipboard fallback). Token persisted in <code>listing_metadata</code> JSONB — <strong>no migration needed</strong> (the metadata-JSONB-as-extension-bag pattern is canonical for token-bearing fields that don't warrant their own column). Wired into Bayut <code>&amp;lt;VirtualTourURL&amp;gt;</code> and PropertyFinder <code>virtual_tour_url</code> via <code>canonicalMapper</code> — see <a href="portal.html"><code>portal.md</code></a> for the adapter pattern.</li></ul>
+<h2>Corpus catalog</h2>
+<p><strong>BL-84</strong> — 731 curated photo URLs merged into <code>photo-data.mjs</code> (bedroom +80, amenity +110, view +81, dining +81). <strong>BL-94</strong> (D-165) — corpus property_id=null discipline.</p>
+<ul><li><strong>Corpus photos vs property photos are intentionally separate.</strong> Corpus photos exist for ML labeling/training and have <code>property_id = NULL</code>. Property photos belong to a real listing and have a non-null <code>property_id</code>. The two share the <code>photos</code> table but the discipline is enforced at the seeder level.</li><li><strong>BL-94 lesson (canonical):</strong> an earlier version of <code>seed-corpus.mjs</code> called <code>getOrCreateCorpusProperty()</code> which fabricated fake property rows to satisfy the foreign key. Those fake rows then leaked onto the Listings page. <strong>Fix and invariant:</strong> <code>property_id: null</code> is the only correct value for corpus inserts. Never fabricate property rows for the corpus side. The <code>--wipe-corpus</code> flag added in BL-94 is the safe-by-default discipline (per <code>multi-tenancy.md § Security</code> Data Safety Guardrails — destructive scripts require explicit override flags).</li><li><strong><code>photo_annotations</code> FK is <code>ON DELETE RESTRICT</code></strong> (BL-103). Annotation training data outlives any single property. RESTRICT prevents cascade-delete loss when a property is removed. Cross-link to <code>multi-tenancy.md § Security</code>.</li><li>Catalog tooling: <code>scripts/photo-data.mjs</code> (the curated URL list), <code>scripts/photo-data.catalog.mjs</code> (allocator — deterministic shuffle, global pool, refill on exhaustion), <code>scripts/dedup-photos.mjs</code> (filename-keyed dedup, dry-run support), <code>scripts/run-bulk-eval.mjs</code> (BL-54a Claude Vision evaluation across all properties).</li></ul>
+<h2>Photo Optimization Pipeline</h2>
+<p><strong>BL-88</strong> — Photo Optimization Pipeline spec (planned).</p>
+<ul><li><strong>Status: spec only</strong> as of 2026-04. Spec at <code>docs/specs/BL-88-PHOTO-OPTIMIZATION-SPEC.md</code> is canonical. Implementation pending.</li><li>Scope: portal-specific presets (Bayut wants W×H, max KB; PropertyFinder different; SeLoger different again), <code>sharp</code> pipeline for resize+compress, market defaults (UAE vs FR vs CH photo style differences), originals preserved.</li><li><strong>Architectural placement:</strong> the pipeline runs <em>before</em> portal feed serialization (see <code>portal.md § Portal Publishing Engine</code>). The canonicalMapper consumes already-optimized photos. Don't conflate "photo storage" (<code>storage_path</code>, original) with "portal-ready photo" (resized, compressed per portal preset).</li></ul>
+<h2>Related docs</h2>
+<ul><li><a href="strategy.html"><code>STRATEGY.md</code></a> — multi-model architecture (Claude Vision today → planned CLIP/ViT). Photo intelligence is the canonical example of "swappable model boundary".</li><li><a href="qa-engine.html"><code>qa-engine.md</code></a> — photo-related Q&amp;A surfaces (e.g. "what rooms does this property have?") read photo + annotation tables but the pipeline is QA-engine territory.</li><li><a href="portal.html"><code>portal.md</code></a> — portal feed adapters consume optimized photos + walkthrough share URLs. Cross-link with § Walkthrough subsystem (BL-89 portal distribution wiring).</li><li><code>multi-tenancy.md § Security</code> — Data Safety Guardrails (BL-103 RESTRICT FK + <code>--dry-run</code> discipline) covers corpus-protection patterns.</li><li>Spec: <code>docs/specs/BL-88-PHOTO-OPTIMIZATION-SPEC.md</code>, plus <code>BL-87-MEDIA-INTELLIGENCE-SPEC.md</code> and <code>BL-87-WALKTHROUGH-REORDER-SPEC.md</code>.</li></ul></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/photo-intelligence.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — CRM Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / crm.md</div>
+  
+  <div class="meta-banner">
+    <span class="meta-pill meta-status-stable">Status: stable</span>
+    <span class="meta-pill">Last updated: 2026-04-28</span>
+    <span class="meta-pill">Absorbed tickets: 16</span>
+  </div>
+  <div class="content"><h1>CRM Architecture</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 <strong>Status:</strong> Living <strong>Update triggers:</strong> src/features/deals/<strong>, src/features/contacts/</strong>, src/features/leads/<strong>, src/features/viewings/</strong>, src/features/intel/<strong> </strong>Owner:** Will (solo) — review on every commit touching update triggers</p></blockquote>
+<h2>Scope</h2>
+<p>The CRM core: deals, contacts, leads, viewings, Intel Cards, lead qualification, deal-document linking. <strong>Distinct from</strong>:</p>
+<ul><li><a href="multi-tenancy.html"><code>multi-tenancy.md</code></a> — RLS plumbing, <code>org_id</code> discipline, RBAC, security boundary patterns.</li><li><a href="signing.html"><code>signing.md</code></a> — document signing lifecycle (templates → recipients → PDF rendering → fully-executed). The deal-side of a signed document (Documents tab, signature status surfaces) lives here; the signing pipeline lives there.</li><li><a href="agentic.html"><code>agentic.md</code></a> — L0/L1/L2 autonomy + Action Cards. <strong>Intel Cards (here) ≠ Action Cards (agentic.md)</strong> — see § "Intel Cards".</li></ul>
+<p>CRM owns the <strong>polymorphic party + activity ledger</strong> primitives that everything else builds on. If you're touching deal/contact/lead schema, <code>entity_parties</code> and <code>activity_events</code> are the load-bearing tables (BL-52). Read § "V2 schema foundation" first.</p>
+<h2>V2 schema foundation</h2>
+<p>The most architecturally significant ticket in the cluster: <strong>BL-52</strong> (D-86) introduced the v2 polymorphic foundation that the rest of the CRM depends on.</p>
+<ul><li><strong><code>entity_parties</code></strong> — polymorphic junction table with <code>entity_type + entity_id + contact_id + role + is_primary + signature_required + signed_at + ownership_pct + notes + created_by</code>. Replaces the older <code>document_contacts</code> and (alongside) <code>deal_participants</code> patterns. <strong>Invariant:</strong> any "who is involved with this thing" link goes through <code>entity_parties</code>. The polymorphic key is <code>(entity_type, entity_id)</code>. Don't introduce parallel junction tables for new entity types — extend <code>entity_parties</code> with a new <code>entity_type</code> value.</li><li><strong><code>activity_events</code></strong> — append-only ledger, indexed by entity, contact, deal, org, occurred<em>at, event</em>type. <strong>Invariant: append-only.</strong> Never <code>UPDATE</code> or <code>DELETE</code> here; corrections go in as new events. The Deal Timeline (BL-46) and Contact Activity tabs both read this.</li><li><strong><code>viewing_feedback</code></strong> column additions (post-BL-52): <code>viewing_id</code>, <code>contact_id</code>, <code>agent_user_id</code>, <code>notes</code>, <code>next_step</code>. Real column names diverged from the original spec — <code>buyer_interest_level</code>, <code>price_feedback</code>, <code>actual_visitors</code> are the canonical names. Code that reads viewing feedback must use these, not spec names.</li><li><strong><code>deal_participants</code> polymorphism</strong> (relevant to BG-16 lesson, kept here as architectural context): rows in <code>deal_participants</code> carry <strong>either</strong> <code>user_id</code> (when the participant is an internal agent) <strong>or</strong> <code>contact_id</code> (when the participant is an external party — seller, buyer, buyer<em>agent). Never both. Code that joins or formats deal</em>participants must null-guard both sides — <code>uid.slice(0, 8)</code> on a null <code>user_id</code> was the canonical regression (BG-16).</li><li>All v2 tables use RLS via <code>get_user_org_id()</code>. Cross-link to <code>multi-tenancy.md § RLS patterns</code>.</li></ul>
+<h2>Activity timeline</h2>
+<p><strong>BL-46</strong> (D-90) — Deal Timeline tab over <code>activity_events</code>.</p>
+<ul><li>4 parallel data sources: deal events, property+contact events, property docs, viewing feedback. Merged + deduped, sorted by <code>occurred_at</code>.</li><li>12 event types with coloured icon dots on a vertical rail. Actor name resolution via <code>agent_profiles</code>.</li><li>Tab pattern: Summary | Timeline at <code>/admin/deals/[id]</code>, with <code>--hz-violet</code> underline indicator.</li><li><strong>Architectural significance</strong>: Deal Timeline is a <em>projection</em> over <code>activity_events</code> filtered by <code>deal_id</code> — not a separate table. Same projection pattern reused for Contact Activity. New "what happened to this thing" surfaces should query <code>activity_events</code> rather than introducing yet another timeline table.</li></ul>
+<h2>Deal detail surface</h2>
+<p><strong>BL-58</strong> — Deal detail panel (parties, financials, commissions, stage history, fixes).</p>
+<ul><li><code>DealDetailPanel.tsx</code> is the canonical "everything about a deal" view. Six sections: Stage, Parties, Property, Financials, Commissions, Notes. Each section reads from the v2 polymorphic tables (parties from <code>entity_parties</code>, financials/commissions from deal columns, stage history from <code>activity_events</code> filtered by stage-change events).</li><li>The panel is the entry point for the Documents tab (BL-70) and the Timeline tab (BL-46). Don't re-implement parties or financials views elsewhere — extend the panel.</li></ul>
+<h2>Lead pipeline</h2>
+<p><strong>BL-36</strong> (D-83) and <strong>BL-59</strong> (D-100) form the lead-side ingestion → conversion pipeline.</p>
+<ul><li><strong>BL-36 — Lead Qualification Form</strong>. Public token-based <code>/q/[token]</code> form (no auth). Typeform-style 4-screen flow: budget bands → buying purpose → timeline → must-haves (140 char). GDPR consent checkbox for EU orgs (FR/CH/IT) — the country-aware consent gate is canonical for any future public form. <strong>Invariants:</strong> - Token expiry 30 days (matches the enrichment-form pattern — keep these consistent so agents can train on one mental model). - On submission: <code>lead.status = 'qualified'</code> is <strong>system-only</strong>. Agents cannot manually set 'qualified' — it's reserved for form-submission events. This prevents agents from gaming intent score and ensures every "qualified" lead has the corroborating answers. - <code>intent_score</code> boost formula: +15 budget, +20 ready-now timeline, +10 must-haves, +5 purpose. Documented here so future scoring tweaks have a baseline. - <code>lead_qualified</code> Intel Card goes to the <strong>assigned agent</strong>, not the admin who sent the qualification form. Routing to the sender breaks the pattern when admins send on behalf of agents.</li><li><strong>BL-59 — Lead → Contact conversion</strong>. New <code>requirements</code> table, <code>converted</code> lead status, ConvertLeadModal (3-step), Requirements tab on contact detail, <code>/api/leads/convert</code> endpoint. <strong>Lesson from BL-59b spec work:</strong> <code>buyer_profiles</code> and <code>seller_profiles</code> are real DB tables, not UI-only. Always check DB before retiring UI surfaces. <code>buyer_profiles</code> and <code>requirements</code> overlap significantly — <code>requirements</code> is the consolidated home for buyer demand profiles. <code>seller_profiles</code> stays (asset-side concern; the real seller fix is TD-12 properties → assets+listings split).</li></ul>
+<h2>Contact composite views</h2>
+<p><strong>BL-48</strong> — Buyer Journey tab on Contact Detail. 5 parallel sources, phase grouping, summary bar.</p>
+<ul><li>Buyer Journey is a <em>composite projection</em> over the contact's lead, requirements, viewings, viewing_feedback, deals. Parallel queries via <code>Promise.all</code>, merged client-side, grouped by buyer phase (interested → viewing → considering → offering → closed).</li><li><strong>Pattern:</strong> Contact Detail tabs (Activity, Documents, Buyer Journey, Requirements) are all parallel projections over the v2 ledger. Adding a new tab means writing a new projection, not introducing per-tab tables.</li></ul>
+<p><strong>BL-93</strong> — Property seller contact linking. <code>linkSellerContact()</code> helper on <code>propertyService.ts</code>; service-role <code>/api/properties/[id]/link-seller</code> route; <code>EditPropertyModal</code> UI. Migration <code>20260403_bl93_seller_contact_linking.sql</code> adds the FK.</p>
+<ul><li><strong>Architectural significance:</strong> the seller-contact link is intentionally <em>not</em> <code>entity_parties</code> — it's a direct property-to-contact FK. Reason: a property has at most one seller-of-record (in single-seller jurisdictions); the polymorphic table is overkill for a 1:1 relationship. When BG-XX or future work needs multi-seller (joint ownership, divorce cases), migrate this to <code>entity_parties</code> with role <code>'seller'</code>.</li></ul>
+<h2>Reverse Match</h2>
+<p><strong>BL-62</strong> (D-101) — buyer requirements → property matching on Property Detail.</p>
+<ul><li>Two-query approach: <code>requirements</code> (active buyers) + <code>contacts</code> (for display). <strong>No joins</strong> — see WAYS-OF-WORKING § "PostgREST + RLS" for why FK joins across RLS-protected tables fail (returns empty silently).</li><li>Client-side scoring across 4 dimensions: budget 40%, bedrooms 25%, area 25%, property type 10%. Org-wide matching. Top 10 results, threshold ≥40. Strong (≥70) / Partial (40–69) tiers.</li><li><strong>Why client-side scoring</strong>: deterministic, easy to tune from logs, no LLM cost, no database function maintenance. The scoring weights are config — change them in code, no DB migration.</li><li>Pre-filled WhatsApp + email outreach. Spec: <code>docs/specs/BL-62-REVERSE-MATCH-SPEC.md</code>. STRATEGY.md mentions Buyer-Seller Matching as part of the Brain layer — Reverse Match is the agent-facing surface; the autonomous matching agent (when it lands) will use the same scoring primitives.</li></ul>
+<h2>Deal Health Score</h2>
+<p><strong>BL-71</strong> — <code>dealHealthService.ts</code> (Jest-tested per BL-76, see WAYS-OF-WORKING § Testing Protocol).</p>
+<ul><li>Composes from multiple signals: stage age, doc completeness, last-activity recency, missing parties, viewing-feedback sentiment.</li><li><strong>Architectural significance</strong>: dealHealth is a pure-compute service (no DB writes). Inputs are deal + activity<em>events + entity</em>parties; output is a single score. Lives in <code>src/features/deals/services/</code>. <strong>Pattern:</strong> any "scoring" feature in the CRM should be a pure-compute service — easy to test, easy to A/B by swapping config, no migration churn.</li><li>Decay: exponential decay on signal age (see <code>scoreDecayService</code> Jest tests for the formula). Decay is the canonical answer for "old signals are less informative".</li></ul>
+<h2>Property Transaction Checklist</h2>
+<p><strong>BL-73</strong> — Property Transaction Checklist Phase 1.</p>
+<ul><li>Per-property checklist of compliance + workflow steps. Stored in <code>property_checklist</code> table (migration <code>20260315_property_checklist.sql</code>). Compliance rules in <code>checklist_compliance_rules</code> (migration <code>20260315_checklist_compliance_rules.sql</code>).</li><li>BL-73b adds checklist share tokens (<code>20260318_bl73b_checklist_share_tokens.sql</code>) for client-shareable read-only views.</li><li><strong>Architectural significance:</strong> the compliance-rule pattern is country-aware (UAE/FR/CH/IT each have different required steps). Rules are data, not code — adding a new market means adding rows to <code>checklist_compliance_rules</code>, not new files. See <code>multi-tenancy.md § Country-agnostic</code> and <a href="i18n.html"><code>i18n.md</code></a> for the lookup-map principle this follows.</li></ul>
+<h2>Viewings</h2>
+<p><strong>BL-43</strong> (D-84, D-85) — Viewing Briefing system. <strong>BL-44</strong> (D-87) — RecordFeedbackModal across 4 surfaces.</p>
+<ul><li><strong>viewingBriefService.ts</strong> assembles 10 data sources via parallelised <code>Promise.all</code>. The brief is cached in <code>viewings.metadata</code> JSONB (24h TTL) — pre-warmed on schedule (fire-and-forget) rather than on demand. <strong>Pattern:</strong> when an LLM-generated artifact has a stable input shape, cache it on the parent entity's JSONB column rather than introducing a new cache table.</li><li>QuickBrief: 30-sec countdown, buyer budget + purpose, key focus tags, AI strategy. ViewingBrief: 7 sections (Buyer Context, Property Highlights, Market Positioning, Likely Questions, Tour Flow, Closing Strategy, sticky Actions panel).</li><li><strong>RecordFeedbackModal (BL-44)</strong> wired to 4 surfaces: QuickBrief, ViewingBrief sticky actions, Contact Activity tab, Intel Cards <code>viewing_prep</code> CTA. Single component, four entry points — the canonical "feedback capture from anywhere" pattern. Post-submit: <code>activity_events</code> insert + Intel Card fire-and-forget if <code>interest≥4</code> or <code>submit_offer</code>.</li><li><strong>Schema gotchas</strong> (worth surfacing here because they bit the project): - <code>viewings.scheduled_at</code> (single column) replaces <code>viewing_date + start_time</code> (two columns). Pre-BL-43 code that uses the two-column shape is broken; canonical is <code>scheduled_at</code>. - <code>viewings.agent_user_id</code> (not <code>user_id</code>). Renamed across 6 files. - <code>useSearchParams</code> requires a Suspense boundary in Next.js App Router — the pre-fill effect must wait for dropdown data before setting IDs (otherwise pre-fill fires against unloaded options and silently fails).</li><li>Spec: implicit; see ROADMAP D-84/D-85.</li></ul>
+<h2>Documents</h2>
+<p><strong>BL-45</strong> (D-88) — Document-Contact Linking. <strong>BL-70</strong> — Documents tab + upload fix.</p>
+<ul><li>Doc-contact linking goes through <code>entity_parties</code> (polymorphic junction; see § V2 schema). Roles: <code>buyer</code>, <code>seller</code>, <code>signer</code>, <code>other</code>. Auto-suggest by <code>document_type</code> at upload time.</li><li><strong>Linked-parties badges</strong>: red=buyer, blue=seller, gray=other. Inline <code>+ Link contact</code> per row. Single <code>useDocuments.ts</code> hook with <code>handleFileUpload</code> returning <code>DocumentRecord | null</code>.</li><li>Contact Detail Documents tab uses a <strong>two-step query</strong>: <code>entity_parties</code> → <code>property_documents</code> (because joining across RLS-protected tables silently returns empty — see WAYS-OF-WORKING and <code>multi-tenancy.md § Common gotchas</code>).</li><li>Cross-link to <a href="signing.html"><code>signing.md</code></a> for everything signing-lifecycle (BL-102 void/resend/correct/version snapshots, BL-81 multi-recipient routing). The Documents tab on a deal is a CRM surface; the routes that send for signature live under <code>/api/signing/</code>.</li></ul>
+<h2>Intel Cards</h2>
+<p><strong>BL-69</strong> — Intel Cards UX (whole-card-tappable for primary CTA + stage_suggestions card type).</p>
+<ul><li><strong>Intel Cards ≠ Action Cards</strong> (this is the frequent source-of-confusion). <strong>Intel Cards</strong> surface CRM signals an agent should be aware of — "Lead X just qualified", "Property Y has 3 matching buyers", "Viewing Z had high interest, follow up". They live in <code>src/features/intel/</code>. <strong>Action Cards</strong> (covered in <a href="agentic.html"><code>agentic.md</code></a>) are agentic proposals the agent approves/rejects — "Send WhatsApp follow-up to X?", "Advance deal to Y stage?".</li><li>Whole-card-tappable pattern: primary CTA fires on card tap, secondary CTAs are explicit buttons. UX rule from BL-69 — clicks on the card body should always fire the <em>most likely</em> next action, not just navigate.</li><li><code>stage_suggestions</code> card type (migration <code>20260314_bl69_stage_suggestion_card_type.sql</code>): the Deal Orchestrator (BL-38) produces these to suggest stage advancement. Cross-link to <a href="agentic.html"><code>agentic.md</code></a> — Deal Orchestrator also feeds Action Cards in BL-97.</li></ul>
+<h2>Deal creation</h2>
+<p><strong>NU-21</strong> — New Deal modal: seller auto-fill, buyer agent, deal title generation.</p>
+<ul><li>When the agent creates a deal from a property + contact pair, NU-21 wires: - <strong>Seller auto-fill</strong> from <code>properties.seller_contact_id</code> (BL-93 link). - <strong>Buyer agent</strong> detection from <code>deal_participants</code> if a <code>buyer_agent</code> row exists for the contact's prior deals — surfaces as a default but agent-editable. - <strong>Deal title generation</strong> — formulaic, e.g. <code>"{property_short} – {buyer_name}"</code>. The format is config (in <code>dealService.ts</code>); change it once for global consistency.</li><li><strong>Architectural significance:</strong> "infer from existing CRM relationships" is the core New-Deal UX pattern. New fields added to deals should follow the same shape — auto-fill from existing data when possible, present the agent with the populated value, allow override. Don't ship blank-form-then-validate.</li></ul>
+<h2>Related docs</h2>
+<ul><li><a href="signing.html"><code>signing.md</code></a> — document signing lifecycle (BL-102 void/resend/correct/version snapshots, BL-81 multi-recipient routing). Cross-link from § Documents.</li><li><a href="multi-tenancy.html"><code>multi-tenancy.md</code></a> — <code>agent_profiles</code>, country-agnostic principle (BL-61), RLS patterns under all v2 schema.</li><li><a href="agentic.html"><code>agentic.md</code></a> — Action Cards (distinct from Intel Cards). Deal Orchestrator (BL-38) feeds both.</li><li><a href="qa-engine.html"><code>qa-engine.md</code></a> — Q&amp;A surfaces inside CRM (deal Q&amp;A, contact Q&amp;A) read from the same v2 ledger.</li><li><a href="i18n.html"><code>i18n.md</code></a> — locale + currency + measurement-unit propagation through CRM surfaces (touches every monetary/area display in this doc).</li><li>Specs: <code>docs/specs/BL-59-LEAD-CONVERSION-SPEC.md</code>, <code>docs/specs/BL-62-REVERSE-MATCH-SPEC.md</code>, <code>docs/specs/BL-73-PROPERTY-CHECKLIST-SPEC.md</code>.</li></ul></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/crm.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

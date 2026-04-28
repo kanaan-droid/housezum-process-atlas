@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — HouseZoom.ai — Internationalization (i18n) Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / i18n.md</div>
+  
+  <div class="content"><h1>HouseZoom.ai — Internationalization (i18n) Architecture</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 <strong>Status:</strong> Living <strong>Update triggers:</strong> src/i18n/<strong>, src/messages/</strong>, locale-related migrations <strong>Owner:</strong> Will (solo) — review on every commit touching update triggers</p></blockquote>
+<p><strong>Last updated:</strong> 2026-04-28 <strong>Status:</strong> Reference document. Reflects state after BL-50 (currency/measurement/voice), BL-60 (UI string keying), BL-68 (API error keying), BL-120 (FR/DE/IT translations + org→user inheritance + browser auto-translate disabled). AR pending BL-121 (RTL).</p>
+<hr/>
+<h2>1. Goals &amp; non-goals</h2>
+<h3>Goals</h3>
+<ul><li>Single source of truth for translations (<code>messages/en.json</code>)</li><li>Org-level default locale, user-level override</li><li>Server-side rendering in the user's locale on first paint (no FOUC, no client-side flash)</li><li>Translated API error responses (server returns <code>errorKey</code>, client renders translation)</li><li>Country-agnostic architecture — adding a new locale is <code>~30min translation script run + smoke</code></li><li>Consistent locale handling across web (SSR Next.js) and native (Capacitor iOS)</li><li><strong>Verified translations not overlaid by browser auto-translate machinery</strong></li></ul>
+<h3>Non-goals (current state)</h3>
+<ul><li>AR / RTL support — separate ticket BL-121</li><li>Per-request DB read for locale resolution — deferred to BL-123 (cookie-derived suffices)</li><li>Dynamic content translation (property descriptions, listing text — agents author in their own language)</li><li>Email template translation (separate track, lower priority)</li><li>Locale-aware SEO / hreflang tags</li><li>AI-generated content respecting user locale (bug, filed as BG-72 — separate track)</li></ul>
+<hr/>
+<h2>2. Supported locales</h2>
+<table><thead><tr><th>Code</th><th>Language</th><th>Markets</th><th>Status</th></tr></thead><tbody><tr><td><code>en</code></td><td>English</td><td>UAE primary, fallback for all</td><td>✅ Source of truth</td></tr><tr><td><code>fr</code></td><td>French</td><td>France, Switzerland (Romandie)</td><td>✅ Live</td></tr><tr><td><code>de</code></td><td>German</td><td>Germany, Switzerland (Deutschschweiz, formal "Sie")</td><td>✅ Live</td></tr><tr><td><code>it</code></td><td>Italian</td><td>Italy, Switzerland (Ticino), formal "Lei"</td><td>✅ Live</td></tr><tr><td><code>ar</code></td><td>Arabic</td><td>UAE</td><td>❌ Translated, not shipped — RTL needed (BL-121)</td></tr></tbody></table>
+<p>CHECK constraints on <code>agent_profiles.language</code> and <code>organizations.default_locale</code> accept all 5 codes for forward-compat.</p>
+<hr/>
+<h2>3. Architecture overview</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│  WEB (Next.js 14 App Router on Vercel)                      │
+│                                                              │
+│  Server-side (SSR) — runs per request                       │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ src/i18n/request.ts → getRequestConfig()             │   │
+│  │   reads NEXT_LOCALE cookie → loads messages/&lt;l&gt;.json │   │
+│  │   returns { locale, messages } to next-intl          │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                              │
+│  Root layout (force-dynamic)                                │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ src/app/layout.tsx                                   │   │
+│  │   &lt;html lang={locale} translate="no"&gt;                │   │
+│  │   &lt;meta name="google" content="notranslate"&gt;        │   │
+│  │   export const dynamic = 'force-dynamic'            │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                              │
+│  Client-side (after hydration)                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ next-intl client provider                            │   │
+│  │   useTranslations('namespace') → t('key')           │   │
+│  │   pulls from server-bundled messages                │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                              │
+│  Reconciliation                                             │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ src/components/shared/LocaleDetector.tsx             │   │
+│  │   on auth mount: read agent_profiles.language        │   │
+│  │   → write NEXT_LOCALE cookie if mismatched           │   │
+│  └──────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  NATIVE (Capacitor iOS, output: 'export')                   │
+│                                                              │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │ src/components/shared/CapacitorIntlProvider.tsx      │   │
+│  │   reads localStorage 'language' key                  │   │
+│  │   loads messages from public/messages/&lt;l&gt;.json       │   │
+│  │   (copied at build time by build-capacitor.sh:88)    │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                              │
+│  No DB integration — locale set on first launch from        │
+│  user profile API call, then persisted in localStorage      │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<hr/>
+<h2>4. Locale resolution chain</h2>
+<h3>4.1 Web (SSR)</h3>
+<p><code>getRequestConfig</code> in <code>src/i18n/request.ts</code> resolves locale per request:</p>
+<pre><code>1. NEXT_LOCALE cookie
+   ↓ if absent
+2. Accept-Language header (parsed for first match in supported locales)
+   ↓ if no match
+3. 'en' (default fallback)</code></pre>
+<p>The cookie is the primary signal; the chain only falls through when the cookie is missing. <strong>There is NO direct DB read in the resolver</strong> — this would require Supabase round-trips per request and cookie-based SSR auth that isn't wired (deferred to BL-123).</p>
+<h3>4.2 Cookie ↔ DB reconciliation</h3>
+<p>The cookie is kept in sync with the DB at exactly two boundaries:</p>
+<ol><li><strong>Login (<code>/api/auth/sync-locale</code>):</strong> server-side endpoint reads <code>agent_profiles.language</code> (fall-through to <code>organizations.default_locale</code> → <code>'en'</code>) and returns <code>Set-Cookie: NEXT_LOCALE=&amp;lt;resolved&amp;gt;</code>. Called immediately after <code>signInWithPassword()</code>, before <code>router.replace('/dashboard')</code>. The browser processes the <code>Set-Cookie</code> header before the destination request fires, so SSR sees the correct cookie on first paint.</li></ol>
+<ol><li><strong>Logout:</strong> <code>clearLocaleCookie()</code> from <code>src/i18n/locale-utils.ts</code> clears <code>NEXT_LOCALE</code> cookie + localStorage before <code>supabase.auth.signOut()</code>. Called from all 4 signOut sites (<code>useAuth.ts</code>, <code>pending-approval/page.tsx</code>, <code>dashboard/page.tsx</code>, <code>AdminNav.tsx</code>).</li></ol>
+<ol><li><strong>Defense-in-depth: <code>LocaleDetector.tsx</code></strong> reconciles cookie ← DB on every authenticated mount. Catches edge cases where the cookie drifts from the DB (e.g. user changes language in another browser tab).</li></ol>
+<h3>4.3 Native (Capacitor)</h3>
+<p>Native skips the cookie chain entirely. <code>CapacitorIntlProvider.tsx</code> reads <code>language</code> from <code>localStorage</code> on app launch, falls back to <code>'en'</code>, and loads messages from <code>public/messages/&amp;lt;locale&amp;gt;.json</code>.</p>
+<p>Locale is set on first authenticated app launch via API call to read <code>agent_profiles.language</code>, then persisted to localStorage. Web cookie state is irrelevant on native.</p>
+<hr/>
+<h2>5. Inheritance model</h2>
+<pre><code>Organization
+  default_locale = 'fr'       ← set by org admin on org creation
+       │
+       │ inherited at user creation / org join
+       ▼
+Agent Profile (user-level)
+  language = 'fr'              ← initial value copied from org default
+                                  ← user can override anytime via Settings → Preferences
+                                  ← NULL means "fall back to org default"
+       │
+       ▼
+runtime resolver chain:
+  agent_profiles.language ?? organizations.default_locale ?? Accept-Language ?? 'en'</code></pre>
+<p><strong>Inheritance wiring:</strong></p>
+<ul><li><code>src/app/api/onboarding/route.ts</code> — first profile in a new org copies <code>org.default_locale</code></li><li><code>src/app/api/invite-signup/route.ts</code> — invite acceptance copies <code>org.default_locale</code> if <code>profile.language</code> is NULL</li></ul>
+<hr/>
+<h2>6. Browser auto-translate suppression</h2>
+<p><strong>Critical for any i18n'd web app.</strong> Browsers (Chrome, Edge, Safari with extensions) detect mismatches between page language and user's preferred language and offer auto-translation. This auto-translation rewrites the rendered DOM at runtime, after our verified translations have already loaded — overlaying our content with machine translation that's lower quality and untestable.</p>
+<p>This was the root cause of the BL-120 IT-on-Chrome bug: Chrome detected <code>&amp;lt;html lang="it"&amp;gt;</code> ≠ <code>Accept-Language: en-US</code>, offered to auto-translate the page, and rewrote our verified Italian into machine English. FR and DE escaped because Will's Chrome had different per-language auto-translate preferences. Safari users never hit it because they don't have built-in auto-translate at the same DOM-overlay level.</p>
+<p><strong>Mitigation (in <code>src/app/layout.tsx</code>):</strong></p>
+<pre><code class="lang-tsx">&lt;html lang={locale} translate="no"&gt;
+  &lt;head&gt;
+    &lt;meta name="google" content="notranslate" /&gt;
+    {/* ... */}
+  &lt;/head&gt;
+  &lt;body&gt;{children}&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<ul><li><code>translate="no"</code> is the W3C-standard attribute for opting out of automatic translation</li><li><code>&amp;lt;meta name="google" content="notranslate"&amp;gt;</code> is the Google-specific equivalent (Chrome's translate engine uses this)</li></ul>
+<p>Together they disable Chrome's auto-translate offer + Google Translate browser extension + Edge's translation feature + similar third-party tools.</p>
+<p>This is the standard mitigation for any app that ships professionally-translated content. We never want machine translation overlaying our verified strings.</p>
+<p><strong>Side-effect:</strong> users who legitimately want auto-translation (e.g. a Spanish-speaking visitor on our French app) lose that capability. Acceptable tradeoff — the cost of allowing it (broken UI for everyone whose system locale doesn't match our supported locales) far exceeds the benefit (a few users get a worse machine translation).</p>
+<hr/>
+<h2>7. File structure</h2>
+<pre><code>messages/
+  en.json                  # SOURCE OF TRUTH (3,763 leaf keys)
+  fr.json                  # 99.8% parity, glossary applied
+  de.json                  # 99.8% parity, formal "Sie", glossary applied
+  it.json                  # 99.8% parity, formal "Lei", glossary applied
+  ar.json                  # translated, not shipped pending RTL (BL-121)
+  _glossary.fr.json        # 34 locked real-estate terms (FR + Romandie)
+  _glossary.de.json        # 34 locked real-estate terms (DE + Deutschschweiz)
+  _glossary.it.json        # 34 locked real-estate terms (IT + Ticino)
+  _review.fr.csv           # per-key audit trail from translation script
+  _review.de.csv
+  _review.it.csv
+
+public/messages/           # Capacitor build output (mirror of messages/*.json)
+  en.json                  # populated by build-capacitor.sh:88
+  fr.json
+  de.json
+  it.json
+  ar.json
+
+src/i18n/
+  request.ts               # getRequestConfig — server-side resolver
+  locale-utils.ts          # clearLocaleCookie() helper
+
+src/components/shared/
+  LocaleDetector.tsx       # client-side cookie ↔ DB reconciliation
+  CapacitorIntlProvider.tsx # native locale provider (localStorage path)
+
+src/app/layout.tsx         # root layout — force-dynamic + translate="no"
+
+src/app/api/auth/
+  sync-locale/route.ts     # POST: resolve locale from DB, return Set-Cookie
+                           # DELETE: clear cookie (currently unused; logout uses client-side)
+
+scripts/i18n/
+  generate-glossary.mjs    # one-shot Claude API call per locale → _glossary.*.json
+  translate-locale.mjs     # batched Claude API translation, idempotent, delta-only
+
+migrations/
+  20260427_bl120_locale_schema.sql  # adds default_locale + language CHECK constraints</code></pre>
+<hr/>
+<h2>8. Key naming conventions</h2>
+<h3>8.1 Namespace organization</h3>
+<p>Top-level namespaces in <code>en.json</code> (and mirror locales):</p>
+<pre><code>shared.*        — cross-domain UI strings (buttons, labels reused everywhere)
+shared.errors.* — auth/membership errors (BG-60 Phase 2)
+errors.*        — API error keys (BG-68)
+  errors.generic.*    — cross-domain shared errors
+  errors.signing.*
+  errors.deals.*
+  errors.actions.*
+  errors.leads.*
+  errors.photos.*
+  errors.admin.*
+  errors.orchestrator.*
+  errors.ai.*
+  errors.market.*
+  errors.&lt;subdomain&gt;.*  — for any new subdomain
+enums.*         — enum code → label maps (BG-60 Phase 3)
+nav.*           — navigation items (bottom nav, sidebar)
+dashboard.*
+properties.*
+contacts.*
+deals.*
+signing.*
+settings.*
+... (one namespace per major feature/page)</code></pre>
+<h3>8.2 Key path structure</h3>
+<p><code>&amp;lt;feature&amp;gt;.&amp;lt;screen&amp;gt;.&amp;lt;element&amp;gt;</code> or <code>&amp;lt;feature&amp;gt;.&amp;lt;context&amp;gt;.&amp;lt;reason&amp;gt;</code></p>
+<p>Examples:</p>
+<ul><li><code>properties.list.heading</code> → "Annonces" / "Angebote" / "Annunci"</li><li><code>errors.signing.fetchDocumentFailed</code> → "Document non trouvé" / "Dokument nicht gefunden"</li><li><code>enums.dealStage.active</code> → "Actif" / "Aktiv"</li></ul>
+<h3>8.3 ICU placeholders</h3>
+<p>Always use ICU param syntax for variables. Translation script preserves them verbatim:</p>
+<pre><code class="lang-json">{
+  "errors": {
+    "generic": {
+      "missingRequiredField": "Field {field} is required"
+    }
+  },
+  "dashboard": {
+    "welcome": "Bonjour, {name} !"
+  },
+  "properties": {
+    "count": "{count, plural, =0 {Aucune annonce} one {# annonce} other {# annonces}}"
+  }
+}</code></pre>
+<p>ICU plural / select / number / date syntax all supported by <code>next-intl</code>.</p>
+<h3>8.4 Anti-patterns (avoid)</h3>
+<p>❌ Hardcoded English in JSX:</p>
+<pre><code class="lang-tsx">&lt;button&gt;Save Changes&lt;/button&gt;          // wrong
+&lt;button&gt;{t('shared.saveChanges')}&lt;/button&gt;  // right</code></pre>
+<p>❌ String concatenation:</p>
+<pre><code class="lang-tsx">{t('greeting')} + ', ' + name           // wrong (FR word order breaks)
+{t('greeting', { name })}                // right ("Bonjour, {name}")</code></pre>
+<p>❌ Translation key with embedded data:</p>
+<pre><code class="lang-tsx">t(`status.${activeStatus}`)              // fragile if statuses change
+{t('status', { context: activeStatus })} // better — explicit ICU select</code></pre>
+<p>❌ Reading <code>navigator.language</code> to drive translation logic on client. Always use the active locale from the resolver chain. Browser language is only for unauthenticated first-visit hint, not authenticated rendering.</p>
+<p>❌ Removing <code>translate="no"</code> on <code>&amp;lt;html&amp;gt;</code>. Browser auto-translate WILL overwrite verified translations. See §6.</p>
+<hr/>
+<h2>9. API error response shape (BG-68)</h2>
+<p>All API routes return errors via <code>apiError()</code> / <code>apiErrorFromThrow()</code> from <code>@/lib/api/errors</code>:</p>
+<pre><code class="lang-ts">// In an API route
+import { apiError, apiErrorFromThrow } from '@/lib/api/errors';
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    if (!body.dealId) {
+      return apiError('errors.signing.missingRequiredField', { field: 'dealId' }, 400);
+    }
+    // ... happy path
+  } catch (err) {
+    return apiErrorFromThrow(err);
+  }
+}</code></pre>
+<p>Response shape:</p>
+<pre><code class="lang-json">{
+  "error": "Field dealId is required",         // English fallback (logs, legacy clients)
+  "errorKey": "errors.signing.missingRequiredField",  // primary signal for client
+  "errorParams": { "field": "dealId" },
+  "details": { "..." }                          // optional, e.g. Zod fieldErrors
+}</code></pre>
+<p>Client-side (<code>translateError()</code>):</p>
+<pre><code class="lang-ts">const message = errorKey
+  ? t(errorKey, errorParams)
+  : (error || 'An unknown error occurred');</code></pre>
+<hr/>
+<h2>10. Translation pipeline</h2>
+<h3>10.1 Adding a new locale</h3>
+<ol><li><strong>Glossary</strong> — <code>node scripts/i18n/generate-glossary.mjs --target &amp;lt;locale&amp;gt;</code> produces <code>messages/_glossary.&amp;lt;locale&amp;gt;.json</code>. Will reviews ~35 terms; this is the most leveraged review gate.</li></ol>
+<ol><li><strong>Translate</strong> — <code>node --env-file=.env.local scripts/i18n/translate-locale.mjs --target &amp;lt;locale&amp;gt;</code> produces <code>messages/&amp;lt;locale&amp;gt;.json</code> and <code>messages/_review.&amp;lt;locale&amp;gt;.csv</code>. Idempotent / resumable / delta-only — only fills missing or identical-to-EN keys. Cost: ~$1-2 per locale at Sonnet pricing.</li></ol>
+<ol><li><strong>Add to CHECK constraints</strong> if not already present:  ``<code>sql  ALTER TABLE organizations DROP CONSTRAINT organizations_default_locale_check;  ALTER TABLE organizations ADD CONSTRAINT organizations_default_locale_check    CHECK (default_locale IN ('en','fr','de','it','ar','&amp;lt;new&amp;gt;'));  -- same for agent_profiles.language  </code>``</li></ol>
+<ol><li><strong>Smoke test</strong> — flip a test user's <code>agent_profiles.language</code> via SQL, log in, verify 5 surfaces in target language. Use Safari (system locale matches) AND Chrome (<code>Accept-Language: en-US</code>) to catch any auto-translate or hydration bugs.</li></ol>
+<ol><li><strong>Capacitor rebuild</strong> — <code>bash scripts/build-capacitor.sh</code> to populate <code>public/messages/&amp;lt;locale&amp;gt;.json</code>.</li></ol>
+<h3>10.2 Updating an existing locale (after adding new EN keys)</h3>
+<p>Same script handles this idempotently:</p>
+<pre><code class="lang-bash">node --env-file=.env.local scripts/i18n/translate-locale.mjs --target fr
+node --env-file=.env.local scripts/i18n/translate-locale.mjs --target de
+node --env-file=.env.local scripts/i18n/translate-locale.mjs --target it</code></pre>
+<p>The script reads <code>messages/&amp;lt;target&amp;gt;.json</code>, computes the gap (missing keys + identical-to-EN-but-should-be-translated), and translates only the delta. Existing translations are never overwritten.</p>
+<h3>10.3 Translation prompt structure</h3>
+<p>Per-batch, ~50 keys at a time:</p>
+<pre><code>System:
+  You are translating UI strings for a real estate CRM into &lt;target_lang&gt;.
+  Domain: real estate brokerage, B2B. Tone: professional, terse, native-speaker.
+  Country anchor: &lt;FR=France+Romandie | DE=Germany+Deutschschweiz | IT=Italy+Ticino&gt;.
+  Glossary (use these exact translations):
+  &lt;glossary_entries&gt;
+  Rules:
+  - Preserve ICU placeholders ({field}, {count}, etc.) verbatim
+  - Preserve markdown/HTML if present
+  - Output JSON only: {"key1": "translation1", ...}
+  - Never translate proper nouns (HouseZoom, Bayut, etc.)
+  - For DE: use formal "Sie", not "du"
+  - For IT: use formal "Lei"
+
+User:
+  Translate these strings. Each key path provides context.
+  &lt;numbered_list_of_key_value_pairs&gt;</code></pre>
+<p>ICU validation runs after translation — any response where <code>{...}</code> count differs from source is rejected and the key falls back to EN.</p>
+<hr/>
+<h2>11. Database schema</h2>
+<h3>11.1 <code>organizations.default_locale</code></h3>
+<pre><code class="lang-sql">default_locale TEXT
+  DEFAULT 'en'
+  CHECK (default_locale IN ('en','fr','de','it','ar'))</code></pre>
+<p>Used as inheritance source for new agent profiles. Editable by org admins (UI deferred — currently SQL-only).</p>
+<h3>11.2 <code>agent_profiles.language</code></h3>
+<pre><code class="lang-sql">language TEXT
+  CHECK (language IN ('en','fr','de','it','ar'))</code></pre>
+<p>NULL means "inherit from org default". Set on user creation, editable via Settings → Preferences.</p>
+<h3>11.3 Deprecated path: <code>agent_profiles.preferences-&amp;gt;'language'</code> (jsonb)</h3>
+<p>Pre-BL-120 path. Now deprecated; top-level <code>language</code> column is source of truth. BL-122 will migrate any remaining readers and drop the jsonb subfield.</p>
+<hr/>
+<h2>12. Known issues and design tradeoffs</h2>
+<h3>12.1 No per-request DB read for locale (BL-123)</h3>
+<p>Resolver chain stops at the cookie. If a user changes their locale in browser tab A, tab B doesn't pick it up until next reload. Acceptable given:</p>
+<ul><li>Locale changes are rare (settings page, not navigation flow)</li><li>Per-request DB read costs 30-100ms latency on every cached page render</li><li>Requires SSR cookie auth (<code>@supabase/ssr</code>) not yet wired</li></ul>
+<p>When SSR auth is wired (other reasons), revisit per-request DB read as the cleaner pattern.</p>
+<h3>12.2 AI-generated content doesn't respect user locale (BG-72)</h3>
+<p>Plan du jour, AI assistant chat, walkthrough narration — these call Claude API at runtime. The user's locale isn't passed in the prompt, so the model defaults to English. UI keys around the AI content render in target locale, but the AI content itself is English. Affects FR/DE/IT/AR equally.</p>
+<p>Cross-cuts BL-38 (orchestrator), BL-85 (walkthrough), AI assistant chat, anywhere AI text reaches users.</p>
+<h3>12.3 Capacitor + native locale parity</h3>
+<p>Native iOS app uses a different locale path than web — localStorage instead of cookies, no DB integration in the resolver. Translations are bundled at build time (<code>scripts/build-capacitor.sh:88</code> copies <code>messages/*.json</code> → <code>public/messages/</code>). Updates require a Capacitor rebuild.</p>
+<p>This is acceptable today since native is single-user-per-device. Multi-user device + locale switching is hypothetical for native and not modeled.</p>
+<h3>12.4 Browser auto-translate disabled globally</h3>
+<p>§6 above. Side-effect: visitors whose system locale isn't in our supported set lose access to browser auto-translation. Acceptable tradeoff — auto-translate overlay broke verified IT translations on Chrome in BL-120, and the cost of allowing it (broken UI, debugging time-sinks) exceeds the benefit (a few visitors get worse machine translation).</p>
+<hr/>
+<h2>13. History — issues encountered and resolved during BL-120</h2>
+<table><thead><tr><th>Issue</th><th>Symptom</th><th>Root cause</th><th>Fix</th></tr></thead><tbody><tr><td><code>&amp;lt;html lang&amp;gt;</code> baked at build</td><td>Server sent <code>&amp;lt;html lang="en"&amp;gt;</code> despite cookie <code>=fr</code></td><td>Next.js 14 statically rendered root layout at build time</td><td><code>export const dynamic = 'force-dynamic'</code> on <code>src/app/layout.tsx</code></td></tr><tr><td>Login transition flash</td><td>New user's first paint rendered in previous user's locale</td><td>Cookie lagged DB; client-side reconciliation ran post-render</td><td><code>/api/auth/sync-locale</code> called between login and redirect; server writes cookie via <code>Set-Cookie</code> BEFORE destination request</td></tr><tr><td>Logout cookie persistence</td><td>Next user on shared device saw previous user's locale</td><td>Cookie wasn't cleared on signOut</td><td><code>clearLocaleCookie()</code> in all 4 signOut sites, before <code>supabase.auth.signOut()</code></td></tr><tr><td>IT broken on Chrome only</td><td>Server HTML correct Italian; rendered DOM English re-translations of Italian values</td><td>Chrome's built-in auto-translate detected <code>&amp;lt;html lang="it"&amp;gt;</code> ≠ <code>Accept-Language: en-US</code>, rewrote DOM at runtime</td><td><code>translate="no"</code> on <code>&amp;lt;html&amp;gt;</code> + <code>&amp;lt;meta name="google" content="notranslate"&amp;gt;</code> in root layout</td></tr><tr><td>1 IT translation batch parse error</td><td>Initial bulk translation produced JSON parse failure</td><td>Claude emitted unescaped ASCII <code>"</code> inside German strings (also affected IT batch)</td><td>Tolerant per-line fallback parser added to translation script</td></tr></tbody></table>
+<hr/>
+<h2>14. Testing checklist for new locale work</h2>
+<p>When changing anything in the i18n stack, verify:</p>
+<ul><li>[ ] Server HTML correct: <code>fetch('/dashboard').then(r =&amp;gt; r.text())</code> contains <code>&amp;lt;html lang="&amp;lt;locale&amp;gt;" translate="no"&amp;gt;</code> and target-language strings</li><li>[ ] DOM matches: <code>document.documentElement.lang</code> === locale, visible text in target language</li><li>[ ] Cookie correct: <code>document.cookie</code> contains <code>NEXT_LOCALE=&amp;lt;locale&amp;gt;</code></li><li>[ ] DB correct: <code>SELECT language FROM agent_profiles WHERE user_id = ?</code> matches</li><li>[ ] Login transition: log out, log back in → first paint is in correct locale (no flash)</li><li>[ ] Logout clears: log out → cookie removed, next user's locale is independent</li><li>[ ] User override: change in Settings → Preferences → persists across reload</li><li>[ ] Org inheritance: new user via invite → <code>agent_profiles.language</code> matches <code>org.default_locale</code></li><li>[ ] User override beats org default: user changes locale → org default stays untouched</li><li>[ ] Fallback: temporarily delete a key → EN string appears</li><li>[ ] API errors: trigger 2-3 API errors (bad request, 404, validation) → <code>errorKey</code> translates correctly</li><li>[ ] <strong>No browser auto-translate offer</strong>: address bar shouldn't show a Translate icon when viewing the app in a non-system locale</li><li>[ ] Cross-browser: test on Safari AND Chrome</li><li>[ ] Cross-<code>Accept-Language</code>: test with system locale matching AND not matching the user's preferred locale</li></ul>
+<hr/>
+<h2>15. Decision log (for posterity)</h2>
+<table><thead><tr><th>Date</th><th>Decision</th><th>Reasoning</th></tr></thead><tbody><tr><td>2026-04-27</td><td>Org default → user inherit → user override</td><td>B2B real estate: agencies operate in a region, agents inherit, but agents can override</td></tr><tr><td>2026-04-27</td><td>Reuse <code>agent_profiles.language</code> (not new <code>preferred_locale</code> column)</td><td>Existing column already wired in Settings; saves a migration</td></tr><tr><td>2026-04-27</td><td>CHECK constraints include <code>'ar'</code> from day one</td><td>Forward-compat is free; avoids a second migration when AR ships</td></tr><tr><td>2026-04-27</td><td>Cookie-derived resolver, not per-request DB read</td><td>30-100ms latency cost on every cached page render; SSR auth not wired</td></tr><tr><td>2026-04-27</td><td>Login: server-side <code>Set-Cookie</code> via <code>/api/auth/sync-locale</code> BEFORE redirect</td><td>Eliminates first-paint flash; cleaner than client-side reconciliation</td></tr><tr><td>2026-04-27</td><td>Logout: clear cookie + localStorage in all signOut sites</td><td>Prevents previous user's locale leaking to next user on shared device</td></tr><tr><td>2026-04-27</td><td><code>force-dynamic</code> on root layout</td><td>Next.js 14 was statically rendering <code>&amp;lt;html lang&amp;gt;</code> at build time</td></tr><tr><td>2026-04-27</td><td>FR + DE + IT batched together; AR deferred</td><td>Translation pipeline is identical across LTR locales; AR needs RTL work as separate ticket</td></tr><tr><td>2026-04-27</td><td>Translation: Claude API batch with Will-reviewed glossary, no human review of bulk</td><td>$3 cost vs. weeks of human review; glossary review at ~35 terms is the leverage point</td></tr><tr><td>2026-04-27</td><td>jsonb <code>preferences.language</code> deprecated → top-level column source of truth</td><td>Avoid dual-write debt; BL-122 cleanup follows</td></tr><tr><td>2026-04-28</td><td>Disable browser auto-translate globally (<code>translate="no"</code> + Google notranslate meta)</td><td>Auto-translate overlaid verified IT translations with machine English; standard mitigation for any i18n'd app</td></tr></tbody></table>
+<hr/>
+<h2>16. Open backlog items</h2>
+<table><thead><tr><th>Ticket</th><th>Description</th></tr></thead><tbody><tr><td>BL-121</td><td>AR locale + RTL layout pass</td></tr><tr><td>BL-122</td><td>Migrate readers off <code>preferences.language</code> jsonb, drop the field</td></tr><tr><td>BL-123</td><td>Migrate locale resolver to per-request DB read once <code>@supabase/ssr</code> is wired</td></tr><tr><td>BG-72 (proposed)</td><td>AI-generated content respects user locale (Plan du jour, walkthrough narration, chat)</td></tr></tbody></table>
+<hr/>
+<h2>17. References</h2>
+<ul><li>Translation script: <code>scripts/i18n/translate-locale.mjs</code></li><li>Glossary script: <code>scripts/i18n/generate-glossary.mjs</code></li><li>Server resolver: <code>src/i18n/request.ts</code></li><li>Login locale sync: <code>src/app/api/auth/sync-locale/route.ts</code></li><li>Logout cookie clearing: <code>src/i18n/locale-utils.ts</code> → used by 4 signOut sites</li><li>Reconciliation component: <code>src/components/shared/LocaleDetector.tsx</code></li><li>Native provider: <code>src/components/shared/CapacitorIntlProvider.tsx</code></li><li>Root layout: <code>src/app/layout.tsx</code> (force-dynamic + translate="no" + Google notranslate)</li><li>API error helper: <code>src/lib/api/errors.ts</code></li><li>Migration: <code>supabase/migrations/20260427_bl120_locale_schema.sql</code></li><li>Phase summaries: <code>docs/bl-120-phase-{0,1,2-3a}-summary.md</code></li></ul>
+<h2>18. Absorbed tickets (BG-79b pass 1)</h2>
+<p>The i18n surface accumulated through several large campaigns. Each entry below captures the architectural significance — what invariant or pattern it established — not a changelog summary.</p>
+<h3>Audit-driven coverage campaigns</h3>
+<ul><li><strong>BG-50</strong> — Agent Context Propagation: currency, measurement unit, locale (5 wave campaign across BG-50X foundation; 529 strings wired across 75+ files; coverage 80.2 → 94.1%, MCP-verified 0 regressions)</li></ul>
+<p>  The largest i18n campaign of the project. Pattern: extend <code>useAgentPreferences()</code> hook to expose <code>currency</code>, <code>measurementUnit</code>, <code>locale</code> (and later <code>phoneCountryCode</code> per BG-50Z); plumb those values through every formatting site that touches money, area, or locale-specific phrasing. The "wire-vs-skip" decision is audit-driven: if the audit detector flags a string and it's user-visible content, wire it; if it's a brand name, emoji, dev-only string, enum code, Tailwind class, or HTML entity, the audit should classify-and-skip rather than flagging it as missing. BG-50 also surfaced the canonical lesson that <strong>duplicate top-level JSON namespaces silently override each other</strong> (last-key-wins) — a 40-key MISSING<em>IN</em>EN spike caught mid-batch and fixed by merging duplicate <code>intel:</code> and <code>portalSimulator:</code> blocks.</p>
+<ul><li><strong>BG-46</strong> — ViewingMode multi-return modal safety <em>([cross-bucketed: surfaced via i18n audit, but the underlying pattern is React render-tree discipline])</em> — <em>files: <code>src/components/shared/ViewingMode.tsx</code></em></li></ul>
+<p>  When a component has multiple <code>return</code> statements per screen state (one per screen), a modal/panel render block must live inside EACH return tree, not just one. Discovered in BL-112 Pass 2 when QaPanel was rendered in only one of three screen returns — the panel would silently disappear on screen change. Two acceptable fixes: (a) hoist the panel render to the component root, (b) refactor multi-screen returns into a single return that switches on screen state. The audit-aware lesson: i18n coverage audits surface this kind of bug because they walk JSX trees per file, but the fix is React-pattern-level, not i18n-level.</p>
+<ul><li><strong>BG-54</strong> — <code>admin.nav.autonomy</code> MISSING<em>MESSAGE noise </em>(closed in BG-50X Batch 2)<em> — </em>files: <code>messages/{en,fr,de,it}.json</code>, admin nav component_</li></ul>
+<p>  A single missing key was firing 70+ MISSING<em>MESSAGE console errors per admin nav re-render. Pre-existing, not a regression — but a reminder that even one missing dynamic key creates console noise at render-frequency. Fix: add the key to all four locales. Static audit may still report unresolvable</em>dynamic_t (a BG-59 pattern-a artifact); runtime resolution is what matters.</p>
+<ul><li><strong>BG-57</strong> — i18n audit script blind-spot fixes (4 detection patterns + classifyHardcoded value-collision bug) — <em>files: <code>scripts/audit/i18n-coverage-full.mjs</code></em></li></ul>
+<p>  Audit script extended to detect: (1) JSX text adjacent to child spans (e.g. <code>Buyer Agent &amp;lt;span&amp;gt;(optional)&amp;lt;/span&amp;gt;</code> was missing the leading text), (2) top-level page <code>&amp;lt;h1&amp;gt;</code>/<code>&amp;lt;h2&amp;gt;</code> headings in non-component pages, (3) status-label ternaries (<code>x ? 'A' : 'B'</code>), (4) <code>setError('...')</code> / setter string literals. Also fixed a value-collision bug in <code>classifyHardcoded</code>. Audit baseline corrected from 75.5 → true 66.5%. New <code>matched_en_key</code> column surfaces reuse opportunities. Total rows 3366 → 3573, missing 820 → 1188 — the audit got more honest, not less effective. <strong>Lesson:</strong> when audit results stay green but real coverage is leaking, look for blind-spot patterns rather than tightening the threshold.</p>
+<ul><li><strong>BG-59</strong> — Audit-noise tightening: 6 skip patterns (html<em>entity, pure</em>emoji, brand, tailwind<em>class, enum</em>code, dev<em>only) — </em>files: <code>scripts/audit/i18n-coverage-full.mjs</code>_</li></ul>
+<p>  <code>classifyForSkip()</code> consulted by <code>classifyHardcoded()</code> before falling through to MISSING. Skip rows stay in CSV (visible for spot-check) but excluded from MISSING and from coverage denominator. Per-bucket counts at close: <code>html_entity=37</code>, <code>pure_emoji=21</code> (incl. flag pairs via Regional<em>Indicator guard), <code>brand=18</code> (45-entry allowlist), <code>tailwind_class=2</code>, <code>enum_code=60</code> (ALL</em>CAPS + dynamically-observed <code>ENUM_VALUES_OBSERVED</code>), <code>dev_only=35</code> (<code>/devtools/</code>, <code>/test/</code>, <code>/lib/dev/</code>). MISSING<em>IN</em>EN: 222 → 49 (Δ −173). Effective coverage 94.1 → 98.6%. <strong>The skip taxonomy is the canonical "what audits should ignore" list.</strong> Future audit additions extend <code>classifyForSkip()</code>; do not add per-call inline skips.</p>
+<ul><li><strong>BG-65</strong> <em>(orphan — filed in error per D-264; was actually BG-59 scope)</em></li></ul>
+<p>  Removed in same commit as BG-59 closure. Documented here so a future reader doesn't search for "BG-65" and find nothing — the work was BG-59.</p>
+<h3>Service-layer + API-error i18n (BG-60 / BG-68 family)</h3>
+<ul><li><strong>BG-65 (closeout) / BG-69 closure</strong> — Phase B mop-up, ~24 sites migrated. <strong>Closes BG-68 Shape C.</strong> — <em>files: <code>src/lib/api/errors.ts</code>, ~24 API routes, <code>messages/en.json</code></em></li></ul>
+<p>  API routes use <code>apiError(key, params?, status?, extra?)</code> from <code>@/lib/api/errors</code>; response shape <code>{ error, errorKey, errorParams, ...extra }</code>. <code>apiErrorFromThrow(err)</code> for catch blocks consuming Shape A. Cross-namespace reuse of <code>shared.errors.*</code> (BG-60) and <code>errors.generic.*</code> preserves layer separation. ICU <code>{field}</code> for repeated validation strings. Webhook routes under <code>src/app/api/inbound/</code> are excluded by design (downstream services don't speak ICU). Detector D in <code>scripts/audit/i18n-coverage-full.mjs</code> guards against regressions on a dedicated second pass over API routes (the main UI walk excludes them). <strong>Service-internal API contracts</strong> like <code>actionExecutorService.ts:50</code> returning English literals as the <code>error:</code> field of an <code>ExecutionResult</code> are deferred to BG-69 — that's a different shape (persisted/logged/re-raised at API boundary) and likely needs stable error codes returned from service, translated at API-route boundary.</p>
+<h3>Currency / measurement-unit propagation (BG-47 → BG-48 family)</h3>
+<ul><li><strong>BG-48</strong> — Agent listing card honors <code>orgCurrency</code> + <code>measurementUnit</code> (canonical full-fix pattern) — <em>files: <code>src/app/properties/page.tsx</code>, <code>src/lib/utils.ts</code></em></li></ul>
+<p>  Surgical fix BG-47 demonstrated the surface; BG-48 is the documented full-fix pattern. Read <code>currency</code> and <code>measurementUnit</code> from <code>useOrg()</code> (or the <code>useAgentPreferences()</code> derived hook), pass them as explicit args to <code>formatCurrency()</code> and <code>formatArea()</code>. Never hardcode a currency code. The <code>setAgentCurrency</code> module-level singleton in <code>lib/utils.ts</code> is the resolution path for currency outside React context (e.g., service-layer code that needs to format a value before returning to the API route). See <a href="multi-tenancy.html"><code>multi-tenancy.md</code></a> § Country-agnostic for the rule, this section for the pattern.</p>
+<h3>Long-tail wiring + closeouts</h3>
+<ul><li><strong>BG-46 (W5 closeout)</strong> — long-tail surfaces wired (~68 strings, 33 files) — <em>files: multiple admin pages, action-log, daily-plan, viewings, deals, intel-market, ai-assistant, shared-components</em></li></ul>
+<p>  The final wave of BG-50 wire scope. Pattern at this stage: each surface gets one focused commit (not a megacommit), MCP-verified before marking done. 12 surfaces consolidated. Closes BG-50 wire scope at 94.1% (then BG-59 audit-noise tightening took it to 98.6%).</p>
+<h3>Planned / open work</h3>
+<ul><li><strong>BL-125</strong> — Split <code>messages/&amp;lt;locale&amp;gt;.json</code> into per-namespace chunks for lazy loading <em>([planned, no commit yet])</em> — <em>files: <code>src/app/layout.tsx</code>, <code>src/i18n/request.ts</code>, <code>messages/</code>, <code>scripts/i18n/translate-locale.mjs</code></em></li></ul>
+<p>  Each locale file is ~140KB / ~3,700 keys. Full dictionary bundled into every page render. With 4 locales (5 once BL-121 lands), that's ~700KB of translation overhead in the bundle even for routes touching a few namespaces. <code>next-intl</code> supports per-namespace loading via <code>getMessages({ namespace })</code> per route. Refactor scope: layout, server resolver, every consumer using full-tree dictionaries, plus the translation pipeline (script-side splitting + recombining). MEDIUM priority — current is acceptable, becomes a problem as locales grow + payload-sensitive routes (Capacitor mobile, slow connections) get profiled.</p></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/i18n.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

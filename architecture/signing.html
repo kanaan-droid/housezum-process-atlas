@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Signing Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / signing.md</div>
+  
+  <div class="meta-banner">
+    <span class="meta-pill meta-status-stable">Status: stable</span>
+    <span class="meta-pill">Last updated: 2026-04-28</span>
+    <span class="meta-pill">Absorbed tickets: 24</span>
+  </div>
+  <div class="content"><h1>Signing Architecture</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 <strong>Status:</strong> Living <strong>Update triggers:</strong> src/components/signing/<strong>, src/app/api/signing/</strong>, src/app/sign/<strong>, src/features/signing/</strong>, signing-related migrations <strong>Owner:</strong> Will (solo) — review on every commit touching update triggers</p></blockquote>
+<h2>Scope</h2>
+<p>Architectural primitives, invariants, and cross-cutting patterns for the signing subsystem. Covers template definition, field placement, recipient routing, CRM auto-fill, PDF rendering pipeline, signature accumulation, and the fully-executed lifecycle. <strong>Canonical E2E flow is <code>docs/specs/NU-7-SIGNING-SPEC.md</code></strong> — this doc complements that spec by capturing the <em>why</em> behind the architectural shape, not the user-story flow. Deal-side document linking (deal-document, contact-document) lives in <a href="crm.html"><code>crm.md</code></a>.</p>
+<h2>Subsystem boundaries</h2>
+<p>The signing subsystem owns:</p>
+<table><thead><tr><th>Concern</th><th>Surface</th></tr></thead><tbody><tr><td>Templates (define field types + positions)</td><td><code>signing_templates</code>, <code>signing_template_fields</code></td></tr><tr><td>Per-recipient signing requests</td><td><code>document_signature_requests</code> (one row per recipient per document; FK back to parent via <code>parent_request_id</code> for resends/corrections)</td></tr><tr><td>Field positions on a document</td><td><code>document_signature_fields</code> (FK to request, percentage coords)</td></tr><tr><td>Lifecycle versions</td><td><code>document_signing_versions</code> (snapshots before void / correct / administrative changes)</td></tr><tr><td>External e-sign envelopes (DocuSign)</td><td><code>esign_envelopes</code></td></tr><tr><td>Document parent</td><td><code>documents</code> (with <code>is_signed=true</code> only when ALL non-cancelled requests are signed — BL-81c invariant)</td></tr></tbody></table>
+<p>Surfaces it exposes:</p>
+<ul><li><strong><code>DocumentPrepareModal</code></strong> — agent-driven prepare flow (template select → field placement / values → recipient assignment → send)</li><li><strong><code>TemplateCanvas</code></strong> — admin authoring of templates over a base PDF</li><li><strong><code>FieldPlacementCanvas</code></strong> — agent prepare-time field placement on the document</li><li><strong><code>AgentPrepareCanvas</code></strong> — agent's own prepare canvas (subset of FieldPlacementCanvas)</li><li><strong><code>PDFFormEditor</code> / <code>PDFFormEditorMultiPage</code></strong> — recipient-facing AcroForm editor on <code>/sign/[token]</code></li><li><strong><code>RequestSignatureModal</code></strong> / <strong><code>TemplateSendModal</code></strong> — modal entry points to send signatures</li><li><strong><code>DirectSendSheet</code></strong> — the modal-skipping fast path (NU-20)</li><li><strong><code>SignatureStatusBadge</code></strong> — surface state on deal/document tables</li></ul>
+<p>Service layer in <code>src/features/signing/services/</code> separates concerns: <code>templateService</code> (templates), <code>requestService</code> (per-recipient requests), <code>autofillService</code> (CRM hydration), <code>baseDocumentService</code> (base PDF resolution + bucket), <code>documentPrepareService</code> (prepare-mode field state), <code>executionService</code> (lifecycle ops — void/resend/correct), <code>fieldValueService</code> (per-field values), <code>publicSigningService</code> (recipient-side, token-scoped), <code>signingService</code> (top-level façade).</p>
+<h2>Template canvas + field placement</h2>
+<p>Tickets here: <code>BL-81</code>, <code>BG-21</code>, <code>BG-22</code>, <code>BG-23</code>.</p>
+<ul><li><strong>Multi-page PDF rendering</strong> is mandatory for both authoring (<code>TemplateCanvas</code>) and prepare (<code>FieldPlacementCanvas</code>). BG-22 rewrote <code>TemplateCanvas</code> from single-page to all-pages-stacked-vertically with per-page coordinate space and a page selector for field placement; BL-81 added the same multi-page navigation to <code>FieldPlacementCanvas</code>. <strong>Invariant:</strong> every canvas surface that sits over a PDF must support multi-page from the start — single-page-only is a future-debt trap.</li><li><strong>PDF.js loader + CSP boundary</strong> (BG-21). PDF.js loads from <code>cdnjs.cloudflare.com</code>, which means the CSP must allowlist that origin in <code>script-src</code>, <code>connect-src</code>, and <code>worker-src</code>. When CSP changes (e.g. BL-92 hardening tightened defaults), the PDF.js allowlist must be re-verified — a missing entry breaks template rendering silently in production with no console error visible to the agent.</li><li><strong>DocumentPrepareModal step structure</strong> (BG-23). Template card click must <code>setStep(2)</code> <em>before</em> awaiting any async fetch, otherwise the agent sees a frozen-on-step-1 UI while the network resolves. Pattern: synchronous step advance, then async data load with its own loading state. Wrapping the entire <code>selectTemplate</code> in <code>try/catch</code> is mandatory — fetch failures silently leaving the UI stuck on step 1 was the original bug.</li><li><strong><code>x_pts/y_pts</code> are NULL unless prepared via DocumentPrepareModal.</strong> Field positions in <code>document_signature_fields</code> only get populated when the agent runs through prepare. A signing request that skips prepare (or hits the legacy direct-send path before NU-20 was wired correctly) leaves coords NULL — code that reads coords must handle the NULL case explicitly, never assume positions exist.</li></ul>
+<h2>Recipient routing + step structure</h2>
+<p>Tickets here: <code>BL-81i</code>, <code>NU-17</code>.</p>
+<ul><li><strong>Recipient selection moved to step 2</strong> (NU-17). Send buttons are conditional on recipient state — the agent cannot send until at least one recipient has the contact info needed for the chosen channel (email or WhatsApp). Conditional UI prevents the dead-end where send-fails-with-no-feedback because of a missing email address.</li><li><strong>Recipient CRM pre-fill</strong> (BL-81i). When a recipient slot is assigned to a deal participant, the agent's name/phone/email pre-fill from <code>deal_participants</code> rather than typing. Excludes <code>agent_prepare</code> fields from the progress counter (BL-81i bug fix) — those are the agent's own fields, not recipient-input fields, and counting them broke the "all recipient fields filled?" gate.</li><li><strong>agent_prepare progress counter</strong> must filter to recipient-input fields only. Agent's pre-prepared values aren't progress — they're the starting point.</li></ul>
+<h2>CRM auto-fill</h2>
+<p>Tickets here: <code>BL-81i</code>, <code>BL-81j</code>, <code>NU-16</code>, <code>NU-24</code>.</p>
+<ul><li><strong>Server-side via <code>/api/signing/crm-autofill</code></strong> (BL-81j). The autofill route uses the <code>service_role</code> Supabase client to bypass RLS. Canonical reason: agent A is signing a document about a property listed by agent B; RLS on <code>properties</code> would block agent A from reading the property's contact data via the anon client. The route validates caller auth + scope, then bypasses RLS only for the contact lookup it needs. This is the <strong>canonical pattern for cross-agent CRM access</strong> — see <code>multi-tenancy.md § Security</code> for the broader service-role discipline.</li><li><strong>Property lookup goes through <code>deal_assets</code></strong> (NU-16), not via the property foreign key directly. <code>deal_assets</code> is the polymorphic join (BL-70 doc architecture) — properties, units, listings can all be assets. Looking up via property FK misses non-property asset types and breaks for upcoming asset variants.</li><li><strong>Role-aware contact_id, case-normalised</strong> (NU-24). When DirectSendSheet maps a field to a contact, it: (1) determines role from the field's <code>role_label</code>, (2) normalises both sides via <code>.toLowerCase()</code> to bridge the Title Case (<code>role_label</code>) ↔ lowercase (<code>deal_participants.role</code>) gap, and (3) aliases <code>"agent"</code> ↔ <code>"listing_agent"</code> in both directions. The first two are required because the case mismatch is silent — neither side errors, the lookup just returns null. The alias is required because templates were authored against <code>"Agent"</code> but DB stores <code>"listing_agent"</code>.</li><li><strong><code>acroform_values: {}</code> on secondary sends</strong> (NU-24). When the same document gets resent (e.g., correction path), the autofill payload must clear <code>acroform_values</code> to <code>{}</code> rather than carry over the prior send's values. <strong>Invariant:</strong> never overwrite shared document values on a resend; the agent re-prepares fresh, the prior sign's values stay attached to <em>that</em> request's <code>document_signature_fields</code> rows.</li></ul>
+<p>Cross-link: <code>multi-tenancy.md § Service role vs. authenticated client</code> for the BG-2 split-clients pattern that underpins this route.</p>
+<h2>PDF rendering: draw-then-strip</h2>
+<p>Tickets here: <code>NU-8</code>, <code>NU-10</code>, <code>NU-11</code>, <code>NU-27</code>, <code>BG-21</code>, <code>BG-35</code>. <em>The most architecturally interesting section.</em></p>
+<p>The recipient-side <code>/sign/[token]</code> page renders a PDF that mixes (a) the original document's page content, (b) AcroForm widgets at field positions for inputs, (c) static rendered values from prior signers and from the agent's prepare phase. The naive approach — keep widgets and <code>form.flatten()</code> at the end — silently fails on PDFs produced by <code>reportlab</code> and <code>pdfrw</code> (a substantial fraction of real-world templates). The architectural answer is <strong>draw-then-strip</strong>.</p>
+<h3>Draw-then-strip pattern</h3>
+<ol><li>Load the base PDF: <code>PDFDocument.load(bytes, { ignoreEncryption: true })</code>. (Encryption flag is mandatory — many real PDFs ship with an empty owner password that breaks default-load.)</li><li>For each field whose value should be visually baked into the page (agent-prepared values; values from prior signers; not-recipient-owned fields):  - Use <code>page.drawText(value, { x, y, size, font })</code> directly onto the page content stream.  - Do NOT manipulate the widget annotation.</li><li>After all values are drawn:  - Strip every Widget annotation from every page's <code>/Annots</code> array.  - Remove the <code>/AcroForm</code> entry from the document catalog.</li><li>Save: serialise via <code>await pdfDoc.save()</code>. <strong>Critical:</strong> extract the underlying <code>ArrayBuffer</code> correctly with <code>saved.buffer.slice(saved.byteOffset, saved.byteOffset + saved.byteLength)</code> — the raw <code>.buffer</code> reference can include trailing bytes from a shared <code>Uint8Array</code> allocator and corrupts the response.</li></ol>
+<h3>Why widgets are stripped after the first signer</h3>
+<p>Once the document is signed by signer 1, the AcroForm widget annotations are stripped (step 3 above). For signer 2, there are no widgets to draw text <em>through</em> — widget-based text drawing is impossible. <strong>Therefore: rebuild from the base PDF on every signer submission.</strong> Always fetch ALL field values + signatures across ALL <code>document_signature_requests</code> for the document, then rebuild in one pass from the original base. Stacking signed PDFs (signer 2 on top of signer 1's signed PDF) is the wrong shape — it works for two signers and breaks for three. The rebuild-from-base discipline is invariant.</p>
+<h3>Recipient-owned fields are excluded from baking</h3>
+<p>Per-recipient field filtering is enforced at PDF-build time too: when fetching <code>document_field_values</code>, build an exclusion set of recipient-assigned field IDs and skip them during draw. The recipient sees their own widgets active; everyone else's prior values are baked into the content stream as drawn text. Agent-prepare overlays (<code>displayValue</code> rendered in the editor) return <code>null</code> on the recipient view (BG-35).</p>
+<h3>NU-8: PDF proxy route</h3>
+<p><code>/api/signing/[token]/pdf</code> does server-side bucket detection (base-documents vs documents) and applies <code>acroform_values</code> server-side via pdf-lib before streaming the filled PDF to the browser. <strong>Eliminates client-side bucket detection entirely.</strong> The recipient browser never needs to know which Supabase bucket the base PDF lives in. Cache-Control is <code>no-store</code> during the active signing flow — <code>max-age=300</code> was tested and produced stale PDFs during debugging. Production keeps <code>no-store</code> even outside debug.</p>
+<h3>NU-10 + NU-11 (D-147): the canonical draw-then-strip implementation</h3>
+<p>NU-10 originally framed the problem as "fix <code>form.flatten()</code>"; the architectural answer was that flatten was wrong for our shape and the proxy route should draw text directly, strip widgets, and remove <code>/AcroForm</code> from the catalog. Recipient-owned fields excluded from baking (NU-11). <code>agent_prepare</code> overlays return null on recipient view. Text field overlays use flex centering, <code>boxSizing</code>, correct padding. Double-text (the bug the original NU-10 report named) was eliminated as a symptom of the rewrite, not as the headline. <strong>The <code>D-147</code> ROADMAP entry is the canonical reference for this implementation.</strong></p>
+<h3>NU-27: signer text fields render into the final PDF</h3>
+<p>Passport, nationality, and similar text fields entered by the signer on <code>/sign/[token]</code> must be rendered into the final PDF — not just persisted in <code>document_field_values</code>. Implementation: on submit, fetch the just-saved values and pass them through the same <code>drawText</code>-then-strip pipeline as agent-prepare values. Without this, the signed PDF is missing all signer-text content and the document is non-compliant downstream.</p>
+<h3>BG-35: PDFFormEditor overlay rules</h3>
+<p>Overlay (the displayed value rendered over the input widget) computation rules: compute <code>displayValue</code> (not raw value, which may not match what the user sees), use visible overflow (<code>overflow: visible</code> on overlay container — <code>overflow: hidden</code> clips the value text in narrow boxes), let the rendered value replace the label rather than stack alongside. Email-first label matching (when a field's purpose is ambiguous, prefer email pattern over name pattern). Prefill order matters — "Email Address" contains "name" as a substring; the wrong match-order returns the wrong field.</p>
+<h3>Other constants from session memory worth preserving</h3>
+<ul><li><code>BASELINE_NUDGE = 0.08</code> (8% of fontSize) — empirically derived offset for <code>drawText</code> to align with widget baseline; hardcoded <code>+2px</code> produces visible drift.</li><li>Use <code>instanceof PDFTextField</code> / <code>instanceof PDFCheckBox</code> for type checks. <strong>Never <code>constructor.name</code></strong> — class names are mangled in production builds, the check returns false, the field falls through, the bake silently skips.</li></ul>
+<h2>Signature accumulation</h2>
+<p>Tickets here: <code>NU-25</code>, <code>NU-19</code>.</p>
+<ul><li><strong>NU-25 invariant: never <code>form.flatten()</code>.</strong> Each submit builds on the previous signed PDF. Always use the existing <code>signed_file_path</code> as source PDF if it exists; otherwise the base PDF. Stack signatures by drawing each new signature onto the current source-of-truth PDF, then strip widgets again, then save. <strong>The signature accumulator is the single canonical place where signatures are composed</strong>; it must be the only path from "submit" to "stored PDF" so the rebuild-from-base discipline holds.</li><li><strong>Signed PDF retrieval via signed URL when <code>is_signed=true</code></strong> (NU-19). When the agent or recipient downloads a "fully executed" document, the route serves the signed PDF via a Supabase signed URL with limited expiry — not the raw bucket path. Avoids both leaking bucket structure and serving expired-cookie URLs.</li></ul>
+<h2>Fully-executed lifecycle</h2>
+<p>Tickets here: <code>NU-18</code>, <code>BL-102</code>.</p>
+<ul><li><strong>Agent auto-sign at send time</strong> (NU-18). When the agent sends a document, their own signature is captured and applied immediately — the agent doesn't need to also receive a signing request and click through. <code>Fully executed</code> requires (a) all recipient requests signed, AND (b) agent signature present. Either gate alone is insufficient.</li><li><strong><code>document.is_signed = true</code> only when ALL non-cancelled requests are signed</strong> (BL-81c). The <code>is_signed</code> boolean is computed, not directly written — it's a function of the request rollup with cancelled requests excluded. Cancelled requests don't block "fully executed".</li><li><strong>BL-102 lifecycle ops: void / resend / correct.</strong> All three operations live under <code>/api/signing/[token]/{void,resend,correct}</code> and snapshot the document state into <code>document_signing_versions</code> before mutating. The snapshot captures field values BEFORE the upsert, not after — important when reconstructing history. - <strong>Resend</strong> creates a new request with <code>parent_request_id</code> pointing at the original; the original gets cancelled. - <strong>Correct</strong> is conditional on a <code>is_material</code> toggle on <code>signing_template_fields</code> — only fields marked material trigger a correction snapshot + auto-resend; immaterial edits update in place. The toggle is set at template-canvas authoring time. - <strong>Diff highlight on the sign page</strong> surfaces what changed between the corrected request and its parent; the version drawer in the agent surface lists every snapshot.</li><li><strong>Expiry reminder cron</strong> (BL-102) lives under <code>vercel.json</code> cron jobs; flagged as an <code>aws-migration</code> item per <a href="strategy.html"><code>STRATEGY.md</code></a> § "Non-negotiable architectural rules" (every Vercel cron must have a Lambda equivalent on AWS migration).</li><li><strong>Overflow menu must dismiss before async resend call</strong> (BL-102 ROADMAP entry). Click-through pattern: close menu synchronously, then await async — otherwise the menu state stays open during the network round-trip and another tap re-fires the action.</li></ul>
+<h2>Direct-send pattern</h2>
+<p>Tickets here: <code>NU-13</code>, <code>NU-20</code>, <code>NU-24</code>.</p>
+<ul><li><strong>DirectSendSheet skips all modal steps</strong> (NU-20). Entry from the deal Documents tab → fast path that takes a pre-prepared template and a contact, skips the four-step DocumentPrepareModal flow, and creates the signing request directly. <strong>Bundled DancingScript font</strong> ships with the app (in <code>public/fonts/DancingScript-Regular.ttf</code>) for typed signatures — the font must be local because external CDN fonts violate the offline-capable signing requirement and the CSP discipline.</li><li><strong>Field assignment edge cases</strong> (NU-24). DirectSendSheet's field-to-contact mapping uses the same role-aware, case-normalised, alias-bidirectional lookup as the modal path — see § "CRM auto-fill" above. The <code>acroform_values: {}</code> clear-on-secondary-send invariant lives in DirectSendSheet's send handler too.</li><li><strong>Copy signing link on pending requests + awaiting count</strong> (NU-13). Agents copy the public <code>/sign/[token]</code> URL from the deal Documents tab and paste it in a different channel (e.g. WhatsApp) when email delivery fails. The "awaiting" count fix in NU-13: the count must reflect non-cancelled, non-signed requests only — earlier display included cancelled requests in the awaiting count, surprising the agent.</li></ul>
+<h2>Route taxonomy</h2>
+<p>Tickets here: <code>BG-26</code>, <code>NU-8</code>. Plus the routes added/used by the rest of the cluster.</p>
+<pre><code>/api/signing/
+├── create/route.ts                    Create signature request(s) for a document
+├── crm-autofill/route.ts              BL-81j: server-side service-role autofill
+├── deal-participants/route.ts         List deal participants for recipient-pick UI
+├── detect-fields/route.ts             AI field detection (form scanner)
+├── finalize/route.ts                  Mark document fully-executed
+├── agent-verify-sign/route.ts         NU-27 listing-agent verify path
+├── verify-agent-check/route.ts        NU-27 service-role identity check
+└── [token]/
+    ├── route.ts                       GET request metadata (recipient-facing, public)
+    ├── pdf/route.ts                   NU-8 PDF proxy — server-side bucket detection
+    ├── submit/route.ts                Submit signed values + accumulate PDF
+    ├── void/route.ts                  BL-102 void
+    ├── resend/route.ts                BL-102 resend (parent_request_id link)
+    └── correct/route.ts               BL-102 correct (material-field guard, version snapshot, auto-resend)</code></pre>
+<p><strong>BG-26: <code>[requestId]</code> vs <code>[token]</code> dynamic route conflict.</strong> Next.js dynamic routing collides on parallel sibling segments (<code>[requestId]/</code> and <code>[token]/</code> cannot both exist as immediate children of <code>/signing/</code>). Resolution: void/resend/correct routes moved from <code>[requestId]/</code> into <code>[token]/</code>, with <code>params.token</code> aliased internally to the <code>requestId</code> value the handlers already expected. <strong>Pattern:</strong> Next.js dynamic segments must be unique per parent — when an existing segment name conflicts, alias rather than introduce a sibling.</p>
+<h2>Edge cases &amp; invariants</h2>
+<p>Pulled forward as a single bullet list so the reader can ctrl-F. Most have a canonical home in <code>WAYS-OF-WORKING.md § Signing Architecture Learnings</code>; cross-link there for any rule whose application reaches beyond signing. The "why" lives here.</p>
+<ul><li><strong><code>credentials: 'include'</code> on every signing fetch</strong> (BG-24). Auth cookies aren't sent on same-origin API requests on some Vercel deployment configurations without explicit <code>credentials: 'include'</code>. BG-24 was the canonical instance: signing send hung indefinitely because the API route returned 401 silently. The fix propagated to all signing fetch sites and was generalised in <code>WAYS-OF-WORKING.md § Fetch Credentials Rule (Non-Negotiable)</code>.</li><li><strong><code>role_label</code> is Title Case</strong> ("Seller" / "Buyer" / "Agent"); <strong><code>deal_participants.role</code> is lowercase</strong> ("seller" / "buyer" / "listing_agent"). Always <code>.toLowerCase()</code> when mapping. Always alias <code>"agent"</code> ↔ <code>"listing_agent"</code> bidirectionally — templates were authored Title Case + short-form, DB stores lowercase + <code>listing_agent</code>.</li><li><strong>AcroForm widgets are stripped after first signer signs.</strong> Rebuild from base PDF for every submission; never stack signed PDFs.</li><li><strong><code>acroform_values: {}</code> on secondary sends</strong> — never overwrite shared document values across resends.</li><li><strong><code>x_pts/y_pts</code> are NULL unless prepared via DocumentPrepareModal.</strong> Code reading positions must handle NULL.</li><li><strong>Always use existing <code>signed_file_path</code> as source PDF when it exists</strong> — accumulate signatures from there.</li><li><strong><code>AcroForm hydration</code>: never hydrate the focused field.</strong> Use <code>document.activeElement</code> check (<code>hydrateFromPropsSkipFocused</code>); use <code>change</code> listener (not <code>input</code>) so values capture only on blur.</li><li><strong><code>createPortal</code> for full-screen modals.</strong> Modals nested in fixed-positioned parents (e.g. deal drawer) trap z-index unless rendered via <code>createPortal(jsx, document.body)</code>.</li><li><strong>Per-recipient field filtering by <code>assigned_contact_id</code></strong> at API-route-creation time. Each recipient's request gets only their own fields plus any agent fields.</li><li><strong>Stale closures in submit handlers.</strong> <code>useCallback</code> deps must include all state used inside — <code>fieldValues</code>, <code>signedFields</code>, etc. — otherwise stale closures silently submit empty data.</li></ul>
+<h2>Documentation</h2>
+<p>Tickets here: <code>NU-7</code>, <code>NU-26</code>.</p>
+<ul><li><strong>Canonical E2E spec:</strong> <code>docs/specs/NU-7-SIGNING-SPEC.md</code>. Template creation, manual path, electronic path, plus the implementation backlog of gaps (recipient locking, recipient-editable override flag, recipient CRM pre-fill, intel card on completion, agent field locking).</li><li><strong>Schema documentation</strong> (NU-26). <code>SEED-INSTRUCTIONS.md</code> carries the complete-wipe SQL for signing tables plus the <code>activity_log</code> and <code>esign_envelopes</code> schema (the latter relevant when DocuSign integration shifts from sandbox to production). When schema changes here, both <code>DB-SCHEMA.md</code> and <code>SEED-INSTRUCTIONS.md</code> need to update — the seed file is what test environments rebuild from.</li></ul>
+<h2>Related docs</h2>
+<ul><li><a href="multi-tenancy.html"><code>multi-tenancy.md</code></a> — service-role bypass pattern (the bedrock under BL-81j), Zod input validation on signing routes (BL-92b), security boundary discipline.</li><li><a href="crm.html"><code>crm.md</code></a> — deal-document linking, Documents tab surfaces, where the deal-side of a signed document lives.</li><li><a href="strategy.html"><code>STRATEGY.md</code></a> — pdf-lib as a strategic tool choice; tech stack rules around AWS migration that affect the cron + bucket boundaries.</li><li>Spec: <code>docs/specs/NU-7-SIGNING-SPEC.md</code>.</li><li>WAYS-OF-WORKING: <code>## Signing Architecture Learnings</code> — the operational rule list (this doc explains <em>why</em>).</li></ul></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/signing.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

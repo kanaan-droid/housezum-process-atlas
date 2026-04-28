@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Agentic Mode Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / agentic.md</div>
+  
+  <div class="content"><h1>Agentic Mode Architecture</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 (skeleton — content TBD in BG-79b) <strong>Status:</strong> Living (skeleton) <strong>Update triggers:</strong> src/services/ai/agentic/<strong>, src/app/action-log/</strong>, src/app/admin/action-log/<strong>, ai<em>autonomy</em>settings/ai<em>action</em>cards migrations </strong>Owner:** Will (solo) — review on every commit touching update triggers</p></blockquote>
+<blockquote><p>⚠ <strong>Skeleton only.</strong> This file is an outline created in BG-79. Substantive content is filled in collaboratively in BG-79b (the absorption pass). Each section below lists candidate tickets and code paths from a mechanical match — Will decides relevance during BG-79b.</p></blockquote>
+<hr/>
+<h2>Why agentic mode exists</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97, BL-98 (founder dogfooding for UX intuition) <strong>Likely files:</strong> <code>docs/specs/BL-97-AGENTIC-MODE-SPEC.md</code></p></blockquote>
+<h2>The three autonomy levels (L0 / L1 / L2)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 (full spec), BL-97 Phase A, BL-97 Phase B, BL-97 Phase C, BL-97 Phase D, BL-98 <strong>Likely files:</strong> <code>src/features/agentic/services/actionCardService.ts</code>, <code>src/features/agentic/services/actionExecutorService.ts</code>, <code>src/app/settings/autonomy/page.tsx</code>, <code>src/app/admin/autonomy/page.tsx</code>, <code>src/app/api/autonomy-settings/route.ts</code></p></blockquote>
+<h2>Action Cards — the unit of work</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 Phase A (foundation), BL-97 Phase B (generator) <strong>Likely files:</strong> <code>src/features/agentic/services/actionCardService.ts</code>, <code>src/features/agentic/services/actionCardGeneratorService.ts</code>, <code>src/features/agentic/components/ActionCard.tsx</code>, <code>src/features/agentic/hooks/useActionCards.ts</code>, <code>src/app/api/action-cards/route.ts</code></p></blockquote>
+<h2>AI Actions Inbox — the user surface</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 Phase A <strong>Likely files:</strong> <code>src/features/agentic/components/ActionInbox.tsx</code>, <code>src/app/dashboard/page.tsx</code> (tab switcher with badge count + History link)</p></blockquote>
+<h2>Action Card lifecycle (created → executed → logged)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 Phase A (list + approve/reject/snooze), BL-97 Phase B (generation + dispatcher), BL-97 Phase C (executor + undo), BL-97 Phase D (L2 sync auto-execute + Action Log) <strong>Likely files:</strong> <code>src/app/api/action-cards/route.ts</code>, <code>src/app/api/action-cards/generate/route.ts</code>, <code>src/app/api/action-cards/[id]/approve/route.ts</code>, <code>src/app/api/action-cards/[id]/reject/route.ts</code>, <code>src/app/api/action-cards/[id]/snooze/route.ts</code>, <code>src/app/api/action-cards/[id]/undo/route.ts</code></p></blockquote>
+<h2>Org-level autonomy ceilings (<code>ai_autonomy_settings</code>)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 Phase B (ceiling check in generator), BL-97 Phase C (ceiling enforcement in executor) <strong>Likely files:</strong> <code>src/app/admin/autonomy/page.tsx</code>, <code>src/app/settings/autonomy/page.tsx</code>, <code>src/app/api/autonomy-settings/route.ts</code>; <code>ai_autonomy_settings</code> migration; <code>actionCardGeneratorService.ts</code> (dedup + ceiling), <code>actionExecutorService.ts</code></p></blockquote>
+<h2>Action Log (agent-facing + admin-facing)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 Phase D, BG-45 (execution details not shown in expanded view) <strong>Likely files:</strong> <code>src/app/action-log/page.tsx</code> (agent-facing — filters, expandable cards, Auto badge, pagination), <code>src/app/admin/action-log/page.tsx</code> (admin org-wide — summary strip, agent dropdown filter), <code>src/app/api/admin/action-log/route.ts</code></p></blockquote>
+<h3>Absorbed tickets</h3>
+<ul><li><strong>BG-45</strong> — Action Log expanded view missing execution details — <em>files: <code>src/app/action-log/page.tsx</code>, <code>src/app/admin/action-log/page.tsx</code></em></li></ul>
+<p>  L2 auto-executions persist <code>execution_result</code> in <code>ai_action_cards</code> with full payload (Twilio SID, recipient phone, channel, error class) but the expanded card view only renders the action's user-visible summary. Surfacing all <code>execution_result</code> keys in the detail section is necessary for agents to debug their own L2 deliveries (e.g., "did this WhatsApp actually go out, and to which phone?") without needing admin help. Pattern: render <code>execution_result</code> as a flat key/value list under the existing summary, not as collapsed JSON.</p>
+<h2>What Level 2 auto-execution actually does</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 Phase D <strong>Likely files:</strong> <code>src/app/api/action-cards/generate/route.ts</code> (fires <code>executeActionCard()</code> inline when agent autonomy = L2; sets <code>auto_executed: true</code> in execution_result), <code>src/features/agentic/services/actionExecutorService.ts</code> (real Twilio WhatsApp dispatch + deal-stage + checklist dispatchers)</p></blockquote>
+<h2>Failure modes &amp; rollback</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 Phase C (undo route), BL-111 (seed agent/contact dual-identity quirk), BG-45 (execution details surfacing), BG-36 (<code>agent_profiles.email</code> backfill + sync trigger), BG-37/37b (action card route 401 fix — service-role + <code>getSession</code>) <strong>Likely files:</strong> <code>src/app/api/action-cards/[id]/undo/route.ts</code>, <code>src/features/agentic/services/actionExecutorService.ts</code> (graceful failure paths)</p></blockquote>
+<h3>Absorbed tickets</h3>
+<ul><li><strong>BG-36</strong> — Sync auth email to <code>agent_profiles</code> (backfill, trigger, seed script fix, shared helper) — <em>files: <code>scripts/lib/getAgentByEmail.mjs</code>, <code>supabase/migrations/20260411_bg36_agent_profile_email_sync.sql</code></em></li></ul>
+<p>  Foundational invariant for action-card execution: the agent identity used to dispatch a card must be reliably resolvable from <code>auth.users</code> via email. <code>agent_profiles.email</code> is not authoritative on its own — it can drift from <code>auth.users.email</code> between profile edits. The migration adds (a) a backfill from <code>auth.users</code> and (b) a trigger that keeps <code>agent_profiles.email</code> in sync. Seed scripts use the shared <code>getAgentByEmail()</code> helper rather than ad-hoc lookups. Anywhere downstream code needs an agent identity for action-card dispatch, route through this helper — direct queries on <code>agent_profiles.email</code> are not safe.</p>
+<ul><li><strong>BG-37</strong> — Action card routes 401 fix: use <code>supabase.auth.getSession()</code> for token instead of <code>localStorage</code> — <em>files: <code>src/features/agentic/components/ActionInbox.tsx</code></em></li></ul>
+<p>  Browser clients in this project hold the Supabase session via <code>supabase.auth.getSession()</code>, not in <code>localStorage</code>. Earlier code attempting to read the JWT from <code>localStorage</code> returned <code>null</code>, so the action-card API routes (which expect a Bearer token) returned 401. Two corollaries documented in <a href="multi-tenancy.html"><code>multi-tenancy.md</code></a> § Security: (1) API routes must use the <strong>service-role</strong> <code>createClient</code> for <code>auth.getUser(token)</code> server-side, never the anon browser client; (2) any client-side code that needs the JWT goes through <code>supabase.auth.getSession()</code>. Cross-link: this pattern applies to every authenticated API route, not just agentic.</p>
+<ul><li><strong>BL-111</strong> — Seed script: agents must not appear as contacts (dual-identity quirk) — <em>files: <code>scripts/seed-dubai.mjs</code></em> — <em>[no commit, ROADMAP-only]</em></li></ul>
+<p>  Discovered during BL-97 Phase D L2 auto-execute testing. <code>seed-dubai.mjs</code> was creating <code>contacts</code> rows for agent personas, so the same person appeared both as an <code>org_members</code> row (agent who logs in) AND as a <code>contacts</code> row (CRM contact who can be a recipient). When an action card targeted that contact_id, the executor would surface confusing dual-identity behavior (the action would route to the agent's own WhatsApp). Fix: before inserting into <code>contacts</code>, check if <code>user_id</code> exists in <code>org_members</code> for the same org and skip if so. This is the canonical "agent identity ≠ contact identity" rule for the seed/test data layer, and a reminder that L2 auto-execute is not safe against pathological seed data.</p>
+<h2>Research &amp; dogfooding</h2>
+<ul><li><strong>BL-98</strong> — Founder dogfooding (Computer Use + Dispatch at Level 1-2 for one week) — <em>files: notes doc</em></li></ul>
+<p>  Build UX intuition for BL-97 from the user's perspective before writing the full spec. Three guiding questions (per ROADMAP entry): (1) When does the approval step feel like friction vs safety? (2) When do you want Level 2 (just do it)? (3) What makes an Action Card trustworthy enough to approve without reading? Output format: annotated notes feeding directly into BL-97 Action Card spec. Tools: Claude Computer Use (via Claude Cowork, Pro/Max subscription), Claude Code Dispatch (async task execution). This is the canonical pattern for "research before architectural commitment" on agentic-mode UX questions.</p>
+<h2>Extension patterns for new action types</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-97 Phase B (generator: comms follow-up + compliance deadlines + Deal Orchestrator), BL-97 Phase C (executor dispatcher pattern) <strong>Likely files:</strong> <code>src/features/agentic/services/actionCardGeneratorService.ts</code> (where new card types are produced — dedup, ceiling check), <code>src/features/agentic/services/actionExecutorService.ts</code> (where new action types are dispatched — WhatsApp / deal-stage / checklist today; new dispatcher methods extend this)</p></blockquote></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/agentic.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

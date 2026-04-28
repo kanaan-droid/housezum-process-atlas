@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Multi-Tenancy Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / multi-tenancy.md</div>
+  
+  <div class="content"><h1>Multi-Tenancy Architecture</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 (skeleton — content TBD in BG-79b) <strong>Status:</strong> Living (skeleton) <strong>Update triggers:</strong> src/middleware.ts, <strong>/rls/</strong>, supabase/migrations/<strong> touching RLS, src/shared/providers/OrgProvider.tsx </strong>Owner:** Will (solo) — review on every commit touching update triggers</p></blockquote>
+<blockquote><p>⚠ <strong>Skeleton only.</strong> This file is an outline created in BG-79. Substantive content is filled in collaboratively in BG-79b (the absorption pass). Each section below lists candidate tickets and code paths from a mechanical match — Will decides relevance during BG-79b.</p></blockquote>
+<hr/>
+<h2>Why multi-tenancy</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-22 (multi-org support), BL-97 strategic framing <strong>Likely files:</strong> <a href="strategy.html"><code>STRATEGY.md</code></a> (data moat — cross-org intelligence), <code>WAYS-OF-WORKING.md</code> § "Country-Agnostic Architecture"</p></blockquote>
+<h2>Org as the unit of isolation (<code>organizations</code> table)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-22 (multi-org), BL-120 (<code>organizations.default_locale</code> column added) <strong>Likely files:</strong> DB-SCHEMA.md (<code>organizations</code> table — id, name, slug, country<em>default, timezone, plan, settings JSONB, logo</em>url, default_locale)</p></blockquote>
+<h3>Absorbed tickets</h3>
+<ul><li><strong>BL-22</strong> — Multi-org support (org switcher, multiple memberships per user, switch context without logout) — <em>[no commit, ROADMAP-only]</em></li></ul>
+<p>  Long-running architectural theme. A user (<code>auth.users.id</code>) can be a member of multiple orgs via <code>org_members</code> rows; each membership carries its own role (owner/admin/manager/agent/assistant/viewer) and permissions_override. The org switcher UI (when built) reads the active <code>org_id</code> from session/cookie — DB queries are always scoped by the active org via RLS. <strong>Invariant:</strong> never grant a user implicit access to all their orgs at once; the active org is the only org RLS evaluates against per request. Cross-org data fetches require an explicit elevation pattern (service-role with <code>org_id</code> parameter) and are the exception, not the rule (see § "Cross-org operations").</p>
+<ul><li><strong>BL-61</strong> — Country-agnostic principle: org config + locale + license rules — <em>files: <code>src/app/settings/profile/page.tsx</code>, <code>useAgentProfile</code>, <code>setAgentCurrency</code> singleton in <code>src/lib/utils.ts</code>, <code>LICENSE_META</code> lookup map</em></li></ul>
+<p>  Established the canonical "no hardcoded market values" pattern. <code>LICENSE_META</code> is the template lookup map: <code>{ UAE: { label: 'RERA License', prefix: 'RERA-' }, France: { label: 'CPI License', prefix: 'CPI-' }, ... }</code>. Every country-specific UI label uses the same shape. <code>setAgentCurrency</code> module-level singleton in <code>lib/utils.ts</code> is the resolution path for currency outside React context (e.g., service-layer formatting). <strong>Lesson from BL-61 close:</strong> <code>isAdminRole</code> must be computed AFTER the loading guard — hooks resolve async, evaluating role before <code>orgLoading=false</code> always returns null. <strong>Lesson from BL-61 cleanup:</strong> admin navigation must have a single entry point — never duplicate in AppShell. The profile-page row is the sole entry point. Cross-link: see WAYS-OF-WORKING.md § "Country-Agnostic Architecture" + § "No Hardcoding Principle"; cross-link from <a href="crm.html"><code>crm.md</code></a> once that doc lands.</p>
+<h2>Org membership (<code>org_members</code>) and RBAC functions</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-22 (multi-org / role hierarchy) <strong>Likely files:</strong> DB-SCHEMA.md (<code>org_members</code> — id, org<em>id, user</em>id, team<em>id, role: owner/admin/manager/agent/assistant/viewer, status, permissions</em>override); Supabase SQL functions <code>get_user_org_id()</code>, <code>get_user_role()</code>, <code>user_has_role()</code></p></blockquote>
+<h2>Row-Level Security (RLS) patterns</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-92 / BL-92b (Security &amp; Compliance Hardening Tier 1 — Zod org<em>id on portal routes), BL-81j (CRM auto-fill RLS fix — moved to service-role server-side), BL-103 (data safety guardrails — photo</em>annotations FK ON DELETE RESTRICT) <strong>Likely files:</strong> <code>supabase/migrations/**</code> (all org-scoped RLS policies — 14 existing + 9 new tables per FEATURE-MAP), <code>src/app/api/signing/crm-autofill/route.ts</code> (service-role bypass example), DB-SCHEMA.md</p></blockquote>
+<h2>The <code>org_id</code> discipline — every table, every row</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-92 (Zod UUID on org_id, 6 portal routes), every BL-XX touching new tables <strong>Likely files:</strong> <code>src/features/properties/services/propertyService.ts</code>, <code>src/features/properties/services/propertyItemsService.ts</code>, <code>src/features/properties/services/sharesService.ts</code>, <code>src/features/contacts/services/contactService.ts</code>, <code>src/features/documents/services/documentService.ts</code>, <code>src/features/ai-assistant/services/assistantService.ts</code> (all show <code>— org_id on inserts</code> per FEATURE-MAP)</p></blockquote>
+<h2>Service role vs. authenticated client (when to use which)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-81j (CRM auto-fill RLS — service<em>role bypasses RLS on cross-agent properties), BG-37/37b (action card routes 401 fix — anon → service role on server), BL-22 onboarding/invite flows <strong>Likely files:</strong> <code>src/app/api/onboarding/route.ts</code> (service</em>role org creation), <code>src/app/api/invite-info/route.ts</code> (service_role for unauthenticated users), <code>src/app/api/signing/verify-agent-check/route.ts</code> (NU-27: service role listing-agent identity check), <code>src/app/api/signing/crm-autofill/route.ts</code></p></blockquote>
+<h3>Absorbed tickets</h3>
+<ul><li><strong>BG-2</strong> — Invite status update fix (split-clients pattern) — <em>files: <code>src/app/api/invite-signup/route.ts</code>, <code>supabase/migrations/003_drop_legacy_users.sql</code></em></li></ul>
+<p>  Canonical pattern for service-role hygiene. <code>signInWithPassword()</code> was tainting the service role client's auth state, which then caused RLS to block the invitation UPDATE. Fix: split into two Supabase clients — <code>supabaseAdmin</code> (clean, for DB ops) + <code>supabaseAuth</code> (for sign-in only). All <code>sb</code> references replaced. <strong>Invariant:</strong> never share a single Supabase client between auth-state operations and service-role DB ops in the same request. The auth state on a service-role client is incidental but RLS evaluates against it; mixing the two breaks RLS bypass silently. Every API route that calls both <code>auth.signInWithPassword</code>/<code>auth.exchangeCodeForSession</code> AND a privileged DB op must use two separate clients.</p>
+<ul><li><strong>BL-64</strong> — Service-role PATCH bypass on <code>agent_profiles</code> (canonical pattern) — <em>files: <code>src/app/admin/members/[userId]/page.tsx</code>, <code>src/app/api/admin/members/[userId]/route.ts</code></em></li></ul>
+<p>  When an admin needs to update another agent's <code>agent_profiles</code> row, the client-side update fails RLS (admins are in the same org but RLS policy on <code>agent_profiles</code> restricts updates to self). Fix pattern: route the update through a server-side API route that uses the service-role client, with explicit role + org checks before the UPDATE. The route validates: (1) caller is authenticated, (2) caller's org<em>id matches target's org</em>id, (3) caller has admin/owner/manager role. Then service-role bypass executes the UPDATE. This is the canonical "admin operates on another user's data" pattern — replicate for any similar future admin surface (e.g., updating another agent's preferences, role, or status).</p>
+<h2>OrgProvider (client) — how org context propagates</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BG-50 P1 (added <code>measurement_unit</code> and <code>language</code> to OrgProvider with <code>null</code> defaults), TD-17 (onboarding redirect bug fix) <strong>Likely files:</strong> <code>src/shared/providers/OrgProvider.tsx</code> (orgId, role, membership, currency, measurement_unit, language, orgName, logoUrl from <code>org_members</code> + <code>organizations.settings</code>), <code>src/shared/hooks/useAuth.ts</code></p></blockquote>
+<h2>Cross-org operations (when allowed, and how)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-81j (cross-agent properties via service-role), BL-22 (multi-org switcher), NU-27 (listing-agent identity verification) <strong>Likely files:</strong> <code>src/app/api/signing/crm-autofill/route.ts</code>, <code>src/app/api/signing/verify-agent-check/route.ts</code></p></blockquote>
+<h2>Common gotchas and debug patterns</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BG-36 (<code>agent_profiles.email</code> not reliable — always use <code>auth.users</code> via <code>getAgentByEmail</code>), BG-37/37b (API routes must use service-role <code>createClient</code> for <code>auth.getUser(token)</code>, never the anon browser client; <code>localStorage</code> does not store Supabase tokens — use <code>supabase.auth.getSession()</code>), BL-81i (contacts query <code>limit(200)</code> silently dropping contacts during CRM hydration) <strong>Likely files:</strong> <code>WAYS-OF-WORKING.md</code> § "Fetch Credentials Rule" + "Common Gotchas"; rule from STRATEGY.md tech-stack: never use FK joins across RLS-protected tables — use two separate queries</p></blockquote>
+<h2>Extension pattern for new org-scoped tables</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> Any BL-XX adding a new table — recent examples: BL-87 (media<em>variants, media</em>events, listing<em>outcomes), BL-36 (lead</em>qualification<em>requests), BL-97 (ai</em>action<em>cards, ai</em>autonomy<em>settings, ai</em>interactions), BL-60 (qa<em>knowledge</em>base, ai<em>qa</em>interactions, ai<em>feedback) <strong>Likely files:</strong> <code>supabase/migrations/**</code> (every new table migration includes RLS policies + org</em>id column); FEATURE-MAP.md table inventory</p></blockquote>
+<hr/>
+<h2>Security</h2>
+<p>RLS, Zod input validation, service-role boundaries, and data-safety guardrails together form the boundary-enforcement layer of multi-tenancy. RLS prevents cross-org reads/writes; Zod prevents malformed input from reaching the DB; service-role boundaries prevent unintentional privilege escalation; data-safety guardrails prevent destructive operations from cascading.</p>
+<h3>Tier 1 hardening (BL-92, D-166)</h3>
+<ul><li><strong><code>validateWebhookSecret.ts</code></strong> — fail-closed webhook secret validator. Applied to 6 portal routes (PropertyFinder, Bayut, Homegate, SeLoger, Idealista, Immobiliare under <code>src/app/api/inbound/</code>). <strong>Rule:</strong> webhooks fail closed, never fail open. If the validator can't verify the secret (missing env var, mismatch, etc.) the route returns 401 without inspecting the payload. Webhook validation precedes Zod validation precedes business logic.</li><li><strong>Zod UUID on <code>org_id</code></strong> for the same 6 portal routes. Catches malformed payloads at the boundary; never trust webhook input shape.</li><li><strong>Zod body on qualification POST</strong> — public <code>/q/[token]</code> form submission validates the payload before writing to <code>lead_qualification_requests</code>.</li><li><strong>CSP + security headers</strong> in <code>next.config.js</code>. Header-based, not meta-tag-based (per the BL-92 hardening session: meta-tag CSP is unreliable across CDN edge cases). Allowlist for Google Fonts + randomuser.me (BL-92b adjustment); cdnjs.cloudflare.com for PDF.js (BG-21 fix).</li><li><strong>Spec:</strong> <code>docs/specs/BL-92-SECURITY-SPEC.md</code>. Tiers 2–4 (authenticated routes deeper review, GDPR, AI-layer hardening) deferred at BL-92 close; partially addressed by BL-92b.</li></ul>
+<h3>Zod on authenticated routes (BL-92b, D-168)</h3>
+<p>Zod schemas added on 9 authenticated API routes (post-BL-92 Tier 1 baseline):</p>
+<table><thead><tr><th>Route</th><th>Validates</th></tr></thead><tbody><tr><td><code>confirm-stage</code></td><td>deal stage transition</td></tr><tr><td><code>signing/create</code></td><td>document signing creation</td></tr><tr><td><code>signing/agent-verify-sign</code></td><td>NU-27 listing-agent verify</td></tr><tr><td><code>gmail/draft-reply</code></td><td>Gmail draft reply payload</td></tr><tr><td><code>photos/annotate</code></td><td>photo annotation submission</td></tr><tr><td><code>checklist/[dealId]</code> POST</td><td>checklist creation</td></tr><tr><td><code>checklist/[dealId]/share</code></td><td>checklist share-token mint</td></tr><tr><td><code>admin/signals/[id]</code> PATCH</td><td>signal update</td></tr><tr><td><code>admin/members/[userId]</code> PATCH</td><td>member update (BL-64 service-role pattern)</td></tr></tbody></table>
+<p>All return 400 with field-level errors on validation failure. <strong>Rule:</strong> any new authenticated POST/PATCH/PUT/DELETE route gets a Zod schema before merge. The audit baseline established by BL-92b is the canonical "what's covered" list — extend it as routes are added.</p>
+<h3>Data Safety Guardrails (BL-103, D-177)</h3>
+<ul><li><code>photo_annotations</code> foreign key changed to <strong>ON DELETE RESTRICT</strong> (was CASCADE). Protects annotation training data from accidental cascade-delete when a parent property is removed. <strong>Rule:</strong> any FK pointing at training/labeled data uses RESTRICT, not CASCADE. The data has higher protection than the parent row.</li><li><code>--dry-run</code> flag added to <code>seed-dubai.mjs</code> and <code>seed-corpus.mjs</code>. All destructive seed operations are guarded — running without <code>--dry-run=false</code> (or equivalent confirmation flag) is a no-op. <strong>Rule:</strong> any new destructive script — wipes, mass updates, cascade deletes — implements <code>--dry-run</code> as the default. Real execution requires an explicit override flag.</li></ul>
+<h3>Cross-link</h3>
+<p>For application-level "no hardcoded values" rules and currency/measurement-unit propagation, see <a href="i18n.html"><code>i18n.md</code></a> § "Currency / measurement-unit propagation". For action-card auth specifically (<code>getSession</code> over <code>localStorage</code>, service-role over anon), see <a href="agentic.html"><code>agentic.md</code></a> § "Failure modes &amp; rollback" → BG-37 entry.</p></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/multi-tenancy.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

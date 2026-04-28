@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Q&amp;A Engine Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / qa-engine.md</div>
+  
+  <div class="content"><h1>Q&amp;A Engine Architecture</h1>
+<blockquote><p><strong>Last verified:</strong> 2026-04-28 (skeleton — content TBD in BG-79b) <strong>Status:</strong> Living (skeleton) <strong>Update triggers:</strong> src/services/ai/qa-<em>.ts, src/services/ai/intent-matcher</em>, src/services/ai/role-resolver<em>, src/services/ai/context-assembler</em>, src/services/ai/data-sieve<em>, src/services/ai/answer-polisher</em>, src/services/ai/property-schema-fallback*, scripts/bl60/<strong>, scripts/eval-qa-engine.mjs </strong>Owner:** Will (solo) — review on every commit touching update triggers</p></blockquote>
+<blockquote><p>⚠ <strong>Skeleton only.</strong> This file is an outline created in BG-79. Substantive content is filled in collaboratively in BG-79b (the absorption pass). Each section below lists candidate tickets and code paths from a mechanical match — Will decides relevance during BG-79b.</p></blockquote>
+<hr/>
+<h2>Why a Q&amp;A engine (vs. a generic chat)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 (AI Assistant Persona &amp; Few-Shot Prompt Engine — replace generic Claude with grounded Q&amp;A engine) <strong>Likely files:</strong> <code>docs/specs/BL-60/</code></p></blockquote>
+<h2>End-to-end pipeline (intent → context → sieve → polish → cache)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 Q&amp;A Engine Phase C (D-187), BL-106 (cache layer) <strong>Likely files:</strong> <code>src/services/ai/qa-engine.service.ts</code> (top-level entry point), <code>src/app/api/ai/qa/route.ts</code>, <code>src/services/ai/types.ts</code> (MatchSource union)</p></blockquote>
+<h2>Intent matcher (BL-60, BL-114 4-branch context hints)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 (initial matcher), BL-114 (4-branch contextHints: property+deal / property-only / deal-only / neither — D-195) <strong>Likely files:</strong> <code>src/services/ai/intent-matcher.service.ts</code>, <code>src/services/ai/keyword-matcher.ts</code> (keyword short-circuit &lt;200ms), <code>src/services/ai/synonym-normalizer.ts</code></p></blockquote>
+<h2>Context assembler</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 Phase C (D-187) <strong>Likely files:</strong> <code>src/services/ai/context-assembler.ts</code></p></blockquote>
+<h2>Role resolver (Path 1: agent-is-asking)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 (D-190 — <code>ai_qa_interactions.role_source</code> CHECK constraint with Path 1 values: <code>deal_participant</code>, <code>deal_type_default</code>, <code>unresolved</code>) <strong>Likely files:</strong> <code>src/services/ai/role-resolver.service.ts</code></p></blockquote>
+<h2>Data sieve (null/NYT/stale gates)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 Phase C (D-187 — deterministic Data Sieve hard-gates on null/NYT/stale before LLM) <strong>Likely files:</strong> <code>src/services/ai/data-sieve.ts</code>, <code>src/services/ai/staleness.ts</code></p></blockquote>
+<h2>Country filter (multi-country pattern extraction)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 Phase C (D-187) <strong>Likely files:</strong> <code>src/services/ai/country-filter.ts</code></p></blockquote>
+<h2>Answer polisher</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 Phase C (D-187 — Sonnet 4.6 with prompt caching) <strong>Likely files:</strong> <code>src/services/ai/answer-polisher.service.ts</code></p></blockquote>
+<h2>Schema fallback (BL-115)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-115 (D-197 — Haiku column classifier on 26-column whitelist of <code>properties.*</code> → DB read → Haiku formatter; triggers when matcher returns <code>qa_id === null</code> AND <code>property_id</code> is set; no cache writes from fallback path), BL-115a (D-198 — ~25 synonym mappings tightening to CLASSIFIER_SYSTEM) <strong>Likely files:</strong> <code>src/services/ai/property-schema-fallback.service.ts</code>, <code>src/services/ai/types.ts</code> (<code>'schema_fallback'</code> added to MatchSource union)</p></blockquote>
+<h3>Absorbed tickets</h3>
+<ul><li><strong>BL-115a</strong> — Schema fallback classifier tightened with ~25 synonym mappings — <em>files: <code>src/services/ai/property-schema-fallback.service.ts</code></em></li></ul>
+<p>  After BL-115 shipped, the Haiku column classifier missed common natural-language phrasings ("how big is the property" → didn't map to <code>size_sqm</code>, "when was it built" → didn't map to <code>year_built</code>, "lease duration" → didn't map to <code>lease_term_months</code>). D-198 added ~25 synonym mappings to <code>CLASSIFIER_SYSTEM</code> covering size/area, year/age, and lease-related phrasings. Live-verified: "how big is the property" now returns <code>size_sqm</code> via fallback. Pattern: synonym maps live in the classifier prompt, not in the matcher — the matcher's job is intent+context, the fallback's job is column-resolution. When users surface a missed natural phrasing, the fix is a synonym entry in <code>CLASSIFIER_SYSTEM</code>, not a new keyword in the matcher.</p>
+<h2>KB rows — property-specific vs. general (BL-115b)</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 corpus seed (D-186 — 210 rows: 105 General Knowledge + 105 Property-Specific, 60 NYT, 9 role-sensitive, 63 with required_fields), BL-115b (D-196 — added 20 Property-Specific rows reading <code>properties.*</code> directly; total 230) <strong>Likely files:</strong> <code>scripts/bl60/HouseZoom_QA_Review_v33.xlsx</code>, <code>scripts/bl60/seed-qa-knowledge-base.mjs</code>, <code>qa_knowledge_base</code> table</p></blockquote>
+<h2>Eval harness &amp; coverage rules</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 Eval Harness (D-189 — 50 starter fixtures across 9 categories, baseline 50/50 pass; forbidden-phrase lint), BL-114 (D-195 — added 8 fixtures E051-E058), BL-115 (D-197 — added 5 fixtures E059-E063) <strong>Likely files:</strong> <code>scripts/eval-qa-engine.mjs</code></p></blockquote>
+<h2>Failure modes &amp; forbidden phrase lint</h2>
+<blockquote><p><strong>TODO (BG-79b):</strong> Absorb relevant tickets and code references. <strong>Likely tickets:</strong> BL-60 Phase C (D-187 forbidden-phrase lint), BL-104 (Dashboard Q&amp;A Context Resolution — deferred; data sieve can't ground answer when no property/deal context) <strong>Likely files:</strong> <code>src/services/ai/forbidden-phrases.ts</code>, <code>src/services/ai/qa-logger.ts</code></p></blockquote>
+<h3>Absorbed tickets</h3>
+<ul><li><strong>BL-104</strong> — Dashboard Q&amp;A Context Resolution <em>(deferred — data sieve cannot ground without property/deal context)</em> — <em>files: dashboard AssistantBar (entry point); resolution would touch <code>intent-matcher.service.ts</code>, <code>context-assembler.ts</code></em> — <em>[deferred until BL-60 v1 real usage data]</em></li></ul>
+<p>  When an agent asks a question from the dashboard <code>AssistantBar</code> (not from Viewing Mode), there is no <code>property_id</code> or <code>deal_id</code> in scope. The Data Sieve hard-gates on null/NYT/stale, so most ground-truth answers can't be produced — the engine would have to fall back to non-data-grounded responses, which violates the engine's "ground truth or refuse" invariant. Four v2 options on the table: (a) entity-reference detection ("the Burj Khalifa one"), (b) active-deal selection, (c) dropdown picker, (d) non-data-grounded-only fallback. Decision deferred until real usage data from BL-60 v1 shows which option agents actually want. Don't pre-build entity-reference NLU without evidence.</p>
+<h2>Operational concerns</h2>
+<ul><li><strong>BL-112</strong> — Auto-focus QaInput on mount so keyboard pops up immediately — <em>files: <code>src/features/ai-qa/components/QaInput.tsx</code></em></li></ul>
+<p>  Mobile-first UX rule for the Q&amp;A panel: when the panel slides up, the input must auto-focus so the keyboard opens immediately, saving one tap. Implemented via a <code>ref</code> + <code>useEffect</code> that calls <code>.focus()</code> on mount. Trivial in code, important for the agent-in-the-field experience that drives all Q&amp;A panel decisions.</p>
+<ul><li><strong>BL-117</strong> — Rebuild matcher cache with tagged corpus — <em>files: matcher cache rebuild script</em></li></ul>
+<p>  The intent matcher uses a precomputed cache of <code>qa_knowledge_base</code> rows tagged with derived keywords (the keyword short-circuit at <code>keyword-matcher.ts</code> short-circuits &lt;200ms when an exact tag matches). When the corpus changes (BL-60 v33 reseeded, BL-115b added 20 rows, etc.) the cache must be rebuilt against the new tagged corpus. This is operational maintenance, not a code-time concern: triggered manually or via cron after corpus changes. If keyword short-circuit hit-rate drops noticeably in observability, suspect a stale cache against a freshly-reseeded corpus.</p></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/qa-engine.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

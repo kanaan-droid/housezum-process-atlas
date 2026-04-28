@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Strategic Architecture (extracted 2026-04-02 thinking)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Architecture</a> / STRATEGY.md</div>
+  
+  <div class="content"><h1>Strategic Architecture (extracted 2026-04-02 thinking)</h1>
+<blockquote><p><strong>Source:</strong> Verbatim extraction from Process Atlas HTML (<code>~/Apps/housezum-process-atlas/architecture/index.html</code> + <code>tech-stack/index.html</code>, both timestamped 2026-04-02 15:24). <strong>Status:</strong> Living-but-unrefreshed. Reflects strategic thinking as of 2026-04-02. Subsequent shipments (BL-97, BL-106, BL-114/115/115b, BL-120, etc.) are NOT reflected. Refresh tracked in BG-79b.</p></blockquote>
+<blockquote><p><strong>Last verified:</strong> 2026-04-02 <strong>Status:</strong> Living <strong>Update triggers:</strong> strategic / roadmap / autonomy / migration / GDPR discussions <strong>Owner:</strong> Will (solo) — review on every commit touching update triggers</p></blockquote>
+<hr/>
+<h1>AI Architecture</h1>
+<p><em>v1.1 · April 2026 · cross-validated</em></p>
+<p>System design, data moat, and AI orchestration strategy for HouseZoom.ai. Updated after cross-validation with Gemini and ChatGPT.</p>
+<h2>North star</h2>
+<p>HouseZoom is not an AI company that sells real estate software. It's a <strong>real estate workflow company</strong> with proprietary AI built on CRM ground truth.</p>
+<p>The moat is not the models. The moat is accumulated workflow, compliance, correction, and communication data that compounds over time. A standalone LLM wrapper has none of it.</p>
+<h2>System layers</h2>
+<h3>Agent &amp; Admin UX — <code>presentation</code> — LIVE</h3>
+<p>Two interfaces provisioned from the same backend. Agent App is mobile-first (Capacitor iOS + Vercel web). Admin CRM is desktop-first. Like Salesforce org → Salesforce mobile.</p>
+<ul><li>Next.js 14 App Router</li><li>Tailwind CSS</li><li>Capacitor iOS</li><li>TypeScript</li><li>i18n: en / fr / de / it</li></ul>
+<h3>Brain — Intelligence + Planning — <code>ai · orchestration</code> — PARTIAL</h3>
+<p>Consumes events, updates scores, generates Intel Cards (Intelligence — built). Generates ranked daily action lists per agent (Planning — not yet built). Runs async on schedule — never blocks user actions. Priority queue: real-time leads bypass batch jobs.</p>
+<ul><li>Claude Sonnet (reasoning)</li><li>Haiku (classification)</li><li>P = U×0.4 + V×0.3 + C×0.3</li><li>Exponential decay scoring</li><li>Daily Plan agent ⬡ TODO</li><li>Deal risk alerts ⬡ TODO</li><li>Buyer-Seller matching</li><li>Compliance monitor</li></ul>
+<h3>Signal Layer — <code>ingestion · events</code> — PARTIAL</h3>
+<p>Detects and normalises inbound events from all channels. Stateless, fast, cheap models. Emits typed events to the activity_events bus with priority tiering. Rate-limited per org to prevent event storms.</p>
+<ul><li>Portal signals (Bayut · PF)</li><li>Gmail sync + Pub/Sub</li><li>WhatsApp (Twilio)</li><li>CRM events</li><li>inbound_signals table</li><li>lead_sessions (72h windows)</li><li>shadow_listings</li></ul>
+<h3>Data Layer — <code>persistence · moat</code> — LIVE → AWS H2 2026</h3>
+<p>Supabase (Postgres + Storage + Auth + RLS) today. Planned AWS migration H2 2026: Lambda/ECS for compute, RDS Aurora for DB, S3 for storage, SageMaker for ML. Data gravity rule: compute must migrate alongside DB — not before.</p>
+<ul><li>Supabase Postgres</li><li>Supabase Storage</li><li>pgvector (embeddings)</li><li>activity_events</li><li>ai_interactions ⬡ TODO</li><li>ai_feedback ⬡ TODO</li><li>communication_graph ⬡ TODO</li><li>deal_outcomes ⬡ TODO</li><li>agent_performance ⬡ TODO</li></ul>
+<h2>AI pipeline — how a signal becomes an action</h2>
+<h3>1 · Detect</h3>
+<p>Raw event arrives from portal, Gmail, WhatsApp, or CRM action.</p>
+<ul><li>→ inbound_signals</li><li>→ entity resolution</li><li>→ lead_sessions</li></ul>
+<h3>2 · Score</h3>
+<p>Intelligence engine scores the signal: urgency, value, confidence.</p>
+<ul><li>→ P = U×V×C</li><li>→ decay applied</li><li>→ intel_cards</li></ul>
+<h3>3 · Plan</h3>
+<p>Planning agent assembles ranked daily action list. Specific, contextual, actionable.</p>
+<ul><li>→ daily 7am batch</li><li>→ real-time triggers</li><li>→ dismiss/snooze loop</li></ul>
+<h3>4 · Learn</h3>
+<p>Agent action (or inaction) feeds back. Corrections captured. Model improves.</p>
+<ul><li>→ ai_feedback</li><li>→ delta capture</li><li>→ ranking update</li></ul>
+<h2>Data moat — status</h2>
+<table><thead><tr><th>Status</th><th>Asset</th><th>Description</th></tr></thead><tbody><tr><td>STRONG</td><td>Compliance graph</td><td>Country × property type × deal stage → required docs and checks. High value, expensive to maintain, hard to replicate.</td></tr><tr><td>STRONG</td><td>Deal graph</td><td>Who is involved, in what role, at what stage, with what documents. Real durations per stage — no public dataset has this.</td></tr><tr><td>BUILDING</td><td>Communication graph</td><td>Who talks to whom, how fast, in what language. Captured but not yet scored. Strongest latent asset — nobody in RE uses it properly.</td></tr><tr><td>BUILDING</td><td>Agent correction data</td><td>Delta between AI draft and what agent actually sent. Delta capture table not yet built — every day without it loses signal.</td></tr><tr><td>FUTURE</td><td>Deal outcomes</td><td>Won/lost reasons, time-to-close per stage. Ground truth for all future ML. Nothing works without this — must be captured from day one.</td></tr><tr><td>FUTURE</td><td>Cross-org intelligence</td><td>"Marina deals close 18% faster with X pricing." Anonymized benchmarks across agencies. Network effect moat — requires scale.</td></tr></tbody></table>
+<h2>Existential threat</h2>
+<p>⚠ <strong>Portals moving upstream</strong></p>
+<p>PropertyFinder, Bayut, and SeLoger already own distribution AND data exhaust. They see: lead → click → contact → conversion. We only see: lead → agent actions. If they ship "AI CRM-lite," the top-of-funnel moat compresses fast.</p>
+<p><strong>Defense:</strong> our moat must be <em>inside the deal</em> — compliance, document workflow, multi-party signing, deal orchestration. Portals cannot easily follow here. Double down on this layer.</p>
+<h2>Autonomy model</h2>
+<h3>AUTONOMOUS</h3>
+<ul><li>Intel Card generation</li><li>Daily plan generation</li><li>Compliance recalculation</li><li>Document reminder sends</li><li>Calendar scheduling (confirmed)</li></ul>
+<h3>HUMAN-IN-THE-LOOP</h3>
+<ul><li>All client-facing comms</li><li>Contract document generation</li><li>Listing content</li><li>Price recommendations</li></ul>
+<h3>NEVER AUTONOMOUS</h3>
+<ul><li>Financial commitments</li><li>Document signature initiation</li><li>Deal stage advancement</li><li>Contact deletion</li></ul>
+<hr/>
+<p><em>HouseZoom.ai Process Atlas · Architecture v1.1 · April 2026 · cross-validated with Gemini + ChatGPT</em></p>
+<hr/>
+<h1>Tech Stack &amp; Tool Inventory</h1>
+<p><em>Living document · updated per session</em></p>
+<p>Every tool, service, and library in use or planned. Status reflects current production state.</p>
+<h2>Core framework</h2>
+<h3>Next.js 14 — LIVE — <code>frontend · backend</code></h3>
+<p>App Router, Server Components, API Routes. All business logic in service classes — route handlers are thin (auth + call service + return response). Required for AWS Lambda migration compatibility.</p>
+<p><code>App Router</code> <code>API Routes</code> <code>Server Actions</code> <code>ISR</code></p>
+<h3>TypeScript — LIVE — <code>language</code></h3>
+<p>Strict mode. All new files typed. npx tsc --noEmit runs before every commit. No any casts without explicit comment.</p>
+<p><code>strict mode</code> <code>pre-commit check</code></p>
+<h3>Tailwind CSS — LIVE — <code>styling</code></h3>
+<p>Utility-first. Design tokens via CSS variables. No custom CSS files — all styles via Tailwind classes or inline style for edge cases.</p>
+<p><code>CSS variables</code> <code>design tokens</code></p>
+<h3>Capacitor — LIVE — <code>ios</code></h3>
+<p>iOS wrapper loading from remote Vercel URL. Native plugins limited — camera uses HTML file input (no capture attribute). TestFlight only needed for native changes.</p>
+<p><code>remote URL mode</code> <code>WKWebView</code> <code>safe-area CSS</code></p>
+<p><em>Native build only for: Capacitor config, app icons, splash, native plugins.</em></p>
+<!-- merge-needed: backend-and-database (overlaps with "Data Layer" above) -->
+<h2>Backend &amp; database</h2>
+<h3>Supabase — LIVE → migrating H2 2026 — <code>db · auth · storage</code></h3>
+<p>Postgres + Storage + Auth + RLS. All tables org-scoped via org_id. RLS enforced at DB level. Migration to AWS RDS Aurora planned H2 2026 — migrate last, after compute.</p>
+<p><code>Postgres 15</code> <code>pgvector</code> <code>RLS</code> <code>Storage buckets</code> <code>Auth</code></p>
+<p><em>Key rule: never use FK joins across RLS-protected tables — use two separate queries.</em></p>
+<h3>pgvector — PLANNED — <code>embeddings</code></h3>
+<p>Already available in Supabase. Will store embeddings for property descriptions, contact notes, deal summaries. Used for semantic search and buyer-property matching.</p>
+<p><code>text-embedding-3-small</code> <code>cosine similarity</code></p>
+<h3>Vercel — LIVE → migrating H2 2026 — <code>hosting · deploy</code></h3>
+<p>Auto-deploy from main branch. Cron jobs via vercel.json. Migration to AWS Lambda/ECS planned H2 2026 — migrate compute before DB. No deep Vercel coupling allowed (no KV, no Edge Config).</p>
+<p><code>auto-deploy</code> <code>Vercel Cron</code> <code>Edge Functions</code></p>
+<p><em>AWS migration rule: no @vercel/kv or @vercel/edge-config imports. Tag all new Vercel crons as aws-migration items.</em></p>
+<h3>AWS (planned) — H2 2026 — <code>cloud · infra</code></h3>
+<p>Post-funding migration. Run Vercel + AWS in parallel per service — no big-bang cutover. Compute first, DB last. Data gravity rule: AI compute must be in same region as DB.</p>
+<p><code>Lambda / ECS</code> <code>RDS Aurora</code> <code>S3</code> <code>SageMaker</code> <code>CloudFront</code></p>
+<!-- merge-needed: ai-and-models (overlaps with "Brain — Intelligence + Planning" above) -->
+<h2>AI &amp; models</h2>
+<h3>Anthropic Claude — LIVE — <code>LLM · reasoning</code></h3>
+<p>Primary LLM for compliance reasoning, communication drafting, document analysis, listing content, Intel Card generation. Always version-pinned.</p>
+<p><code>claude-sonnet-4-20250514</code> <code>claude-haiku-4-5</code> <code>vision</code></p>
+<p><em>All calls must go through central ai_service wrapper — never direct SDK calls in components.</em></p>
+<h3>GPT-4o-mini / Haiku — ROUTING PLANNED — <code>LLM · classification</code></h3>
+<p>Small, cheap models for intent detection and entity extraction. Target: &lt;300ms latency, ~10% cost of Sonnet. ai_service wrapper handles routing by feature ID.</p>
+<p><code>intent detection</code> <code>entity extraction</code> <code>classification</code></p>
+<h3>OpenAI Embeddings — PLANNED — <code>embeddings</code></h3>
+<p>text-embedding-3-small for generating embeddings stored in pgvector. Used for semantic search, duplicate detection, buyer-property matching.</p>
+<p><code>text-embedding-3-small</code> <code>1536 dims</code></p>
+<h3>Whisper — PLANNED — <code>voice · transcription</code></h3>
+<p>Voice transcription for agent voice input. Via API initially, self-hosted on AWS when volume warrants it.</p>
+<p><code>whisper-1</code> <code>Arabic · English · French</code></p>
+<h3>CLIP / ViT (HuggingFace) — FUTURE — <code>vision · ML</code></h3>
+<p>Photo room classifier. Fine-tuned on HouseZoom labeled corpus. Requires 5k labeled examples — BL-54b must complete first. Replaces manual room tagging.</p>
+<p><code>fine-tune on corpus</code> <code>5k labels needed</code> <code>SageMaker training</code></p>
+<h3>SageMaker — FUTURE · AWS H2 2026 — <code>ML training</code></h3>
+<p>ML training pipeline for intent classifier and photo room classifier. Only viable after labeled data thresholds are reached. No self-hosted ML in 2026.</p>
+<p><code>intent classifier</code> <code>room classifier</code> <code>deal risk predictor</code></p>
+<h2>Integrations &amp; APIs</h2>
+<h3>Resend — LIVE — <code>email</code></h3>
+<p>Transactional email. Invite emails, document notifications, compliance alerts.</p>
+<p><code>transactional</code> <code>invite flow</code></p>
+<h3>Twilio — LIVE (sandbox) — <code>whatsapp · sms</code></h3>
+<p>WhatsApp Phase 1 (outbound). Currently on sandbox number. Upgrade to verified WhatsApp Business number requires Meta Business verification.</p>
+<p><code>WhatsApp sandbox</code> <code>REST (not SDK)</code></p>
+<p><em>NU-5: upgrade to production WhatsApp number — ~2-5 days Meta verification.</em></p>
+<h3>Gmail API + Pub/Sub — LIVE (polling) — <code>email sync</code></h3>
+<p>Gmail OAuth, label-based sync, intent detection, entity linking, Intel Card generation. Currently polling. Real-time Pub/Sub webhook deprioritized pending AWS infra decision.</p>
+<p><code>OAuth 2.0</code> <code>gmail.readonly</code> <code>HouseZoom label</code></p>
+<h3>pdf-lib — LIVE — <code>documents · signing</code></h3>
+<p>Server-side PDF manipulation for document signing pipeline. Draw-then-strip approach (never form.flatten()). Rebuild from base PDF on every signer submission.</p>
+<p><code>draw-then-strip</code> <code>AcroForm</code> <code>multi-party signing</code></p>
+<p><em>Never use form.flatten() — silently fails on reportlab/pdfrw PDFs.</em></p>
+<h3>Bayut Adapter — LIVE — <code>portal · UAE</code></h3>
+<p>XML feed generation for Bayut portal. Part of portal publishing engine. Includes VirtualTourURL wiring from walkthrough share tokens.</p>
+<p><code>XML feed</code> <code>UAE</code> <code>virtual tour</code></p>
+<h3>PropertyFinder Adapter — LIVE — <code>portal · UAE</code></h3>
+<p>JSON feed generation for PropertyFinder. Canonical mapper normalises property data across portal-specific schemas.</p>
+<p><code>JSON feed</code> <code>UAE</code> <code>virtual_tour_url</code></p>
+<h3>SeLoger / Leboncoin (planned) — PLANNED · France — <code>portal · France</code></h3>
+<p>Portal adapters for France expansion. Country-agnostic portal engine already supports multiple adapters — only adapter + canonical mapping needed per portal.</p>
+<p><code>SeLoger</code> <code>Leboncoin</code> <code>Bien'ici</code></p>
+<h3>Pexels / Pixabay / Unsplash — LIVE (seeding) — <code>photo corpus</code></h3>
+<p>Photo corpus seeding for annotation pipeline (BL-54b). ~3,962 photos seeded. Unsplash hit rate limit mid-run — re-run needed. CDN URLs only, no storage_path.</p>
+<p><code>~3,962 photos</code> <code>annotation queue</code> <code>CDN URLs</code></p>
+<h2>Developer tooling</h2>
+<h3>Claude Code (CC) — LIVE — <code>AI dev agent</code></h3>
+<p>Terminal-based implementation agent. Executes markdown prompt files from ~/Downloads/claude/. Handles all file edits and git operations. Will runs SQL migrations manually.</p>
+<p><code>~/Downloads/claude/</code> <code>prompt-driven</code> <code>git push</code></p>
+<p><em>Workflow: Claude drafts spec → Will reviews → CC executes → Will deploys + tests.</em></p>
+<h3>Claude in Chrome (MCP) — LIVE — <code>browser automation</code></h3>
+<p>Browser automation for live debugging. Operates as separate Chrome session (independent auth). Preferred pattern: Will tests manually and reports results.</p>
+<p><code>separate session</code> <code>live debug only</code></p>
+<h3>Process Atlas — LIVE — <code>docs · GitHub Pages</code></h3>
+<p>GitHub Pages site at housezum-process-atlas. Roadmap, Architecture, and Tech Stack pages. Regenerated via scripts each session and pushed to main.</p>
+<p><code>GitHub Pages</code> <code>~/Apps/housezum-process-atlas</code></p>
+<h3>Vercel Cron — LIVE — <code>scheduled jobs</code></h3>
+<p>Daily 3am UTC purge of 90-day old events. vercel.json defines crons. Each new cron must be tagged as aws-migration item in ROADMAP — will need Lambda equivalent on AWS.</p>
+<p><code>vercel.json</code> <code>CRON_SECRET</code> <code>max 2 on Hobby</code></p>
+<h2>Infrastructure migration timeline</h2>
+<h3>Now → H1 2026 — Current stack — Vercel + Supabase</h3>
+<p>Full stack on Vercel + Supabase. No self-hosted ML. Anthropic API for all AI. Build for portability: thin route handlers, no Vercel-specific coupling.</p>
+<p><code>Vercel</code> <code>Supabase</code> <code>Anthropic API</code></p>
+<h3>H2 2026 (post-funding) — Parallel migration — compute first</h3>
+<p>Migrate stateless compute to AWS Lambda/ECS. Run Vercel + AWS in parallel per service. Keep Supabase as DB. No big-bang cutover. Data gravity: compute must stay near DB.</p>
+<p><code>Lambda / ECS</code> <code>S3</code> <code>Supabase (still)</code></p>
+<h3>2027 — DB migration + ML infrastructure</h3>
+<p>Supabase → RDS Aurora (heaviest lift — plan early, execute last). SageMaker for ML training when labeled data thresholds reached. Bedrock as alternative to Anthropic API.</p>
+<p><code>RDS Aurora</code> <code>SageMaker</code> <code>CloudFront</code></p>
+<h2>Non-negotiable architectural rules</h2>
+<p>▸ <strong>Thin route handlers</strong> — API routes: auth + call service + return. Business logic lives in service classes only. Required for Lambda migration compatibility.</p>
+<p>▸ <strong>No Vercel coupling</strong> — No @vercel/kv or @vercel/edge-config. Every new Vercel cron = ROADMAP aws-migration tag. If it only works on Vercel, flag before adding.</p>
+<p>▸ <strong>Storage paths only</strong> — Never store absolute URLs. Always storage_path column. Maps cleanly to S3 on migration. No Supabase-specific URL construction in components.</p>
+<p>▸ <strong>Country-agnostic</strong> — No hardcoded AED, RERA, or single-country values. All market-specific strings in lookup maps. UAE = fallback only, not primary path.</p>
+<p>▸ <strong>org<em>id on everything</strong> — Every table row has org</em>id. RLS enforced at DB level. Never filter by org in application code as primary security — DB enforces it.</p>
+<p>▸ <strong>AI wrapper only</strong> — All model calls through central ai_service — never direct Anthropic/OpenAI SDK calls in components. Model routing, cost control, logging in one place.</p>
+<p>▸ <strong>Behavior before data</strong> — Ship features that create agent behavior first. Capture signal from that behavior second. Don't build logging before there's anything to log.</p>
+<p>▸ <strong>Async always</strong> — Planning, scoring, and AI generation run on schedules or in background. Never block a user action on an AI call. Priority queue: real-time &gt; batch.</p>
+<p>▸ <strong>Outcomes or nothing</strong> — A system that tracks activity but not outcomes builds no real ML advantage. Capture deal won/lost/reason from day one.</p>
+<hr/>
+<p><em>HouseZoom.ai Process Atlas · Tech Stack Inventory · April 2026</em></p></div>
+</main>
+<footer>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/strategy.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>
