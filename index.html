@@ -1,442 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HouseZum — Documentation Atlas</title>
-  <style>
-    :root {
-      --hz-bg: #FFFFFF;
-      --hz-bg-secondary: #F8FAFC;
-      --hz-card: #FFFFFF;
-      --hz-card-hover: #F8FAFC;
-      --hz-text: #1E293B;
-      --hz-text-secondary: #64748B;
-      --hz-text-tertiary: #94A3B8;
-      --hz-border: rgba(0, 0, 0, 0.08);
-      --hz-violet: #7C3AED;
-      --hz-violet-light: rgba(124, 58, 237, 0.1);
-      --hz-blue: #3B82F6;
-      --hz-blue-light: rgba(59, 130, 246, 0.1);
-      --hz-green: #10B981;
-      --hz-green-light: rgba(16, 185, 129, 0.1);
-      --hz-orange: #F59E0B;
-      --hz-orange-light: rgba(245, 158, 11, 0.1);
-      --hz-red: #EF4444;
-      --hz-red-light: rgba(239, 68, 68, 0.1);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: var(--hz-bg);
-      color: var(--hz-text);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 24px 80px;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 6px 14px;
-      background: var(--hz-violet-light);
-      color: var(--hz-violet);
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-bottom: 16px;
-    }
-
-    h1 {
-      font-size: 42px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #7C3AED, #3B82F6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 12px;
-    }
-
-    header p {
-      color: var(--hz-text-secondary);
-      font-size: 18px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .section {
-      margin-bottom: 48px;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--hz-border);
-    }
-
-    .section-icon {
-      font-size: 24px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--hz-text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      background: var(--hz-card);
-      border: 1px solid var(--hz-border);
-      border-radius: 16px;
-      padding: 24px;
-      text-decoration: none;
-      color: inherit;
-      transition: all 0.2s ease;
-      display: block;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    }
-
-    .card:hover {
-      background: var(--hz-card-hover);
-      border-color: var(--hz-violet);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.12);
-    }
-
-    .card-disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .card-disabled:hover {
-      transform: none;
-      border-color: var(--hz-border);
-      box-shadow: none;
-      background: var(--hz-card);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }
-
-    .card-title {
-      font-size: 17px;
-      font-weight: 600;
-      color: var(--hz-text);
-    }
-
-    .card-status {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .status-live {
-      background: var(--hz-green-light);
-      color: var(--hz-green);
-    }
-
-    .status-new {
-      background: var(--hz-violet-light);
-      color: var(--hz-violet);
-    }
-
-    .status-soon {
-      background: var(--hz-orange-light);
-      color: var(--hz-orange);
-    }
-
-    .status-download {
-      background: var(--hz-blue-light);
-      color: var(--hz-blue);
-    }
-
-    .card-desc {
-      font-size: 14px;
-      color: var(--hz-text-secondary);
-      line-height: 1.5;
-    }
-
-    .card-meta {
-      display: flex;
-      gap: 12px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-
-    .meta-tag {
-      font-size: 11px;
-      padding: 4px 8px;
-      background: var(--hz-bg-secondary);
-      border-radius: 6px;
-      color: var(--hz-text-tertiary);
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px 24px;
-      color: var(--hz-text-tertiary);
-      font-size: 14px;
-      border-top: 1px solid var(--hz-border);
-    }
-
-    @media (max-width: 640px) {
-      h1 { font-size: 32px; }
-      .grid { grid-template-columns: 1fr; }
-      .container { padding: 24px 16px 60px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Process Atlas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+header.hero{max-width:880px;margin:0 auto;padding:64px 32px 24px;text-align:center}
+header.hero h1{font-size:32px;font-weight:700;letter-spacing:-0.6px;margin-bottom:12px;color:var(--text)}
+header.hero p{font-size:15px;color:var(--text2);max-width:600px;margin:0 auto}
+main{max-width:1100px;margin:0 auto;padding:24px 32px 64px}
+.sections{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:24px}
+.section-card{display:flex;align-items:flex-start;gap:14px;padding:20px 22px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+.section-card:hover{border-color:var(--purple);transform:translateY(-1px);text-decoration:none}
+.section-icon{font-size:28px;line-height:1;flex-shrink:0;margin-top:2px}
+.section-meta{flex:1;min-width:0}
+.section-title{font-size:17px;font-weight:600;margin-bottom:6px;color:var(--text);letter-spacing:-0.2px}
+.section-desc{font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:10px}
+.section-cta{font-size:12px;color:var(--purple);font-family:var(--mono)}
+.section-card:hover .section-cta{text-decoration:none}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer code{font-family:var(--mono);color:var(--text2)}
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="badge">Documentation Atlas</div>
-      <h1>HouseZum Docs</h1>
-      <p>Product specifications, architecture references, feature specs, and development guides — all in one place.</p>
-    </header>
-
-    <!-- SPECIFICATIONS -->
-    <section class="section">
-      <div class="section-header">
-        <span class="section-icon">📋</span>
-        <span class="section-title">Specifications</span>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+</nav>
+<header class="hero">
+  <h1>HouseZoom.ai Process Atlas</h1>
+  <p>Operating playbook for the platform — roadmap, architecture, data environments, and tech stack. Auto-generated from the source repo.</p>
+</header>
+<main>
+  <section class="sections">
+    <a class="section-card" href="roadmap/">
+      <div class="section-icon">📍</div>
+      <div class="section-meta">
+        <h2 class="section-title">Roadmap</h2>
+        <p class="section-desc">Product development status — board, timeline, and session log views. Auto-generated from ROADMAP.md.</p>
+        <span class="section-cta">Open Roadmap →</span>
       </div>
-      <div class="grid">
-        <a href="specs/HouseZum-PRD-v2.0.docx" class="card" download>
-          <div class="card-header">
-            <span class="card-title">Product Requirements (PRD)</span>
-            <span class="card-status status-download">Download</span>
-          </div>
-          <p class="card-desc">Comprehensive PRD covering personas, transaction lifecycle, sharing model, data architecture, and phased roadmap.</p>
-          <div class="card-meta">
-            <span class="meta-tag">v2.0</span>
-            <span class="meta-tag">Feb 2026</span>
-            <span class="meta-tag">.docx</span>
-          </div>
-        </a>
-
-        <a href="specs/HouseZum-Listing-Sharing-Spec-v1.1.docx" class="card" download>
-          <div class="card-header">
-            <span class="card-title">Listing Sharing Feature Spec</span>
-            <span class="card-status status-new">New</span>
-          </div>
-          <p class="card-desc">Agent-to-agent sharing, multi-market support (SNPI, Bayut, MLS), visibility tiers, anonymous tracking, request-based enrichment.</p>
-          <div class="card-meta">
-            <span class="meta-tag">v1.1</span>
-            <span class="meta-tag">Feb 2026</span>
-            <span class="meta-tag">.docx</span>
-          </div>
-        </a>
-
-        <a href="specs/HouseZum-Home-Buying-Process-Map.docx" class="card" download>
-          <div class="card-header">
-            <span class="card-title">Home Buying Process Map</span>
-            <span class="card-status status-download">Download</span>
-          </div>
-          <p class="card-desc">15-step transaction lifecycle with actor touchpoints, documents, pain points, and AI opportunities. Based on California (~90% universal).</p>
-          <div class="card-meta">
-            <span class="meta-tag">v1.0</span>
-            <span class="meta-tag">Feb 2026</span>
-            <span class="meta-tag">.docx</span>
-          </div>
-        </a>
-
-        <a href="specs/housezum-mls-integration-research.md" class="card">
-          <div class="card-header">
-            <span class="card-title">MLS Integration Research</span>
-            <span class="card-status status-download">Download</span>
-          </div>
-          <p class="card-desc">Market-by-market analysis: France (SNPI), UAE (Bayut), USA (CRMLS), Germany, UK, Italy, Switzerland. APIs, feasibility, and phased rollout.</p>
-          <div class="card-meta">
-            <span class="meta-tag">8 Markets</span>
-            <span class="meta-tag">Feb 2026</span>
-            <span class="meta-tag">.md</span>
-          </div>
-        </a>
+    </a>
+    <a class="section-card" href="architecture/">
+      <div class="section-icon">🏗️</div>
+      <div class="section-meta">
+        <h2 class="section-title">Architecture</h2>
+        <p class="section-desc">11 architecture docs covering signing, agentic mode, Q&amp;A engine, multi-tenancy, i18n, cache, CRM core, photo intelligence, portal subsystem, and strategic framing. Auto-generated from docs/architecture/.</p>
+        <span class="section-cta">Open Architecture →</span>
       </div>
-    </section>
-
-    <!-- PROCESSES -->
-    <section class="section">
-      <div class="section-header">
-        <span class="section-icon">🔄</span>
-        <span class="section-title">Processes</span>
+    </a>
+    <a class="section-card" href="data-environments/">
+      <div class="section-icon">🗄️</div>
+      <div class="section-meta">
+        <h2 class="section-title">Data Environments</h2>
+        <p class="section-desc">Staging environment source-of-truth — seeded demo orgs (UAE / FR / DE-CH / IT), CHECK constraint cache, idempotency markers, rollback procedures. Auto-generated from docs/data-environments/.</p>
+        <span class="section-cta">Open Data Environments →</span>
       </div>
-      <div class="grid">
-        <a href="processes/home-buying.html" class="card">
-          <div class="card-header">
-            <span class="card-title">Home Buying Process</span>
-            <span class="card-status status-live">Live</span>
-          </div>
-          <p class="card-desc">7 interactive diagrams covering the complete Italian home buying journey — from search to keys.</p>
-        </a>
-
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">Home Selling Process</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">Seller workflow from listing to closing, including agent tasks and document requirements.</p>
-        </div>
-
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">Rental Process</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">End-to-end rental workflow for landlords and tenants.</p>
-        </div>
+    </a>
+    <a class="section-card" href="tech-stack/">
+      <div class="section-icon">🧰</div>
+      <div class="section-meta">
+        <h2 class="section-title">Tech Stack</h2>
+        <p class="section-desc">Tools, services, and libraries in use or planned across the platform.</p>
+        <span class="section-cta">Open Tech Stack →</span>
       </div>
-    </section>
-
-    <!-- ARCHITECTURE -->
-    <section class="section">
-      <div class="section-header">
-        <span class="section-icon">🏗️</span>
-        <span class="section-title">Architecture</span>
-      </div>
-      <div class="grid">
-        <a href="architecture/" class="card">
-          <div class="card-header">
-            <span class="card-title">System Architecture</span>
-            <span class="card-status status-live">Live</span>
-          </div>
-          <p class="card-desc">High-level architecture: Next.js, Supabase, Vercel, AI integrations, and how they connect.</p>
-        </a>
-
-        <a href="tech-stack/" class="card">
-          <div class="card-header">
-            <span class="card-title">Tech Stack Inventory</span>
-            <span class="card-status status-live">Live</span>
-          </div>
-          <p class="card-desc">Complete technology inventory: frameworks, databases, APIs, deployment, and dependencies.</p>
-        </a>
-
-        <a href="roadmap/" class="card">
-          <div class="card-header">
-            <span class="card-title">Product Roadmap</span>
-            <span class="card-status status-live">Live</span>
-          </div>
-          <p class="card-desc">Interactive kanban board with all backlog items, in-progress features, and completed deliverables.</p>
-        </a>
-
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">Database Schema</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">Supabase tables, relationships, RLS policies, and data model diagrams.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- FEATURES -->
-    <section class="section">
-      <div class="section-header">
-        <span class="section-icon">✨</span>
-        <span class="section-title">Features</span>
-      </div>
-      <div class="grid">
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">Property Management</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">CRUD operations for rooms, features, systems, exterior elements with category-specific fields.</p>
-        </div>
-
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">Contacts & Relationships</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">Buyer, seller, agent, and service provider management with property linking.</p>
-        </div>
-
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">AI Form Generator</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">13 real estate document templates with PDF generation, email and WhatsApp sharing.</p>
-        </div>
-
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">Internationalization</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">Multi-language support across EN, FR, DE, IT with browser detection and user preferences.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- GUIDES -->
-    <section class="section">
-      <div class="section-header">
-        <span class="section-icon">📘</span>
-        <span class="section-title">Guides</span>
-      </div>
-      <div class="grid">
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">Deployment & CI/CD</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">Vercel deployment, Git workflows, environment variables, and production troubleshooting.</p>
-        </div>
-
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">i18n Implementation</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">next-intl setup, adding translation keys, and locale management guide.</p>
-        </div>
-
-        <div class="card card-disabled">
-          <div class="card-header">
-            <span class="card-title">Design System</span>
-            <span class="card-status status-soon">Coming soon</span>
-          </div>
-          <p class="card-desc">Aurora theme, CSS variables, Tailwind overrides, and component styling patterns.</p>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <footer>
-    HouseZum Documentation Atlas — Last updated April 2026
-  </footer>
+    </a>
+  </section>
+</main>
+<footer>
+  Auto-generated 2026-04-29 from <code>scripts/generate-atlas-index.mjs</code>.
+  Add a section by editing <code>ATLAS_SECTIONS</code> in the generator and re-running.
+</footer>
 </body>
 </html>

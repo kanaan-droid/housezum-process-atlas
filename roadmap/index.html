@@ -137,9 +137,33 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-25';
+const LAST_UPDATED = '2026-04-29';
 const DATA = {
   "inProgress": [
+    {
+      "id": "~~BL-126~~",
+      "title": "~~Seed EU locales (FR/DE/IT) with realistic CRM data~~",
+      "desc": "CLOSED 2026-04-29 → D-280. 75 contacts (12 buyers + 5 sellers + 3 owners + 5 service providers per org × 3 orgs) + 30 deals + 30 viewings + 18 viewing_feedback + 30 leads + 15 property↔seller links + 3 org default_locale fixes (en→fr/de/it) across Saint Germain Immobilier (FR), Zürich Premium Realty (DE-CH), Milano Prestige (IT). Email convention will+{role}-{locale}-{first-last}@housezoom.ai with co/sl/ld prefixes. Locale-authentic names (modern + older-skewing seller pools), phone formats (+33/+41/+39), email TLDs (orange.fr/bluewin.ch/libero.it), commission rates (FR 4-6%, DE 2-3%, IT 3-5%), notes/feedback in target language, locale-appropriate service-provider roles. Idempotent via [seed:eu-v1] marker; --dry-run / --force / --rollback / --locale= flags. Spec: docs/specs/SEED-EU-LOCALES-SPEC.md.",
+      "files": "scripts/seed-eu-locales.mjs, docs/specs/SEED-EU-LOCALES-SPEC.md, docs/data-environments/SEEDED-DATA.md",
+      "tag": "comms",
+      "added": "2026-04-29"
+    },
+    {
+      "id": "~~BL-120~~",
+      "title": "~~Locale backfill FR/DE/IT + org→user inheritance~~",
+      "desc": "CLOSED 2026-04-28 → D-276. FR/DE/IT now at 99.8% parity vs EN (3,757 of 3,763 keys; 6 intentional skips per locale = proper nouns + emojis). New organizations.default_locale column. Existing agent_profiles.language column constrained to en/fr/de/it/ar (forward-compat with BL-121). Org→user inheritance wired in onboarding + invite-signup. New apiError-style POST /api/auth/sync-locale Set-Cookies on login; logout clears via new clearLocaleCookie() helper. Login uses window.location.replace (full nav) so the server's new \u003chtml lang\u003e lands on first paint. \u003chtml translate=\"no\"\u003e opts out of Chrome auto-translate (prevents \"Strumenti\"→\"Instruments\" machine-translation overlay). New translation pipeline: scripts/i18n/{generate-glossary,translate-locale}.mjs with 34-term per-locale glossaries, idempotent batching, ICU validator, tolerant JSON-recovery parser. Architecture doc at docs/architecture/i18n.md. AR deferred to BL-121 (RTL pass).",
+      "files": "docs/architecture/i18n.md, src/i18n/{request,locale-utils}.ts, src/components/shared/LocaleDetector.tsx, src/app/api/auth/sync-locale/route.ts, scripts/i18n/, messages/{fr,de,it}.json",
+      "tag": "admin",
+      "added": "2026-04-28"
+    },
+    {
+      "id": "~~BG-68~~",
+      "title": "~~API Error Payload i18n (Shape C)~~",
+      "desc": "CLOSED 2026-04-27. Phase A → D-269 (audit baseline 265, 7 webhook routes excluded). Phase B → src/lib/api/errors.ts apiError() + apiErrorFromThrow() helpers. Batches (a) boilerplate 130/D-271, (b) signing 48/D-272, (c) actions/leads/deals 20/D-273, (d) photos/admin/orchestrator/ai/market 43/D-274, (e) mop-up 24/D-275. 265 sites migrated to 0, 100% closed across 5 batches in 1 day. Detector D in audit guards regressions. Service-internal API contracts (actionExecutorService.ts:50 style) deferred to BG-69 (separate ticket).",
+      "files": "docs/specs/BG-68-Spec-Shape-C-API-Error-Payloads.md, src/lib/api/errors.ts, scripts/audit-api-error-payloads.mjs, scripts/audit/i18n-coverage-full.mjs",
+      "tag": "admin",
+      "added": "2026-04-27"
+    },
     {
       "id": "BL-98",
       "title": "Founder Dogfooding — Agentic Mode",
@@ -160,11 +184,67 @@ const DATA = {
   "nextUp": [
     {
       "id": "BL-107",
-      "title": "DEADLINE 2026-05-10 — Seed property cleanup (storage limit)",
-      "desc": "Supabase storage at limit. Hard deadline. Parked since 2026-04-11 BL-81 ship. Need to identify + delete unused seed property photos / blob entries.",
+      "title": "Seed property cleanup (deferred — plan upgrade scheduled)",
+      "desc": "Was hard deadline 2026-05-10 due to Supabase storage limit. Will is upgrading plan next week (2026-W19), removing the deadline pressure. Ticket stays open as quality work but no longer blocks.",
       "files": "Storage, seed scripts",
       "tag": "infra",
       "added": "2026-04-25"
+    },
+    {
+      "id": "BL-127",
+      "title": "Retrofit Gulf Horizon (UAE) seed to use [seed:uae-v1] marker pattern",
+      "desc": "The original scripts/seed-dubai.mjs predates the marker-based idempotency convention (introduced in BL-126 as [seed:eu-v1]). Currently relies on deterministic UUIDs + manual FK-ordered wipe in scripts/SEED-INSTRUCTIONS.md. Retrofit to append [seed:uae-v1] to all seeded notes fields, add --rollback / --force flags matching the EU script. Brings UAE seed to feature parity with EU.",
+      "files": "scripts/seed-dubai.mjs, scripts/SEED-INSTRUCTIONS.md, docs/data-environments/SEEDED-DATA.md",
+      "tag": "ai",
+      "added": "2026-04-29"
+    },
+    {
+      "id": "TD-26",
+      "title": "Refactor Atlas HTML generators into a single config-driven script",
+      "desc": "Currently 3 near-identical generators: generate-roadmap-html.mjs, generate-architecture-html.mjs, generate-data-environments-html.mjs (added 2026-04-29 in D-281). Each has its own copy of the template HTML, CSS variables, cross-link rewriter, etc. Refactor to a single generate-atlas-html.mjs that takes a config block (source dir, output dir, theme, page title, known-docs set) and emits HTML for any docs tree. Trigger: when a 4th docs tree appears (likely candidate: specs HTML), refactor first.",
+      "files": "scripts/generate-atlas-*.mjs, scripts/atlas/ (NEW dir)",
+      "tag": "infra",
+      "added": "2026-04-29"
+    },
+    {
+      "id": "BG-83",
+      "title": "Re-sync DB-SCHEMA.md against live CHECK constraints",
+      "desc": "Multiple stale entries discovered during BL-126 execution: (1) leads.purpose documented as buy/rent/invest, live is investor/end_user/tenant/unknown; (2) viewing_feedback.user_id documented nullable, live is NOT NULL; (3) viewing_feedback.next_step is enum-constrained (follow_up/send_comps/submit_offer/no_interest/second_viewing) but DB-SCHEMA didn't flag this; (4) viewing_feedback.price_feedback is also enum-constrained (too_high/fair/good_value/no_comment) — also unflagged. D-282 corrected these four; this ticket adds a CI/EOS check that runs the canonical pg_get_constraintdef query (in docs/data-environments/SEEDED-DATA.md § 5.1) and diffs against a constraint snapshot file so future drift surfaces fast.",
+      "files": "DB-SCHEMA.md, scripts/audit/audit-db-constraints.mjs (NEW), constraint snapshot file",
+      "tag": "admin",
+      "added": "2026-04-29"
+    },
+    {
+      "id": "~~BG-79b~~",
+      "title": "~~Absorb grandfathered tickets into architecture docs~~",
+      "desc": "CLOSED 2026-04-28 → D-277. 94/94 paid down across 3 absorption passes. 11 arch docs (INDEX + STRATEGY + agentic + multi-tenancy + qa-engine + i18n + cache + signing + crm + photo-intelligence + portal). 5 testing tickets routed to WAYS-OF-WORKING § Testing Protocol via new ABSORBED_NON_ARCH set; 13 DROPs verified non-architectural via new DROPPED_TICKETS set; BL-118 (DLD/Dubai Pulse) deferred as the lone remaining grandfathered entry. Architecture documentation set complete — Documentation Governance Protocol fully active.",
+      "files": "docs/architecture/*.md, scripts/docs-check.mjs, WAYS-OF-WORKING.md",
+      "tag": "ai",
+      "added": "2026-04-28"
+    },
+    {
+      "id": "BG-81",
+      "title": "Agent Watchdog — propose doc updates on PRs touching trigger files",
+      "desc": "After BG-79b. GitHub Action that, on every PR matching the BG-78 trigger map, calls Claude with (diff + affected architecture doc + relevant WAYS-OF-WORKING section) and posts a PR comment with either \"no doc update needed because X\" or a suggested patch to the relevant docs/architecture/*.md. Human reviews/edits/merges. Scope: blocked on BG-79b producing real evidence about where doc-update friction actually is — premature to design before measurement. Cost considerations: API key in GitHub Secrets, per-PR token cost, failure handling (API down ≠ block PR), prompt versioning. Estimated 4-6h once scoped.",
+      "files": ".github/workflows/, scripts/docs-watchdog.mjs (likely), prompt config",
+      "tag": "ai",
+      "added": "2026-04-28"
+    },
+    {
+      "id": "BG-75",
+      "title": "Cache doc precision — fallback dual-write site",
+      "desc": "docs/architecture/cache.md says cache writes happen \"at the very bottom\" / \"after the answer polisher\" — but there's a secondary write at qa-engine.service.ts:291 in the fallback path (Step 6) for fallback/null and fallback/nyt responses that bypass polishing. Doc's spirit is preserved (fallbacks ARE the final response in that path) but a one-sentence addition would make it precise. Surfaced during BG-74 verification.",
+      "files": "docs/architecture/cache.md",
+      "tag": "core",
+      "added": "2026-04-28"
+    },
+    {
+      "id": "BG-76",
+      "title": "Tighten audit script's stale-detection (false positives)",
+      "desc": "BG-73 audit tool over-reported staleness 7/8 — extraction artifacts from the tree-walker, sibling-path conflation, and not recognizing the doc's → in foo/bar redirect-style entries as intentional. Re-running the audit in a few months at this signal-to-noise ratio wastes CC time on false patches. Fix: match the doc's actual rendering style; don't conflate sibling paths. Note: BG-73 ran inline node one-liners; BG-76 should formalize this as a reusable script at the path below.",
+      "files": "scripts/audit/audit-project-structure.mjs (NEW)",
+      "tag": "core",
+      "added": "2026-04-28"
     },
     {
       "id": "~~BL-98~~",
@@ -489,9 +569,9 @@ const DATA = {
   ],
   "backlog": [
     {
-      "id": "BG-50",
-      "title": "Agent Context Propagation: Currency, Measurement, Locale",
-      "desc": "HIGH — top of next session. Comprehensive i18n pass replacing BG-48 + BG-49 (merged). Estimate 6-8 hours across 6 phases. Acceptance: Pierre/Hans/Marco see correct locale + currency + units across all 12 UI surfaces; Fatima/Will see no regression. Surgical sample shipped under BG-47 (D-221).",
+      "id": "~~BG-50~~",
+      "title": "~~Agent Context Propagation: Currency, Measurement, Locale~~",
+      "desc": "CLOSED 2026-04-26 — wire scope shipped. 5 waves over BG-50X foundation: 529 strings wired across 75+ files. Coverage 80.2% → 94.1% (+13.9pp). Missing rows 753 → 222 (~50 BG-60 service-layer deferred + ~170 audit-noise to be cleaned via BG-59 follow-up). MCP-verified 0 regressions. D-numbers: D-253 (BG-59 script) + D-254..D-258 (BG-50X 4b/4c/5b/audit-grouping) + D-259..D-263 (W1-W5).",
       "tag": "admin",
       "added": "docs/specs/BG-50-Spec-Agent-Context-Propagation.md"
     },
@@ -1271,6 +1351,62 @@ const DATA = {
       "desc": "Replace broken data.dubai.gov.ae placeholder with real Dubai Pulse OAuth integration. Prereqs: API Key + Secret (~14-day grant), OAuth token rotation, adapter rewrite to CKAN schema, re-enable cron. Blocked on Dubai Pulse API Key grant. Current files retained for build-on.",
       "tag": "ai",
       "added": "src/app/api/market/ingest-dld/route.ts, src/features/market-intelligence/*"
+    },
+    {
+      "id": "BG-66",
+      "title": "Refactor tools/list-property/page.tsx (1,053 lines)",
+      "desc": "Exceeds healthy page.tsx threshold. Extract form logic into useListPropertyForm hook, split into sub-components (form sections, preview pane, submit handler). Target: page.tsx ≤ 300 lines. LOW priority — file works fine; hygiene only. Spotted via cloc codebase scan 2026-04-26 EOD.",
+      "tag": "core",
+      "added": "src/app/tools/list-property/page.tsx"
+    },
+    {
+      "id": "BL-121",
+      "title": "AR locale + RTL layout pass",
+      "desc": "Translation pipeline is identical (re-run scripts/i18n/translate-locale.mjs --target ar once a glossary lands). The actual work is RTL layout: \u003chtml dir=\"rtl\"\u003e switching, CSS logical properties (margin-inline-start etc.), bidi text handling, mirrored chevrons / back-arrows / pagination, flipped flexbox row→row-reverse where needed, audit of every absolute-positioned UI affordance. Do NOT ship AR translation without the RTL pass — broken UI is worse than EN UI. Add 'ar' to locales arrays in src/i18n/{request,locale-utils}.ts + src/components/shared/CapacitorIntlProvider.tsx. Estimated 1-2 day standalone effort. CHECK constraints in DB already accept 'ar' (BL-120 forward-compat). UAE market priority.",
+      "tag": "ai",
+      "added": "messages/ar.json (NEW), src/i18n/*, src/components/shared/CapacitorIntlProvider.tsx, app-wide CSS / layout audit"
+    },
+    {
+      "id": "BL-125",
+      "title": "Split messages/\u003clocale\u003e.json into per-namespace chunks for lazy loading",
+      "desc": "Each locale file is ~140 KB with ~3,700 keys; the full dictionary is bundled into every page render. With 4 locales today (en/fr/de/it) and 5 once BL-121 lands (ar), that's ~700 KB of translation overhead in the bundle even for routes that touch only a few namespaces. Split by top-level namespace (shared, errors, dashboard, properties, signing, etc.) and load only what each route needs. next-intl supports this via getMessages({ namespace }) per route. Refactor effort spans src/app/layout.tsx, src/i18n/request.ts, every consumer using full-tree dictionaries, plus the translation pipeline (script-side splitting + recombining). MEDIUM priority — current ~140 KB/locale is acceptable today, becomes a problem as locales grow + payload-sensitive routes (Capacitor mobile, slow connections) get profiled. Filed at BL-120 close per Will's directive.",
+      "tag": "infra",
+      "added": "src/app/layout.tsx, src/i18n/request.ts, messages/, scripts/i18n/translate-locale.mjs"
+    },
+    {
+      "id": "BL-123",
+      "title": "Migrate locale resolver to per-request DB read",
+      "desc": "src/i18n/request.ts currently resolves locale via the NEXT_LOCALE cookie (DB-derived; reconciled by LocaleDetector on each authenticated mount + Save handler). The cookie-first approach was chosen in BL-120 to avoid a Supabase round-trip on every request — the codebase has no @supabase/ssr cookie-based auth wired, sessions live in client localStorage (housezoom-auth). When @supabase/ssr is wired (separate auth refactor), upgrade getRequestConfig to read agent_profiles.language directly from the user's session at request time, falling back to organizations.default_locale, then Accept-Language, then 'en'. Eliminates the first-paint reconciliation flash documented in docs/bl-120-phase-1-summary.md. LOW priority — current behavior is correct, just has a one-time flash on cookie/DB drift. Filed at BL-120 close per Will's directive.",
+      "tag": "admin",
+      "added": "src/i18n/request.ts, src/components/shared/LocaleDetector.tsx, auth refactor (separate scope)"
+    },
+    {
+      "id": "BL-122",
+      "title": "Migrate readers off preferences.language jsonb, drop the orphan field",
+      "desc": "After BL-120 lands, the top-level agent_profiles.language column is the single source of truth for the user's UI locale. The preferences.language jsonb mirror was retired as a write target (writes now go to top-level only) but the existing jsonb data remains as orphan rows. Action: grep for any residual readers (currently 0 — only src/app/settings/profile/page.tsx:195 remained pre-BL-120, fixed in Phase 1d to read top-level), then drop the jsonb field via SET preferences = preferences - 'language' across the table, then optionally migrate any remaining preferences jsonb consumers to dedicated columns. LOW priority — orphan data is harmless. Filed at BL-120 close.",
+      "tag": "ai",
+      "added": "agent_profiles.preferences, src/features/agent-profile/hooks/useAgentProfile.ts"
+    },
+    {
+      "id": "BG-69",
+      "title": "Service-internal API-contract i18n (Shape C deferral from BG-68)",
+      "desc": "actionExecutorService.ts:50 and sibling functions return English literals as the error: field of an ExecutionResult API contract (not a NextResponse.json payload). Different shape from BG-68's API-route payloads — these are persisted/logged/passed back to the API route which returns its own response. Likely solution: stable error codes returned from service, translated at API-route boundary via apiError(). MEDIUM priority — affects user-facing errors when surfaced from agentic execution paths. Filed at BG-68 closure (D-275) per Batch (e) Decisions §3 (Option B chosen — kept BG-68 strictly to API-route payloads).",
+      "tag": "ux",
+      "added": "src/features/agentic/services/actionExecutorService.ts"
+    },
+    {
+      "id": "BG-67",
+      "title": "Audit symmetry: track throwI18nError(key) as present key",
+      "desc": "Audit script (scripts/audit/i18n-coverage-full.mjs) tracks t(key) and getTranslations() calls as \"present\" key references but NOT throwI18nError(key) calls. Result: coverage % under-counts present keys by ~4 per BG-60 batch (each batch's new keys exist in en.json but are invisible to the PRESENT count). Fix: extend the audit's static_t detector to also match throwI18nError(...) call expressions. LOW priority — coverage % is approximate, no functional impact. Spotted in BG-60 Phase 2 Batch 1 final report.",
+      "tag": "ux",
+      "added": "scripts/audit/i18n-coverage-full.mjs"
+    },
+    {
+      "id": "~~BG-68~~",
+      "title": "~~Service-Layer i18n Shape C (API response payload literals)~~",
+      "desc": "MOVED to In Progress 2026-04-27. Phase A audit + Phase B Batches (a)(b)(c) shipped (D-269/271/272/273). 198/265 sites migrated, Detector D at 67 (74% closed). See In Progress section. Note: spec scope shifted from actionExecutorService.ts:50-style internal API contracts to API-route response shapes (NextResponse.json({ error })) — actionExecutor and siblings still need a separate batch (Shape C v2).",
+      "tag": "ux",
+      "added": "src/features/agentic/services/actionExecutorService.ts, docs/specs/BG-68-Spec-Shape-C-API-Error-Payloads.md"
     }
   ],
   "techDebt": [
@@ -1766,8 +1902,15 @@ const DATA = {
       "added": "2026-04-25"
     },
     {
-      "id": "BG-59",
-      "title": "Audit script: 5 detection blind spots — (a) dynamic_t enumerable runtime set, (b) setError fallback in `",
+      "id": "~~BG-60~~",
+      "title": "~~Service-layer i18n strategy~~",
+      "desc": "MOVED to In Progress 2026-04-27. Phase 1 foundation shipped → D-265. See In Progress section.",
+      "tag": "ux",
+      "added": "2026-04-26"
+    },
+    {
+      "id": "~~BG-59~~",
+      "title": "~~Audit script: 5 detection blind spots — (a) dynamic_t enumerable runtime set, (b) setError fallback in `",
       "desc": "",
       "tag": "core",
       "added": "scripts/audit/i18n-coverage-full.mjs misses 5 sibling patterns; together they hide ~20 user-facing strings in already wired-clean files. (a) dynamic_t with closed enumerable runtime set: flagged unresolvable:type_is_string when var in t(prefix.${var}) is TS-typed as string even though the runtime set is closed and fully enumerable from local data flow. Confirmed: AdminNav.tsx:153 (21 keys via navGroups[].items[].key literals), ComplianceBanner.tsx:245 (7 keys via groupByCategory() if/else + default). (b) setter expression-fallback `setError(err.message"
@@ -1785,9 +1928,254 @@ const DATA = {
       "desc": "Property detail → Summary tab → tap \"Run Market Analysis\" card. Current: redirects to /tools/market-analysis with only the Property reference pre-filled; Area, Building, Type, Bedrooms, Size, Floor, Asking Price all blank → forces agent to re-enter everything + re-tap Run Analysis. Expected: from property context, auto-populate ALL form values (area, building, type, bedrooms, size, floor, price) from properties.* AND skip straight to analysis result. Implementation hint: propertyId query-param passthrough + autorun flag. UX issue, NOT an i18n regression. Medium-High severity. Confirmed via user screenshots during 2026-04-23 EOS testing.",
       "tag": "ai",
       "added": "2026-04-23"
+    },
+    {
+      "id": "BG-61",
+      "title": "/admin/analytics Pipeline by Stage chart axis shows raw enum values",
+      "desc": "Recharts label customization needed. Chart axis displays raw closed/qualified/under_contract/etc. instead of Title Case (\"Closed\", \"Qualified\", \"Under Contract\"). Pre-existing, surfaced during BG-50 W5 MCP testing. Low severity. Fix: pass tickFormatter to Recharts axis or pre-map data to Title Case before render.",
+      "tag": "admin",
+      "added": "2026-04-26"
+    },
+    {
+      "id": "BG-62",
+      "title": "/properties/[id] \"1 issues\" ICU plural opportunity",
+      "desc": "Property detail summary shows 1 issues for single-issue case (should be 1 issue). Use {count, plural, one {# issue} other {# issues}} ICU template instead of raw ${count} issues. Pre-existing, surfaced during BG-50 W5 MCP testing. Low severity.",
+      "tag": "ai",
+      "added": "2026-04-26"
+    },
+    {
+      "id": "BG-63",
+      "title": "/settings/profile \"English • • Sqft\" empty bullet (unset currency)",
+      "desc": "Empty bullet between \"English\" and \"Sqft\" preferences when currency preference is unset. Conditional rendering needed — render the currency segment only when set, or omit the surrounding bullet separator. Pre-existing, surfaced during BG-50 W4 MCP testing. Low severity.",
+      "tag": "admin",
+      "added": "2026-04-26"
+    },
+    {
+      "id": "BG-64",
+      "title": "/admin/leads/[id] \"Residency Status: resident\" raw lowercase enum",
+      "desc": "Lead detail page shows Residency Status: resident (raw enum value) instead of humanized Resident/Non-Resident. Same class as BL-105 — humanize lead enum values across detail surfaces. Pre-existing, surfaced during BG-50 W5 MCP testing. Low severity.",
+      "tag": "admin",
+      "added": "2026-04-26"
     }
   ],
   "done": [
+    {
+      "id": "D-282",
+      "title": "DB-SCHEMA + WAYS-OF-WORKING governance updates from BL-126 lessons",
+      "desc": "4 stale-constraint corrections to DB-SCHEMA.md viewing_feedback + leads tables: (1) leads.purpose was documented buy/rent/invest, live is investor/end_user/tenant/unknown; (2) viewing_feedback.user_id was documented nullable, live is NOT NULL (legacy column kept alongside modern agent_user_id); (3) viewing_feedback.org_id was documented nullable, live is NOT NULL; (4) viewing_feedback.next_step was documented free-text \"Planned follow-up\", live is enum-constrained follow_up/send_comps/submit_offer/no_interest/second_viewing; (5) viewing_feedback.price_feedback enum was unflagged in DB-SCHEMA — now marked CHECK. Added pointer at top of DB-SCHEMA.md to docs/data-environments/SEEDED-DATA.md § 5 (canonical CHECK constraint cache) + the explicit \"DB-SCHEMA is a hint, live pg_constraint is canonical\" note. New WAYS-OF-WORKING.md § Seed Script Discipline section with 6 hard rules distilled from BL-126: DB-SCHEMA is a hint, NOT NULL audits are table-scoped, CHECK violations cascade (audit whole script), marker convention [seed:\u003cscope\u003e-v\u003cn\u003e], required CLI flags, defensive-payload-over-minimal. BG-83 filed (separately in D-280) for the recurring constraint-drift audit script.",
+      "completed": "2026-04-29",
+      "tag": "admin"
+    },
+    {
+      "id": "D-281",
+      "title": "SEEDED-DATA.md governance doc + Atlas data-environments extension + auto-generated atlas root index",
+      "desc": "New canonical doc at docs/data-environments/SEEDED-DATA.md (~580 lines, owned by Will) — staging-environment source-of-truth covering 4 demo orgs (UAE / FR / DE-CH / IT), seed-script inventory, idempotency markers ([seed:eu-v1] for EU, no marker for UAE pending BL-127), CHECK constraint cache (canonical pg_get_constraintdef query + parsed snapshot for the 5 tables seed scripts touch), per-table NOT NULL audit, rollback procedures. New atlas section at https://kanaan-droid.github.io/housezum-process-atlas/data-environments/ via cloned scripts/generate-data-environments-html.mjs (mirrors architecture generator: same purple #0f0f11 palette, same minimal markdown converter, same cross-link rewriter; \"lonely landing\" promotion logic — when section has only one .md and no INDEX.md, the single file becomes index.html). Atlas root index.html now auto-generated via new scripts/generate-atlas-index.mjs from a 4-entry ATLAS_SECTIONS config block — replaces manually-edited root, makes adding a 5th docs tree a one-line config change. npm scripts extended: docs:html:data-environments, docs:html:atlas-index, plus docs:html chains all 4 generators in order. PROJECT-STRUCTURE.md synced (BG-82b add-trigger satisfied for new dir + 2 new scripts). TD-26 filed for the refactor-the-3-near-identical-generators-into-one-config-driven follow-up.",
+      "completed": "2026-04-29",
+      "tag": "admin"
+    },
+    {
+      "id": "D-280",
+      "title": "BL-126 — EU locale CRM seed (FR / DE-CH / IT) (CLOSES BL-126)",
+      "desc": "New scripts/seed-eu-locales.mjs (~1450 LoC, 7 phases, idempotent via [seed:eu-v1] marker, --dry-run / --force / --rollback / --locale= flags). Seeded 75 contacts (25 per org × 3) + 30 deals + 30 viewings + 18 viewing_feedback + 30 leads + 15 property↔seller links + 3 org default_locale fixes (en→fr/de/it) across Saint Germain Immobilier (FR), Zürich Premium Realty (DE-CH), Milano Prestige (IT). Email convention will+{role}-{locale}-{first-last}@housezoom.ai with co/sl/ld prefixes joining existing ag for agents. Locale-authentic names (modern + older-skewing seller pools per locale: Henri/Heinrich/Giuseppe families etc.), phone formats (+33/+41/+39), email TLDs (orange.fr/bluewin.ch/libero.it), commission rates (FR 4-6%, DE 2-3%, IT 3-5%), notes/feedback in target language, locale-appropriate service-provider roles (notaire/Notar/notaio etc.). Per-org dedup helper prevents name-collision-induced duplicate emails (modern + older pools share a Set; lead emails use a separate Set since prefix differs). Spec: docs/specs/SEED-EU-LOCALES-SPEC.md. 6 patch iterations during execution to land — leads.purpose CHECK constraint (DB-SCHEMA stale), viewing_feedback.user_id NOT NULL, viewing_feedback.org_id NOT NULL (root cause: Phase 6 select dropped org_id), viewing_feedback.next_step enum CHECK (was free text), contact name dedup (5 duplicate name pairs → identical emails). Commits: 9fab936 (initial) → d9c7317 (purpose) → cf53a05 (user_id) → f6e19ab (org_id) → c5d6a3f (next_step) → c90d296 (dedup). Final live-run clean, content spot-check passes.",
+      "completed": "2026-04-29",
+      "tag": "comms"
+    },
+    {
+      "id": "D-279",
+      "title": "Architecture diagrams embedded — system / AI / autonomy levels",
+      "desc": "Four SVG diagrams embedded into 3 arch docs: INDEX.md (system architecture, 4-tier client→app→data+AI→external), STRATEGY.md (3-layer agentic orchestration: Signal Agents detect → Intelligence Engine scores → Planning Agent acts; multi-model routing + data flywheel), agentic.md (3a Yariv inversion across L0/L1/L2 + 3b action-types × autonomy matrix with permanently-locked rows). Generator extended with two passthrough rules (\u003c!-- arch-diagram start --\u003e fenced blocks + defensive bare \u003csvg\u003e fallback) and .arch-diagram / .arch-diagram-caption CSS rules. Light card background (#fafaf7) on diagrams preserves gray section labels (fill=\"#888780\") against the Atlas's dark page background. SVGs use hardcoded hex pastels (light fills + dark same-ramp text), 680px max-width, calibrated viewBox per the diagram-design system. Marker IDs (arrow-sys, arrow-ai, locked-stripe) scoped per-diagram to avoid collision when multiple render together. Live at https://kanaan-droid.github.io/housezum-process-atlas/architecture/ (and /strategy.html, /agentic.html). Commits: 2d90a74 (housezum-app), c391ef4 (process-atlas).",
+      "completed": "2026-04-28",
+      "tag": "ai"
+    },
+    {
+      "id": "D-278",
+      "title": "Architecture HTML generator + Atlas extension",
+      "desc": "New scripts/generate-architecture-html.mjs mirrors the existing generate-roadmap-html.mjs pattern (no external markdown library — minimal inline converter scoped to the patterns arch docs use: headers h1–h6, paragraphs, bold/italic/inline-code, fenced code blocks, links, blockquotes, ul/ol, tables, hr, HTML-comment passthrough). Generates 11 HTML pages (one per arch doc + INDEX as landing) into ~/Apps/housezum-process-atlas/architecture/. Cross-link rewriting handles two patterns: text → foo.html, AND inline-code ` foo.md  (the actual pattern used in arch-doc prose) wrapped as \u003ca href=\"foo.html\"\u003e\u003ccode\u003efoo.md\u003c/code\u003e\u003c/a\u003e via a KNOWN_DOCS set built at generation time. Front-matter banner shows status (stable/skeleton/living), last-updated date, absorbed-tickets count. Idempotent regen (wipes + rewrites). Visual language matched the existing Atlas purple #0f0f11 palette. npm scripts: docs:html:roadmap, docs:html:architecture, docs:html (combined). WAYS-OF-WORKING § \"Architecture HTML Regeneration\" documents the manual workflow. Live at https://kanaan-droid.github.io/housezum-process-atlas/architecture/. Commits: cd18ce3 (housezum-app), 77a768b` (process-atlas regen).",
+      "completed": "2026-04-28",
+      "tag": "admin"
+    },
+    {
+      "id": "D-277",
+      "title": "BG-79b — Documentation Governance Protocol grandfathered-ticket paydown (CLOSES BG-79b)",
+      "desc": "94/94 paid down across 3 absorption passes. Pass 1 (6e61641): 30 tickets across agentic.md (5: BG-36, BG-37, BG-45, BL-98, BL-111), qa-engine.md (4: BL-104, BL-112, BL-115a, BL-117), i18n.md (9: BG-46, BG-48, BG-50, BG-54, BG-57, BG-59, BG-65, BG-69, BL-125), multi-tenancy.md (7: BG-2, BL-22, BL-61, BL-64, BL-92, BL-92b, BL-103 — added new § Security section), plus 5 testing tickets (BL-72/74/75/76/77) routed to WAYS-OF-WORKING § Testing Protocol via new ABSORBED_NON_ARCH set. Created 4 skeleton arch docs (signing.md, crm.md, photo-intelligence.md, portal.md) + extended trigger map with 13 new entries. Pass 2 (3a09806): 24 signing tickets absorbed into signing.md (BL-81, BL-81i, BL-81j, BL-102, NU-7, NU-8, NU-10, NU-11, NU-13, NU-16, NU-17, NU-18, NU-19, NU-20, NU-24, NU-25, NU-26, NU-27, BG-21, BG-22, BG-23, BG-24, BG-26, BG-35). signing.md skeleton → stable, 199 lines. Architectural primitives captured: draw-then-strip PDF pipeline (drawText → strip Widgets → remove /AcroForm catalog), service-role bypass for cross-agent CRM autofill (BL-81j), [requestId] vs [token] route-conflict aliasing (BG-26), credentials:include propagation discipline (BG-24), signature-accumulator-as-single-canonical-path invariant. Pass 3 (2c2d4cc): 39 tickets absorbed/dropped — crm.md (16: V2 polymorphic foundation BL-52, BL-36, BL-43, BL-44, BL-45, BL-46, BL-48, BL-58, BL-59, BL-62, BL-69, BL-70, BL-71, BL-73, BL-93, NU-21), photo-intelligence.md (7: BG-25, BL-84, BL-86, BL-87, BL-88, BL-89, BL-94), portal.md (3: BL-53, BL-55, BL-90), DROP (13: BG-16, BG-17, BG-18, BG-19, BG-20, BG-47, BG-55, BL-35, BL-37, BL-57, BL-116, NU-22, NU-28). New DROPPED_TICKETS exception set added to docs-check.mjs as parallel mechanism to ABSORBED_NON_ARCH (with per-ticket rationale comments). BL-118 (Dubai Pulse / DLD market-data) deferred as the lone remaining grandfathered entry per Option A — threshold rule (3+ tickets) blocks one-ticket arch docs; will absorb when 2-3 market-data tickets cluster. Final state: 11 stable arch docs + 5 ABSORBED_NON_ARCH + 13 DROPPED + 1 deferred = 94/94. Architecture documentation set complete, Documentation Governance Protocol fully active.",
+      "completed": "2026-04-28",
+      "tag": "ai"
+    },
+    {
+      "id": "D-276",
+      "title": "BL-120 — locale backfill FR/DE/IT, org→user inheritance, browser-translate opt-out (CLOSES BL-120)",
+      "desc": "Schema: supabase/migrations/20260427_bl120_locale_schema.sql adds organizations.default_locale TEXT DEFAULT 'en' CHECK (en/fr/de/it/ar); constrains existing agent_profiles.language column to the same set (NULL allowed → inherit from org default). AR included for forward-compat with BL-121. Inheritance wired in /api/onboarding + /api/invite-signup — sets agent_profiles.language = org.default_locale only if currently NULL. Translation pipeline: scripts/i18n/generate-glossary.mjs (34-term seed list per locale via Claude Sonnet 4.5) + scripts/i18n/translate-locale.mjs (delta-only, idempotent, 50-batch ICU-validating, with tolerant per-line recovery parser for the DE typographic-quote JSON case). Glossaries committed at messages/_glossary.{fr,de,it}.json (Will-approved at GATE 2). Translations: 1551 (FR) + 1571 (DE) + 1523 (IT) = 4645 keys filled across all 3 locales; 99.8% parity (6 intentional skips per locale = proper nouns + emojis). One nested ICU select plural (contactDeals.noDealsFound) hand-translated. 2 stale keys dropped per locale. Resolver: rewrote src/i18n/request.ts with chain cookie → Accept-Language → 'en'. Reconciliation: LocaleDetector.tsx reads agent_profiles.language (fallback to organizations.default_locale) on every authenticated mount, sets cookie + reloads if drift. New clearLocaleCookie() in src/i18n/locale-utils.ts + wired into 4 signOut sites (useAuth, dashboard, pending-approval, AdminNav). New POST/DELETE /api/auth/sync-locale route — login flow calls POST with bearer token; server reads DB, returns Set-Cookie atomically before navigation. Login page swapped 5 router.replace → window.location.replace so SSR's new \u003chtml lang\u003e reaches the DOM on first paint. Save handler in useAgentProfile.ts writes top-level language column (was jsonb-only — root cause of MCP \"save reverts\" symptom); writes localStorage for Capacitor parity. force-dynamic on root layout + diagnostic [i18n/request] resolved logging shipped as hotfixes during MCP smoke. Browser auto-translate opt-out: \u003chtml translate=\"no\"\u003e + \u003cmeta name=\"google\" content=\"notranslate\"\u003e on root layout (both branches). Root cause of an IT-only Chrome bug Will caught: machine translation was overwriting verified Italian content with bad English (\"Strumenti\" → \"Instruments\"). Per-user, per-source-language Chrome state, asymmetric across locales. Architecture doc: docs/architecture/i18n.md. Test accounts (regression smoke): Camille FR, Claudia DE, Alessandro IT — DO NOT alter their DB locales. Out of scope (filed): BL-121 (AR + RTL), BL-122 (drop preferences.language jsonb), BL-123 (per-request DB resolver via @supabase/ssr), BL-125 (per-namespace splitting). 8 commits over 1 day: 8717818 (Phase 1+2+3a) → e64a9d5 (force-dynamic + diagnostic) → fa55985 (logout cookie clear + login sync-locale) → 86b6fbf (window.location.replace) → 0260f87 (translate=no) → this commit (Phase 4 docs + close). Coverage: en 100%, fr/de/it 99.8%, ar 0% (deferred).",
+      "completed": "2026-04-28",
+      "tag": "admin"
+    },
+    {
+      "id": "D-275",
+      "title": "BG-68 Phase B Batch (e) — mop-up, CLOSES BG-68",
+      "desc": "24 final sites migrated across 10 route files via TS-AST sweep (clean — 0 skipped, 0 surgical edits). New keys (19): added errors.admin.exceedsOrgCeiling (template literal, ICU {orgCeiling}); new namespaces errors.walkthrough.* (7: saveOrderingFailed, resetOrderingFailed, notEnoughPhotos, buildFailed, propertyNotFound, generateShareTokenFailed, missingRequiredField), errors.devtools.* (3: aiNotConfigured, anthropicApiFailed [template, ICU {status, body}], missingRequiredField), errors.google.* (3: noRefreshToken, refreshFailed, missingRequiredField), errors.viewingBrief.* (1: viewingNotFound), errors.feeds.* (2: unknownPortal, generateFailed), errors.qualification.* (1: missingRequiredField), errors.checklist.* (1: missingRequiredField). 5 cross-namespace reuses: shared.errors.noOrgMembership ×3 (autonomy-settings ×2 + viewing-brief ×1, identical \"No org\" semantic to Batch (a)/(b)/(d) usage), errors.admin.exceedsSystemCeiling ×1 (autonomy-settings — identical literal to Batch (d)'s admin route), errors.admin.missingRequiredField ×1 (autonomy-settings \"action_type, max_level\" — identical to Batch (d)). 4 template-literal sites with ICU param extraction (2 autonomy-settings, 2 devtools). 8 ICU missingRequiredField sites across 6 subdomains (consistency with prior batches). Routine decisions made autonomously: kept walkthrough.propertyNotFound distinct from photos.propertyNotFound (per-domain pattern from Batch (c)); kept devtools.aiNotConfigured distinct from BG-60's intel.errors.aiNotConfigured (different layer — server-internal vs user-friendly). Decisions to flag: §1 generic-promotion check — errors.deals.insufficientPermissions did NOT recur. §2 cron route exclusions — cron subdomain had 0 sites, no exclusion decision needed. §3 Shape C deferral — chose Option B: filed BG-69 for actionExecutorService.ts:50-style internal API contracts; kept BG-68 strictly to src/app/api//route.ts payloads. §4 audit drift — final count exactly 24, matched projection. tsc clean. Detector D: 24 → 0. BG-68 audit: 265 → 0 over 5 batches in 1 day (Apr 27). CLOSES BG-68.",
+      "completed": "2026-04-27",
+      "tag": "admin"
+    },
+    {
+      "id": "D-274",
+      "title": "BG-68 Phase B Batch (d) — photos/admin/orchestrator/ai/market subdomains",
+      "desc": "43 sites migrated across 18 route files via TS-AST sweep (42 mechanical + 1 surgical for admin/signals/log-manual Zod-validation route with details field). New keys (28) under errors.{photos,admin,orchestrator,ai,market}.* namespaces: photos 13 (queueLoadFailed, saveAnnotationFailed, detectionFailed, feedbackLogFailed, propertyNotFound, noPhotosForProperty, createEvaluationFailed, methodNotAllowed, missingUrlOrPreset, unknownPreset, fetchSourceFailed, optimizationFailed, missingRequiredField), admin 6 (exceedsSystemCeiling, signalNotFound, unknownAction, createContactFailed, createLeadFailed, missingRequiredField), orchestrator 4 (planNotFound, taskNotFound, invalidDuration, missingRequiredField), ai 3 (invalidSurface, invalidAnswerMode, missingRequiredField), market 2 (uploadPdfFailed, missingRequiredField). 2 cross-namespace reuses: admin \"Invalid input\" (×2 — direct + Zod-extra) → errors.generic.invalidRequest (semantic match with Batch (a) key); ai \"No organization membership found\" → shared.errors.noOrgMembership (BG-60 reuse, matches Batch (b) signing precedent). 4 template-literal sites with ICU param extraction: photos Unknown preset: ${preset} → apiError('errors.photos.unknownPreset', { preset }, 400); admin Cannot exceed system ceiling of ${hardCeiling}; ai surface is required and must be one of: ${...} (allowed); ai answer_mode must be one of: ${...} (allowed). 16 ICU missingRequiredField sites across all 5 subdomains (consistency with Batches (b)/(c) pattern). Routine decisions made autonomously (per prompt's authority within scope): kept admin createContact/createLead distinct from leads.createContactFailed (different domain context); kept photos.methodNotAllowed distinct (single-site occurrence; defer generic promotion); no Decisions-to-flag triggers fired (no cross-3+-subdomain promotion candidates, no Shape-C deferrals, no webhooks in scope). Generic-promotion candidate from D-273 (errors.deals.insufficientPermissions): scanned this batch's findings — string does NOT recur. No promotion trigger yet. tsc clean. Detector D: 67 → 24 (Δ−43, exact). CSV refreshed. Phase B remaining: Batch (e) mop-up only — 24 findings → BG-68 closure.",
+      "completed": "2026-04-27",
+      "tag": "admin"
+    },
+    {
+      "id": "D-273",
+      "title": "BG-68 Phase B Batch (c) — actions/leads/deals/properties domains",
+      "desc": "20 sites migrated across 7 route files via TS-AST sweep (clean — 0 skipped, no surgical edits). New keys (18): errors.actions.* (5: cardNotFound, cannotReject, cardCannotUndo, undoExpired, missingRequiredField), errors.leads.* (8: notFound, alreadyConverted, contactNotFound, createContactFailed, contactInfoRequired, createRequirementFailed, updateStatusFailed, missingRequiredField), errors.deals.* (5: insufficientPermissions, suggestionNotFound, updateStageFailed, notFound, deleteFailed). Per Will's approval: per-domain notFound keys (no generic consolidation), ICU missingRequiredField for singletons (consistency with Batch (b) pattern), errors.deals.deleteFailed distinct from BG-60's service-layer admin.deals.errors.failedToDelete (layer separation). 2 ICU sites: action-cards snooze_until + leads lead_id. Tracking: errors.deals.insufficientPermissions (3 sites) flagged as future generic-promotion candidate if it recurs in Batches (d)/(e). Note: prompt's \"actions\" domain maps to src/app/api/action-cards/ in this codebase (actions/ is empty). Detector D: 87 → 67 (Δ−20, exact match). tsc clean. Refreshed CSV. Phase B remaining batches: (d) ai 6 + admin 8 + orchestrator 8 + photos 17 + market 4 = 43 findings, (e) mop-up across autonomy-settings 5 / walkthrough 7 / cron 3 / devtools 3 / google 3 / qualification 1 / viewing-brief 2 / feeds 2 / checklist 1 / media 1 = 24 findings.",
+      "completed": "2026-04-27",
+      "tag": "admin"
+    },
+    {
+      "id": "D-272",
+      "title": "BG-68 Phase B Batch (b) — signing domain migration to errors.signing.*",
+      "desc": "Refreshed CSV against post-Batch-(a) baseline: docs/audits/BG-68-api-error-payloads-2026-04-27.csv (135 rows total post-(a), 87 post-(b)). Per-domain reconciliation: signing 79→48→0 (full close), generic 134→61, actions 23→5, deals 16→7, ai 12→6, leads 12→8, properties 1→0. 48 signing call sites migrated across 12 route files to errors.signing.* keyspace via TS-AST sweep (46 mechanical + 2 surgical for routes with extra fields like field_id and isListingAgent). Added 32 new keys under errors.signing.* namespace (note: my pre-Step-5 count of \"22 new keys\" was an arithmetic miscount of my own proposal table; actual = 32 new + 3 reuses = 35 total — Will's approved consolidations are intact: token/expiry 3→1 expired, doc-fetch 4→1 fetchDocumentFailed, validation 5→1 missingRequiredField with ICU {field} param). Reused 3 cross-domain keys: shared.errors.notAuthenticated (BG-60) for \"Not authenticated\" ×2, shared.errors.noOrgMembership (BG-60) for \"No org found\" (verified !member semantic), errors.generic.missingRequiredFields (Batch (a)) for \"Missing params\". 5 ICU-param sites: `apiError('errors.signing.missingRequiredField', { field: 'recipient'",
+      "completed": "'document_id or template_id'",
+      "tag": "admin"
+    },
+    {
+      "id": "D-271",
+      "title": "BG-68 Phase B Batch (a) — boilerplate consolidation + apiError helper + Detector D",
+      "desc": "New helper src/lib/api/errors.ts exports apiError(key, params?, status?, extra?) and apiErrorFromThrow(err, fallbackStatus?). Both return NextResponse\u003c{ error, errorKey, errorParams }\u003e per spec §4 (and merge optional extra fields like Zod details into the body). resolveEnglish() does naive ICU param substitution server-side from messages/en.json for backwards-compat error field; authoritative translation happens client-side via translateError(). Added 6 new keys under errors.generic.* namespace: unauthorized, internalServerError (consolidates \"Internal error\" + \"Internal server error\" → 22 sites collapse to 1 key), forbidden, invalidRequest, notFound, documentNotFound, missingRequiredFields. Reused existing shared.errors.noOrgMembership for the 5 \"No org membership\" sites (preserved per-route 400/403 status mix). 130 boilerplate sites migrated across 52 route files in a mechanical TS-AST sweep + 7 surgical edits for routes with extra details field (Zod validation responses). Excluded src/app/api/inbound/ (7 portal webhooks, English-only per spec §3a). New audit Detector D in scripts/audit/i18n-coverage-full.mjs does a dedicated second pass over src/app/api//route.ts (api files are excluded from the main UI walk by design). Detector D: 265 → 135 (Δ−130, exact match with sweep count). Detectors A/B/C/E unchanged. Coverage 99.6% (no UI strings touched). tsc clean. Phase B remaining batches (per Will's locked order): (b) signing — 79 findings, (c) actions/leads/deals/properties, (d) ai/admin/orchestrator/photos/market, (e) mop-up.",
+      "completed": "2026-04-27",
+      "tag": "admin"
+    },
+    {
+      "id": "D-270",
+      "title": "BG-60 Phase 3 — Shape B const-maps migrated to en.json (CLOSES BG-60)",
+      "desc": "Saved spec at docs/specs/BG-60-Phase-3-Spec-Const-Map-i18n.md. Migrated 4 const-map exports → messages/en.json under new enums.* namespace (37 entries total): enums.photo.roomType.* (24 incl. legacy aliases), enums.photo.issue.* (8), enums.checklist.phase.* (5). 3 service files cleaned: photoAnnotationService.ts (ROOM_TYPE_LABELS + ISSUE_LABELS removed; ROOM_TYPE_OPTIONS / ISSUE_OPTIONS retained with new RoomType / Issue string-union type exports), walkthroughService.ts (ROOM_TYPE_LABELS import dropped; service emits raw room_type code in room_label for consumer translation), checklistService.ts (PHASE_LABELS removed; service emits phase code in phase.title field for consumer translation). 4 consumer files updated: admin/photo-intelligence/annotate/page.tsx (3 components added tRoomType / tIssue translators across 5 LABEL lookups), walkthrough/components/WalkthroughReorderGrid.tsx (added tRoomType translator + translateRoom helper with formatRoomLabel fallback for unknown codes; alt attribute now uses translated displayLabel), app/c/[token]/page.tsx (server component, added getTranslations('enums.checklist.phase')), app/tools/property-checklist/page.tsx (client component, added useTranslations('enums.checklist.phase')). emailCardGenerator.INTENT_CARD_TYPE retained as service-internal — both keys and values are enum codes (EmailIntent → card_type), no English labels migrated; BG-60 marker comment updated to clarify rationale. BuyerJourneyTab.PHASE_LABELS left as-is — values were already i18n keys ('phaseDiscovery'), not English literals. New audit Detector E added to scripts/audit/i18n-coverage-full.mjs (scans for import { *_LABELS } from '@/features//services/' — release blocker if \u003e 0). Detector A: 47, Detector B: 1 (only entityResolutionService dev-only), Detector C: 0, Detector E: 0. Coverage 98.9% → 99.6%. tsc clean. CLOSES BG-60.",
+      "completed": "2026-04-27",
+      "tag": "comms"
+    },
+    {
+      "id": "D-269",
+      "title": "BG-68 Phase A — spec save + API error payload audit (baseline)",
+      "desc": "Saved spec at docs/specs/BG-68-Spec-Shape-C-API-Error-Payloads.md. New audit script scripts/audit-api-error-payloads.mjs uses @babel/parser to scan src/app/api//route.ts for 4 patterns (P1 string-literal NextResponse, P2 template-literal NextResponse, P3 string-literal Response, P4 new Response with 4xx/5xx status). Whitelist: err.message / error.message / errorMessage identifier / 'i18n:...' literal. CSV: docs/audits/BG-68-api-error-payloads-2026-04-27.csv (265 data rows). Webhook exclusion path corrected: spec §3a referenced src/app/api/webhooks/ which is absent in this codebase; real portal webhook handlers live under src/app/api/inbound/ (7 routes: homegate, seloger, property-finder, immobiliare, bayut, idealista, whatsapp). Script updated to exclude both prefixes — original 277 findings dropped to 265 with 7 webhook routes correctly excluded. Domain breakdown: signing 79, generic-other 134 (admin 28, photos 18, orchestrator 17, market 15, autonomy-settings 11, walkthrough 7, cron 5, devtools 4, qualification 4, viewing-brief 4, checklist 3, google 3, feeds 2, media 1), actions 23, deals 16, ai 12, leads 12, properties 1. Pattern split: P1=270, P2=7, P3=0, P4=0 — codebase uses NextResponse.json exclusively. Top file: signing/create/route.ts (14 findings). High-frequency duplicates (Unauthorized ~50+, Internal server error ~40+) — Will accepts 265 baseline; consolidation to shared keys expected to shrink unique key count to ~80-100. Phase B batch order locked by Will: (1) boilerplate first (auth/401 + 500s) — collapses ~100 findings into shared keys, (2) signing (largest concentration), (3) actions/leads/deals/properties domains, (4) ai/admin/orchestrator/photos/market/autonomy/walkthrough/cron/devtools/qualification/viewing-brief/checklist/google/feeds/media mop-up. No service files / no en.json / no client code touched in this prompt — pure inventory. tsc clean.",
+      "completed": "2026-04-27",
+      "tag": "comms"
+    },
+    {
+      "id": "D-268",
+      "title": "BG-60 Phase 2 Batch 3 — AI/intel/assistant services Shape A wiring (Phase 2 Shape A CLOSED)",
+      "desc": "Step 0 Detector A ternary \"fix\" was investigated and found unnecessary — existing detector at scripts/audit/i18n-coverage-full.mjs:671-674 already handles ConditionalExpression with err.message in either branch (10 ternary entries already in CSV). No detector changes shipped. Migrated 7 UI-facing throws across 3 service files: assistantService.ts L71 → shared.errors.failedToGetAiResponse (REUSE), L146 → assistant.errors.transcriptionFailed (NEW); aiContentService.ts L20 → intel.errors.aiNotConfigured (NEW; runtime per-request env check, surfaced as user-friendly key rather than dev-flagged because it can reach production users on env misconfiguration), L93 + L170 → intel.errors.invalidAiResponseFormat (NEW shared key); cardGeneratorService.ts L37 → shared.errors.notAuthenticated (REUSE), L55 → intel.errors.aiGenerationFailed (NEW, after preserving API data.error if present). All BG-60 markers in migrated services removed. K=0 strict-scope catch sites: useAssistant.ts catches but pushes a hardcoded fallback message (no err.message surface), enhanceExistingCards has inner per-card try/catch that swallows AI failures as best-effort, schedule-viewing/page.tsx swallows via console.error, /api/intel/generate route returns JSON to client which doesn't strict-scope catch any single Batch-3 service. actionExecutorService.ts:50 deferred — internal API-contract function returning multiple English literals as error: field (not a Shape A throw); will tackle in a separate batch alongside its many sibling literals. entityResolutionService.ts:6 retains its Batch-2 // BG-60: dev-only, do not migrate marker (server-startup env check). Audit detector counts after batch: B=8→1 (Δ−7, matches all 7 migrations; only entityResolutionService dev-only remains); A=47→47 (Δ0, K=0); C=0 unchanged. Coverage 98.7% → 98.9%. tsc clean. 11/11 helper unit tests still pass. Phase 2 Shape A wiring COMPLETE. Commit: \u003cTBD\u003e.",
+      "completed": "2026-04-27",
+      "tag": "ai"
+    },
+    {
+      "id": "D-267",
+      "title": "BG-60 Phase 2 Batch 2 — deal/property/invite services Shape A wiring + Detector B ?? regex fix",
+      "desc": "Bundled Step 0 detector fix: extended scripts/audit/i18n-coverage-full.mjs Detector B's BinaryExpression check to accept both BarBarToken (`",
+      "completed": "",
+      "tag": "admin"
+    },
+    {
+      "id": "D-266",
+      "title": "BG-60 Phase 2 Batch 1 — signing services Shape A wiring",
+      "desc": "Migrated 7 throw new Error('English literal') patterns across 3 service files: baseDocumentService.ts (3 throws: notAuthenticated, noOrgMembership, failedToCreateBaseDocument), templateService.ts (3 throws: notAuthenticated, noOrgMembership, failedToCreateTemplate), requestService.ts (1 throw: failedToCreateRequest). Updated 5 strict-scope catch sites to use translateError(err, tRoot): signing-templates/[id]/edit/page.tsx, signing-templates/new/page.tsx, DocumentPrepareModal.tsx, TemplateSendModal.tsx, DealDocumentsTab.tsx. Added 4 new i18n keys: shared.errors.noOrgMembership (cross-domain — likely recurs in Batches 2-3), signing.errors.{failedToCreateBaseDocument,failedToCreateTemplate,failedToCreateRequest}. Reused existing shared.errors.notAuthenticated. Audit detector counts: B=13→9 (Δ−4: matches the 4 throws Detector B identified; the other 3 nullish-coalesce ?? fallbacks Detector B doesn't see today were also migrated per spec intent — flagged below); A=53→48 (Δ−5: all signing catch sites updated); C=0 unchanged. Discrepancy with spec acceptance criteria: spec said MISSING_IN_EN unchanged at ~49. Actual: 49→45 (Δ−4). Reason: audit's static_t detector tracks t() calls but not throwI18nError(key) calls — so the 4 migrated throws drop from MISSING without the new keys re-surfacing as static_t missing. This is desirable noise-reduction, not a bug. Future BG-59 enhancement could extend audit to track throwI18nError(key) as static_t for symmetry. Discrepancy with Detector B count: Detector B only catches `",
+      "completed": "fallbacks not ?? — 3 throw new Error(x?.message ?? 'literal') patterns in baseDoc/template/request slipped through Detector B but were migrated per spec (\"migrate all UI-facing throws\"). Audit-tooling gap, not migration error. All 4 BG-60 marker comments removed from signing services. tsc clean. 11/11 helper tests still pass. Commit: \u003cTBD\u003e`.",
+      "tag": "admin"
+    },
+    {
+      "id": "D-265",
+      "title": "BG-60 Phase 1 — foundation: helpers + convention doc + audit detectors",
+      "desc": "Two new helpers: src/lib/i18n/throwI18nError.ts (services throw i18n:key:{params} prefixed Errors) + src/lib/i18n/translateError.ts (catch sites translate via t; pass-through for non-prefixed errors; dev-mode bare-key surface for debugging; prod fallback to shared.errors.somethingWentWrong). 11/11 Jest unit tests pass at tests/unit/throwI18nError.test.ts + tests/unit/translateError.test.ts (covers prefixed/non-prefixed/malformed/empty cases, both dev + prod env behavior). WAYS-OF-WORKING.md extended with service-layer i18n convention section (Shape A error throws + Shape B const-map labels). Audit script extended with three NEW detectors (don't affect coverage % / missing count): A=53 catch-site setError(err.message) / toast.error(err.message) patterns flagged as Phase 2 worklist; B=13 service-layer English throw new Error('literal') patterns; C=0 raw i18n: keys in JSX text (release blocker — must stay 0). Per-detector CSVs at audit-output/bg60-detector-{a,b,c}.csv. Discrepancy with spec acceptance criteria: prompt acceptance said Detector B ≈ 32; actual count is 13 (throws only). The 32 figure conflated Shape A throws + Shape B const-map rows; per prompt body, Detector B as implemented only catches throw new Error() patterns (Shape A). Const-maps (Shape B) are out of Detector B's scope by design — Phase 3 will mop them up via different mechanism. No service files touched (Phase 2/3). MISSING_IN_EN unchanged at 49; coverage unchanged at 98.6%. tsc clean. Commit: \u003cTBD\u003e.",
+      "completed": "2026-04-27",
+      "tag": "ai"
+    },
+    {
+      "id": "D-264",
+      "title": "BG-59 audit-noise tightening — 6 skip patterns (html_entity, pure_emoji, brand, tailwind_class, enum_code, dev_only)",
+      "desc": "Script-only change to scripts/audit/i18n-coverage-full.mjs. Adds classifyForSkip() consulted by classifyHardcoded() before falling through to MISSING. Skip rows stay in CSV (visible for spot-check) but excluded from MISSING and from coverage denominator. Per-bucket skip counts: html_entity=37, pure_emoji=21 (incl. flag pairs via Regional_Indicator guard), brand=18 (45-entry allowlist with currencies + portals + AI vendors), tailwind_class=2 (single-token bg-red-50/30 shape + multi-token composition), enum_code=60 (ALL_CAPS + dynamically-observed ENUM_VALUES_OBSERVED set), dev_only=35 (/src/app/devtools/, /src/app/test/, /src/lib/dev/). MISSING_IN_EN: 222 → 49 (Δ −173). Effective coverage 94.1% → 98.6%. Remaining 49 missing rows = 41 BG-60 service-layer markers + 8 source-comment-marked residuals (5 VOICE_SAMPLES TTS fixtures + 3 PascalCase ROLE_MAP enum keys). Removes orphan BG-65 (filed in error in commit c5aebea — was actually BG-59 scope). Closes BG-59 ticket. No source/json changes. tsc clean.",
+      "completed": "2026-04-27",
+      "tag": "ai"
+    },
+    {
+      "id": "D-263",
+      "title": "BG-50 W5 long-tail wired + MCP-verified — closes BG-50 wire scope",
+      "desc": "12 surfaces consolidated, 33 files touched: admin-other (29 flagged → 5 wired + 24 audit-noise skips), agent-actionlog (20 → 18), agent-dailyplan (18 → 17), viewings (15 → 15; BG-46 ViewingMode multi-return verified), agent-deals (12 → 3), intel-market (12 → 5 + 7 BG-60), agent-dashboard (4 → 2), tools-checklist/tools-other/tools-listing-generator (all pure-emoji skips), ai-assistant (1 + 2 BG-60), shared-components (1 + 2 brand/emoji). 68 strings wired, 92.3% → 94.1%. BG-60 markers reach 21 total. Caught & fixed mid-batch: duplicate intel: and portalSimulator: JSON blocks silently overrode existing namespaces (last-key-wins; surfaced via MISSING_IN_EN: 40 spike, fixed by merging into existing blocks). Commit: 1ce3a08. Closes BG-50 wire scope.",
+      "completed": "2026-04-26",
+      "tag": "admin"
+    },
+    {
+      "id": "D-262",
+      "title": "BG-50 W4 mop-up wired + MCP-verified",
+      "desc": "4 surfaces (auth-onboarding 39 → 32 wired + 7 brand skips, properties 36 → 24 + 11 skips + 1 BG-60, clients-contacts 35 → 34 + 1 brand, agent-settings 27 → 18 + 9 skips). 24 files. 118 strings wired, 89.2% → 92.3%. Notable: settings/profile LICENSE_META (BG-50X 5b) NOT regressed — verified post-batch; VOICE_SAMPLES (5 multilingual TTS samples keyed by user voice_language) skipped with custom comment as language-coded fixtures rather than UI strings; existing top-level namespaces (contactDetail.*, propertyDetails.gallery.*, publicShare.*, auth.*) extended rather than creating per-prompt-suggested duplicates. New agentSettings.autonomy.* distinct from admin.autonomy.* per spec. Commit: 9c3cffb.",
+      "completed": "2026-04-26",
+      "tag": "admin"
+    },
+    {
+      "id": "D-261",
+      "title": "BG-50 W3 shared-misc wired + MCP-verified",
+      "desc": "28 component/hook files + 7 service files (39 BG-60 deferred). 140 strings wired, 85.5% → 89.2%. New surface-shared key adminHooks.errors.noOrgContext consolidates 9 throw sites across 4 admin hooks (useTeams, useWorkflows, useLeads, useDeals). Feature-directory namespacing applied throughout: leads.*, walkthrough.*, portalSimulator.*, agentic.*, aiQa.*, photos.*, requirements.*, documents.*, shared.autocompleteSelect.*. Commit: ebf3dda.",
+      "completed": "2026-04-26",
+      "tag": "admin"
+    },
+    {
+      "id": "D-260",
+      "title": "BG-50 W2 public-token-flows wired + MCP-verified",
+      "desc": "6 files across 4 external-facing flows (/c/[token], /sign/[token], /q/[token], /w/[token] + ContactCTA). Per-flow namespacing with NO cross-flow consolidation (publicContact, publicSign, publicQualification, publicWalkthrough) preserves translator flexibility for distinct external audiences. Server-component pattern proven: c/[token]/page.tsx and w/[token]/page.tsx are async server components — used getTranslations from next-intl/server with await; client components used useTranslations. 85 strings wired, 83.4% → 85.5%. 16 skips (10 LABEL_TO_ACROFORM_KEY enum codes, 4 brand Powered by HouseZoom/WhatsApp/HouseZoom.ai alts, 2 pure emoji). 30-key CLIENT_LABELS server-side const-map restructured via Option 2. Commit: ab7c7fe.",
+      "completed": "2026-04-26",
+      "tag": "comms"
+    },
+    {
+      "id": "D-259",
+      "title": "BG-50 W1 signing wired + MCP-verified",
+      "desc": "12 files in src/components/signing/* and src/features/signing/services/*. 118 strings wired, 80.2% → 83.4%. New per-file namespaces: signing.requestSignatureModal.*, signing.fieldPlacementCanvas.*, signing.agentPrepareCanvas.*, signing.pdfFormEditor.*, signing.pdfFormEditorMultiPage.*. Major files: DocumentPrepareModal (62 flagged → 28 wired + 34 enum/AcroForm const FPs), RequestSignatureModal (32 → 29 + 3 skips), FieldPlacementCanvas (28 → 26 + 2 emoji), TemplateSendModal (19 → 17 + 2 enum), TemplateCanvas (10 → 10). 51 skips total (37 module-scope ROLE_MAP/CRM_KEY_TO_ACROFORM enum FPs, 10 service-layer rows, 4 pure emoji). FIELD_LABELS / MENU_OPTIONS / STEP_LABELS const-map restructures via Option 2. First use of t.rich() in signing namespace (fillAmberFields with \u003camber\u003e slot). ICU plural for autoFilledHint. Commit: b3f543b.",
+      "completed": "2026-04-26",
+      "tag": "ux"
+    },
+    {
+      "id": "D-258",
+      "title": "BG-50 audit-grouping: surface plan CSV at audit-output/bg-50-surface-plan.csv",
+      "desc": "Bucketed remaining 753 missing rows by surface across 21 buckets (0 unclassified after revised mapping extension). Drove the W1-W5 wave plan. Top surfaces by string count: shared-misc (186), signing (169), public-token-flows (101), auth-onboarding (39), properties (36), clients-contacts (35), agent-settings (27). Mapping extended mid-prompt with public-token-flows (new, distinct from published-public), dev-tools, agent-actionlog, agent-dailyplan, agent-dashboard, dead-code, plus pending-approval folded into auth-onboarding. Audit-noise glyph candidates surfaced (~26 non-translatable rows: brand names, HTML entities, emoji, Tailwind classes). Commit: a5e743f.",
+      "completed": "2026-04-26",
+      "tag": "admin"
+    },
+    {
+      "id": "D-257",
+      "title": "BG-50X Batch 4c-wire: pattern (d) UI bucket — 42 throws across 24 files",
+      "desc": "Wired 42 hardcoded throw new Error('literal') strings surfaced by BG-59 pattern (d) into next-intl. Service-layer rows (10) deferred to BG-60 with verbatim marker comments. Major consolidations: shared.errors.notAuthenticated (12 occurrences), shared.errors.failedToGetAiResponse (cross-namespace), shared.errors.somethingWentWrong reuse, adminHooks.errors.memberNotFound (2 occurrences), per-file split for whatsapp.errors.failedToSend / docusign.errors.failedToSend (distinct domains). JSON-merge regression caught: duplicate errors blocks under admin.deals.verify and tools.listing-generator silently overrode added keys (last-key-wins); fixed by merging blocks. 79.1% → 80.2%, missing −42 exact. Commit: c35ec6b.",
+      "completed": "2026-04-26",
+      "tag": "comms"
+    },
+    {
+      "id": "D-256",
+      "title": "BG-50X Batch 4c-triage: pattern (d) bucketing CSV",
+      "desc": "Pre-wire artifact at audit-output/pattern-d-triage.csv — 68 rows triaged into 52 UI / 16 dev / 0 ambiguous. Bucket criteria: UI = throw fallback surfaces via catch→setError to user; dev = pure debug/log/internal-error throws not user-facing. Commit: 340f528.",
+      "completed": "2026-04-26",
+      "tag": "infra"
+    },
+    {
+      "id": "D-255",
+      "title": "BG-50X Batch 5b: pattern (e) nested const-maps",
+      "desc": "17 strings wired across files containing const X = { foo: { label: 'bar', ... } } nested-object const-maps that pattern (e) of BG-59 surfaced. Module-scope → moved inside component body via factory or useMemo per BG-50X 5b convention. 78.7% → 79.1%. Commit: a88e3be.",
+      "completed": "2026-04-26",
+      "tag": "ai"
+    },
+    {
+      "id": "D-254",
+      "title": "BG-50X Batch 4b: patterns (b)+(c) wired",
+      "desc": "Pattern (b) `setError(err.message",
+      "completed": "",
+      "tag": "core"
+    },
+    {
+      "id": "D-253",
+      "title": "BG-59: i18n audit script extended with 5 blind-spot patterns",
+      "desc": "Closed 5 detection blind spots: (a) dynamic_t with closed enumerable runtime set, (b) setError fallback in `",
+      "completed": "",
+      "tag": "ux"
+    },
+    {
+      "id": "D-252",
+      "title": "BG-50X pattern (a) verification: 14 codebase-wide enumerated dynamic_t rows confirmed present in en.json (no wires needed)",
+      "desc": "Pattern (a) fully closed: 28 rows reclassified in BG-59 + 14 verified this batch = 42 total. Coverage stable at 78.7%. Verified files: src/app/admin/workflows/page.tsx L139 (4 country labels: AE/CH/FR/IT), src/features/deals/components/DealDocumentsTab.tsx L888 (5 doc category labels: transaction/mortgage/inspection/legal/other) + L890 (5 empty-state messages, same keys). All 14 already wired pre-BG-59; the audit just couldn't see them before the enumeration fallback shipped.",
+      "completed": "2026-04-26",
+      "tag": "admin"
+    },
     {
       "id": "D-251",
       "title": "BG-50W MCP-verified live on housezoom.ai",
@@ -3463,6 +3851,21 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-04-28 (session 2)",
+      "title": "Documentation Governance Protocol installed + Big Sync. 7 tickets in one session. BG-73 PROJECT-STRUCTURE.md sync (audit + patch, 8 stale / 3 wrong / 18 gaps fixed → 901b3e0). BG-74 docs/architecture/cache.md canonical reference for BL-106 Q&A cache → 6e25b84. BG-77 read-only audit found ARCHITECTURE.md 47 days / ~790 commits stale + AGENTIC-AI-STRATEGY.md (2026-02-09) actively misleading + 2026-04-02 cross-validated v1.1 thinking trapped in Process Atlas HTML. Cross-validated docs strategy with Gemini + ChatGPT, converged on hybrid-modular: thin entry point + docs/architecture/*.md per concern, no docs/adr/, mechanical triggers, fail-loud CI. BG-78 installed Documentation Governance Protocol replacing failed Living Documentation Protocol (47 days silent drift) — new WAYS-OF-WORKING.md § Documentation Governance, PROJECT-KNOWLEDGE-MANIFEST.md, scripts/docs-check.mjs (340 lines, 3 checks), CI integration → 90588fd. BG-79 Big Sync — extracted Process Atlas HTML to docs/architecture/STRATEGY.md (392 lines verbatim), created INDEX.md + 3 skeletons (agentic.md, multi-tenancy.md, qa-engine.md), retrofitted i18n.md and cache.md headers, deleted ARCHITECTURE.md, marked AGENTIC-AI-STRATEGY.md superseded, grandfathered 77 historical tickets → d75367f. BG-79c ghost-absorption sweep — added stripTodoBlocks() pre-filter so \"Likely tickets:\" lines don't ghost-absorb, re-grandfathered 17 ghosts (one was NU-27, surfaced via docs:check failure on first run — proof the fail-loud protocol works) → 878af6f. BG-75 + BG-76 filed in backlog → 6596146. BG-82a sync PROJECT-STRUCTURE.md for today's 7 file additions + 1 deletion that BG-78 trigger map didn't catch (4f8a7af). BG-82b add docs/ + scripts/ triggers + reusable effectiveSince per-rule mechanism replacing BG-78's bootstrap hack (ccba570 + fix-up ad9e422).",
+      "decisions": "Cross-validation with Gemini+ChatGPT changed the design — Gemini's \"Mirror Problem\" argument killed the hybrid-with-monolith plan in favor of pure-modular-with-INDEX. ChatGPT's Project Knowledge Manifest idea solved the \"stale uploads even after fixed repo\" failure mode. Mechanical triggers \u003e prose-heavy rules (\"automation-coupled docs live; prose-heavy docs die\"). Bootstrap-mode self-deactivation via file-count check is cleaner than env-var bypass flags. Fail-loud CI catches its own bugs (NU-27 ghost surfaced this way). Ghost-absorption is a real failure mode for any \"doc mentions ticket = absorbed\" regex; stripTodoBlocks() generalizes the fix. Anchor --since to protocol install commit, not HEAD~N — pre-protocol commits cannot violate rules that didn't exist. The protocol caught its own gap: BG-78 trigger map only covered src/ and supabase/migrations/, so 7 new files under docs/ and scripts/ shipped without PROJECT-STRUCTURE.md updates. Will spotted it; we fixed both the immediate miss (BG-82a) and the protocol gap (BG-82b) before EOS. The effectiveSince mechanism added in BG-82b is more general than BG-78's bootstrap-mode hack and replaces it for future rule additions. Subject-anchored grep (^TICKET:) for resolving install commits is the right pattern when commits may reference future tickets in their body — unanchored grep produces false positives."
+    },
+    {
+      "date": "2026-04-28",
+      "title": "BL-120 CLOSED — locale backfill FR/DE/IT to 99.8% parity, org→user inheritance, browser-translate opt-out. D-276. New organizations.default_locale column + CHECK on existing agent_profiles.language (en/fr/de/it/ar; AR forward-compat for BL-121). Inheritance wired in onboarding/invite-signup. New /api/auth/sync-locale Set-Cookies on login; logout clears via clearLocaleCookie(). Login uses window.location.replace to force full nav so server's new \u003chtml lang\u003e lands on first paint. \u003chtml translate=\"no\"\u003e opts out of Chrome auto-translate (root cause of an IT-only Chrome bug overwriting \"Strumenti\" with \"Instruments\"). New translation pipeline scripts/i18n/{generate-glossary,translate-locale}.mjs with 34-term per-locale glossaries, idempotent batched Claude Sonnet 4.5 calls, ICU validator, tolerant per-line JSON recovery parser. Architecture doc at docs/architecture/i18n.md. Backlog adds: BL-121 (AR + RTL), BL-122 (drop preferences.language jsonb), BL-123 (per-request DB resolver via @supabase/ssr), BL-125 (per-namespace splitting).",
+      "decisions": "DB owns the locale, cookie is fast read path; cookie reconciled at login (server-side Set-Cookie via /api/auth/sync-locale) + logout (clearLocaleCookie before signOut) + LocaleDetector (defense in depth on every authenticated mount). Top-level agent_profiles.language is source of truth — preferences.language jsonb retired as write target (BL-122 cleans up readers). window.location.replace (full nav) post-login is required because soft router.replace reuses root layout React tree and discards the server's new \u003chtml lang\u003e. \u003chtml translate=\"no\"\u003e mandatory for any i18n'd web app — Chrome's auto-translate is per-user/per-language state, asymmetric across locales, and overwrites verified translations with machine translation. ICU select/plural keys may need manual review post-bulk-translate (flat-translation prompt mishandles nested ICU)."
+    },
+    {
+      "date": "2026-04-27",
+      "title": "BG-60 CLOSED + BG-68 Detector D 265 → 67 (74% closed) in single day. D-269 BG-68 Phase A audit (265 baseline, 7 webhook routes excluded). D-270 BG-60 Phase 3 — Shape B const-maps to en.json enums.* namespace (37 entries, 3 service files, 4 consumer files, Detector E). D-271 BG-68 Phase B Batch (a) — apiError() helper + 130 boilerplate sites + 7 keys + Detector D. D-272 Batch (b) — 48 signing sites + 32 keys (token/expiry, fetch-document, validation consolidations). D-273 Batch (c) — 20 actions/leads/deals sites + 18 keys. Session log: docs/sessions/2026-04-27-session-1.md.",
+      "decisions": "API routes use apiError(key, params?, status?, extra?) from @/lib/api/errors; response shape { error, errorKey, errorParams, ...extra }; apiErrorFromThrow(err) for catch blocks consuming Shape A; cross-namespace reuse of shared.errors.* (BG-60) and errors.generic.* (Batch (a)) preserves layer separation; ICU {field} for repeated validation strings; webhook routes excluded under src/app/api/inbound/; Detector D dedicated second pass over API routes (main UI walk excludes them by design)."
+    },
     {
       "date": "2026-04-15",
       "title": "BL-97 Phase D — L2 Sync Execution + Action Log UI. Implemented L2 immediate auto-execution in generate route (no cron). Built agent /action-log and admin /admin/action-log pages with filters, summary strip, agent dropdown, Auto badge. Verified E2E with real WhatsApp delivery (SID confirmed). Logged BG-45 (execution details not shown in expanded view) and BL-111 (seed agent/contact dual identity quirk).",

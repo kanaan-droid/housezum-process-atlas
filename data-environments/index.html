@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — SEEDED-DATA — Staging Environment Source of Truth</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/" class="active">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  
+  
+  <div class="content"><h1>SEEDED-DATA — Staging Environment Source of Truth</h1>
+<blockquote><p><strong>Status:</strong> Stable <strong>Last updated:</strong> 2026-04-29 (Session 4, post BL-126) <strong>Owner:</strong> Will Kanaan <strong>Replaces:</strong> scattered references in CHANGELOG.md, ROADMAP.md, individual session logs, and <code>scripts/seed-*.mjs</code> headers</p>
+<p><strong>Read this BEFORE running any SQL audit or "what data do we have" investigation.</strong> Past sessions have wasted multiple days on questions this doc answers in 30 seconds.</p></blockquote>
+<hr/>
+<h2>1. Overview</h2>
+<h3>1.1 What's seeded</h3>
+<p>The HouseZoom production database hosts <strong>two operational concerns</strong> in the same tables:</p>
+<ol><li><strong>Real platform data</strong> — actual users, real orgs, anything created via the app UI by Will or future paying customers.</li><li><strong>Seeded demo/staging data</strong> — fixture data populated by scripts to make the product demoable, testable, and visually realistic across all target markets (UAE, FR, DE-CH, IT).</li></ol>
+<p>Seeded data is <strong>always</strong> discoverable via specific markers. There is no "seeded data is also production data" gray zone — every seeded row carries an identifier explained in § 1.3.</p>
+<h3>1.2 Quick lookup — the 4 demo orgs</h3>
+<table><thead><tr><th>Locale</th><th>Org name</th><th>Org ID</th><th>Country</th><th>Currency</th><th>Seed script</th><th>Marker</th></tr></thead><tbody><tr><td><code>en</code> (UAE)</td><td>Gulf Horizon Realty</td><td><code>4c08163d-6839-46a9-9183-b9bd4e62ae56</code></td><td>UAE</td><td>AED</td><td><code>scripts/seed-dubai.mjs</code></td><td>(no marker — predates marker pattern)</td></tr><tr><td><code>fr</code></td><td>Saint Germain Immobilier</td><td><code>c07d0805-ca5c-444f-9917-8780a0583b91</code></td><td>France</td><td>EUR</td><td><code>scripts/seed-eu-locales.mjs</code></td><td><code>[seed:eu-v1]</code></td></tr><tr><td><code>de</code></td><td>Zürich Premium Realty</td><td><code>5a895dc4-dd4d-4791-a3c2-855b0d8e94dc</code></td><td>Switzerland</td><td>CHF</td><td><code>scripts/seed-eu-locales.mjs</code></td><td><code>[seed:eu-v1]</code></td></tr><tr><td><code>it</code></td><td>Milano Prestige</td><td><code>0bdbef88-937b-41b8-8885-a2eedf4de323</code></td><td>Italy</td><td>EUR</td><td><code>scripts/seed-eu-locales.mjs</code></td><td><code>[seed:eu-v1]</code></td></tr></tbody></table>
+<h3>1.3 The marker convention</h3>
+<p><strong>Every seeded row from a script using marker discipline carries a string of the form <code>[seed:&amp;lt;scope&amp;gt;-v&amp;lt;n&amp;gt;]</code> appended to its <code>notes</code> field.</strong></p>
+<p>Why this pattern:</p>
+<ul><li><strong>Schema-clean</strong> — no dedicated <code>is_seed</code> column, no migrations needed.</li><li><strong>Visible</strong> — markers show up in UI (mildly ugly but signals "this is demo data" to anyone inspecting).</li><li><strong>Surgical rollback</strong> — <code>DELETE WHERE notes LIKE '%[seed:&amp;lt;scope&amp;gt;-v&amp;lt;n&amp;gt;]%'</code> only touches seeded rows, never real data.</li><li><strong>Re-runnable</strong> — seed scripts check for existing markers before running; abort with <code>--force</code> instructions if found.</li></ul>
+<table><thead><tr><th>Marker</th><th>Scope</th><th>First introduced</th></tr></thead><tbody><tr><td><code>[seed:eu-v1]</code></td><td>EU locales seed (FR/DE/IT)</td><td>BL-126 (2026-04-29)</td></tr><tr><td>(none)</td><td>Gulf Horizon Realty (UAE)</td><td>BL-1/D-52 (2026-02-28) — predates marker pattern</td></tr></tbody></table>
+<p><strong>Gulf Horizon caveat:</strong> the original UAE seed shipped before this convention. <code>seed-dubai.mjs</code> is idempotent (re-run safe via deterministic UUIDs) but rolling back individual rows requires the FK-ordered wipe SQL in <code>scripts/SEED-INSTRUCTIONS.md</code>. Future re-seed of UAE should retrofit the marker pattern.</p>
+<hr/>
+<h2>2. The 4 demo orgs in detail</h2>
+<h3>2.1 Gulf Horizon Realty (UAE)</h3>
+<p><strong>Org ID:</strong> <code>4c08163d-6839-46a9-9183-b9bd4e62ae56</code> <strong>Locale:</strong> English (<code>en</code>) <strong>Currency:</strong> AED <strong>Seed script:</strong> <code>scripts/seed-dubai.mjs</code> <strong>Origin:</strong> D-52 (2026-02-28), enhanced through D-54, D-186, D-196, D-205, D-207, NU-26.</p>
+<h4>2.1.1 Headline counts (per D-52 + ongoing additions)</h4>
+<table><thead><tr><th>Entity</th><th>Count</th><th>Source</th></tr></thead><tbody><tr><td>Agents</td><td>10</td><td>seed-dubai.mjs</td></tr><tr><td>Properties</td><td>100 (15 areas, sale + rent)</td><td>seed-dubai.mjs</td></tr><tr><td>Contacts</td><td>300</td><td>seed-dubai.mjs</td></tr><tr><td>Leads</td><td>54</td><td>seed-dubai.mjs</td></tr><tr><td>Deals</td><td>20</td><td>seed-dubai.mjs</td></tr><tr><td>Workflows</td><td>15</td><td>seed-dubai.mjs</td></tr><tr><td>Viewings</td><td>80</td><td>seed-dubai.mjs</td></tr><tr><td>WhatsApp messages</td><td>200</td><td>seed-dubai.mjs</td></tr><tr><td>Unsplash photos</td><td>632</td><td>seed-dubai.mjs</td></tr><tr><td>Audit log entries</td><td>150</td><td>seed-dubai.mjs</td></tr><tr><td>QA knowledge base</td><td>230 rows (105 general + 125 property-specific)</td><td><code>scripts/bl60/seed-qa-knowledge-base.mjs</code></td></tr></tbody></table>
+<h4>2.1.2 Test accounts</h4>
+<table><thead><tr><th>Email</th><th>Name</th><th>Role</th><th>Notes</th></tr></thead><tbody><tr><td><code>will+fatima-gh@housezoom.ai</code></td><td>Fatima</td><td>Admin / Agent</td><td>Primary test login for UAE</td></tr><tr><td><code>will+patrick151-owner@housezoom.ai</code></td><td>Patrick Schmidt</td><td>Seller</td><td>Property owner test account</td></tr><tr><td><code>will+james-gh@housezoom.ai</code></td><td>James Crawford</td><td>Agent</td><td>Secondary agent</td></tr><tr><td><code>will+lena-gh@housezoom.ai</code></td><td>Lena Fischer</td><td>Agent (non-owner)</td><td>Used for agent-role E2E tests</td></tr></tbody></table>
+<h4>2.1.3 Known issues (filed as TD)</h4>
+<ul><li><strong>TD-24:</strong> 3 junk properties (<code>e78d26b9</code>, <code>0ecb61fc</code>, <code>c7636b82</code>) blocking on <code>deals_property_id_fkey</code>. <code>year_built</code> nulled in Phase 2.2 but rows remain. Low priority — not user-visible. Clean during next full reseed.</li></ul>
+<hr/>
+<h3>2.2 Saint Germain Immobilier (FR)</h3>
+<p><strong>Org ID:</strong> <code>c07d0805-ca5c-444f-9917-8780a0583b91</code> <strong>Locale:</strong> French (<code>fr</code>) <strong>Currency:</strong> EUR <strong>Seed script:</strong> <code>scripts/seed-eu-locales.mjs</code> <strong>Origin:</strong> BL-126 (2026-04-29)</p>
+<h4>2.2.1 Agents (7 — <code>agent_profiles.language='fr'</code>)</h4>
+<table><thead><tr><th>Email</th><th>Name</th><th>Notes</th></tr></thead><tbody><tr><td><code>will+ag-fr-jean@housezoom.ai</code></td><td>Jean Dupont</td><td></td></tr><tr><td><code>will+ag-fr-marie@housezoom.ai</code></td><td>Marie Martin</td><td></td></tr><tr><td><code>will+ag-fr-pierre@housezoom.ai</code></td><td>Pierre Durand</td><td></td></tr><tr><td><code>will+ag-fr-sophie@housezoom.ai</code></td><td>Sophie Bernard</td><td></td></tr><tr><td><code>will+ag-fr-lucas@housezoom.ai</code></td><td>Lucas Petit</td><td></td></tr><tr><td><code>will+ag-fr-camille@housezoom.ai</code></td><td><strong>Camille Moreau</strong></td><td><strong>BL-120 test login</strong></td></tr><tr><td><code>will+ag-fr-thomas@housezoom.ai</code></td><td>Thomas Laurent</td><td></td></tr></tbody></table>
+<h4>2.2.2 Properties (5)</h4>
+<table><thead><tr><th>Property ID</th><th>Listing</th><th>Price</th><th>Type</th></tr></thead><tbody><tr><td><code>4c27f7ee-…</code></td><td>Auteuil Nord, Paris 16ème</td><td>€1,645,000</td><td>Apartment</td></tr><tr><td><code>803027ee-…</code></td><td>Notre Dame des Champs, Paris 6ème</td><td>€3,150,000</td><td>Apartment</td></tr><tr><td><code>40ab0e5b-…</code></td><td>Montmartre, Paris 18ème</td><td>€3,450,000</td><td>Villa</td></tr><tr><td><code>bfbe0d7f-…</code></td><td>Saint Merri, Le Marais, Paris 4ème</td><td>€1,990,000</td><td>Apartment</td></tr><tr><td><code>d6f631e7-…</code></td><td>Saint Philippe du Roule, Paris 8ème</td><td>€2,150,000</td><td>Apartment</td></tr></tbody></table>
+<h4>2.2.3 BL-126 seed counts</h4>
+<p>25 contacts (5 sellers + 12 buyers + 3 owners + 5 service providers) · 10 deals · 10 viewings · 6 viewing_feedback · 10 leads.</p>
+<hr/>
+<h3>2.3 Zürich Premium Realty (DE-CH)</h3>
+<p><strong>Org ID:</strong> <code>5a895dc4-dd4d-4791-a3c2-855b0d8e94dc</code> <strong>Locale:</strong> German (<code>de</code>) <strong>Currency:</strong> CHF <strong>Seed script:</strong> <code>scripts/seed-eu-locales.mjs</code></p>
+<h4>2.3.1 Agents (7)</h4>
+<table><thead><tr><th>Email</th><th>Name</th><th>Notes</th></tr></thead><tbody><tr><td><code>will+ag-ch-hans@housezoom.ai</code></td><td>Hans Müller</td><td></td></tr><tr><td><code>will+ag-ch-peter@housezoom.ai</code></td><td>Peter Meier</td><td></td></tr><tr><td><code>will+ag-ch-thomas@housezoom.ai</code></td><td>Thomas Schmid</td><td></td></tr><tr><td><code>will+ag-ch-daniel@housezoom.ai</code></td><td>Daniel Keller</td><td></td></tr><tr><td><code>will+ag-ch-markus@housezoom.ai</code></td><td>Markus Weber</td><td></td></tr><tr><td><code>will+ag-ch-claudia@housezoom.ai</code></td><td><strong>Claudia Fischer</strong></td><td><strong>BL-120 test login</strong></td></tr><tr><td><code>will+ag-ch-sabine@housezoom.ai</code></td><td>Sabine Baumann</td><td></td></tr></tbody></table>
+<h4>2.3.2 Properties (5)</h4>
+<table><thead><tr><th>Property ID</th><th>Listing</th><th>Price</th><th>Type</th></tr></thead><tbody><tr><td><code>21b07dc1-…</code></td><td>Pfaffhausen, 8053 Zürich</td><td>CHF 1,450,000</td><td>Apartment</td></tr><tr><td><code>af0b8d69-…</code></td><td>Turbinenstrasse 60 (Zölly), 8005 Zürich</td><td>CHF 3,190,000</td><td>Apartment</td></tr><tr><td><code>36ce8f53-…</code></td><td>Bergellerstrasse 43 (Höngg), 8049 Zürich</td><td>CHF 2,210,000</td><td>Apartment</td></tr><tr><td><code>0cd3e789-…</code></td><td>Affoltern, 8046 Zürich</td><td>CHF 1,350,000</td><td>Apartment</td></tr><tr><td><code>750d0c66-…</code></td><td>Eichstrasse 5, 8045 Zürich</td><td>CHF 2,070,000</td><td>Apartment</td></tr></tbody></table>
+<h4>2.3.3 BL-126 seed counts</h4>
+<p>Same shape as Saint Germain: 25 contacts · 10 deals · 10 viewings · 6 feedback · 10 leads.</p>
+<hr/>
+<h3>2.4 Milano Prestige (IT)</h3>
+<p><strong>Org ID:</strong> <code>0bdbef88-937b-41b8-8885-a2eedf4de323</code> <strong>Locale:</strong> Italian (<code>it</code>) <strong>Currency:</strong> EUR <strong>Seed script:</strong> <code>scripts/seed-eu-locales.mjs</code></p>
+<h4>2.4.1 Agents (7)</h4>
+<table><thead><tr><th>Email</th><th>Name</th><th>Notes</th></tr></thead><tbody><tr><td><code>will+ag-it-marco@housezoom.ai</code></td><td>Marco Rossi</td><td></td></tr><tr><td><code>will+ag-it-luca@housezoom.ai</code></td><td>Luca Bianchi</td><td></td></tr><tr><td><code>will+ag-it-alessandro@housezoom.ai</code></td><td><strong>Alessandro Ferrari</strong></td><td><strong>BL-120 test login</strong></td></tr><tr><td><code>will+ag-it-matteo@housezoom.ai</code></td><td>Matteo Colombo</td><td></td></tr><tr><td><code>will+ag-it-andrea@housezoom.ai</code></td><td>Andrea Ricci</td><td></td></tr><tr><td><code>will+ag-it-giulia@housezoom.ai</code></td><td>Giulia Romano</td><td></td></tr><tr><td><code>will+ag-it-francesca@housezoom.ai</code></td><td>Francesca Galli</td><td></td></tr></tbody></table>
+<h4>2.4.2 Properties (5)</h4>
+<table><thead><tr><th>Property ID</th><th>Listing</th><th>Price</th><th>Type</th></tr></thead><tbody><tr><td><code>aa422eab-…</code></td><td>Viale Premuda 20/A</td><td>€1,290,000</td><td>Apartment</td></tr><tr><td><code>dd98b2f3-…</code></td><td>Palazzo Aurea, Piazzale Medaglie d'Oro 3</td><td>€1,678,000</td><td>Apartment</td></tr><tr><td><code>9d6606f2-…</code></td><td>Via Galvano Fiamma 15/1</td><td>€1,100,000</td><td>Apartment</td></tr><tr><td><code>27899ddc-…</code></td><td>Via Castel Morrone 5</td><td>€1,076,000</td><td>Apartment</td></tr><tr><td><code>03ee7f6b-…</code></td><td>Via Andrea Solari 23</td><td>€930,000</td><td>Apartment</td></tr></tbody></table>
+<h4>2.4.3 BL-126 seed counts</h4>
+<p>Same shape as Saint Germain and Zürich Premium: 25 contacts · 10 deals · 10 viewings · 6 feedback · 10 leads.</p>
+<hr/>
+<h2>3. BL-126 EU seed inventory</h2>
+<h3>3.1 Counts (per locale × entity)</h3>
+<table><thead><tr><th>Entity</th><th>FR</th><th>DE</th><th>IT</th><th>Total</th></tr></thead><tbody><tr><td>Contacts</td><td>25</td><td>25</td><td>25</td><td>75</td></tr><tr><td>↳ Buyers</td><td>12</td><td>12</td><td>12</td><td>36</td></tr><tr><td>↳ Sellers (linked to properties)</td><td>5</td><td>5</td><td>5</td><td>15</td></tr><tr><td>↳ Owners (not yet listed)</td><td>3</td><td>3</td><td>3</td><td>9</td></tr><tr><td>↳ Service providers</td><td>5</td><td>5</td><td>5</td><td>15</td></tr><tr><td>Deals</td><td>10</td><td>10</td><td>10</td><td>30</td></tr><tr><td>Viewings</td><td>10</td><td>10</td><td>10</td><td>30</td></tr><tr><td>Viewing feedback</td><td>6</td><td>6</td><td>6</td><td>18</td></tr><tr><td>Leads</td><td>10</td><td>10</td><td>10</td><td>30</td></tr><tr><td>Org default_locale UPDATEs</td><td>1</td><td>1</td><td>1</td><td>3</td></tr></tbody></table>
+<p><strong>Grand total: ~205 rows + 3 org updates.</strong></p>
+<h3>3.2 Email naming convention (locked)</h3>
+<p>Pattern: <code>will+{role}-{locale}-{first}-{last}@housezoom.ai</code></p>
+<table><thead><tr><th>Role prefix</th><th>Meaning</th><th>Example</th></tr></thead><tbody><tr><td><code>ag</code></td><td>Agent</td><td><code>will+ag-fr-camille@housezoom.ai</code></td></tr><tr><td><code>co</code></td><td>Contact (buyer / owner / service provider)</td><td><code>will+co-fr-michelle-laurier@housezoom.ai</code></td></tr><tr><td><code>sl</code></td><td>Seller (linked to property via <code>seller_contact_id</code>)</td><td><code>will+sl-de-heinrich-zollinger@housezoom.ai</code></td></tr><tr><td><code>ld</code></td><td>Lead (inbound, may have converted)</td><td><code>will+ld-it-giorgio-conti@housezoom.ai</code></td></tr></tbody></table>
+<p><strong>Format rules:</strong></p>
+<ul><li>Lowercase locale code: <code>fr</code> / <code>de</code> / <code>it</code></li><li>Dash-joined name; diacritics stripped in email local-part (<code>Geneviève</code> → <code>genevieve</code>)</li><li>Hyphenated names compressed: <code>Marie-Claire</code> → <code>marie-claire</code></li></ul>
+<h3>3.3 Locale data libraries (where in the script)</h3>
+<p>The full locale-specific data libraries (modern + older name pools, phone formats, email TLDs, currencies, commission rates, lead sources, locale-language notes pools) live in the <code>LOCALE_DATA</code> config block at the top of <code>scripts/seed-eu-locales.mjs</code>. Reference the script header for the canonical source.</p>
+<p>Cross-reference: <code>docs/specs/SEED-EU-LOCALES-SPEC.md</code> § 5 documents the design intent.</p>
+<hr/>
+<h2>4. How to interact with seeded data</h2>
+<h3>4.1 Run a fresh seed (EU locales)</h3>
+<pre><code class="lang-bash">cd ~/Apps/housezum-app
+node --env-file=.env.local scripts/seed-eu-locales.mjs --dry-run    # MANDATORY first
+node --env-file=.env.local scripts/seed-eu-locales.mjs              # if dry-run looks right</code></pre>
+<h3>4.2 Re-seed (rollback + re-run in one command)</h3>
+<pre><code class="lang-bash">node --env-file=.env.local scripts/seed-eu-locales.mjs --force</code></pre>
+<h3>4.3 Rollback only (no re-seed)</h3>
+<pre><code class="lang-bash">node --env-file=.env.local scripts/seed-eu-locales.mjs --rollback</code></pre>
+<h3>4.4 Single-locale debugging</h3>
+<pre><code class="lang-bash">node --env-file=.env.local scripts/seed-eu-locales.mjs --locale=fr   # one locale only</code></pre>
+<h3>4.5 Query for seeded data (SQL)</h3>
+<pre><code class="lang-sql">-- Count seeded rows per org (the canonical "is the seed live?" check)
+SELECT 
+  o.name,
+  o.default_locale,
+  (SELECT COUNT(*) FROM contacts WHERE org_id = o.id AND notes LIKE '%[seed:eu-v1]%') AS contacts,
+  (SELECT COUNT(*) FROM deals WHERE org_id = o.id AND notes LIKE '%[seed:eu-v1]%') AS deals,
+  (SELECT COUNT(*) FROM viewings WHERE org_id = o.id AND notes LIKE '%[seed:eu-v1]%') AS viewings,
+  (SELECT COUNT(*) FROM leads WHERE org_id = o.id AND notes LIKE '%[seed:eu-v1]%') AS leads
+FROM organizations o
+WHERE o.id IN (
+  '5a895dc4-dd4d-4791-a3c2-855b0d8e94dc',
+  'c07d0805-ca5c-444f-9917-8780a0583b91',
+  '0bdbef88-937b-41b8-8885-a2eedf4de323'
+)
+ORDER BY o.name;</code></pre>
+<h3>4.6 Seed the UAE org (Gulf Horizon)</h3>
+<p>Different script, FK-ordered wipe required first if re-running. See <code>scripts/SEED-INSTRUCTIONS.md</code> for the canonical procedure.</p>
+<pre><code class="lang-bash">node --env-file=.env.local scripts/seed-dubai.mjs</code></pre>
+<hr/>
+<h2>5. CHECK constraint reference (the "do not investigate by SQL" cache)</h2>
+<blockquote><p><strong>Why this section exists:</strong> seed scripts crash on stale CHECK constraints. <code>DB-SCHEMA.md</code> has been wrong about live constraints multiple times. This section is the cache of last resort — <strong>always trust this over <code>DB-SCHEMA.md</code> until both are reconfirmed by re-running § 5.1</strong>.</p></blockquote>
+<h3>5.1 Canonical "regenerate this section" SQL</h3>
+<p>Run this in Supabase SQL editor any time you suspect drift, before any new seed work, or as part of EOS:</p>
+<pre><code class="lang-sql">SELECT conname, pg_get_constraintdef(oid)
+FROM pg_constraint
+WHERE conrelid::regclass::text IN
+  ('contacts','leads','deals','viewings','viewing_feedback','properties','organizations','agent_profiles')
+  AND contype = 'c'
+ORDER BY conrelid::regclass::text, conname;</code></pre>
+<h3>5.2 Constraint snapshot (verified 2026-04-29)</h3>
+<h4>contacts</h4>
+<table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>contact_type</code></td><td><code>buyer</code>, <code>seller</code>, <code>agent</code>, <code>service_provider</code></td></tr></tbody></table>
+<h4>leads</h4>
+<table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>purpose</code></td><td><code>investor</code>, <code>end_user</code>, <code>tenant</code>, <code>unknown</code></td></tr><tr><td><code>status</code></td><td><code>new</code>, <code>contacted</code>, <code>qualified</code>, <code>nurturing</code>, <code>converted</code>, <code>closed_won</code>, <code>closed_lost</code></td></tr><tr><td><code>source_type</code></td><td><code>portal</code>, <code>whatsapp</code>, <code>email</code>, <code>referral</code>, <code>import</code>, <code>website</code>, <code>walk_in</code>, <code>manual</code></td></tr><tr><td><code>intent_confidence</code></td><td><code>low</code>, <code>medium</code>, <code>high</code></td></tr><tr><td><code>intent_score</code></td><td><code>0..100</code> (range constraint)</td></tr><tr><td><code>buying_purpose</code></td><td><code>primary_residence</code>, <code>investment</code>, <code>holiday_home</code>, <code>not_sure</code></td></tr><tr><td><code>financing_type</code></td><td><code>cash</code>, <code>mortgage</code>, <code>unknown</code></td></tr><tr><td><code>move_timeline</code></td><td><code>ready_now</code>, <code>1_3_months</code>, <code>3_6_months</code>, <code>just_exploring</code></td></tr><tr><td><code>timeframe</code></td><td><code>immediate</code>, <code>1-3m</code>, <code>3-6m</code>, <code>6-12m</code>, <code>exploring</code></td></tr></tbody></table>
+<h4>deals</h4>
+<table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>current_stage_key</code></td><td><code>qualified</code>, <code>negotiation</code>, <code>under_contract</code>, <code>due_diligence</code>, <code>closing</code>, <code>closed</code></td></tr><tr><td><code>status</code></td><td><code>active</code>, <code>won</code>, <code>lost</code>, <code>withdrawn</code>, <code>on_hold</code></td></tr><tr><td><code>deal_type</code></td><td><code>sale_secondary</code>, <code>rental</code></td></tr><tr><td><code>financing_type</code></td><td><code>cash</code>, <code>mortgage</code>, <code>payment_plan</code>, <code>unknown</code></td></tr><tr><td><code>probability_source</code></td><td><code>stage_default</code>, <code>ai</code>, <code>manual</code></td></tr><tr><td><code>probability</code></td><td><code>0..100</code> (range)</td></tr><tr><td><code>probability_ai</code></td><td><code>0..100</code> (range)</td></tr></tbody></table>
+<h4>viewings</h4>
+<table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>status</code></td><td><code>scheduled</code>, <code>completed</code>, <code>cancelled</code>, <code>no_show</code></td></tr></tbody></table>
+<h4>viewing_feedback</h4>
+<table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>next_step</code></td><td><code>follow_up</code>, <code>send_comps</code>, <code>submit_offer</code>, <code>no_interest</code>, <code>second_viewing</code></td></tr><tr><td><code>buyer_interest_level</code></td><td>(NO CHECK constraint — plain text)</td></tr></tbody></table>
+<h3>5.3 NOT NULL audit on <code>viewing_feedback</code> (high-incident column)</h3>
+<p><code>viewing_feedback</code> has both legacy and modern columns for the same concept. Both halves need population:</p>
+<table><thead><tr><th>Column</th><th>Nullable?</th><th>Notes</th></tr></thead><tbody><tr><td><code>id</code></td><td>NO (default)</td><td>UUID generated</td></tr><tr><td><code>viewing_id</code></td><td>YES</td><td>Modern; nullable but always populate</td></tr><tr><td><code>property_id</code></td><td>YES</td><td>Modern; nullable but always populate</td></tr><tr><td><code>user_id</code></td><td><strong>NO</strong></td><td><strong>Legacy canonical agent column. NOT NULL.</strong> Must populate.</td></tr><tr><td><code>agent_user_id</code></td><td>YES</td><td>Modern shadow column. Populate same value as <code>user_id</code> for forward-compat.</td></tr><tr><td><code>org_id</code></td><td><strong>NO</strong></td><td><strong>Required.</strong> Pull from parent viewing.</td></tr><tr><td><code>contact_id</code></td><td>YES</td><td></td></tr></tbody></table>
+<p><strong>Hit list during BL-126:</strong> <code>user_id</code> NOT NULL caught us. <code>org_id</code> NOT NULL caught us. <strong>Two iterations on the same table</strong> because the first fix audit didn't go column-by-column on the failing table itself. Lesson: when a NOT NULL violation hits, audit the <strong>entire</strong> target table's NOT NULL columns before re-running, not just the one that fired.</p>
+<h3>5.4 Stale <code>DB-SCHEMA.md</code> entries (the "do not trust" list)</h3>
+<p>As of 2026-04-29:</p>
+<ul><li>❌ <strong><code>leads.purpose</code></strong> — DB-SCHEMA says <code>buy/rent/invest</code>, live is <code>investor/end_user/tenant/unknown</code>. Filed for next DB-SCHEMA sync pass.</li><li>❌ <strong><code>viewing_feedback.user_id</code> nullability</strong> — DB-SCHEMA says nullable, live is NOT NULL. Filed.</li></ul>
+<p>(Pre-EOS task each session: re-run § 5.1, diff against this table, update both this section and <code>DB-SCHEMA.md</code>.)</p>
+<hr/>
+<h2>6. Dual-column legacy patterns (the "which column is canonical?" map)</h2>
+<blockquote><p><strong>Why this section exists:</strong> several tables have both a legacy and a modern column for the same concept (typically <code>user_id</code> vs <code>*_user_id</code>). Knowing which to populate is the difference between a clean seed and a NOT NULL crash.</p></blockquote>
+<h3>6.1 The audit (verified during BL-126)</h3>
+<table><thead><tr><th>Table</th><th>Legacy column</th><th>Modern column</th><th>Canonical (write to)</th><th>Notes</th></tr></thead><tbody><tr><td><code>contacts</code></td><td><code>user_id</code> (NOT NULL)</td><td>(none)</td><td><code>user_id</code></td><td>Single column, no shadow.</td></tr><tr><td><code>leads</code></td><td>(none)</td><td><code>assigned_user_id</code></td><td><code>assigned_user_id</code></td><td>Modern only.</td></tr><tr><td><code>deals</code></td><td>(none)</td><td><code>assigned_user_id</code></td><td><code>assigned_user_id</code></td><td><code>owner_user_id</code> exists but nullable; can leave NULL.</td></tr><tr><td><code>viewings</code></td><td><code>user_id</code> (nullable)</td><td><code>agent_user_id</code></td><td><code>agent_user_id</code></td><td>Legacy column nullable — safe to leave NULL but populating both is more correct.</td></tr><tr><td><code>viewing_feedback</code></td><td><code>user_id</code> (NOT NULL)</td><td><code>agent_user_id</code> (nullable)</td><td><strong>BOTH</strong></td><td>NOT NULL on legacy means must populate. Populate both with same UUID for forward-compat.</td></tr></tbody></table>
+<h3>6.2 Future-proofing</h3>
+<p>Any future migration that tightens nullability on a currently-nullable legacy column (e.g., making <code>viewings.user_id</code> NOT NULL) will surface at runtime in <code>seed-eu-locales.mjs</code> via <code>formatPgError</code> with a parsed diagnostic. <strong>No silent failure path</strong> — design intent.</p>
+<hr/>
+<h2>7. Lessons learned from BL-126 (for future seed work)</h2>
+<ol><li><strong>Diagnostic-first.</strong> BL-126 ran SQL discovery (agents → properties → photo coverage → CRM gap) BEFORE writing the spec. This is the same workflow that worked for BG-79b. Spec quality is downstream of diagnostic quality.</li><li><strong>Spec before script.</strong> A markdown spec with counts, distribution tables, and locale data libraries took ~1 hour to write. Saved at least a day of CC iteration.</li><li><strong><code>DB-SCHEMA.md</code> is a hint, not a contract.</strong> Verify CHECK constraints against <code>pg_constraint</code> before any insert-heavy work. § 5.1 is the canonical query.</li><li><strong>NOT NULL audits must cover the entire target table, not just the column that fired.</strong> BL-126 hit <code>viewing_feedback.user_id</code> NOT NULL, patched it, and immediately hit <code>viewing_feedback.org_id</code> NOT NULL on the next run. Two CC iterations on the same table because the first audit was column-scoped instead of table-scoped.</li><li><strong>Idempotency markers in <code>notes</code> are clean enough.</strong> No dedicated <code>is_seed</code> column needed. Trade-off: marker is visible in UI (mildly ugly). Acceptable for demo orgs.</li><li><strong><code>--force</code> (rollback + re-seed) is mandatory for iterative demo prep.</strong> Append-only creates duplicates that pollute fast. <code>--rollback</code> then <code>--seed</code> two-step is too slow for tweaking. <code>--force</code> in one shot is the sweet spot.</li><li><strong>CC's deviations are usually correct.</strong> When CC pushes back on a spec detail, the deviation is more often a real catch than over-engineering. BL-126 examples: <code>viewing_feedback.buyer_interest_level</code> (correct DB column name vs spec's <code>interest_level</code>), monthly-rent budget shape for tenant leads, audit summary block in script header. Pattern noted in last 3+ sessions.</li><li><strong>Phase 0 advisory &gt; programmatic pre-flight.</strong> Supabase JS doesn't expose <code>pg_constraint</code> (PostgREST publishes only <code>public</code> schema). Manual SQL block in seed script header + runtime CHECK violation parser via <code>formatPgError</code> was the cleanest fit.</li></ol>
+<hr/>
+<h2>8. Related docs / scripts</h2>
+<h3>Specs</h3>
+<ul><li><code>docs/specs/SEED-EU-LOCALES-SPEC.md</code> — design intent for BL-126</li><li><code>scripts/SEED-INSTRUCTIONS.md</code> — Gulf Horizon FK-ordered wipe procedure</li></ul>
+<h3>Scripts</h3>
+<ul><li><code>scripts/seed-eu-locales.mjs</code> — EU locales seed (FR/DE/IT)</li><li><code>scripts/seed-dubai.mjs</code> — Gulf Horizon (UAE)</li><li><code>scripts/bl60/seed-qa-knowledge-base.mjs</code> — Q&amp;A corpus seed (cross-org)</li></ul>
+<h3>Architecture cross-links</h3>
+<ul><li><code>docs/architecture/multi-tenancy.md</code> — org_id semantics, RLS, service-role usage</li><li><code>docs/architecture/crm.md</code> — contacts/leads/deals/viewings data model</li></ul>
+<h3>Other governance</h3>
+<ul><li><code>WAYS-OF-WORKING.md</code> § Testing Protocol — how seeded data interacts with E2E</li><li><code>DB-SCHEMA.md</code> — canonical schema doc (cross-check against § 5.1 before trusting)</li><li><code>ROADMAP.md</code> — D-numbers and BL-numbers referenced throughout</li></ul>
+<hr/>
+<h2>9. Maintenance</h2>
+<p>This doc is updated:</p>
+<ul><li><strong>Pre-EOS</strong> when a session adds or modifies seed data</li><li><strong>At seed-script ship time</strong> when a new script is committed</li><li><strong>When <code>DB-SCHEMA.md</code> is re-synced</strong> — § 5.4 stale list gets cleared</li></ul>
+<p>Run § 5.1 SQL each session that touches seeded data to detect constraint drift.</p></div>
+</main>
+<footer>
+  HouseZoom.ai Data Environments · Auto-generated from <code>docs/data-environments/INDEX.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>
