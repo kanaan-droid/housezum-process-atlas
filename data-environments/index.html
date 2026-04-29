@@ -181,9 +181,62 @@ ORDER BY o.name;</code></pre>
 <p>Different script, FK-ordered wipe required first if re-running. See <code>scripts/SEED-INSTRUCTIONS.md</code> for the canonical procedure.</p>
 <pre><code class="lang-bash">node --env-file=.env.local scripts/seed-dubai.mjs</code></pre>
 <hr/>
-<h2>5. CHECK constraint reference (the "do not investigate by SQL" cache)</h2>
-<blockquote><p><strong>Why this section exists:</strong> seed scripts crash on stale CHECK constraints. <code>DB-SCHEMA.md</code> has been wrong about live constraints multiple times. This section is the cache of last resort — <strong>always trust this over <code>DB-SCHEMA.md</code> until both are reconfirmed by re-running § 5.1</strong>.</p></blockquote>
-<h3>5.1 Canonical "regenerate this section" SQL</h3>
+<h2>5. BL-128: EU property<em>items + neighborhood</em>info + energy backfill (D-285 / D-286)</h2>
+<p><strong>Marker:</strong> <code>[seed:eu-v1-items]</code> (items + neighborhoods); <code>[seed:eu-v1-items energy]</code> (energy class additional_notes audit line — separate marker, separate audit trail).</p>
+<p><strong>Script:</strong> <code>scripts/seed-eu-agencies/seed-eu-property-items.mjs</code> (~850 LoC + ~110 LoC BL-128b extension).</p>
+<p><strong>Spec:</strong> <code>docs/specs/SEED-EU-ITEMS-SPEC.md</code>.</p>
+<h3>Three phases</h3>
+<table><thead><tr><th>Phase</th><th>Target</th><th>Marker location</th><th>Cleared by <code>--rollback</code>?</th></tr></thead><tbody><tr><td>1</td><td><code>property_items</code> (~26 rows × 15 properties = 384 total)</td><td><code>metadata.seed_marker</code></td><td>✅ Yes</td></tr><tr><td>2</td><td><code>properties.neighborhood_info</code> (15 rows, locale-language Haiku-generated paragraph)</td><td>Suffix at end of paragraph string</td><td>✅ Yes</td></tr><tr><td>3</td><td><code>properties.energy_class</code> + <code>properties.energy_efficiency_index</code> + <code>properties.additional_notes</code> audit line</td><td>Audit line in <code>additional_notes</code> (NOT in the energy fields themselves)</td><td>❌ <strong>No</strong> — energy fields are real correctness data</td></tr></tbody></table>
+<h3>Item taxonomy (DB column <code>category</code> + <code>item_type</code>)</h3>
+<table><thead><tr><th><code>category</code></th><th><code>item_type</code> values</th></tr></thead><tbody><tr><td><code>room</code></td><td><code>room</code> (only) — name = display name (Salon / Wohnzimmer / Soggiorno)</td></tr><tr><td><code>feature</code></td><td><code>appliance</code>, <code>bathroom_fixture</code>, <code>storage</code>, <code>architectural</code>, <code>bathroom_feature</code>, <code>flooring</code>, <code>glazing</code>, <code>kitchen_feature</code>, <code>room_feature</code></td></tr><tr><td><code>system</code></td><td><code>split_ac</code>, <code>intercom</code>, <code>water_heater</code>, <code>security</code>, <code>smart_home</code></td></tr><tr><td><code>exterior</code></td><td><code>parking</code>, <code>storage</code>, <code>exterior</code>, <code>balcony</code>, <code>amenity</code>, <code>landscaping</code>, <code>pool</code></td></tr></tbody></table>
+<p>(Full locale vocabulary tables — names, brands, materials, item-by-item — in <code>docs/specs/SEED-EU-ITEMS-SPEC.md</code>, not duplicated here.)</p>
+<h3>Per-locale item counts (post-BL-128 final state)</h3>
+<table><thead><tr><th>Org</th><th>Properties</th><th>property_items rows</th><th>Avg/property</th></tr></thead><tbody><tr><td>Saint Germain Immobilier (FR)</td><td>5</td><td>~140</td><td>~28</td></tr><tr><td>Zürich Premium Realty (DE-CH)</td><td>5</td><td>~115</td><td>~23</td></tr><tr><td>Milano Prestige (IT)</td><td>5</td><td>~128</td><td>~26</td></tr><tr><td><strong>EU total</strong></td><td><strong>15</strong></td><td><strong>384</strong></td><td><strong>~26</strong></td></tr><tr><td>Gulf Horizon Realty (UAE)</td><td>101</td><td>2,502</td><td>~25</td></tr></tbody></table>
+<h3>Energy lookup tables (BL-128b)</h3>
+<p>These are the canonical kWh/m²/yr midpoints used by the script. Documented here so future scripts / audits don't have to read the script source.</p>
+<table><thead><tr><th>Class</th><th>FR (DPE)</th><th>DE-CH (GEAK)</th><th>IT (APE)</th></tr></thead><tbody><tr><td>A</td><td>50</td><td>40</td><td>30</td></tr><tr><td>B</td><td>75</td><td>60</td><td>70</td></tr><tr><td>C</td><td>120</td><td>100</td><td>110</td></tr><tr><td>D</td><td>180</td><td>150</td><td>160</td></tr><tr><td>E</td><td>250</td><td>220</td><td>230</td></tr><tr><td>F</td><td>350</td><td>300</td><td>320</td></tr><tr><td>G</td><td>450</td><td>400</td><td>420</td></tr></tbody></table>
+<h3>Known data quality issue (BG-87)</h3>
+<p>4 of 5 Milano properties have pre-existing impossible APE class/index combos in <code>properties</code> table from BL-EU-SEED Step 4 (D-220):</p>
+<table><thead><tr><th>Address</th><th>Class</th><th>Index (kWh/m²/yr)</th><th>Issue</th></tr></thead><tbody><tr><td>Via Andrea Solari 23</td><td>G</td><td>175</td><td>Impossible — G should be ≥320</td></tr><tr><td>Via Castel Morrone 5</td><td>A</td><td>175</td><td>Impossible — A should be ≤30</td></tr><tr><td>Via Galvano Fiamma 15/1</td><td>A</td><td>54.29</td><td>Impossible — A should be ≤30</td></tr><tr><td>Viale Premuda 20/A</td><td>D</td><td>175</td><td>Out of range — D should be 110–160</td></tr></tbody></table>
+<p>The BL-128b script's <code>energy_efficiency_index IS NULL</code> filter correctly skipped these (preservation of existing data is intentional). Only Piazzale Medaglie d'Oro 3 (NULL pre-script) was overwritten by our script and is correct (D=160). BG-87 filed for audit + correction.</p>
+<h3>Verification queries</h3>
+<pre><code class="lang-sql">-- 1. Per-property item counts (expect 23–33 each, 384 total)
+SELECT o.name, p.address, COUNT(pi.id) AS items
+FROM properties p
+JOIN organizations o ON o.id = p.org_id
+LEFT JOIN property_items pi ON pi.property_id = p.id
+WHERE p.org_id IN (
+  '0bdbef88-937b-41b8-8885-a2eedf4de323',
+  'c07d0805-ca5c-444f-9917-8780a0583b91',
+  '5a895dc4-dd4d-4791-a3c2-855b0d8e94dc'
+)
+GROUP BY o.name, p.address
+ORDER BY o.name, p.address;
+
+-- 2. Neighborhood + energy completeness (expect 15 rows, all non-NULL)
+SELECT o.name, p.address, p.energy_class, p.energy_efficiency_index,
+       LENGTH(p.neighborhood_info) AS nbhd_len
+FROM properties p
+JOIN organizations o ON o.id = p.org_id
+WHERE p.org_id IN (
+  '0bdbef88-937b-41b8-8885-a2eedf4de323',
+  'c07d0805-ca5c-444f-9917-8780a0583b91',
+  '5a895dc4-dd4d-4791-a3c2-855b0d8e94dc'
+)
+ORDER BY o.name, p.address;</code></pre>
+<h3>Rollback procedure</h3>
+<pre><code class="lang-bash"># Full rollback (all 15 properties, all 3 phases — energy fields preserved)
+node --env-file=.env.local scripts/seed-eu-agencies/seed-eu-property-items.mjs --rollback
+
+# Locale-scoped rollback
+node --env-file=.env.local scripts/seed-eu-agencies/seed-eu-property-items.mjs --rollback --locale=fr
+
+# Single-property rollback
+node --env-file=.env.local scripts/seed-eu-agencies/seed-eu-property-items.mjs --rollback --property-id=&lt;uuid&gt;</code></pre>
+<hr/>
+<h2>6. CHECK constraint reference (the "do not investigate by SQL" cache)</h2>
+<blockquote><p><strong>Why this section exists:</strong> seed scripts crash on stale CHECK constraints. <code>DB-SCHEMA.md</code> has been wrong about live constraints multiple times. This section is the cache of last resort — <strong>always trust this over <code>DB-SCHEMA.md</code> until both are reconfirmed by re-running § 6.1</strong>.</p></blockquote>
+<h3>6.1 Canonical "regenerate this section" SQL</h3>
 <p>Run this in Supabase SQL editor any time you suspect drift, before any new seed work, or as part of EOS:</p>
 <pre><code class="lang-sql">SELECT conname, pg_get_constraintdef(oid)
 FROM pg_constraint
@@ -191,7 +244,7 @@ WHERE conrelid::regclass::text IN
   ('contacts','leads','deals','viewings','viewing_feedback','properties','organizations','agent_profiles')
   AND contype = 'c'
 ORDER BY conrelid::regclass::text, conname;</code></pre>
-<h3>5.2 Constraint snapshot (verified 2026-04-29)</h3>
+<h3>6.2 Constraint snapshot (verified 2026-04-29)</h3>
 <h4>contacts</h4>
 <table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>contact_type</code></td><td><code>buyer</code>, <code>seller</code>, <code>agent</code>, <code>service_provider</code></td></tr></tbody></table>
 <h4>leads</h4>
@@ -202,26 +255,26 @@ ORDER BY conrelid::regclass::text, conname;</code></pre>
 <table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>status</code></td><td><code>scheduled</code>, <code>completed</code>, <code>cancelled</code>, <code>no_show</code></td></tr></tbody></table>
 <h4>viewing_feedback</h4>
 <table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>next_step</code></td><td><code>follow_up</code>, <code>send_comps</code>, <code>submit_offer</code>, <code>no_interest</code>, <code>second_viewing</code></td></tr><tr><td><code>buyer_interest_level</code></td><td>(NO CHECK constraint — plain text)</td></tr></tbody></table>
-<h3>5.3 NOT NULL audit on <code>viewing_feedback</code> (high-incident column)</h3>
+<h3>6.3 NOT NULL audit on <code>viewing_feedback</code> (high-incident column)</h3>
 <p><code>viewing_feedback</code> has both legacy and modern columns for the same concept. Both halves need population:</p>
 <table><thead><tr><th>Column</th><th>Nullable?</th><th>Notes</th></tr></thead><tbody><tr><td><code>id</code></td><td>NO (default)</td><td>UUID generated</td></tr><tr><td><code>viewing_id</code></td><td>YES</td><td>Modern; nullable but always populate</td></tr><tr><td><code>property_id</code></td><td>YES</td><td>Modern; nullable but always populate</td></tr><tr><td><code>user_id</code></td><td><strong>NO</strong></td><td><strong>Legacy canonical agent column. NOT NULL.</strong> Must populate.</td></tr><tr><td><code>agent_user_id</code></td><td>YES</td><td>Modern shadow column. Populate same value as <code>user_id</code> for forward-compat.</td></tr><tr><td><code>org_id</code></td><td><strong>NO</strong></td><td><strong>Required.</strong> Pull from parent viewing.</td></tr><tr><td><code>contact_id</code></td><td>YES</td><td></td></tr></tbody></table>
 <p><strong>Hit list during BL-126:</strong> <code>user_id</code> NOT NULL caught us. <code>org_id</code> NOT NULL caught us. <strong>Two iterations on the same table</strong> because the first fix audit didn't go column-by-column on the failing table itself. Lesson: when a NOT NULL violation hits, audit the <strong>entire</strong> target table's NOT NULL columns before re-running, not just the one that fired.</p>
-<h3>5.4 Stale <code>DB-SCHEMA.md</code> entries (the "do not trust" list)</h3>
+<h3>6.4 Stale <code>DB-SCHEMA.md</code> entries (the "do not trust" list)</h3>
 <p>As of 2026-04-29:</p>
 <ul><li>❌ <strong><code>leads.purpose</code></strong> — DB-SCHEMA says <code>buy/rent/invest</code>, live is <code>investor/end_user/tenant/unknown</code>. Filed for next DB-SCHEMA sync pass.</li><li>❌ <strong><code>viewing_feedback.user_id</code> nullability</strong> — DB-SCHEMA says nullable, live is NOT NULL. Filed.</li></ul>
-<p>(Pre-EOS task each session: re-run § 5.1, diff against this table, update both this section and <code>DB-SCHEMA.md</code>.)</p>
+<p>(Pre-EOS task each session: re-run § 6.1, diff against this table, update both this section and <code>DB-SCHEMA.md</code>.)</p>
 <hr/>
-<h2>6. Dual-column legacy patterns (the "which column is canonical?" map)</h2>
+<h2>7. Dual-column legacy patterns (the "which column is canonical?" map)</h2>
 <blockquote><p><strong>Why this section exists:</strong> several tables have both a legacy and a modern column for the same concept (typically <code>user_id</code> vs <code>*_user_id</code>). Knowing which to populate is the difference between a clean seed and a NOT NULL crash.</p></blockquote>
 <h3>6.1 The audit (verified during BL-126)</h3>
 <table><thead><tr><th>Table</th><th>Legacy column</th><th>Modern column</th><th>Canonical (write to)</th><th>Notes</th></tr></thead><tbody><tr><td><code>contacts</code></td><td><code>user_id</code> (NOT NULL)</td><td>(none)</td><td><code>user_id</code></td><td>Single column, no shadow.</td></tr><tr><td><code>leads</code></td><td>(none)</td><td><code>assigned_user_id</code></td><td><code>assigned_user_id</code></td><td>Modern only.</td></tr><tr><td><code>deals</code></td><td>(none)</td><td><code>assigned_user_id</code></td><td><code>assigned_user_id</code></td><td><code>owner_user_id</code> exists but nullable; can leave NULL.</td></tr><tr><td><code>viewings</code></td><td><code>user_id</code> (nullable)</td><td><code>agent_user_id</code></td><td><code>agent_user_id</code></td><td>Legacy column nullable — safe to leave NULL but populating both is more correct.</td></tr><tr><td><code>viewing_feedback</code></td><td><code>user_id</code> (NOT NULL)</td><td><code>agent_user_id</code> (nullable)</td><td><strong>BOTH</strong></td><td>NOT NULL on legacy means must populate. Populate both with same UUID for forward-compat.</td></tr></tbody></table>
 <h3>6.2 Future-proofing</h3>
 <p>Any future migration that tightens nullability on a currently-nullable legacy column (e.g., making <code>viewings.user_id</code> NOT NULL) will surface at runtime in <code>seed-eu-locales.mjs</code> via <code>formatPgError</code> with a parsed diagnostic. <strong>No silent failure path</strong> — design intent.</p>
 <hr/>
-<h2>7. Lessons learned from BL-126 (for future seed work)</h2>
-<ol><li><strong>Diagnostic-first.</strong> BL-126 ran SQL discovery (agents → properties → photo coverage → CRM gap) BEFORE writing the spec. This is the same workflow that worked for BG-79b. Spec quality is downstream of diagnostic quality.</li><li><strong>Spec before script.</strong> A markdown spec with counts, distribution tables, and locale data libraries took ~1 hour to write. Saved at least a day of CC iteration.</li><li><strong><code>DB-SCHEMA.md</code> is a hint, not a contract.</strong> Verify CHECK constraints against <code>pg_constraint</code> before any insert-heavy work. § 5.1 is the canonical query.</li><li><strong>NOT NULL audits must cover the entire target table, not just the column that fired.</strong> BL-126 hit <code>viewing_feedback.user_id</code> NOT NULL, patched it, and immediately hit <code>viewing_feedback.org_id</code> NOT NULL on the next run. Two CC iterations on the same table because the first audit was column-scoped instead of table-scoped.</li><li><strong>Idempotency markers in <code>notes</code> are clean enough.</strong> No dedicated <code>is_seed</code> column needed. Trade-off: marker is visible in UI (mildly ugly). Acceptable for demo orgs.</li><li><strong><code>--force</code> (rollback + re-seed) is mandatory for iterative demo prep.</strong> Append-only creates duplicates that pollute fast. <code>--rollback</code> then <code>--seed</code> two-step is too slow for tweaking. <code>--force</code> in one shot is the sweet spot.</li><li><strong>CC's deviations are usually correct.</strong> When CC pushes back on a spec detail, the deviation is more often a real catch than over-engineering. BL-126 examples: <code>viewing_feedback.buyer_interest_level</code> (correct DB column name vs spec's <code>interest_level</code>), monthly-rent budget shape for tenant leads, audit summary block in script header. Pattern noted in last 3+ sessions.</li><li><strong>Phase 0 advisory &gt; programmatic pre-flight.</strong> Supabase JS doesn't expose <code>pg_constraint</code> (PostgREST publishes only <code>public</code> schema). Manual SQL block in seed script header + runtime CHECK violation parser via <code>formatPgError</code> was the cleanest fit.</li></ol>
+<h2>8. Lessons learned from BL-126 (for future seed work)</h2>
+<ol><li><strong>Diagnostic-first.</strong> BL-126 ran SQL discovery (agents → properties → photo coverage → CRM gap) BEFORE writing the spec. This is the same workflow that worked for BG-79b. Spec quality is downstream of diagnostic quality.</li><li><strong>Spec before script.</strong> A markdown spec with counts, distribution tables, and locale data libraries took ~1 hour to write. Saved at least a day of CC iteration.</li><li><strong><code>DB-SCHEMA.md</code> is a hint, not a contract.</strong> Verify CHECK constraints against <code>pg_constraint</code> before any insert-heavy work. § 6.1 is the canonical query.</li><li><strong>NOT NULL audits must cover the entire target table, not just the column that fired.</strong> BL-126 hit <code>viewing_feedback.user_id</code> NOT NULL, patched it, and immediately hit <code>viewing_feedback.org_id</code> NOT NULL on the next run. Two CC iterations on the same table because the first audit was column-scoped instead of table-scoped.</li><li><strong>Idempotency markers in <code>notes</code> are clean enough.</strong> No dedicated <code>is_seed</code> column needed. Trade-off: marker is visible in UI (mildly ugly). Acceptable for demo orgs.</li><li><strong><code>--force</code> (rollback + re-seed) is mandatory for iterative demo prep.</strong> Append-only creates duplicates that pollute fast. <code>--rollback</code> then <code>--seed</code> two-step is too slow for tweaking. <code>--force</code> in one shot is the sweet spot.</li><li><strong>CC's deviations are usually correct.</strong> When CC pushes back on a spec detail, the deviation is more often a real catch than over-engineering. BL-126 examples: <code>viewing_feedback.buyer_interest_level</code> (correct DB column name vs spec's <code>interest_level</code>), monthly-rent budget shape for tenant leads, audit summary block in script header. Pattern noted in last 3+ sessions.</li><li><strong>Phase 0 advisory &gt; programmatic pre-flight.</strong> Supabase JS doesn't expose <code>pg_constraint</code> (PostgREST publishes only <code>public</code> schema). Manual SQL block in seed script header + runtime CHECK violation parser via <code>formatPgError</code> was the cleanest fit.</li></ol>
 <hr/>
-<h2>8. Related docs / scripts</h2>
+<h2>9. Related docs / scripts</h2>
 <h3>Specs</h3>
 <ul><li><code>docs/specs/SEED-EU-LOCALES-SPEC.md</code> — design intent for BL-126</li><li><code>scripts/SEED-INSTRUCTIONS.md</code> — Gulf Horizon FK-ordered wipe procedure</li></ul>
 <h3>Scripts</h3>
@@ -229,12 +282,12 @@ ORDER BY conrelid::regclass::text, conname;</code></pre>
 <h3>Architecture cross-links</h3>
 <ul><li><code>docs/architecture/multi-tenancy.md</code> — org_id semantics, RLS, service-role usage</li><li><code>docs/architecture/crm.md</code> — contacts/leads/deals/viewings data model</li></ul>
 <h3>Other governance</h3>
-<ul><li><code>WAYS-OF-WORKING.md</code> § Testing Protocol — how seeded data interacts with E2E</li><li><code>DB-SCHEMA.md</code> — canonical schema doc (cross-check against § 5.1 before trusting)</li><li><code>ROADMAP.md</code> — D-numbers and BL-numbers referenced throughout</li></ul>
+<ul><li><code>WAYS-OF-WORKING.md</code> § Testing Protocol — how seeded data interacts with E2E</li><li><code>DB-SCHEMA.md</code> — canonical schema doc (cross-check against § 6.1 before trusting)</li><li><code>ROADMAP.md</code> — D-numbers and BL-numbers referenced throughout</li></ul>
 <hr/>
-<h2>9. Maintenance</h2>
+<h2>10. Maintenance</h2>
 <p>This doc is updated:</p>
-<ul><li><strong>Pre-EOS</strong> when a session adds or modifies seed data</li><li><strong>At seed-script ship time</strong> when a new script is committed</li><li><strong>When <code>DB-SCHEMA.md</code> is re-synced</strong> — § 5.4 stale list gets cleared</li></ul>
-<p>Run § 5.1 SQL each session that touches seeded data to detect constraint drift.</p></div>
+<ul><li><strong>Pre-EOS</strong> when a session adds or modifies seed data</li><li><strong>At seed-script ship time</strong> when a new script is committed</li><li><strong>When <code>DB-SCHEMA.md</code> is re-synced</strong> — § 6.4 stale list gets cleared</li></ul>
+<p>Run § 6.1 SQL each session that touches seeded data to detect constraint drift.</p></div>
 </main>
 <footer>
   HouseZoom.ai Data Environments · Auto-generated from <code>docs/data-environments/INDEX.md</code>
