@@ -84,7 +84,7 @@ footer a{color:var(--text2)}
   
   
   <div class="content"><h1>Legal &amp; Compliance Architecture</h1>
-<p><strong>Status:</strong> Foundational — schema landed BL-129 (D-289). Ingestion and posture features phased through BL-130 → BL-138. <strong>Owner:</strong> Will (Product), Claude (Architecture), CC (Implementation) <strong>Last updated:</strong> 2026-04-30 <strong>Atlas section:</strong> <code>legal-compliance/</code></p>
+<p><strong>Status:</strong> Foundational — schema landed BL-129 (D-289). Ingestion and posture features phased through BL-130 → BL-140. <strong>Owner:</strong> Will (Product), Claude (Architecture), CC (Implementation) <strong>Last updated:</strong> 2026-04-30 <strong>Atlas section:</strong> <code>legal-compliance/</code></p>
 <hr/>
 <h2>TL;DR</h2>
 <p>HouseZoom provides <strong>decision support</strong>, not legal authority. Every compliance message we surface to an agent must:</p>
@@ -141,19 +141,19 @@ not a substitute for legal counsel.</code></pre>
 <p><code>compliance_rules</code> extended with <code>source_*</code> fields, <code>valid_from</code> / <code>valid_to</code>, <code>workflow_stage_canonical</code>. Schema can hold provenance and time-bounded effectivity. No UI changes yet.</p>
 <h3>Phase 2 — France ingestion with full provenance (BL-130, in progress)</h3>
 <p>Every FR rule ingested includes complete <code>source_*</code> fields. Sources: Notaires.fr (primary), ANIL (rental), Service-Public.fr, Légifrance (validation only). ~60 rules across Sale + Rental.</p>
-<h3>Phase 3 — Citation rendering (BL-131)</h3>
+<h3>Phase 3 — Citation rendering (BL-135)</h3>
 <p>ComplianceBanner and <code>/admin/compliance</code> rule detail render source citation + clickable link + verification date + standard disclaimer. Locale-aware. Non-dismissible. ~1 day.</p>
-<h3>Phase 4 — Italy + Switzerland ingestion (BL-132, BL-133)</h3>
+<h3>Phase 4 — Italy + Switzerland ingestion (BL-131, BL-132)</h3>
 <p>Same pattern as BL-130. Italy primary: Agenzia delle Entrate + "Agente immobiliare" exam manuals. Switzerland primary: SVIT + cantonal notary guides. Switzerland is data-acquisition-heavy due to cantonal fragmentation.</p>
-<h3>Phase 5 — Admin review queue (BL-134)</h3>
+<h3>Phase 5 — Admin review queue (BL-136)</h3>
 <p><code>/admin/compliance/review</code> page. New <code>compliance_rule_org_acceptance</code> table. Per-rule accept/reject/override flow. Bulk accept with explicit acknowledgment. Default state for new rules: info-only until accepted.</p>
-<h3>Phase 6 — ToS-grade onboarding gate (BL-135)</h3>
+<h3>Phase 6 — ToS-grade onboarding gate (BL-137)</h3>
 <p>Triggered when first paying customer signs. Onboarding flow requires admin to scroll/check-acknowledge the active ruleset before agency goes live. Persisted as versioned acceptance record. Re-prompts on material ruleset version change.</p>
-<h3>Phase 7 — Legal forms library (BL-136)</h3>
+<h3>Phase 7 — Legal forms library (BL-138)</h3>
 <p>Every rule referencing a standard form links directly to the official authority's form URL. Internal forms gallery shows authority + URL + last-verified-date. Reinforces "we point at standards, we don't redefine them."</p>
-<h3>Phase 8 — Freshness audit job (BL-137)</h3>
+<h3>Phase 8 — Freshness audit job (BL-139)</h3>
 <p>Weekly job flags rules where <code>source_verified_at</code> is older than 6 months (configurable per-authority — fee tables get 90-day SLA, civil code articles get 365-day SLA). Surfaces in admin dashboard. Also flagged: rules whose <code>source_url</code> returns 404 or material content drift (heuristic).</p>
-<h3>Phase 9 — UAE consolidation + ingestion (BL-133 country_code, BL-138 ingestion)</h3>
+<h3>Phase 9 — UAE consolidation + ingestion (BL-133 country_code, BL-140 ingestion)</h3>
 <p>Pre-work: consolidate <code>country_code = 'UAE'</code> to canonical <code>'AE'</code> (BL-133, deferred). Then UAE Sale + Rental ingestion using RERA broker certification course as primary source. Currently deferred per geopolitical context.</p>
 <hr/>
 <h2>Technical contract</h2>
@@ -170,7 +170,7 @@ workflow_stage_canonical TEXT  -- CHECK: listing/pre_offer/offer/pre_contract/
 
 -- workflow_templates.stages JSONB entries
 { "id": "...", "name": "...", "canonical": "&lt;canonical_stage&gt;", ... }</code></pre>
-<h3>Schema (planned, BL-134)</h3>
+<h3>Schema (planned, BL-136)</h3>
 <pre><code class="lang-sql">CREATE TABLE compliance_rule_org_acceptance (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id uuid NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
@@ -223,7 +223,7 @@ workflow_stage_canonical TEXT  -- CHECK: listing/pre_offer/offer/pre_contract/
 <ul><li><code>DB-SCHEMA.md</code> — <code>compliance_rules</code> table reference</li><li><code>FEATURE-MAP.md</code> — Compliance Engine Service entry</li><li><code>docs/specs/COUNTRY-COMPLIANCE-SPEC.docx</code> — Original 4-layer engine spec (Phase 3.1)</li><li><code>docs/specs/HouseZoom-Compliance-Workflow-Rules-v2.xlsx</code> — Pre-populated 125 rules (legacy, pre-provenance)</li><li><code>docs/specs/BL-129-compliance-ingestion-schema-spec.md</code> — Schema extension spec (D-289)</li><li><code>WAYS-OF-WORKING.md</code> — "Compliance liability posture" section (cross-references this doc)</li></ul>
 <hr/>
 <h2>Open questions</h2>
-<ol><li><strong>Default state of newly-ingested rules</strong> — info-only until accepted, or invisible until accepted? (Will to confirm before BL-134 design.)</li><li><strong>Final disclaimer language</strong> — pending legal counsel review. Current text is development-grade.</li><li><strong>Material vs. non-material version changes</strong> — what triggers re-prompt vs. silent update? Heuristic: any change to <code>severity</code>, <code>blocking</code>, <code>conditions.required_*</code>, <code>actions[*].type</code>, or <code>valid_to</code> triggers re-prompt; pure citation/wording updates do not. (To formalize in BL-134.)</li><li><strong>Per-authority freshness SLAs</strong> — fee tables (90 days), civil code articles (365 days), regulatory circulars (30 days)? (To formalize in BL-137.)</li></ol></div>
+<ol><li><strong>Default state of newly-ingested rules</strong> — info-only until accepted, or invisible until accepted? (Will to confirm before BL-136 design.)</li><li><strong>Final disclaimer language</strong> — pending legal counsel review. Current text is development-grade.</li><li><strong>Material vs. non-material version changes</strong> — what triggers re-prompt vs. silent update? Heuristic: any change to <code>severity</code>, <code>blocking</code>, <code>conditions.required_*</code>, <code>actions[*].type</code>, or <code>valid_to</code> triggers re-prompt; pure citation/wording updates do not. (To formalize in BL-136.)</li><li><strong>Per-authority freshness SLAs</strong> — fee tables (90 days), civil code articles (365 days), regulatory circulars (30 days)? (To formalize in BL-139.)</li></ol></div>
 </main>
 <footer>
   HouseZoom.ai Legal &amp; Compliance · Auto-generated from <code>docs/legal-compliance/INDEX.md</code>
