@@ -83,7 +83,7 @@ footer a{color:var(--text2)}
   
   
   <div class="content"><h1>SEEDED-DATA — Staging Environment Source of Truth</h1>
-<blockquote><p><strong>Status:</strong> Stable <strong>Last updated:</strong> 2026-04-29 (Session 4, post BL-126) <strong>Owner:</strong> Will Kanaan <strong>Replaces:</strong> scattered references in CHANGELOG.md, ROADMAP.md, individual session logs, and <code>scripts/seed-*.mjs</code> headers</p>
+<blockquote><p><strong>Status:</strong> Stable <strong>Last updated:</strong> 2026-04-29 (Session 4, post BL-126); 2026-04-30 — BG-86/87 closeout, BL-126 deals MCP-verified, energy correctness section added <strong>Owner:</strong> Will Kanaan <strong>Replaces:</strong> scattered references in CHANGELOG.md, ROADMAP.md, individual session logs, and <code>scripts/seed-*.mjs</code> headers</p>
 <p><strong>Read this BEFORE running any SQL audit or "what data do we have" investigation.</strong> Past sessions have wasted multiple days on questions this doc answers in 30 seconds.</p></blockquote>
 <hr/>
 <h2>1. Overview</h2>
@@ -149,6 +149,9 @@ footer a{color:var(--text2)}
 <h3>3.3 Locale data libraries (where in the script)</h3>
 <p>The full locale-specific data libraries (modern + older name pools, phone formats, email TLDs, currencies, commission rates, lead sources, locale-language notes pools) live in the <code>LOCALE_DATA</code> config block at the top of <code>scripts/seed-eu-locales.mjs</code>. Reference the script header for the canonical source.</p>
 <p>Cross-reference: <code>docs/specs/SEED-EU-LOCALES-SPEC.md</code> § 5 documents the design intent.</p>
+<h3>3.4 MCP verification (2026-04-30)</h3>
+<p>End-to-end MCP-verified on 2026-04-30. All 3 orgs render functional Deals views at <code>/admin/deals</code> for their respective admins:</p>
+<ul><li><strong>Zürich Premium Realty</strong> (Hans Müller, <code>will+ag-ch-hans@</code>): "Deal-Pipeline · 8 aktive Deals · CHF 16'178'400 Pipeline-Wert" — DE labels correct.</li><li><strong>Saint Germain Immobilier</strong> (Jean Dupont, <code>will+ag-fr-jean@</code>): "Pipeline des affaires · 8 affaires actives · 19 405 350 €" — FR labels correct.</li><li><strong>Milano Prestige</strong> (Marco Rossi, <code>will+ag-it-marco@</code>): "Pipeline Trattative · 8 trattative attive · 9 535 960 €" — 5 of 6 stage labels correct, "Due diligence" not localized (see BG-88).</li></ul>
 <hr/>
 <h2>4. How to interact with seeded data</h2>
 <h3>4.1 Run a fresh seed (EU locales)</h3>
@@ -195,10 +198,17 @@ ORDER BY o.name;</code></pre>
 <h3>Energy lookup tables (BL-128b)</h3>
 <p>These are the canonical kWh/m²/yr midpoints used by the script. Documented here so future scripts / audits don't have to read the script source.</p>
 <table><thead><tr><th>Class</th><th>FR (DPE)</th><th>DE-CH (GEAK)</th><th>IT (APE)</th></tr></thead><tbody><tr><td>A</td><td>50</td><td>40</td><td>30</td></tr><tr><td>B</td><td>75</td><td>60</td><td>70</td></tr><tr><td>C</td><td>120</td><td>100</td><td>110</td></tr><tr><td>D</td><td>180</td><td>150</td><td>160</td></tr><tr><td>E</td><td>250</td><td>220</td><td>230</td></tr><tr><td>F</td><td>350</td><td>300</td><td>320</td></tr><tr><td>G</td><td>450</td><td>400</td><td>420</td></tr></tbody></table>
-<h3>Known data quality issue (BG-87)</h3>
-<p>4 of 5 Milano properties have pre-existing impossible APE class/index combos in <code>properties</code> table from BL-EU-SEED Step 4 (D-220):</p>
+<h3>Energy fields status (post-BG-87, 2026-04-30)</h3>
+<p>All 15 in-scope EU properties have both <code>energy_class</code> and <code>energy_efficiency_index</code> populated post-BG-87 (D-288). 6 properties had their index rewritten to safe-interior values during BG-87 — see CHANGELOG D-288 for the exact before/after table. Stored class was preserved in all 6 cases.</p>
+<p><strong>Energy class scales used:</strong></p>
+<ul><li><strong>FR DPE 2021:</strong> A ≤ 70 / B 71-110 / C 111-180 / D 181-250 / E 251-330 / F 331-420 / G &gt; 420</li><li><strong>IT APE:</strong> A ≤ 100 / B 101-120 / C 121-160 / D 161-200 / E 201-250 / F 251-340 / G &gt; 340</li><li><strong>CH GEAK:</strong> A ≤ 50 / B 51-90 / C 91-130 / D 131-160 / E 161-220 / F 221-250 / G &gt; 250</li></ul>
+<p><strong>Stray properties</strong> — 2 EU properties remain with NULL energy fields, both predate BL-126 (also have NULL <code>city</code>):</p>
+<ul><li>Italy: <code>38 Via Tigura</code> — id <code>c7636b82-2431-4375-8bf5-9445583f5658</code></li><li>Switzerland: <code>137 Banhofstrasse Zurich</code> — id <code>faf74908-7867-47cb-85ec-b43513e77fb6</code></li></ul>
+<p>Out of BG-87 scope. See § Pending cleanup below.</p>
+<h3>Known data quality issue (BG-87 — CLOSED 2026-04-30 → D-288)</h3>
+<p>4 of 5 Milano properties had pre-existing impossible APE class/index combos in <code>properties</code> table from BL-EU-SEED Step 4 (D-220):</p>
 <table><thead><tr><th>Address</th><th>Class</th><th>Index (kWh/m²/yr)</th><th>Issue</th></tr></thead><tbody><tr><td>Via Andrea Solari 23</td><td>G</td><td>175</td><td>Impossible — G should be ≥320</td></tr><tr><td>Via Castel Morrone 5</td><td>A</td><td>175</td><td>Impossible — A should be ≤30</td></tr><tr><td>Via Galvano Fiamma 15/1</td><td>A</td><td>54.29</td><td>Impossible — A should be ≤30</td></tr><tr><td>Viale Premuda 20/A</td><td>D</td><td>175</td><td>Out of range — D should be 110–160</td></tr></tbody></table>
-<p>The BL-128b script's <code>energy_efficiency_index IS NULL</code> filter correctly skipped these (preservation of existing data is intentional). Only Piazzale Medaglie d'Oro 3 (NULL pre-script) was overwritten by our script and is correct (D=160). BG-87 filed for audit + correction.</p>
+<p>The BL-128b script's <code>energy_efficiency_index IS NULL</code> filter correctly skipped these (preservation of existing data is intentional). BG-87 (D-288) corrected these via SQL on 2026-04-30 — Strategy B (preserve stored class, rewrite index to safe-interior value). Root cause filed as TD-EU-MIDPOINT.</p>
 <h3>Verification queries</h3>
 <pre><code class="lang-sql">-- 1. Per-property item counts (expect 23–33 each, 384 total)
 SELECT o.name, p.address, COUNT(pi.id) AS items
@@ -284,7 +294,12 @@ ORDER BY conrelid::regclass::text, conname;</code></pre>
 <h3>Other governance</h3>
 <ul><li><code>WAYS-OF-WORKING.md</code> § Testing Protocol — how seeded data interacts with E2E</li><li><code>DB-SCHEMA.md</code> — canonical schema doc (cross-check against § 6.1 before trusting)</li><li><code>ROADMAP.md</code> — D-numbers and BL-numbers referenced throughout</li></ul>
 <hr/>
-<h2>10. Maintenance</h2>
+<h2>10. Pending cleanup</h2>
+<p><strong>2 stray EU properties with NULL fields, predate BL-126:</strong></p>
+<ul><li>Italy: <code>38 Via Tigura</code> — id <code>c7636b82-2431-4375-8bf5-9445583f5658</code></li><li>Switzerland: <code>137 Banhofstrasse Zurich</code> — id <code>faf74908-7867-47cb-85ec-b43513e77fb6</code></li></ul>
+<p>Both have NULL city, NULL energy<em>class, NULL energy</em>efficiency_index. Surfaced by BG-87 diagnostic on 2026-04-30. <strong>Decision needed:</strong> delete (test residue), backfill via BL-128/128b targeted run, or file separate investigation TD.</p>
+<hr/>
+<h2>11. Maintenance</h2>
 <p>This doc is updated:</p>
 <ul><li><strong>Pre-EOS</strong> when a session adds or modifies seed data</li><li><strong>At seed-script ship time</strong> when a new script is committed</li><li><strong>When <code>DB-SCHEMA.md</code> is re-synced</strong> — § 6.4 stale list gets cleared</li></ul>
 <p>Run § 6.1 SQL each session that touches seeded data to detect constraint drift.</p></div>

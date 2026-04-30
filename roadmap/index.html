@@ -137,9 +137,49 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-29';
+const LAST_UPDATED = '2026-04-30';
 const DATA = {
   "inProgress": [
+    {
+      "id": "~~BG-84~~",
+      "title": "~~P0 RLS cross-tenant leak — ai_action_cards + agent_daily_plans~~",
+      "desc": "CLOSED 2026-04-29 → D-283. Two policies created with roles = {public} and qual = true exposed every row to every authenticated user across orgs. Confirmed via MCP browser test (Jean@SaintGermain reading 11 UAE cards). Migration scopes both to TO service_role. New WAYS-OF-WORKING § RLS Policy Discipline.",
+      "files": "supabase/migrations/2026-04-29-bg-84-rls-cross-tenant-fix.sql, WAYS-OF-WORKING.md",
+      "tag": "admin",
+      "added": "2026-04-29"
+    },
+    {
+      "id": "~~BL-128~~",
+      "title": "~~EU property_items + neighborhood_info backfill~~",
+      "desc": "CLOSED 2026-04-29 → D-285. 384 property_items rows seeded across 15 EU properties (FR ~140, DE-CH ~115, IT ~128) with locale-realistic vocabulary (Boffi/V-ZUG/Smeg, Cave/Reduit/Cantina, Gardien/Concierge/Portineria). 15 neighborhood_info paragraphs generated via Claude Haiku in target locale languages (67–94 words each). 3 energy_class letters derived for NULL rows. Idempotent via [seed:eu-v1-items] marker (metadata.seed_marker for items, paragraph suffix for neighborhoods, additional_notes line for energy). Verified end-to-end via MCP browser across all 3 locales.",
+      "files": "scripts/seed-eu-agencies/seed-eu-property-items.mjs, docs/specs/SEED-EU-ITEMS-SPEC.md",
+      "tag": "ai",
+      "added": "2026-04-29"
+    },
+    {
+      "id": "~~BL-128b~~",
+      "title": "~~energy_efficiency_index backfill amendment~~",
+      "desc": "CLOSED 2026-04-29 → D-286. ~110 LoC amendment extending BL-128's Phase 3. New ENERGY_INDEX_BY_LOCALE constant (FR DPE / DE-CH GEAK / IT APE midpoints kWh/m²/yr per A→G letter). Phase 3 filter widened to energy_efficiency_index IS NULL. Conditional update payload — preserves existing class, only writes index if both fields NULL fills both, marker append guarded against duplication. Rollback explicitly does NOT clear energy fields. All 15 EU properties now have both energy_class and energy_efficiency_index populated.",
+      "files": "scripts/seed-eu-agencies/seed-eu-property-items.mjs, docs/specs/SEED-EU-ITEMS-SPEC.md",
+      "tag": "ai",
+      "added": "2026-04-29"
+    },
+    {
+      "id": "~~BG-86~~",
+      "title": "~~Property detail page — surface energy info on Spécifications card~~",
+      "desc": "CLOSED 2026-04-30 → D-287. Energy class + efficiency index row at top of Spécifications card. Colored badge matches DPE/GEAK/APE scale (D=yellow with black text, others white). Locale-aware labels + units across en/fr/de/it. Renders gracefully when only one of class/index present; hides when both NULL. MCP-verified across FR/IT/DE-CH.",
+      "files": "src/features/properties/components/DetailsTab.tsx, messages/{en,fr,de,it}.json",
+      "tag": "ai",
+      "added": "2026-04-30"
+    },
+    {
+      "id": "~~BG-87~~",
+      "title": "~~Audit + correct EU energy class/index inconsistencies~~",
+      "desc": "CLOSED 2026-04-30 → D-288. SQL-only data correction. 6 EU properties had energy_efficiency_index landing exactly on class boundaries; rewrote index to safe-interior values, preserved stored class. Pre-fix diagnostic + post-fix verification: 0 mismatches across 15 in-scope EU properties. Root cause filed as TD-EU-MIDPOINT.",
+      "files": "Supabase SQL Editor (correction); ~/Downloads/claude/BG-87-diagnostic-v2.sql, BG-87-fix.sql",
+      "tag": "core",
+      "added": "2026-04-30"
+    },
     {
       "id": "~~BL-126~~",
       "title": "~~Seed EU locales (FR/DE/IT) with realistic CRM data~~",
@@ -205,6 +245,38 @@ const DATA = {
       "files": "scripts/generate-atlas-*.mjs, scripts/atlas/ (NEW dir)",
       "tag": "infra",
       "added": "2026-04-29"
+    },
+    {
+      "id": "BG-85",
+      "title": "Recurring RLS policy audit script",
+      "desc": "Sibling to BG-83 (constraint-drift audit). Implements the lesson from BG-84: a script that runs the canonical pg_policies audit query at WAYS-OF-WORKING § RLS Policy Discipline § 3 and diffs against an allowlist snapshot. Catches misconfigured roles = {public} + qual = true policies before they ship. Add to EOS checklist.",
+      "files": "scripts/audit/audit-rls-policies.mjs (NEW), allowlist snapshot file",
+      "tag": "ai",
+      "added": "2026-04-29"
+    },
+    {
+      "id": "TD-EU-MIDPOINT",
+      "title": "Fix ENERGY_INDEX_BY_LOCALE boundary midpoints in seed-eu-property-items.mjs",
+      "desc": "Current midpoints (FR D=180, E=250) sit exactly on official DPE class boundaries — any future --force reseed reintroduces the BG-87 mismatches we patched today. Replace with safe-interior values. FR: A=50, B=90, C=145, D=215, E=290, F=375, G=470. DE-CH: A=40, B=70, C=110, D=145, E=190, F=235, G=300. IT: A=70, B=110, C=140, D=180, E=225, F=295, G=380. Single constant in single script. No DB changes.",
+      "files": "scripts/seed-eu-agencies/seed-eu-property-items.mjs",
+      "tag": "infra",
+      "added": "2026-04-30"
+    },
+    {
+      "id": "BL-ENERGY-VALIDATION",
+      "title": "Validation layer for energy_class ↔ energy_efficiency_index consistency",
+      "desc": "No layer today validates that energy_class and energy_efficiency_index agree per the country's scale. Two layers: (1) DB-level CHECK constraint or trigger enforcing range-per-class-per-country (DPE/APE/GEAK); (2) app-level inline validation in property edit/create forms. New utility src/lib/energyClassRanges.ts shared by both.",
+      "files": "new migration + EditPropertyModal + new utility",
+      "tag": "ai",
+      "added": "2026-04-30"
+    },
+    {
+      "id": "BG-88",
+      "title": "\"Due diligence\" deal stage label not localized in IT",
+      "desc": "Milano Prestige /admin/deals view renders 5 of 6 stage labels in Italian; \"Due diligence\" stays in English. FR shows \"Vérification\", DE-CH shows \"Prüfung\". Likely missing key in messages/it.json under deal-stage namespace. \u003c5 LoC fix.",
+      "files": "messages/it.json",
+      "tag": "admin",
+      "added": "2026-04-30"
     },
     {
       "id": "BG-83",
@@ -1569,6 +1641,14 @@ const DATA = {
       "files": "housezum-backups/.github/workflows/backup.yml",
       "tag": "admin",
       "added": "2026-04-21"
+    },
+    {
+      "id": "TD-27",
+      "title": "Refine BG-82b trigger map: scope docs/sessions/ to directory-level (not per-file)",
+      "desc": "Every session log addition trips BG-82b's docs/sessions/ add-trigger because it's a NEW file under docs/sessions/. PROJECT-STRUCTURE.md doesn't need per-file enumeration of session logs — the directory listing is sufficient documentation. Surfaces every session as a docs:check violation on the session-log commit (e.g. a47dc82 from Session 4 EOS, resolved forward via follow-up 4f3ae0c). Without this fix, every future session log permanently leaves a historical violation. Fix: in scripts/docs-check.mjs, change the docs/sessions/ rule from \"new file requires PROJECT-STRUCTURE.md update\" to \"new directory-level entry only\" — i.e., the rule fires once when docs/sessions/ itself is created, not on every file added inside. Could roll into TD-26's generic-generator refactor scope.",
+      "files": "scripts/docs-check.mjs, WAYS-OF-WORKING.md § Documentation Governance",
+      "tag": "ux",
+      "added": "2026-04-29"
     }
   ],
   "bugs": [
@@ -1959,6 +2039,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-283",
+      "title": "BG-84 — P0 RLS cross-tenant data leak fixed (CLOSES BG-84)",
+      "desc": "Two policies on ai_action_cards (53 rows) and agent_daily_plans (510+ rows) created with roles = {public} and qual = true were intended as service-role bypass policies but applied to every Postgres role. Combined via PERMISSIVE OR with legitimate user-scoped policies, evaluating to (auth.uid() = user_id) OR true — always true. Every authenticated user read every row across orgs. Found via MCP browser session: Jean (FR admin) seeing 11 queued AI action cards belonging to UAE agents (Fatima/Raj/Hassan). Migration supabase/migrations/2026-04-29-bg-84-rls-cross-tenant-fix.sql (BEGIN/COMMIT wrapped) drops both misconfigured policies and recreates them scoped TO service_role — service-role JWT still works for API routes that legitimately bypass RLS, but anon and authenticated end users no longer match. New WAYS-OF-WORKING § RLS Policy Discipline codifies the lesson: service-role bypass MUST be TO service_role; multiple PERMISSIVE policies OR; canonical pg_policies audit query (must return zero non-public rows); roles = {public} allowlist (10 tables: market data + token-gated public writes). DB-SCHEMA ai_action_cards RLS line updated. BG-85 filed for recurring RLS audit script (sibling to BG-83). Will runs the migration manually in Supabase SQL Editor; CC ships migration file + doc updates.",
+      "completed": "2026-04-29",
+      "tag": "admin"
+    },
     {
       "id": "D-282",
       "title": "DB-SCHEMA + WAYS-OF-WORKING governance updates from BL-126 lessons",
