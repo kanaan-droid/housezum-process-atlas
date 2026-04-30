@@ -181,6 +181,22 @@ const DATA = {
       "added": "2026-04-30"
     },
     {
+      "id": "~~BL-129~~",
+      "title": "~~Compliance ingestion schema extensions~~",
+      "desc": "CLOSED 2026-04-30 → D-289. Schema-only migration (no data ingestion, no app logic, no UI). Adds 7 columns to compliance_rules (source_url / source_citation / source_authority / source_verified_at / valid_from / valid_to / workflow_stage_canonical), 2 CHECK constraints (canonical-stage allowlist, validity-window ordering), 2 partial indexes. Documents (no DDL) required canonical field on workflow_templates.stages JSONB entries. Types extended (ComplianceRule + WorkflowStage + new WorkflowStageCanonical union). Existing 125 rules + 5 templates unchanged; columns are nullable. Unblocks BL-130 / BL-131 / BL-132.",
+      "files": "supabase/migrations/20260430_bl129_compliance_ingestion_schema.sql, docs/specs/BL-129-compliance-ingestion-schema-spec.md, src/types/index.ts, DB-SCHEMA.md",
+      "tag": "compliance",
+      "added": "2026-04-30"
+    },
+    {
+      "id": "~~BL-134~~",
+      "title": "~~Publish Legal & Compliance atlas section~~",
+      "desc": "CLOSED 2026-04-30 → D-291. New docs/legal-compliance/ARCHITECTURE.md (foundational liability-posture doc — three lines of defense, anchor principle on standard public legal forms, phased rollout, disclaimer copy in en/fr/it/de/ar, source-authority registry per country). Atlas section published at https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/ via cloned scripts/generate-legal-compliance-html.mjs (mirrors data-environments generator — same purple #0f0f11 palette, same minimal markdown converter, same cross-link rewriter, same lonely-landing logic). ATLAS_SECTIONS config extended (now 5 sections: roadmap / architecture / data-environments / legal-compliance / tech-stack). npm scripts: new docs:html:legal-compliance, chained into docs:html. WAYS-OF-WORKING new \"Compliance liability posture\" section pointing to canonical doc. DB-SCHEMA compliance_rules header cross-references the liability-posture doc. TD-26b filed — three near-identical generators now exist; consolidation more urgent.",
+      "files": "docs/legal-compliance/ARCHITECTURE.md, scripts/generate-legal-compliance-html.mjs, scripts/generate-atlas-index.mjs, package.json, PROJECT-STRUCTURE.md, WAYS-OF-WORKING.md, DB-SCHEMA.md",
+      "tag": "compliance",
+      "added": "2026-04-30"
+    },
+    {
       "id": "~~BL-126~~",
       "title": "~~Seed EU locales (FR/DE/IT) with realistic CRM data~~",
       "desc": "CLOSED 2026-04-29 → D-280. 75 contacts (12 buyers + 5 sellers + 3 owners + 5 service providers per org × 3 orgs) + 30 deals + 30 viewings + 18 viewing_feedback + 30 leads + 15 property↔seller links + 3 org default_locale fixes (en→fr/de/it) across Saint Germain Immobilier (FR), Zürich Premium Realty (DE-CH), Milano Prestige (IT). Email convention will+{role}-{locale}-{first-last}@housezoom.ai with co/sl/ld prefixes. Locale-authentic names (modern + older-skewing seller pools), phone formats (+33/+41/+39), email TLDs (orange.fr/bluewin.ch/libero.it), commission rates (FR 4-6%, DE 2-3%, IT 3-5%), notes/feedback in target language, locale-appropriate service-provider roles. Idempotent via [seed:eu-v1] marker; --dry-run / --force / --rollback / --locale= flags. Spec: docs/specs/SEED-EU-LOCALES-SPEC.md.",
@@ -241,10 +257,18 @@ const DATA = {
     {
       "id": "TD-26",
       "title": "Refactor Atlas HTML generators into a single config-driven script",
-      "desc": "Currently 3 near-identical generators: generate-roadmap-html.mjs, generate-architecture-html.mjs, generate-data-environments-html.mjs (added 2026-04-29 in D-281). Each has its own copy of the template HTML, CSS variables, cross-link rewriter, etc. Refactor to a single generate-atlas-html.mjs that takes a config block (source dir, output dir, theme, page title, known-docs set) and emits HTML for any docs tree. Trigger: when a 4th docs tree appears (likely candidate: specs HTML), refactor first.",
+      "desc": "Currently 4 near-identical generators after BL-134/D-291: generate-roadmap-html.mjs, generate-architecture-html.mjs, generate-data-environments-html.mjs, generate-legal-compliance-html.mjs. Each has its own copy of the template HTML, CSS variables, cross-link rewriter, etc. Refactor to a single generate-atlas-html.mjs that takes a config block (source dir, output dir, theme, page title, known-docs set) and emits HTML for any docs tree. Now urgent — see TD-26b.",
       "files": "scripts/generate-atlas-*.mjs, scripts/atlas/ (NEW dir)",
-      "tag": "infra",
+      "tag": "compliance",
       "added": "2026-04-29"
+    },
+    {
+      "id": "TD-26b",
+      "title": "Generator-consolidation escalation — three (now four) near-identical clones",
+      "desc": "Filed 2026-04-30 with BL-134/D-291. The fourth clone (generate-legal-compliance-html.mjs) intensifies TD-26: every new section duplicates ~500 LoC of template + converter + rewriter + lonely-landing logic. Inconsistent nav across generators is already showing (each generator hardcodes the section list in its \u003cnav\u003e block — Legal & Compliance is in its own nav but missing from data-environments/architecture/roadmap navs until they regenerate against a config-driven base). Promote TD-26 to active before the fifth clone lands. Scope: extract the template + converter + KNOWN_DOCS + lonely-landing into scripts/atlas/render.mjs; thin per-section wrappers reduce to ~30 LoC each (slug, source dir, atlas dir, nav-active flag); \u003cnav\u003e block builds from ATLAS_SECTIONS so adding a section auto-updates every page's nav.",
+      "files": "scripts/generate-atlas-*.mjs, scripts/atlas/ (NEW dir)",
+      "tag": "compliance",
+      "added": "2026-04-30"
     },
     {
       "id": "BG-85",
@@ -276,6 +300,14 @@ const DATA = {
       "desc": "Milano Prestige /admin/deals view renders 5 of 6 stage labels in Italian; \"Due diligence\" stays in English. FR shows \"Vérification\", DE-CH shows \"Prüfung\". Likely missing key in messages/it.json under deal-stage namespace. \u003c5 LoC fix.",
       "files": "messages/it.json",
       "tag": "admin",
+      "added": "2026-04-30"
+    },
+    {
+      "id": "BL-130",
+      "title": "France Sale + Rental compliance ingestion",
+      "desc": "First country ingestion using BL-129's new compliance_rules provenance + canonical-stage columns. Populates source_url / source_citation / source_authority / source_verified_at for FR rules from notaires.fr / ANIL / Légifrance / Code Civil; adds canonical field to FR Sale + Rental workflow templates' stages. Blocks BL-131 (Italy) and BL-132 (Switzerland) — same pattern repeats per country with locale-specific authority sources (Agenzia delle Entrate / OMI for IT; cantonal sources for CH).",
+      "files": "compliance_rules (FR rows), workflow_templates (FR Sale + Rental), new ingestion script under scripts/compliance-ingestion/",
+      "tag": "compliance",
       "added": "2026-04-30"
     },
     {
@@ -640,6 +672,13 @@ const DATA = {
     }
   ],
   "backlog": [
+    {
+      "id": "BL-133",
+      "title": "UAE country_code consolidation + integrity guard (deferred — UAE work on hold)",
+      "desc": "Existing compliance_rules (22 rows), workflow_templates (TBD), and qa_knowledge_base (TBD) contain a mix of country_code = 'AE' (ISO-3166-1 alpha-2, canonical) and country_code = 'UAE' (informal, non-ISO). App code uniformly queries 'AE' — the 'UAE'-tagged rows are dead data invisible to the compliance engine, intel cards, and workflow lookup. Root cause: scripts/bl60/seed-qa-knowledge-base.mjs:168 writes 'UAE' instead of 'AE'; likely contaminated other tables via similar legacy seeds. Scope: (1) Data migration: UPDATE country_code 'UAE' → 'AE' across compliance_rules, workflow_templates, qa_knowledge_base, and any other table with a country_code column found via SELECT table_name FROM information_schema.columns WHERE column_name = 'country_code'. (2) Pre-flight conflict check: ensure consolidation doesn't violate unique constraints (especially compliance_rules.unique_rule_code_version). (3) Add CHECK constraint country_code ~ '^[A-Z]{2}$' on all affected tables. (4) Fix scripts/bl60/seed-qa-knowledge-base.mjs:168 'UAE' → 'AE' (fold into BL-127 if BL-127 hasn't shipped yet, otherwise standalone). Status: deferred — execute when UAE work resumes. Filed: 2026-04-30 during BL-129 verification (D-289).",
+      "tag": "compliance",
+      "added": "supabase/migrations/\u003cfuture-date\u003e_bl133_country_code_consolidation.sql (NEW), scripts/bl60/seed-qa-knowledge-base.mjs (1-line fix, or fold into BL-127)"
+    },
     {
       "id": "~~BG-50~~",
       "title": "~~Agent Context Propagation: Currency, Measurement, Locale~~",

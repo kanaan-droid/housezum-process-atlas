@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Legal &amp; Compliance Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/" class="active">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  
+  
+  <div class="content"><h1>Legal &amp; Compliance Architecture</h1>
+<p><strong>Status:</strong> Foundational — schema landed BL-129 (D-289). Ingestion and posture features phased through BL-130 → BL-138. <strong>Owner:</strong> Will (Product), Claude (Architecture), CC (Implementation) <strong>Last updated:</strong> 2026-04-30 <strong>Atlas section:</strong> <code>legal-compliance/</code></p>
+<hr/>
+<h2>TL;DR</h2>
+<p>HouseZoom provides <strong>decision support</strong>, not legal authority. Every compliance message we surface to an agent must:</p>
+<ol><li><strong>Cite an authoritative source</strong> (notaire guide, RERA manual, Légifrance article, etc.)</li><li><strong>Carry a verify-yourself disclaimer</strong> (locale-aware)</li><li><strong>Be reviewable, acceptable, or rejectable by the agency admin</strong> before it influences agent behavior</li></ol>
+<p>Standard public legal forms (Form F, compromis de vente, rogito) are the <strong>canonical reference</strong> — we point at them, we never redefine them.</p>
+<p>This document is the durable contract. Every future compliance ticket follows this posture.</p>
+<hr/>
+<h2>Why this exists</h2>
+<p>When HouseZoom flags "you cannot share this listing — DPE diagnostic missing," we are making a legal-adjacent claim. If that claim is wrong (rule outdated, edge case missed, regional exception ignored) and the agent acts on it, three risks materialize:</p>
+<table><thead><tr><th>Risk</th><th>Example</th><th>Our posture</th></tr></thead><tbody><tr><td><strong>Liability claim</strong></td><td>Agent sued for proceeding under stale rule we surfaced as current</td><td>Cite source + disclaimer + admin acceptance log</td></tr><tr><td><strong>Reputational</strong></td><td>"HouseZoom told me it was fine"</td><td>Disclaimer language is permanent in UI, not just onboarding</td></tr><tr><td><strong>Regulatory</strong></td><td>A regulator views us as practicing law</td><td>We provide tooling and references, not interpretations</td></tr></tbody></table>
+<p>We are <strong>not</strong> a legal authority. We are not a substitute for a notaire, lawyer, or qualified compliance officer. The system codifies <em>publicly available</em> rules from <em>named authorities</em>; the agency remains the responsible party.</p>
+<hr/>
+<h2>The three lines of defense</h2>
+<h3>1. Always cite, always disclaim</h3>
+<p>Every rule in <code>compliance_rules</code> carries:</p>
+<table><thead><tr><th>Field</th><th>Purpose</th><th>Example</th></tr></thead><tbody><tr><td><code>source_url</code></td><td>Direct link to authority page/PDF</td><td><code>https://www.notaires.fr/fr/immobilier-fiscalité/vente-immobiliere/...</code></td></tr><tr><td><code>source_citation</code></td><td>Human-readable cite</td><td><code>"Notaires.fr, Guide Vente §3.2, retrieved 2026-04-30"</code></td></tr><tr><td><code>source_authority</code></td><td>Top-level body</td><td><code>"Notaires.fr"</code>, <code>"ANIL"</code>, <code>"Légifrance"</code>, <code>"DLD"</code>, <code>"RERA"</code>, <code>"Agenzia delle Entrate"</code></td></tr><tr><td><code>source_verified_at</code></td><td>When a human last confirmed source still says this</td><td><code>2026-04-30</code></td></tr></tbody></table>
+<p>Every compliance UI surface (ComplianceBanner, <code>/admin/compliance</code>, agent-facing toasts) renders:</p>
+<pre><code>[Rule title]
+[Severity badge]
+
+[Plain-language explanation]
+
+📖 Source: Notaires.fr, Guide Vente §3.2 ↗
+📅 Last verified: 30 April 2026
+
+⚠️ This is guidance based on public sources. Always verify against
+the current law and consult a qualified professional. HouseZoom is
+not a substitute for legal counsel.</code></pre>
+<p>Disclaimer copy is <strong>fixed, locale-aware, and permanent</strong> — it is not dismissible, not collapsible, not relegated to a tooltip on first view only. See <a href="#disclaimer-copy">Disclaimer copy</a> for canonical text.</p>
+<h3>2. Affirmative admin acceptance</h3>
+<p>A rule that has been ingested into <code>compliance_rules</code> is <strong>not yet active for an agency</strong> until the agency admin has reviewed and accepted it.</p>
+<p><strong>Rule lifecycle states for an agency:</strong></p>
+<pre><code>ingested → pending_review → accepted → active
+                         ↘ rejected   → inactive (audit log only)
+                         ↘ overridden → active with org-specific severity/conditions</code></pre>
+<p>Acceptance is recorded in a new join table <code>compliance_rule_org_acceptance</code>:</p>
+<table><thead><tr><th>Field</th><th>Notes</th></tr></thead><tbody><tr><td><code>org_id</code></td><td>FK organizations</td></tr><tr><td><code>rule_id</code></td><td>FK compliance_rules</td></tr><tr><td><code>state</code></td><td><code>pending_review</code> / <code>accepted</code> / <code>rejected</code> / <code>overridden</code></td></tr><tr><td><code>accepted_by</code></td><td>FK auth.users (admin)</td></tr><tr><td><code>accepted_at</code></td><td>timestamptz</td></tr><tr><td><code>acceptance_version</code></td><td>snapshot of <code>compliance_rules.version</code> at time of acceptance</td></tr><tr><td><code>notes</code></td><td>optional admin reason (especially for <code>rejected</code> / <code>overridden</code>)</td></tr><tr><td><code>ip_address</code></td><td>for audit defensibility</td></tr></tbody></table>
+<p>When <code>compliance_rules.version</code> increments materially (significant change, not typo fixes), the join row's <code>state</code> flips back to <code>pending_review</code> and the admin is re-prompted.</p>
+<p><strong>Default behavior for newly-ingested rules</strong> (TBD pending Will confirmation):</p>
+<ul><li><strong>Recommended:</strong> Fire as <strong>info-only</strong> (no severity, just citation) until accepted, then promote to declared severity.</li><li><strong>Alternative:</strong> Invisible until accepted (riskier — agents miss real obligations).</li></ul>
+<h3>3. Editable ruleset (admin can review, accept, reject, override)</h3>
+<p>Admin has a dedicated UI surface for reviewing the ruleset:</p>
+<ul><li><code>/admin/compliance</code> — existing surface, extended with acceptance state column.</li><li><code>/admin/compliance/review</code> — new dedicated review queue showing all <code>pending_review</code> rules with side-by-side: [rule text] | [source] | [our interpretation] | [accept/reject/override actions].</li><li>Bulk operations: "Accept all pending FR rules" with explicit per-country acknowledgment.</li><li>Rejection requires a reason (free text). Override requires reason + new severity/conditions.</li></ul>
+<hr/>
+<h2>Anchor principle: standard public legal forms</h2>
+<p>The system points at canonical forms, it does not encode their content.</p>
+<table><thead><tr><th>Country</th><th>Form</th><th>We store</th><th>We do not store</th></tr></thead><tbody><tr><td>France</td><td>Compromis de vente</td><td>URL + name + when required</td><td>The form's text or a paraphrase</td></tr><tr><td>France</td><td>Acte authentique</td><td>URL + name + when required</td><td>Field-by-field interpretation</td></tr><tr><td>Italy</td><td>Compromesso (Contratto preliminare)</td><td>URL + name + when required</td><td>The form's text</td></tr><tr><td>Italy</td><td>Rogito notarile</td><td>URL + name + when required</td><td>The form's text</td></tr><tr><td>UAE</td><td>Form F (MOU)</td><td>URL + name + when required</td><td>Custom interpretations beyond official guidance</td></tr><tr><td>Switzerland</td><td>Cantonal sale agreements</td><td>Per-canton URL + name</td><td>The form's text</td></tr></tbody></table>
+<p>Rationale: forms change. Authorities update them. Replicating them creates a maintenance burden and a liability surface (we may surface a stale version). Pointing at the authoritative source means the agent always sees the current form.</p>
+<p>When an agent needs to fill a form, they download from the authority's URL or use HouseZoom's existing e-signature flow with the latest authority-published template — the system never claims to be the source of truth for the form's content.</p>
+<hr/>
+<h2>Phased rollout</h2>
+<p>The principle is established now. Implementation phases based on customer demand and risk exposure.</p>
+<h3>Phase 1 — Schema foundation ✅ (BL-129, D-289)</h3>
+<p><code>compliance_rules</code> extended with <code>source_*</code> fields, <code>valid_from</code> / <code>valid_to</code>, <code>workflow_stage_canonical</code>. Schema can hold provenance and time-bounded effectivity. No UI changes yet.</p>
+<h3>Phase 2 — France ingestion with full provenance (BL-130, in progress)</h3>
+<p>Every FR rule ingested includes complete <code>source_*</code> fields. Sources: Notaires.fr (primary), ANIL (rental), Service-Public.fr, Légifrance (validation only). ~60 rules across Sale + Rental.</p>
+<h3>Phase 3 — Citation rendering (BL-131)</h3>
+<p>ComplianceBanner and <code>/admin/compliance</code> rule detail render source citation + clickable link + verification date + standard disclaimer. Locale-aware. Non-dismissible. ~1 day.</p>
+<h3>Phase 4 — Italy + Switzerland ingestion (BL-132, BL-133)</h3>
+<p>Same pattern as BL-130. Italy primary: Agenzia delle Entrate + "Agente immobiliare" exam manuals. Switzerland primary: SVIT + cantonal notary guides. Switzerland is data-acquisition-heavy due to cantonal fragmentation.</p>
+<h3>Phase 5 — Admin review queue (BL-134)</h3>
+<p><code>/admin/compliance/review</code> page. New <code>compliance_rule_org_acceptance</code> table. Per-rule accept/reject/override flow. Bulk accept with explicit acknowledgment. Default state for new rules: info-only until accepted.</p>
+<h3>Phase 6 — ToS-grade onboarding gate (BL-135)</h3>
+<p>Triggered when first paying customer signs. Onboarding flow requires admin to scroll/check-acknowledge the active ruleset before agency goes live. Persisted as versioned acceptance record. Re-prompts on material ruleset version change.</p>
+<h3>Phase 7 — Legal forms library (BL-136)</h3>
+<p>Every rule referencing a standard form links directly to the official authority's form URL. Internal forms gallery shows authority + URL + last-verified-date. Reinforces "we point at standards, we don't redefine them."</p>
+<h3>Phase 8 — Freshness audit job (BL-137)</h3>
+<p>Weekly job flags rules where <code>source_verified_at</code> is older than 6 months (configurable per-authority — fee tables get 90-day SLA, civil code articles get 365-day SLA). Surfaces in admin dashboard. Also flagged: rules whose <code>source_url</code> returns 404 or material content drift (heuristic).</p>
+<h3>Phase 9 — UAE consolidation + ingestion (BL-133 country_code, BL-138 ingestion)</h3>
+<p>Pre-work: consolidate <code>country_code = 'UAE'</code> to canonical <code>'AE'</code> (BL-133, deferred). Then UAE Sale + Rental ingestion using RERA broker certification course as primary source. Currently deferred per geopolitical context.</p>
+<hr/>
+<h2>Technical contract</h2>
+<h3>Schema (post-BL-129)</h3>
+<pre><code class="lang-sql">-- compliance_rules
+source_url            TEXT
+source_citation       TEXT
+source_authority      TEXT
+source_verified_at    TIMESTAMPTZ
+valid_from            DATE
+valid_to              DATE
+workflow_stage_canonical TEXT  -- CHECK: listing/pre_offer/offer/pre_contract/
+                               -- contract/cooling_off/pre_transfer/transfer/post_transfer
+
+-- workflow_templates.stages JSONB entries
+{ "id": "...", "name": "...", "canonical": "&lt;canonical_stage&gt;", ... }</code></pre>
+<h3>Schema (planned, BL-134)</h3>
+<pre><code class="lang-sql">CREATE TABLE compliance_rule_org_acceptance (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id uuid NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  rule_id uuid NOT NULL REFERENCES compliance_rules(id) ON DELETE CASCADE,
+  state text NOT NULL CHECK (state IN ('pending_review','accepted','rejected','overridden')),
+  accepted_by uuid REFERENCES auth.users(id),
+  accepted_at timestamptz,
+  acceptance_version integer NOT NULL,
+  override_severity text,         -- when state='overridden'
+  override_conditions jsonb,      -- when state='overridden'
+  notes text,
+  ip_address inet,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now(),
+  UNIQUE (org_id, rule_id)
+);</code></pre>
+<h3>Compliance engine integration</h3>
+<p><code>complianceEngine.evaluateCompliance()</code> extended to:</p>
+<ol><li>Load rules <strong>filtered by org's acceptance state</strong> (only <code>accepted</code> and <code>overridden</code> rules fire at declared severity; <code>pending_review</code> rules fire as info-only; <code>rejected</code> rules don't fire).</li><li>Filter by <code>valid_from &amp;lt;= NOW() AND (valid_to IS NULL OR valid_to &amp;gt;= NOW())</code>.</li><li>Return <code>EvaluationResult</code> items including <code>source_url</code>, <code>source_citation</code>, <code>source_authority</code>, <code>source_verified_at</code> for UI rendering.</li></ol>
+<hr/>
+<h2>Disclaimer copy</h2>
+<p>Canonical text, locale-aware. Renders below every compliance message in agent-facing UI.</p>
+<p><strong>English (canonical):</strong></p>
+<blockquote><p>⚠️ This guidance is based on publicly available sources and is provided for informational purposes only. It is not legal advice and does not replace consultation with a qualified professional (notaire, lawyer, or compliance officer). Always verify against current law before acting. HouseZoom is not liable for actions taken solely on the basis of this information.</p></blockquote>
+<p><strong>French:</strong></p>
+<blockquote><p>⚠️ Ces informations proviennent de sources publiques et sont fournies à titre informatif uniquement. Elles ne constituent pas un conseil juridique et ne remplacent pas la consultation d'un professionnel qualifié (notaire, avocat, ou responsable conformité). Vérifiez toujours auprès de la législation en vigueur avant d'agir. HouseZoom décline toute responsabilité pour les actions entreprises sur la seule base de ces informations.</p></blockquote>
+<p><strong>Italian:</strong></p>
+<blockquote><p>⚠️ Queste informazioni provengono da fonti pubbliche e sono fornite a scopo puramente informativo. Non costituiscono consulenza legale e non sostituiscono il parere di un professionista qualificato (notaio, avvocato, o responsabile della conformità). Verifica sempre la normativa vigente prima di agire. HouseZoom non è responsabile per le azioni intraprese esclusivamente sulla base di queste informazioni.</p></blockquote>
+<p><strong>German (Swiss):</strong></p>
+<blockquote><p>⚠️ Diese Hinweise basieren auf öffentlich zugänglichen Quellen und dienen ausschliesslich Informationszwecken. Sie stellen keine Rechtsberatung dar und ersetzen nicht die Beratung durch eine qualifizierte Fachperson (Notar, Anwalt oder Compliance-Verantwortlichen). Prüfen Sie stets die aktuelle Rechtslage, bevor Sie handeln. HouseZoom übernimmt keine Haftung für Handlungen, die ausschliesslich auf diesen Informationen basieren.</p></blockquote>
+<p><strong>Arabic (UAE, future):</strong></p>
+<blockquote><p>⚠️ هذه الإرشادات مستندة إلى مصادر عامة ومقدمة لأغراض معلوماتية فقط. لا تشكل استشارة قانونية ولا تحل محل استشارة مهني مؤهل (موثق، محامٍ، أو مسؤول امتثال). تحقق دائمًا من القانون الحالي قبل اتخاذ أي إجراء. HouseZoom غير مسؤولة عن الإجراءات المتخذة بناءً على هذه المعلومات وحدها.</p></blockquote>
+<p><strong>Final language pass:</strong> subject to legal counsel review before Phase 6 (ToS-grade onboarding gate). Until then, text above is canonical for development.</p>
+<hr/>
+<h2>Source authorities by country</h2>
+<h3>France 🇫🇷</h3>
+<table><thead><tr><th>Authority</th><th>Used for</th><th>URL</th></tr></thead><tbody><tr><td>Notaires.fr</td><td>Sale workflow, transaction steps, fees</td><td>https://www.notaires.fr</td></tr><tr><td>ANIL</td><td>Rental law, tenant/landlord obligations</td><td>https://www.anil.org</td></tr><tr><td>Service-Public.fr</td><td>Procedures, deadlines, official forms</td><td>https://www.service-public.fr</td></tr><tr><td>Légifrance</td><td>Validation only — article numbers, exact text</td><td>https://www.legifrance.gouv.fr</td></tr></tbody></table>
+<h3>Italy 🇮🇹</h3>
+<table><thead><tr><th>Authority</th><th>Used for</th><th>URL</th></tr></thead><tbody><tr><td>Agenzia delle Entrate</td><td>Taxes, registration, cadastral</td><td>https://www.agenziaentrate.gov.it</td></tr><tr><td>"Agente immobiliare" exam manuals</td><td>Workflow, document requirements</td><td>(paid books)</td></tr><tr><td>Codice Civile</td><td>Validation only</td><td>https://www.normattiva.it</td></tr></tbody></table>
+<h3>Switzerland 🇨🇭</h3>
+<table><thead><tr><th>Authority</th><th>Used for</th><th>URL</th></tr></thead><tbody><tr><td>SVIT Switzerland</td><td>Workflow, professional standards</td><td>https://www.svit.ch</td></tr><tr><td>Cantonal notary registries</td><td>Per-canton notary process</td><td>(per canton)</td></tr><tr><td>Swiss Code of Obligations</td><td>Federal validation</td><td>https://www.fedlex.admin.ch</td></tr></tbody></table>
+<h3>UAE 🇦🇪 (deferred)</h3>
+<table><thead><tr><th>Authority</th><th>Used for</th><th>URL</th></tr></thead><tbody><tr><td>RERA / DREI broker course</td><td>Workflow, forms, fees</td><td>(paid course)</td></tr><tr><td>Dubai Land Department</td><td>Fees, transfer process, circulars</td><td>https://dubailand.gov.ae</td></tr><tr><td>ADREC</td><td>Abu Dhabi specifics</td><td>https://www.adrec.gov.ae</td></tr><tr><td>UAE Ministry of Justice</td><td>Federal law</td><td>https://www.moj.gov.ae</td></tr></tbody></table>
+<hr/>
+<h2>Out of scope (explicit)</h2>
+<p>The following are deliberately <strong>not</strong> part of this architecture:</p>
+<ul><li><strong>Real-time legal advice.</strong> We do not interpret edge cases beyond the scope of ingested rules.</li><li><strong>Cross-border transactions.</strong> Multi-country deals (e.g. French buyer of Swiss property) require professional advisors. The system can flag relevant rules from each market but does not synthesize cross-border guidance.</li><li><strong>Tax optimization.</strong> We surface tax obligations as they exist in the law; we do not advise on minimization strategies.</li><li><strong>AI-generated legal text.</strong> No generative-AI output that paraphrases, restates, or interprets law goes to the agent without source attribution and disclaimer rendered alongside.</li><li><strong>Form generation.</strong> We point at official forms; we do not generate facsimiles. Existing e-signature flow uses authority-published templates only.</li></ul>
+<hr/>
+<h2>Related documents</h2>
+<ul><li><code>DB-SCHEMA.md</code> — <code>compliance_rules</code> table reference</li><li><code>FEATURE-MAP.md</code> — Compliance Engine Service entry</li><li><code>docs/specs/COUNTRY-COMPLIANCE-SPEC.docx</code> — Original 4-layer engine spec (Phase 3.1)</li><li><code>docs/specs/HouseZoom-Compliance-Workflow-Rules-v2.xlsx</code> — Pre-populated 125 rules (legacy, pre-provenance)</li><li><code>docs/specs/BL-129-compliance-ingestion-schema-spec.md</code> — Schema extension spec (D-289)</li><li><code>WAYS-OF-WORKING.md</code> — "Compliance liability posture" section (cross-references this doc)</li></ul>
+<hr/>
+<h2>Open questions</h2>
+<ol><li><strong>Default state of newly-ingested rules</strong> — info-only until accepted, or invisible until accepted? (Will to confirm before BL-134 design.)</li><li><strong>Final disclaimer language</strong> — pending legal counsel review. Current text is development-grade.</li><li><strong>Material vs. non-material version changes</strong> — what triggers re-prompt vs. silent update? Heuristic: any change to <code>severity</code>, <code>blocking</code>, <code>conditions.required_*</code>, <code>actions[*].type</code>, or <code>valid_to</code> triggers re-prompt; pure citation/wording updates do not. (To formalize in BL-134.)</li><li><strong>Per-authority freshness SLAs</strong> — fee tables (90 days), civil code articles (365 days), regulatory circulars (30 days)? (To formalize in BL-137.)</li></ol></div>
+</main>
+<footer>
+  HouseZoom.ai Legal &amp; Compliance · Auto-generated from <code>docs/legal-compliance/INDEX.md</code>
+  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>
