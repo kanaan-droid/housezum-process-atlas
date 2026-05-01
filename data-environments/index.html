@@ -97,7 +97,7 @@ footer a{color:var(--text2)}
 <p><strong>Every seeded row from a script using marker discipline carries a string of the form <code>[seed:&amp;lt;scope&amp;gt;-v&amp;lt;n&amp;gt;]</code> appended to its <code>notes</code> field.</strong></p>
 <p>Why this pattern:</p>
 <ul><li><strong>Schema-clean</strong> — no dedicated <code>is_seed</code> column, no migrations needed.</li><li><strong>Visible</strong> — markers show up in UI (mildly ugly but signals "this is demo data" to anyone inspecting).</li><li><strong>Surgical rollback</strong> — <code>DELETE WHERE notes LIKE '%[seed:&amp;lt;scope&amp;gt;-v&amp;lt;n&amp;gt;]%'</code> only touches seeded rows, never real data.</li><li><strong>Re-runnable</strong> — seed scripts check for existing markers before running; abort with <code>--force</code> instructions if found.</li></ul>
-<table><thead><tr><th>Marker</th><th>Scope</th><th>First introduced</th></tr></thead><tbody><tr><td><code>[seed:eu-v1]</code></td><td>EU locales seed (FR/DE/IT)</td><td>BL-126 (2026-04-29)</td></tr><tr><td>(none)</td><td>Gulf Horizon Realty (UAE)</td><td>BL-1/D-52 (2026-02-28) — predates marker pattern</td></tr></tbody></table>
+<table><thead><tr><th>Marker</th><th>Scope</th><th>First introduced</th></tr></thead><tbody><tr><td><code>[seed:eu-v1]</code></td><td>EU locales seed (FR/DE/IT)</td><td>BL-126 (2026-04-29)</td></tr><tr><td><code>[seed:fr-compliance-v1]</code></td><td>France compliance rules — Sale + Rental (60 rules)</td><td>BL-130 (2026-04-30)</td></tr><tr><td>(none)</td><td>Gulf Horizon Realty (UAE)</td><td>BL-1/D-52 (2026-02-28) — predates marker pattern</td></tr></tbody></table>
 <p><strong>Gulf Horizon caveat:</strong> the original UAE seed shipped before this convention. <code>seed-dubai.mjs</code> is idempotent (re-run safe via deterministic UUIDs) but rolling back individual rows requires the FK-ordered wipe SQL in <code>scripts/SEED-INSTRUCTIONS.md</code>. Future re-seed of UAE should retrofit the marker pattern.</p>
 <hr/>
 <h2>2. The 4 demo orgs in detail</h2>
@@ -243,6 +243,57 @@ node --env-file=.env.local scripts/seed-eu-agencies/seed-eu-property-items.mjs -
 
 # Single-property rollback
 node --env-file=.env.local scripts/seed-eu-agencies/seed-eu-property-items.mjs --rollback --property-id=&lt;uuid&gt;</code></pre>
+<hr/>
+<h2>5b. BL-130: France compliance ingestion (D-### / 2026-04-30)</h2>
+<p><strong>Marker:</strong> <code>[seed:fr-compliance-v1]</code> — appended to <code>compliance_rules.description</code>. <strong>Org:</strong> none — country-layer rules with <code>org_id = NULL</code>, <code>layer = 'country'</code>, <code>country_code = 'FR'</code>. <strong>Created via:</strong> all rows inserted with <code>created_via = 'ingestion'</code> (forces info-only severity at runtime per BL-130 engine update).</p>
+<h3>5b.1 What gets seeded</h3>
+<table><thead><tr><th>Bucket</th><th>Count</th><th>Code prefix</th></tr></thead><tbody><tr><td>Sale — documents</td><td>15</td><td><code>FR-SALE-DOC-*</code></td></tr><tr><td>Sale — fees</td><td>5</td><td><code>FR-SALE-FEE-*</code></td></tr><tr><td>Sale — legal/timing</td><td>5</td><td><code>FR-SALE-LEG-*</code></td></tr><tr><td>Sale — tax</td><td>3</td><td><code>FR-SALE-TAX-*</code></td></tr><tr><td>Rental — documents</td><td>10</td><td><code>FR-RENT-DOC-*</code></td></tr><tr><td>Rental — fees</td><td>5</td><td><code>FR-RENT-FEE-*</code></td></tr><tr><td>Rental — legal/timing</td><td>10</td><td><code>FR-RENT-LEG-*</code></td></tr><tr><td>Rental — security deposit</td><td>3</td><td><code>FR-RENT-DEP-*</code></td></tr><tr><td>Agent obligations (sale + rental)</td><td>4</td><td><code>FR-AGENT-*</code></td></tr><tr><td><strong>Total</strong></td><td><strong>60</strong></td><td></td></tr></tbody></table>
+<p>Every rule populates <code>source_url</code>, <code>source_citation</code>, <code>source_authority</code>, and <code>source_verified_at = '2026-04-30'</code>. Source authorities used: Service-Public.fr (primary for diagnostics), Notaires.fr (sale guides), ANIL (rental guides), Légifrance (legal anchors — Loi Hoguet, Loi 6.7.1989, Loi ALUR, Loi ELAN), impots.gouv.fr (tax). Default <code>valid_from = '2024-01-01'</code>, with two effective-date exceptions (<code>FR-RENT-DOC-DPE-G-INTERDIT-001 = '2025-01-01'</code>, <code>FR-RENT-FEE-EDL-ENTREE-001 = '2026-01-01'</code>). <code>valid_to = NULL</code> for all rules.</p>
+<h3>5b.2 Marker query</h3>
+<pre><code class="lang-sql">-- Count seeded FR ingestion rules
+SELECT COUNT(*) FROM compliance_rules
+WHERE country_code = 'FR'
+  AND created_via = 'ingestion'
+  AND description LIKE '%[seed:fr-compliance-v1]%';
+-- Expect: 60 (after a clean seed).
+
+-- Provenance completeness on seeded rules
+SELECT
+  COUNT(*) AS total,
+  COUNT(*) FILTER (WHERE source_url IS NOT NULL) AS with_url,
+  COUNT(*) FILTER (WHERE source_citation IS NOT NULL) AS with_citation,
+  COUNT(*) FILTER (WHERE source_authority IS NOT NULL) AS with_authority,
+  COUNT(*) FILTER (WHERE workflow_stage_canonical IS NOT NULL) AS with_canonical
+FROM compliance_rules
+WHERE country_code = 'FR' AND created_via = 'ingestion';
+-- Expect: all four counts == total.</code></pre>
+<h3>5b.3 Run the script</h3>
+<pre><code class="lang-bash"># Dry-run
+node --env-file=.env.local scripts/seed-fr-compliance.mjs --dry-run
+
+# Full seed
+node --env-file=.env.local scripts/seed-fr-compliance.mjs
+
+# Re-seed (idempotent — wipes the [seed:fr-compliance-v1] rows then re-inserts)
+node --env-file=.env.local scripts/seed-fr-compliance.mjs --force
+
+# Rollback only
+node --env-file=.env.local scripts/seed-fr-compliance.mjs --rollback
+
+# Scope filter
+node --env-file=.env.local scripts/seed-fr-compliance.mjs --scope=sale
+node --env-file=.env.local scripts/seed-fr-compliance.mjs --scope=rental</code></pre>
+<h3>5b.4 Rollback procedure</h3>
+<pre><code class="lang-sql">-- Surgical rollback (touches only seeded rows; leaves manual rules untouched)
+DELETE FROM compliance_rules
+WHERE country_code = 'FR'
+  AND created_via = 'ingestion'
+  AND description LIKE '%[seed:fr-compliance-v1]%';</code></pre>
+<p>The seed script's <code>--rollback</code> flag runs this same statement via the Supabase client. Manual <code>created_via='manual'</code> rules are never touched by either path.</p>
+<h3>5b.5 Engine behavior on seeded rows</h3>
+<p><code>src/features/admin/services/complianceEngine.ts</code> branches on <code>rule.created_via === 'ingestion'</code>:</p>
+<ul><li><code>severity</code> forced to <code>'info'</code> (declared severity preserved as <code>original_severity</code> on the result)</li><li><code>blocking</code> forced to <code>false</code></li><li><code>acceptance_pending: true</code> flag set (for future BL-135 / BL-136 UI badging)</li></ul>
+<p>This makes ingested rules visible in the admin queue and ComplianceBanner without yet enforcing them — admin acceptance flow that promotes them to declared severity is BL-136.</p>
 <hr/>
 <h2>6. CHECK constraint reference (the "do not investigate by SQL" cache)</h2>
 <blockquote><p><strong>Why this section exists:</strong> seed scripts crash on stale CHECK constraints. <code>DB-SCHEMA.md</code> has been wrong about live constraints multiple times. This section is the cache of last resort — <strong>always trust this over <code>DB-SCHEMA.md</code> until both are reconfirmed by re-running § 6.1</strong>.</p></blockquote>

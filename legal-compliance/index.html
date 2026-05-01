@@ -215,6 +215,16 @@ workflow_stage_canonical TEXT  -- CHECK: listing/pre_offer/offer/pre_contract/
 <h3>UAE 🇦🇪 (deferred)</h3>
 <table><thead><tr><th>Authority</th><th>Used for</th><th>URL</th></tr></thead><tbody><tr><td>RERA / DREI broker course</td><td>Workflow, forms, fees</td><td>(paid course)</td></tr><tr><td>Dubai Land Department</td><td>Fees, transfer process, circulars</td><td>https://dubailand.gov.ae</td></tr><tr><td>ADREC</td><td>Abu Dhabi specifics</td><td>https://www.adrec.gov.ae</td></tr><tr><td>UAE Ministry of Justice</td><td>Federal law</td><td>https://www.moj.gov.ae</td></tr></tbody></table>
 <hr/>
+<h2>Known data quality issues</h2>
+<p>This section logs ingestion-related data issues we've corrected, so future audits can trace what was changed and why.</p>
+<h3>2026-04-30 — Markdown link contamination in BL-130 (FR) source_* fields</h3>
+<p><strong>Symptom:</strong> 30 of 60 FR ingested rules had <code>source_authority</code> (and some <code>source_citation</code> / <code>source_url</code>) values stored as markdown auto-link syntax like <code>[Service-Public.fr](http://Service-Public.fr)</code> instead of plain text.</p>
+<p><strong>Root cause:</strong> The BL-130 spec file had auto-linked URL text. CC copied the values verbatim into the seed script.</p>
+<p><strong>Detection:</strong> Manual review during BL-130 verification (Phase 1 #4).</p>
+<p><strong>Correction:</strong> Migration BL-141 ran REGEXP_REPLACE to strip the markdown syntax. Seed script updated with defensive <code>stripMarkdownLinks()</code> helper.</p>
+<p><strong>Affected scope:</strong> 60 FR ingested rules with <code>created_via='ingestion'</code>. No agent-facing impact (compliance rules fire info-only until BL-136 acceptance flow).</p>
+<p><strong>Prevention:</strong> Seed-script defensive helper + future ingestion specs should use plain-text source_authority values (no auto-link syntax).</p>
+<hr/>
 <h2>Out of scope (explicit)</h2>
 <p>The following are deliberately <strong>not</strong> part of this architecture:</p>
 <ul><li><strong>Real-time legal advice.</strong> We do not interpret edge cases beyond the scope of ingested rules.</li><li><strong>Cross-border transactions.</strong> Multi-country deals (e.g. French buyer of Swiss property) require professional advisors. The system can flag relevant rules from each market but does not synthesize cross-border guidance.</li><li><strong>Tax optimization.</strong> We surface tax obligations as they exist in the law; we do not advise on minimization strategies.</li><li><strong>AI-generated legal text.</strong> No generative-AI output that paraphrases, restates, or interprets law goes to the agent without source attribution and disclaimer rendered alongside.</li><li><strong>Form generation.</strong> We point at official forms; we do not generate facsimiles. Existing e-signature flow uses authority-published templates only.</li></ul>

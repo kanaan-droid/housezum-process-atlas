@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-04-30';
+const LAST_UPDATED = '2026-05-01';
 const DATA = {
   "inProgress": [
     {
@@ -179,6 +179,22 @@ const DATA = {
       "files": "Supabase SQL Editor (correction); ~/Downloads/claude/BG-87-diagnostic-v2.sql, BG-87-fix.sql",
       "tag": "core",
       "added": "2026-04-30"
+    },
+    {
+      "id": "~~BL-135~~",
+      "title": "~~Citation rendering in ComplianceBanner + /admin/compliance rule detail view~~",
+      "desc": "CLOSED 2026-05-01 → D-293. Citation rendering on both compliance surfaces. (1) ComplianceBanner — per-rule citation block (source_authority, source_citation, source_url, source_verified_at), \"Pending review\" pill, muted left border, sticky non-dismissible disclaimer footer. (2) /admin/compliance — replaced inline expandable detail with right-side slide-in panel (ComplianceRuleDetailPanel.tsx, matches DealDetailPanel pattern). Panel sections: header badges (layer/severity/status/Pending/created_via), source attribution (only when fields populated), description, validity window, canonical workflow stage, conditions/actions JSON in \u003cdetails\u003e, metadata, sticky disclaimer footer. Disclaimer copy pulled verbatim from docs/legal-compliance/ARCHITECTURE.md § Disclaimer copy (single source of truth, BL-134). 20 new i18n keys × 4 locales = 80 strings (en/fr/de/it). Type/engine plumbing fix: RuleResult + ComplianceRuleRow extended with source_authority + source_verified_at (BL-130 only carried source_url + source_citation through). MCP-verified as Jean Dupont (FR) on housezoom.ai/admin/compliance — 60 ingested rules render with full provenance, panel opens/closes correctly, source URL clickable, disclaimer in French, source text stays native. Known follow-ups filed: TD-COMPLIANCE-DATE-LOCALE (D-294, dates not locale-aware), TD-COMPLIANCE-BANNER-INFO-RULES-VISIBILITY (D-295, info-tier rules invisible to agent), TD-COMPLIANCE-RULES-ARCHIVE-PUBLISH (D-296, regression — toggle dropped). Unblocks BL-136 (admin acceptance flow).",
+      "files": "src/components/shared/ComplianceBanner.tsx, src/features/admin/components/ComplianceRuleDetailPanel.tsx, src/app/admin/compliance/page.tsx, src/features/admin/services/complianceEngine.ts, messages/{en,fr,de,it}.json",
+      "tag": "compliance",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "~~BL-141~~",
+      "title": "~~Strip markdown auto-link syntax from BL-130 source_* fields~~",
+      "desc": "CLOSED 2026-05-01 → D-291. Data-cleanup migration + companion seed-script defensive helper. Root cause: BL-130 spec source had auto-linked URL text like Service-Public.fr; values were copied verbatim into the seed and persisted, so 60 FR ingested rows carried markdown link syntax in source_authority (and possibly inline in source_citation, defensively in source_url) instead of plain text. Migration runs three idempotent UPDATEs (full-string match for source_authority + source_url, global inline match for source_citation) scoped to country_code='FR' AND created_via='ingestion' — manual rules untouched, re-runs are no-ops. scripts/seed-fr-compliance.mjs adds a stripMarkdownLinks() helper wired into buildRow() for all three source_* fields — belt-and-suspenders so a future spec edit reintroducing auto-links cannot recontaminate. New \"Known data quality issues\" section in docs/legal-compliance/ARCHITECTURE.md logs the incident (symptom / root cause / detection / correction / scope / prevention). Sister TD: TD-COMPLIANCE-CATEGORIES (also an ingestion data-quality cleanup). No agent-facing impact — ingested rules fire info-only until BL-136.",
+      "files": "supabase/migrations/20260501_bl141_strip_markdown_links_fr_compliance.sql, scripts/seed-fr-compliance.mjs, docs/legal-compliance/ARCHITECTURE.md, CHANGELOG.md",
+      "tag": "compliance",
+      "added": "2026-05-01"
     },
     {
       "id": "~~BL-129~~",
@@ -255,6 +271,30 @@ const DATA = {
       "added": "2026-04-29"
     },
     {
+      "id": "TD-COMPLIANCE-DATE-LOCALE (D-294)",
+      "title": "Date helpers ignore agent locale across the app",
+      "desc": "Discovered during BL-135 MCP verification: the side panel /admin/compliance rule detail renders dates as English-style (\"April 30, 2026\", \"January 1, 2024\", \"May 1, 2026\") even when the agent's locale is FR. The new ComplianceRuleDetailPanel uses the project's existing date helper, which means the issue is not local to BL-135 — it likely affects every surface that renders dates: deals, leads, viewings, audit log, signing requests, etc. Scope: (1) audit Intl.DateTimeFormat / toLocaleDateString / date-fns / dayjs call sites across src/; (2) confirm whether helper accepts a locale arg and is being called without one, or whether it hardcodes en-US; (3) wire useAgentPreferences().locale through. Possibly same-shape fix as Commandment #1 ({currency}) — single helper takes locale from a hook. Severity: LOW (cosmetic, no data integrity issue) but cross-cutting (probably 30+ surfaces). Audit first, scope properly, then estimate.",
+      "files": "TBD via audit pass; likely src/lib/utils.ts date helper(s), all admin/agent surfaces rendering dates",
+      "tag": "compliance",
+      "added": "2026-05-02"
+    },
+    {
+      "id": "TD-COMPLIANCE-BANNER-INFO-RULES-VISIBILITY (D-295)",
+      "title": "Ingested info-only rules invisible in ComplianceBanner",
+      "desc": "Discovered during BL-135 MCP verification: ComplianceBanner only renders rule rows for non-passing rules. Per BL-130, ingested rules force severity='info' + `status='passed'",
+      "files": "'warned'`, so they never appear in the banner — even though 60 FR rules are evaluated against every FR property. The agent has no awareness of what reference rules were auto-applied to their listing. Product question, not a bug. Options to consider: (a) \"12 reference rules evaluated, all passed\" summary line at the bottom of the banner; (b) separate \"Reference rules\" tab/expansion within the banner showing all info-tier rules with their citations; (c) info-tier rules surface in the side panel only (admin), not in the agent banner at all (status quo); (d) pull info-tier rules into a separate dedicated UI surface (e.g. property → \"Compliance reference\" sub-tab). Strategically related to BL-136 — admins need to *accept* ingested rules; agents probably should also see what was applied. Worth flagging in the BL-136 spec when we draft it. Severity: MEDIUM (user awareness gap, not blocking).",
+      "tag": "compliance",
+      "added": "src/components/shared/ComplianceBanner.tsx, possibly new src/features/admin/components/ComplianceReferenceRules.tsx depending on direction"
+    },
+    {
+      "id": "TD-COMPLIANCE-RULES-ARCHIVE-PUBLISH (D-296)",
+      "title": "Restore Archive/Publish toggle in admin compliance side panel",
+      "desc": "Behavior regression introduced by BL-135. The pre-BL-135 inline-detail had a Publish ↔ Archive toggle button on company-layer rules. The BL-135 spec listed only \"Delete\" as the panel's footer action; CC followed the spec literally and dropped the toggle. The hook useComplianceRules.toggleStatus is still exposed (a void toggleStatus line in src/app/admin/compliance/page.tsx suppresses the unused-warning) — so the underlying mutation infrastructure is intact and only the UI binding was lost. Scope: re-add the Publish/Archive toggle to the side panel footer, alongside Delete. Same gating rules apply (company-layer non-statutory only). Severity: LOW (admins can still manage via DB; no data loss; recoverable in a small follow-up).",
+      "files": "src/features/admin/components/ComplianceRuleDetailPanel.tsx, src/app/admin/compliance/page.tsx",
+      "tag": "compliance",
+      "added": "2026-05-02"
+    },
+    {
       "id": "TD-26",
       "title": "Refactor Atlas HTML generators into a single config-driven script",
       "desc": "Currently 4 near-identical generators after BL-134/D-291: generate-roadmap-html.mjs, generate-architecture-html.mjs, generate-data-environments-html.mjs, generate-legal-compliance-html.mjs. Each has its own copy of the template HTML, CSS variables, cross-link rewriter, etc. Refactor to a single generate-atlas-html.mjs that takes a config block (source dir, output dir, theme, page title, known-docs set) and emits HTML for any docs tree. Now urgent — see TD-26b.",
@@ -303,10 +343,18 @@ const DATA = {
       "added": "2026-04-30"
     },
     {
-      "id": "BL-130",
-      "title": "France Sale + Rental compliance ingestion",
-      "desc": "First country ingestion using BL-129's new compliance_rules provenance + canonical-stage columns. Populates source_url / source_citation / source_authority / source_verified_at for FR rules from notaires.fr / ANIL / Légifrance / Code Civil; adds canonical field to FR Sale + Rental workflow templates' stages. Blocks BL-131 (Italy) and BL-132 (Switzerland) — same pattern repeats per country with locale-specific authority sources (Agenzia delle Entrate / OMI for IT; cantonal sources for CH).",
-      "files": "compliance_rules (FR rows), workflow_templates (FR Sale + Rental), new ingestion script under scripts/compliance-ingestion/",
+      "id": "TD-COMPLIANCE-CATEGORIES",
+      "title": "Extend compliance_rules.category CHECK to add first-class taxonomy",
+      "desc": "BL-130 squeezed FR ingested rules into the existing CHECK allowlist (documentation, licensing, disclosure, financial, process, quality, communication) with these forced mappings: legal/timing rules → process, tax rules → financial, security_deposit rules → financial, agent obligations → licensing. This works but conflates real-estate-specific concepts under generic buckets — e.g. a tax rule and a security-deposit rule both end up as financial, and procedural rules of law (cooling-off period, DIA) sit in process next to internal workflow rules. Plan: once BL-131 (IT) and BL-132 (CH) are seeded and we can see the full cross-country category usage pattern, propose a CHECK extension adding legal, tax, and possibly security_deposit as first-class categories, then re-bucket the FR rows in a follow-up migration. Not urgent — info-only via created_via='ingestion' means no user-facing bucket leakage today. Sister ticket: BL-141 (closed 2026-05-01) was the same flavor of \"ingestion data quality\" tech debt — markdown auto-link syntax baked into source_* fields, fixed via REGEXP_REPLACE migration + seed-script defensive helper. Both belong to the same lineage: spec-text-into-DB issues that surface only after the first live seed and need a small follow-up migration to clean.",
+      "files": "compliance_rules (CHECK), scripts/seed-fr-compliance.mjs allowlist, FR rule re-bucket migration",
+      "tag": "comms",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "~~BL-130~~",
+      "title": "~~France Sale + Rental compliance ingestion~~",
+      "desc": "CLOSED 2026-04-30 → D-290. Schema addendum (compliance_rules.created_via text NOT NULL DEFAULT 'manual' with CHECK manual/ingestion/system + partial index). Existing 8-stage FR Sale workflow template backfilled with canonical per stage; new 5-stage France Rental template inserted (locked_steps = dossier_validation/bail/EDL). Seed script scripts/seed-fr-compliance.mjs ingests 60 country-layer FR compliance rules ([seed:fr-compliance-v1], created_via='ingestion') — 30 sale (15 doc + 5 fee + 5 legal + 3 tax + 2 agent), 30 rental (10 doc + 5 fee + 10 legal + 3 dépôt + 2 agent). Every rule populates source_url / source_citation / source_authority / source_verified_at='2026-04-30'; sources span Service-Public.fr / Notaires.fr / ANIL / Légifrance / impots.gouv.fr. Compliance engine forces severity='info', blocking=false, acceptance_pending=true on created_via='ingestion' rules — declared severity preserved as original_severity on the result. Manual rules + UAE blocking unchanged. Unblocks BL-131 (Italy) + BL-132 (Switzerland). Acceptance flow → BL-136. Citation rendering → BL-135.",
+      "files": "supabase/migrations/20260430_bl130_compliance_created_via.sql, scripts/seed-fr-compliance.mjs, src/features/admin/services/complianceEngine.ts, src/types/index.ts, DB-SCHEMA.md",
       "tag": "compliance",
       "added": "2026-04-30"
     },
@@ -1521,6 +1569,14 @@ const DATA = {
     }
   ],
   "techDebt": [
+    {
+      "id": "TD-DATA-COUNTRY-CODE-COLLISION",
+      "title": "Same column name (country_code) stores different semantics across tables",
+      "desc": "agent_profiles.country_code stores PHONE country codes (33, 41, 39) while compliance_rules.country_code (and most app code) stores ISO alpha-2 codes (FR, CH, IT). Discovered during BL-130 MCP verification when admin lookup query WHERE country_code IN ('FR','CH','IT') returned 0 rows from agent_profiles. Workaround used during verification: query email LIKE 'will+ag-fr%' to find FR admins. Audit and consolidate when next touching agent_profiles — likely rename one of the columns to disambiguate (agent_profiles.phone_country_code is the most honest fix) or migrate agent_profiles to ISO alpha-2 with a backfill. Defer until BL-131 (IT) and BL-132 (CH) ingestion confirms full scope of impact — those tickets will surface every place the collision matters.",
+      "files": "agent_profiles schema, all .from('agent_profiles') queries, DB-SCHEMA.md",
+      "tag": "comms",
+      "added": "2026-04-30"
+    },
     {
       "id": "TD-1",
       "title": "Service layer refactor Phase 3",
