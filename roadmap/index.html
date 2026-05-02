@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-01';
+const LAST_UPDATED = '2026-05-02';
 const DATA = {
   "inProgress": [
     {
@@ -179,6 +179,22 @@ const DATA = {
       "files": "Supabase SQL Editor (correction); ~/Downloads/claude/BG-87-diagnostic-v2.sql, BG-87-fix.sql",
       "tag": "core",
       "added": "2026-04-30"
+    },
+    {
+      "id": "~~BL-137~~",
+      "title": "~~Country canonicalization (organizations.country_code)~~",
+      "desc": "CLOSED 2026-05-01 → D-298. Schema canonicalization unblocking BL-136 bootstrap. Live audit (2026-05-01) found 6 orgs in organizations.country_default storing a MIX of formats: 2 ISO codes ('AE', 'IT' — wait, post-cleanup only 'AE'+'IT' if you count Williamkanaan's legacy 'IT' — see § 1) and 4 English names ('France', 3× 'Switzerland', 'Italy'). Compliance bootstrap join country_code='FR' = country_default='FR' returned 0 rows because Saint Germain stores 'France'. Migration: ADD COLUMN country_code TEXT with CHECK country_code ~ '^[A-Z]{2}$'; backfill via CASE (ISO-passthrough branch + English-name → ISO mapping for FR/CH/IT/AE plus defensive DE/GB/US/ES). DO block aborts with RAISE EXCEPTION if any unmapped value — forces reconciliation. country_default deprecated via COMMENT (kept as safety net during deprecation window). Helper: new src/lib/country.ts — CountryCode union (8 ISO codes), COUNTRY_LABELS typed map (8 × 4 locales = 32 entries), getCountryLabel(code, locale), isSupportedCountry, legacyCountryNameToCode (migration-window helper). 12 unit tests green. Read sites migrated: admin home, admin settings, schedule-viewing, useIntelCards, qa-engine cache key, qualification API, q/[token] EU GDPR check — all switched to country_code with country_default fallback during deprecation window. Write sites dual-write: seed-eu-agencies, seed-dubai, /api/onboarding, orgService.createOrganization. BL-136 hotfix flipped back: complianceNotificationService.notifyNewRule and bl136-bootstrap-cards.mjs join queries restored to country_code = country_code — no more org-side column mismatch. Every country_default mention in code carries a BL-137 dual-write comment marker for the future cleanup ticket to grep. AR labels deferred to BL-121. Filed for follow-up: TD-COUNTRY-CLEANUP (drop country_default + remove dual-write + delete legacyCountryNameToCode after one release); TD-COUNTRY-LABELS-AR; TD-COUNTRY-PICKER-COMPONENT; TD-PERFECTAGENCY-ORG-AUDIT (already noted; PerfectAgency since deleted as abandoned signup).",
+      "files": "supabase/migrations/20260501_bl137_organizations_country_code.sql, src/lib/country.ts, tests/unit/country.test.ts, src/types/index.ts, src/features/admin/services/{complianceNotificationService,orgService}.ts, src/features/intel/hooks/useIntelCards.ts, src/services/ai/qa-engine.service.ts, src/app/{admin/page,admin/settings/page,tools/schedule-viewing/page,api/onboarding/route,api/qualification/[token]/route,q/[token]/page,onboarding/page}.tsx, scripts/{bl136-bootstrap-cards,seed-dubai,seed-eu-agencies/seed-orgs-users}.mjs, DB-SCHEMA.md, WAYS-OF-WORKING.md, FEATURE-MAP.md, PROJECT-STRUCTURE.md",
+      "tag": "compliance",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "~~BL-136~~",
+      "title": "~~Admin acceptance flow for compliance rules~~",
+      "desc": "CLOSED 2026-05-01 → D-297 (+ 4 hotfixes #1-#4 captured under D-299 paper-trail entry). Per-org accept/reject/snooze/revoke flow over created_via='ingestion' rules with full audit trail. Schema: new compliance_rule_org_acceptance table (append-only, RLS enforces; UPDATE/DELETE denied to authenticated; service_role bypasses for cache wipes). New SQL function compute_rule_fingerprint(compliance_rules) (sha256 over 10 canonical rule fields) mirrored byte-for-byte by src/features/admin/services/ruleFingerprint.ts; drift test in tests/unit/ruleFingerprint.test.ts. New view v_compliance_rule_acceptance_state returning per-(rule, org) state (pending / accepted / rejected / snoozed / stale_accepted). intel_cards CHECK extended with 3 new card_types. Engine: evaluateCompliance() pulls state for ingestion rules in scope; state==='accepted' → fire at declared severity, otherwise stay info-only with acceptance_state populated on RuleResult. Manual rules untouched. Boolean acceptance_pending kept as derived alias for one release (TD-COMPLIANCE-DROP-ACCEPTANCE-PENDING-ALIAS). Banner: ComplianceBanner filters out non-accepted ingestion rules — resolves TD-COMPLIANCE-BANNER-INFO-RULES-VISIBILITY (D-295). UI: new AcceptanceActionFooter (5 state branches), new RuleDiffPanel (stale_accepted caveat — Q1=A no-history trade-off), state-aware pill on rule list with filter dropdown (default Pending only if any pending+stale exist). Notifications: four trigger paths (org_setup, law_update, new_rule, snooze_expiry) via existing intel_cards + /api/send-email Resend. App-level only (direct SQL UPDATEs to compliance_rules don't fire — TD-COMPLIANCE-DIRECT-SQL-EDIT-NOTIFICATIONS). Cron: /api/cron/compliance-snooze-sweep daily at 03:00 UTC, idempotent same-day. Bootstrap: scripts/bl136-bootstrap-cards.mjs one-shot to emit acceptance_pending cards for the 60 existing FR rules. i18n: 39 new keys × 4 locales = 156 strings. AR out of scope (BL-121). Two new email HTML templates with the spec § 7.3 caveat in compliance-law-update. acceptanceService writes via service_role; API routes (POST /api/admin/compliance/acceptance, POST /api/admin/compliance/acceptance/[id]/revoke, GET /api/admin/compliance/acceptance/state) gate on org_members.role IN ('owner','admin'). TDs filed: TD-COMPLIANCE-FINGERPRINT-CI-PARITY (escalated 🔴 — hotfix #4 was the bill for skipping it), TD-COMPLIANCE-FINGERPRINT-WRITE-ON-RULE-CHANGE, TD-COMPLIANCE-FINGERPRINT-JSONB-ROBUST-SERIALIZER, TD-COMPLIANCE-DROP-ACCEPTANCE-PENDING-ALIAS, TD-COMPLIANCE-RULE-HISTORY, TD-COMPLIANCE-BULK-ACCEPT, TD-COMPLIANCE-EMAIL-DIGEST, TD-COMPLIANCE-ACCEPTANCE-VIEW-PERF, TD-COMPLIANCE-DIRECT-SQL-EDIT-NOTIFICATIONS, TD-USEORGMEMBERS-FK-VERIFY (hotfix #2 audit), TD-MCP-COMPLIANCEBANNER-LISTING-FLOW-VERIFY, TD-MCP-CRON-SNOOZE-SWEEP-VERIFY, TD-MCP-CLICK-VS-REACT-EVENT, TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE. 4 post-MCP hotfixes (#1 column-name spec error 115f12c; #2 org_members↔agent_profiles RLS-FK split f07abf7; #3 hook hardening d904668; #4 JS↔SQL fingerprint parity c799079). Unblocks BL-131 (IT) + BL-132 (CH) for agent-facing rollout.",
+      "files": "supabase/migrations/20260501_bl136_compliance_acceptance.sql, src/features/admin/services/{ruleFingerprint,acceptanceService,complianceNotificationService,complianceEngine}.ts, src/features/admin/hooks/useComplianceAcceptance.ts, src/features/admin/components/{AcceptanceActionFooter,RuleDiffPanel,ComplianceRuleDetailPanel}.tsx, src/app/admin/compliance/page.tsx, src/components/shared/ComplianceBanner.tsx, src/app/api/admin/compliance/acceptance/{route,[id]/revoke/route,state/route}.ts, src/app/api/cron/compliance-snooze-sweep/route.ts, scripts/bl136-bootstrap-cards.mjs, tests/unit/ruleFingerprint.test.ts, tests/e2e/admin-compliance-acceptance.spec.ts, messages/{en,fr,de,it}.json, vercel.json, docs/supabase-email-templates/{compliance-acceptance-pending,compliance-law-update}.html, WAYS-OF-WORKING.md, docs/legal-compliance/ARCHITECTURE.md, DB-SCHEMA.md, FEATURE-MAP.md, PROJECT-STRUCTURE.md",
+      "tag": "comms",
+      "added": "2026-05-01"
     },
     {
       "id": "~~BL-135~~",
@@ -279,8 +295,8 @@ const DATA = {
       "added": "2026-05-02"
     },
     {
-      "id": "TD-COMPLIANCE-BANNER-INFO-RULES-VISIBILITY (D-295)",
-      "title": "Ingested info-only rules invisible in ComplianceBanner",
+      "id": "~~TD-COMPLIANCE-BANNER-INFO-RULES-VISIBILITY~~ (D-295)",
+      "title": "~~Ingested info-only rules invisible in ComplianceBanner~~ — RESOLVED 2026-05-01 by BL-136. ComplianceBanner now filters out rules where acceptance_state !== 'accepted'. Pre-acceptance ingested rules stay hidden from agents per the spec — admins accept them via /admin/compliance side panel before they surface. Original notes preserved below for historical context.",
       "desc": "Discovered during BL-135 MCP verification: ComplianceBanner only renders rule rows for non-passing rules. Per BL-130, ingested rules force severity='info' + `status='passed'",
       "files": "'warned'`, so they never appear in the banner — even though 60 FR rules are evaluated against every FR property. The agent has no awareness of what reference rules were auto-applied to their listing. Product question, not a bug. Options to consider: (a) \"12 reference rules evaluated, all passed\" summary line at the bottom of the banner; (b) separate \"Reference rules\" tab/expansion within the banner showing all info-tier rules with their citations; (c) info-tier rules surface in the side panel only (admin), not in the agent banner at all (status quo); (d) pull info-tier rules into a separate dedicated UI surface (e.g. property → \"Compliance reference\" sub-tab). Strategically related to BL-136 — admins need to *accept* ingested rules; agents probably should also see what was applied. Worth flagging in the BL-136 spec when we draft it. Severity: MEDIUM (user awareness gap, not blocking).",
       "tag": "compliance",
@@ -1570,12 +1586,12 @@ const DATA = {
   ],
   "techDebt": [
     {
-      "id": "TD-DATA-COUNTRY-CODE-COLLISION",
-      "title": "Same column name (country_code) stores different semantics across tables",
-      "desc": "agent_profiles.country_code stores PHONE country codes (33, 41, 39) while compliance_rules.country_code (and most app code) stores ISO alpha-2 codes (FR, CH, IT). Discovered during BL-130 MCP verification when admin lookup query WHERE country_code IN ('FR','CH','IT') returned 0 rows from agent_profiles. Workaround used during verification: query email LIKE 'will+ag-fr%' to find FR admins. Audit and consolidate when next touching agent_profiles — likely rename one of the columns to disambiguate (agent_profiles.phone_country_code is the most honest fix) or migrate agent_profiles to ISO alpha-2 with a backfill. Defer until BL-131 (IT) and BL-132 (CH) ingestion confirms full scope of impact — those tickets will surface every place the collision matters.",
-      "files": "agent_profiles schema, all .from('agent_profiles') queries, DB-SCHEMA.md",
+      "id": "🔴 TD-DATA-COUNTRY-CODE-COLLISION",
+      "title": "Country code data integrity issues across tables — escalated 2026-05-01",
+      "desc": "Two distinct collisions, both feeding the same TD because resolution will likely share migrations. (1) Format collision (filed 2026-04-30): agent_profiles.country_code stores PHONE country codes (33, 41, 39) while compliance_rules.country_code (and most app code) stores ISO alpha-2 (FR, CH, IT). Workaround at MCP time: query email LIKE 'will+ag-fr%' to find FR admins. Likely fix: rename agent_profiles.country_code → phone_country_code to disambiguate. (2) Value collision in compliance_rules (escalated 2026-05-01): compliance_rules.country_code itself contains BOTH 'AE' (16 rows) and 'UAE' (22 rows) for the same country. The engine matches one OR the other, not both → UAE orgs get partial compliance signal. Need consolidation script + decision on canonical ISO value (probably 'AE' per ISO-3166). Severity escalated to HIGH: must resolve before BL-131 (IT) + BL-132 (CH) ingestion lands — those tickets will inherit whatever pattern is canonical and the bug doubles per country added.",
+      "files": "agent_profiles schema, compliance_rules data + future migration, all .from('agent_profiles') queries, DB-SCHEMA.md",
       "tag": "comms",
-      "added": "2026-04-30"
+      "added": "2026-04-30 (escalated 2026-05-01)"
     },
     {
       "id": "TD-1",
@@ -1744,6 +1760,158 @@ const DATA = {
       "files": "scripts/docs-check.mjs, WAYS-OF-WORKING.md § Documentation Governance",
       "tag": "ux",
       "added": "2026-04-29"
+    },
+    {
+      "id": "🔴 TD-COMPLIANCE-FINGERPRINT-CI-PARITY",
+      "title": "Wire local Supabase or RPC parity check to CI — top priority before next hash-using feature",
+      "desc": "Filed 2026-05-01 as part of BL-136 Phase 1; escalated end of session because hotfix #4 (c799079) existed for exactly this reason. The JS↔SQL parity test in tests/unit/ruleFingerprint.test.ts is describe.skip'd when local Supabase isn't available, which means CI never validates that JS computeRuleFingerprint and SQL compute_rule_fingerprint produce identical output. Hotfix #4 added an unconditional hardcoded-fixture test that catches drift on the JS side, but doesn't compare against the live SQL function. Fix: either (a) stand up a local Supabase in CI with the BL-136 + hotfix #4 migrations applied, OR (b) add a Postgres RPC function exposing compute_rule_fingerprint to PostgREST and call it from the test against staging. Until done, every change to ruleFingerprint.ts or the SQL function risks the same class of production bug.",
+      "files": "tests/unit/ruleFingerprint.test.ts, CI config, possibly new RPC",
+      "tag": "ai",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-FINGERPRINT-WRITE-ON-RULE-CHANGE",
+      "title": "Store fingerprint as a generated/triggered column on compliance_rules",
+      "desc": "Hotfix #4 Option C deferred for end-of-month cleanup. Add current_fingerprint TEXT column to compliance_rules, populate via Postgres trigger on INSERT/UPDATE. View v_compliance_rule_acceptance_state then compares stored vs current with no recomputation. Eliminates the JS↔SQL parity problem at the schema level — the JS computeRuleFingerprint becomes the only source of truth, and SQL just reads what was written. Bigger blast radius than a hotfix can carry; recommended once BL-131/BL-132 ingestion stabilizes.",
+      "files": "compliance_rules schema, new trigger, v_compliance_rule_acceptance_state body, acceptanceService.acceptRule",
+      "tag": "compliance",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-FINGERPRINT-JSONB-ROBUST-SERIALIZER",
+      "title": "Replace recursive plpgsql jsonb_compact with a faster implementation if perf demands",
+      "desc": "Hotfix #4 inlined jsonb_compact() as a recursive plpgsql function. Works correctly for all current rule shapes; ~25 lines. Effectively closes the prompt's original \"robust serializer\" TD. Open future option: rewrite as a C extension or use a Postgres custom-jsonb-type implementation if benchmarks reveal it as a hotspot. Not blocking; flagged only because it's recursive plpgsql which is slower than native operators.",
+      "files": "supabase/migrations/20260501_bl136_hotfix4_fingerprint_parity.sql (function jsonb_compact)",
+      "tag": "core",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟡 TD-DB-SCHEMA-INTEL-CARDS-DUAL-LIST",
+      "title": "Stale duplicate intel_cards.card_type CHECK list at DB-SCHEMA.md L2292",
+      "desc": "DB-SCHEMA.md has TWO different CHECK lists for intel_cards.card_type — the canonical comprehensive list near the table definition (L1100) lists 32 values (29 original + 3 new from BL-136), while a separate quick-reference table around L2292 has a stale shorter subset that misses ~half the values. The duplicate has bitten BL-130 and BL-136 migration drafting. Delete the L2292 row in this EOS commit; longer-term, refactor DB-SCHEMA.md to have ONE authoritative source for each CHECK list.",
+      "files": "DB-SCHEMA.md (delete L2292 entry; possibly tooling to enforce single-source-of-truth on CHECK summaries)",
+      "tag": "infra",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟡 TD-SPEC-DB-SCHEMA-CROSS-CHECK",
+      "title": "Add a spec-time discipline: grep DB-SCHEMA.md for every column name referenced",
+      "desc": "BL-136 spec (Final v1) referenced organizations.country_code as the join column, but live schema only had country_default. The mismatch surfaced at bootstrap-script execution time, costing ~1 round-trip + the entire BL-137 mid-session canonicalization. Fix: pre-flight at spec-draft time — for each \u003ctable\u003e.\u003ccolumn\u003e reference in any new spec, run grep -nE \"\u003ccolumn\u003e\" DB-SCHEMA.md and verify the column actually exists on that table. Could be enforced by a pre-commit hook that scans docs/specs/*.md for column-shaped references.",
+      "files": "docs/specs/* workflow, possibly scripts/audit/spec-column-refs.mjs",
+      "tag": "admin",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-USEORGMEMBERS-FK-VERIFY",
+      "title": "Verify agent_profiles!org_members_user_id_fkey syntax in useOrgMembers.ts:53 actually resolves",
+      "desc": "Hotfix #2 audit found that src/features/admin/hooks/useOrgMembers.ts:53 uses an explicit FK-name hint to nest agent_profiles under org_members. The hint works ONLY if a FK with that exact name exists on the live DB. Out of BL-136 hotfix scope. Verify via d org_members in psql; if no FK by that name, the hook silently breaks the same way BL-136's bootstrap did before hotfix #2.",
+      "files": "src/features/admin/hooks/useOrgMembers.ts:53",
+      "tag": "admin",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-MCP-COMPLIANCEBANNER-LISTING-FLOW-VERIFY",
+      "title": "Finish BL-136 spec § 11 step 7 — verify ingested-rule visibility flip on listing.share trigger",
+      "desc": "MCP couldn't finish step 7 from /properties/[id] alone — the 60 FR rules trigger on listing.share (14 rules) or deal.stage_change (46 rules), not on property detail page load. Need a listing publish flow or deal stage transition to fully exercise the banner gating logic. ~10 min next session.",
+      "files": "MCP walk path; no code changes expected",
+      "tag": "admin",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-MCP-CRON-SNOOZE-SWEEP-VERIFY",
+      "title": "Finish BL-136 spec § 11 step 9 — verify /api/cron/compliance-snooze-sweep against backdated snooze",
+      "desc": "Hit the cron endpoint with a Bearer $CRON_SECRET header against a snooze backdated to NOW() - INTERVAL '1 day'. Confirm one compliance_acceptance_pending intel_card emitted and the same-day idempotency probe blocks a second run. ~5 min next session.",
+      "files": "MCP walk path; possibly curl against staging",
+      "tag": "compliance",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-MCP-CLICK-VS-REACT-EVENT",
+      "title": "MCP pixel-click on Accepter button did not trigger React's onClick during hotfix #3 verification",
+      "desc": "During BL-136 hotfix #3 testing, the MCP browser drove a pixel-coordinate click on the Accepter button — the click registered visually but no React onClick handler fired. Workaround: invoked __reactProps.onClick() directly via DevTools console. Real users with real mice unaffected. File only if recurring across other MCP walks; could be a Vercel preview-build interaction quirk or a React event-delegation timing issue.",
+      "files": "MCP browser tooling; flag for investigation if symptom recurs",
+      "tag": "infra",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE",
+      "title": "docs:check flags per-phase commits as debt-ceiling violations",
+      "desc": "Recurring across BL-129 / BL-130 / BL-135 / BL-136 / BL-137: each phase commit (Phase 1 / 2 / 3) touches code/specs but the paper trail (FEATURE-MAP / PROJECT-STRUCTURE / etc.) is consolidated in the final phase or in the EOS commit. docs:check flags every interim phase as missing-paper-trail, and the violation accumulates in the unabsorbed-debt count (~14/119 today). Fix: adjust the rule to allow paper-trail consolidation in a follow-up commit within the same session, OR make the rule scan a sliding-window of the last N commits rather than per-commit. Ideally rolls into TD-26's generic-generator refactor scope.",
+      "files": "scripts/docs-check.mjs, WAYS-OF-WORKING.md § Documentation Governance",
+      "tag": "admin",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-DROP-ACCEPTANCE-PENDING-ALIAS",
+      "title": "Migrate callers to acceptance_state enum, drop the acceptance_pending boolean alias",
+      "desc": "BL-136 kept RuleResult.acceptance_pending: boolean as a derived alias for one release while callers (UI badges, intel-card watchers) migrate to the richer `acceptance_state: 'pending'",
+      "files": "'accepted'",
+      "tag": "ux",
+      "added": "'rejected'"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-DIRECT-SQL-EDIT-NOTIFICATIONS",
+      "title": "Add a Postgres trigger so direct SQL UPDATEs to compliance_rules fire law_update notifications",
+      "desc": "Today, complianceNotificationService.notifyLawUpdate is invoked only from API routes that update rules. Direct SQL UPDATEs (e.g. data fixes from Supabase SQL Editor) silently change the fingerprint, flipping accepted rules to stale_accepted without notifying admins. Documented as a known caveat in WAYS-OF-WORKING § Compliance Acceptance Flow rule #3. Fix: Postgres trigger on compliance_rules AFTER UPDATE that calls notifyLawUpdate(NEW.id) via pg_notify or HTTP webhook. File only if direct-SQL-edits become a real production risk.",
+      "files": "compliance_rules trigger, possibly an HTTP-webhook extension",
+      "tag": "compliance",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-RULE-HISTORY",
+      "title": "Build a compliance_rules_history snapshot table for true field-by-field diff",
+      "desc": "BL-136 § 9 Q1 trade-off: we don't store per-field rule history; the RuleDiffPanel for stale_accepted rules just renders the current source attribution with a caveat (\"This rule has changed since you accepted it on {date}. We don't store per-field history yet — review the full current rule below.\"). File ONLY if admins push back on the caveat. Implementation would be a snapshot table populated on every UPDATE via trigger, with a diff renderer in the RuleDiffPanel.",
+      "files": "compliance_rules_history (NEW), RuleDiffPanel.tsx",
+      "tag": "compliance",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-BULK-ACCEPT",
+      "title": "Bulk accept-all-from-country onboarding helper",
+      "desc": "BL-136 § 14: /admin/compliance per-rule decision flow may feel heavy if a French agency lands and faces 60 pending FR rules at once. File ONLY if onboarding feedback confirms the friction. Implementation: dropdown/button on the rule list that batch-accepts all rules for a chosen country; same audit log row per rule but written in one transaction.",
+      "files": "src/app/admin/compliance/page.tsx, possibly new acceptanceService.acceptManyByCountry",
+      "tag": "compliance",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-EMAIL-DIGEST",
+      "title": "Daily/weekly digest of pending acceptances replacing per-event email",
+      "desc": "BL-136 § 14: today, notifyOrgSetup and notifyLawUpdate send one email per (rule × admin). For a 60-rule onboarding, that's 60 emails to one admin in a single bootstrap. Switch to a daily/weekly digest with a single email summarizing N pending rules + a link to /admin/compliance. File when onboarding email volume becomes a real complaint.",
+      "files": "complianceNotificationService.ts, possibly a new compliance-pending-digest cron route",
+      "tag": "comms",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-ACCEPTANCE-VIEW-PERF",
+      "title": "Materialize v_compliance_rule_acceptance_state if cross-product gets hot",
+      "desc": "BL-136 § 5.3 documented the cross-product caveat. Today's footprint: 60 rules × 6 orgs = 360 view rows. Per-call query bounded by WHERE org_id = $current_org so per-call cost is bounded by N_rules. With 4 countries × ~50 rules and 100 orgs, that's still trivial. File when EXPLAIN ANALYZE on the engine's acceptance lookup shows real cost. Materialised view + refresh-on-rule-change trigger.",
+      "files": "v_compliance_rule_acceptance_state, possibly migration to materialized view",
+      "tag": "compliance",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟡 TD-COUNTRY-CLEANUP",
+      "title": "Drop organizations.country_default, remove dual-write blocks, delete legacyCountryNameToCode",
+      "desc": "BL-137 deprecation window runs through end of May 2026. After confirming all production traffic stable on country_code: (1) DROP COLUMN organizations.country_default; (2) grep -rn \"BL-137 dual-write\" src/ scripts/ and remove every flagged dual-write line; (3) delete legacyCountryNameToCode() from src/lib/country.ts; (4) rename qa-cache.service.ts field org_country_default → org_country_code (will invalidate cache once); (5) remove \"BL-137\" comment markers. ~1 hour total. Recommended date: 2026-05-31.",
+      "files": "organizations schema migration, src//*.ts dual-write sites, src/lib/country.ts, src/services/ai/qa-cache.service.ts",
+      "tag": "admin",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-COUNTRY-LABELS-AR",
+      "title": "Add Arabic labels to COUNTRY_LABELS when BL-121 RTL pass ships",
+      "desc": "BL-137 § 9: COUNTRY_LABELS map currently has en/fr/de/it. BL-121 will add full Arabic + RTL support; at that point, add an ar entry to each of the 8 COUNTRY_LABELS rows + extend the SupportedLocale union. Trivial mechanical change — don't pre-translate; coordinate with the BL-121 translator pass.",
+      "files": "src/lib/country.ts",
+      "tag": "core",
+      "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-COUNTRY-PICKER-COMPONENT",
+      "title": "Extract reusable \u003cCountryPicker /\u003e component when 3+ surfaces need to edit country",
+      "desc": "BL-137 § 13: today only org settings + onboarding flow let users pick a country. If the count grows to 3+ (e.g. property location override, lead source country), extract a typed \u003cCountryPicker value={code} onChange={(code) =\u003e …} locale={…} /\u003e component that uses SUPPORTED_COUNTRIES + getCountryLabel.",
+      "files": "New src/components/shared/CountryPicker.tsx",
+      "tag": "admin",
+      "added": "2026-05-01"
     }
   ],
   "bugs": [
