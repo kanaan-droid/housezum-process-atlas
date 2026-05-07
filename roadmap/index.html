@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-02';
+const LAST_UPDATED = '2026-05-07';
 const DATA = {
   "inProgress": [
     {
@@ -737,11 +737,11 @@ const DATA = {
   ],
   "backlog": [
     {
-      "id": "BL-133",
-      "title": "UAE country_code consolidation + integrity guard (deferred — UAE work on hold)",
-      "desc": "Existing compliance_rules (22 rows), workflow_templates (TBD), and qa_knowledge_base (TBD) contain a mix of country_code = 'AE' (ISO-3166-1 alpha-2, canonical) and country_code = 'UAE' (informal, non-ISO). App code uniformly queries 'AE' — the 'UAE'-tagged rows are dead data invisible to the compliance engine, intel cards, and workflow lookup. Root cause: scripts/bl60/seed-qa-knowledge-base.mjs:168 writes 'UAE' instead of 'AE'; likely contaminated other tables via similar legacy seeds. Scope: (1) Data migration: UPDATE country_code 'UAE' → 'AE' across compliance_rules, workflow_templates, qa_knowledge_base, and any other table with a country_code column found via SELECT table_name FROM information_schema.columns WHERE column_name = 'country_code'. (2) Pre-flight conflict check: ensure consolidation doesn't violate unique constraints (especially compliance_rules.unique_rule_code_version). (3) Add CHECK constraint country_code ~ '^[A-Z]{2}$' on all affected tables. (4) Fix scripts/bl60/seed-qa-knowledge-base.mjs:168 'UAE' → 'AE' (fold into BL-127 if BL-127 hasn't shipped yet, otherwise standalone). Status: deferred — execute when UAE work resumes. Filed: 2026-04-30 during BL-129 verification (D-289).",
+      "id": "~~BL-133~~",
+      "title": "~~UAE country_code consolidation + integrity guard~~",
+      "desc": "CLOSED 2026-05-05 → D-301. 3-phase migration shipped: Phase 1 audit (read-only, surfaces conflict pairs in compliance_rules self-join — Will hand-resolves before proceeding); Phase 2 transactional DO block rewrites 'UAE' → 'AE' across 5 tables (compliance_rules, workflow_templates, qa_knowledge_base, market_profiles, agent_profiles.operating_country) with pre-flight conflict guard + post-flight zero-UAE verification + RAISE NOTICE for any unexpected scope drift; Phase 3 ADD CONSTRAINT … CHECK (country_code ~ '^[A-Z]{2}$') on all 5 columns with naming convention \u003ctable\u003e_\u003ccolumn\u003e_iso_format. Backup snapshot block in migration header (5 tables, drop after 7 days clean). Seed script scripts/bl60/seed-qa-knowledge-base.mjs:168 patched at source: 'UAE' → 'AE' with comment marker. Out of scope: agent_profiles.country_code (phone format 33/41/971) — different format-collision half of TD, stays open. Spec: docs/specs/BL-133-Spec-Country-Code-Canonicalization.md. Closes value-collision half of TD-DATA-COUNTRY-CODE-COLLISION; downgrades 🔴 → 🟡 (format-collision half remains). Unblocks BL-131 (IT) + BL-132 (CH) — they inherit a clean canonical contract. Actual: 278 rows rewritten across 3 tables (compliance_rules: 32, qa_knowledge_base: 233 — entire corpus, agent_profiles.operating_country: 13). Plus in-session scope addition: 21 English country names in agent_profiles.operating_country (FR/IT/CH × 7 each) canonicalized via 3 targeted UPDATEs. MCP-verified end-to-end on Gulf Horizon Realty same day (logged in as will+raj-gh@housezoom.ai — 121 rules in /admin/compliance, ComplianceBanner correct on UAE property, BL-130 disclaimer renders, DB CHECK enforcement smoke-tested by rejected 'UAE' INSERT). Zero conflicts in Phase 1 audit. New TD filed: TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT (seed-script source of the 21 English names).",
       "tag": "compliance",
-      "added": "supabase/migrations/\u003cfuture-date\u003e_bl133_country_code_consolidation.sql (NEW), scripts/bl60/seed-qa-knowledge-base.mjs (1-line fix, or fold into BL-127)"
+      "added": "supabase/migrations/20260505_bl133_country_code_canonicalization.sql, scripts/bl60/seed-qa-knowledge-base.mjs, docs/specs/BL-133-Spec-Country-Code-Canonicalization.md, DB-SCHEMA.md, WAYS-OF-WORKING.md"
     },
     {
       "id": "~~BG-50~~",
@@ -1586,12 +1586,20 @@ const DATA = {
   ],
   "techDebt": [
     {
-      "id": "🔴 TD-DATA-COUNTRY-CODE-COLLISION",
-      "title": "Country code data integrity issues across tables — escalated 2026-05-01",
-      "desc": "Two distinct collisions, both feeding the same TD because resolution will likely share migrations. (1) Format collision (filed 2026-04-30): agent_profiles.country_code stores PHONE country codes (33, 41, 39) while compliance_rules.country_code (and most app code) stores ISO alpha-2 (FR, CH, IT). Workaround at MCP time: query email LIKE 'will+ag-fr%' to find FR admins. Likely fix: rename agent_profiles.country_code → phone_country_code to disambiguate. (2) Value collision in compliance_rules (escalated 2026-05-01): compliance_rules.country_code itself contains BOTH 'AE' (16 rows) and 'UAE' (22 rows) for the same country. The engine matches one OR the other, not both → UAE orgs get partial compliance signal. Need consolidation script + decision on canonical ISO value (probably 'AE' per ISO-3166). Severity escalated to HIGH: must resolve before BL-131 (IT) + BL-132 (CH) ingestion lands — those tickets will inherit whatever pattern is canonical and the bug doubles per country added.",
-      "files": "agent_profiles schema, compliance_rules data + future migration, all .from('agent_profiles') queries, DB-SCHEMA.md",
+      "id": "🟡 TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT",
+      "title": "seed-eu-agencies writes English country names to agent_profiles.operating_country",
+      "desc": "Discovered 2026-05-05 during BL-133 Phase 3 CHECK application. 21 rows (7 each FR/IT/CH) had operating_country set to English names ('France', 'Italy', 'Switzerland') instead of ISO alpha-2 codes. Same regression class as scripts/bl60/seed-qa-knowledge-base.mjs:168 (patched in BL-133). The CHECK constraint added in BL-133 Phase 3 (agent_profiles_operating_country_iso_format) now blocks this at INSERT time, but the seed-script source is still wrong. Next time a seed-eu-agencies re-run is attempted, it will fail with a CHECK violation. Fix: patch the seed script to write ISO codes (FR/IT/CH/AE) instead of English names; add comment marker // BL-133 seed regression — see TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT so future grep surfaces lineage. ~10 min standalone fix; could also be folded into the next BL-126-adjacent ticket. Filed: 2026-05-05.",
+      "files": "scripts/seed-eu-agencies/seed-orgs-users.mjs (likely site; verify location), or wherever agent_profiles rows are inserted in the EU seed flow",
+      "tag": "ai",
+      "added": "2026-05-05"
+    },
+    {
+      "id": "🟡 TD-DATA-COUNTRY-CODE-COLLISION",
+      "title": "Country code data integrity issues — value-collision half closed by BL-133 (2026-05-05); format-collision half remains open",
+      "desc": "(1) Format collision (REMAINS OPEN, filed 2026-04-30): agent_profiles.country_code stores PHONE country codes (33, 41, 39) while every other column system-wide named country_code stores ISO alpha-2 (FR, CH, IT). Workaround at MCP time: query email LIKE 'will+ag-fr%' to find FR admins. Likely fix: rename agent_profiles.country_code → phone_country_code (or agent_profiles.contact_country_code) to disambiguate. Worth filing as its own ticket once BL-133 is bedded in. (2) ~~Value collision in compliance_rules (escalated 2026-05-01):~~ CLOSED 2026-05-05 by BL-133. Migration 20260505_bl133_country_code_canonicalization.sql rewrote 'UAE' → 'AE' across compliance_rules, workflow_templates, qa_knowledge_base, market_profiles, agent_profiles.operating_country, and added schema-layer ISO-format CHECK constraints to prevent recurrence. Seed script (scripts/bl60/seed-qa-knowledge-base.mjs:168) patched at source. Severity downgraded 🔴 → 🟡 (format-collision half is still real but lower-impact than the production-correctness value-collision was).",
+      "files": "agent_profiles schema, all .from('agent_profiles') queries, DB-SCHEMA.md",
       "tag": "comms",
-      "added": "2026-04-30 (escalated 2026-05-01)"
+      "added": "2026-04-30 (value half closed 2026-05-05)"
     },
     {
       "id": "TD-1",
@@ -1762,12 +1770,12 @@ const DATA = {
       "added": "2026-04-29"
     },
     {
-      "id": "🔴 TD-COMPLIANCE-FINGERPRINT-CI-PARITY",
-      "title": "Wire local Supabase or RPC parity check to CI — top priority before next hash-using feature",
-      "desc": "Filed 2026-05-01 as part of BL-136 Phase 1; escalated end of session because hotfix #4 (c799079) existed for exactly this reason. The JS↔SQL parity test in tests/unit/ruleFingerprint.test.ts is describe.skip'd when local Supabase isn't available, which means CI never validates that JS computeRuleFingerprint and SQL compute_rule_fingerprint produce identical output. Hotfix #4 added an unconditional hardcoded-fixture test that catches drift on the JS side, but doesn't compare against the live SQL function. Fix: either (a) stand up a local Supabase in CI with the BL-136 + hotfix #4 migrations applied, OR (b) add a Postgres RPC function exposing compute_rule_fingerprint to PostgREST and call it from the test against staging. Until done, every change to ruleFingerprint.ts or the SQL function risks the same class of production bug.",
-      "files": "tests/unit/ruleFingerprint.test.ts, CI config, possibly new RPC",
+      "id": "~~TD-COMPLIANCE-FINGERPRINT-CI-PARITY~~ (D-302)",
+      "title": "~~Wire local Supabase or RPC parity check to CI — top priority before next hash-using feature~~ — CLOSED 2026-05-05 → D-302 (Option A — Local Supabase in CI). GitHub Actions now spins up a postgres:15 service per run, applies tests/ci/auth-schema-shim.sql + tests/ci/schema-baseline.sql + every file under supabase/migrations/ with ON_ERROR_STOP=1, exports TEST_DATABASE_URL for the test step. New tests/unit/__helpers__/db.ts exports describeIfDb (Jest-safe replacement for Vitest-only describe.skipIf) + getTestPgClient(). tests/unit/ruleFingerprint.test.ts gained two new describeIfDb blocks — JS↔SQL parity over 3 fixtures (minimal / maximal / Unicode) and a pg_get_function_arguments shape-drift guard for compute_rule_fingerprint + jsonb_compact. Each parity test BEGIN/ROLLBACKs around its own fixture rows. Local dev (no TEST_DATABASE_URL) skips parity blocks; structural + hardcoded-fixture blocks still run unconditionally. New deps: pg + @types/pg. ADR: docs/adr/0001-fingerprint-ci-parity.md documents the Option A vs Option B comparison + cost analysis (~60 sec CI runtime added). New TD spawned: TD-CI-SCHEMA-BASELINE-PROMOTE (move orphan tables into proper migrations so production + CI are reproducible from one source). Original notes preserved below for historical context.",
+      "desc": "tests/unit/ruleFingerprint.test.ts, CI config, possibly new RPC",
+      "files": "2026-05-01",
       "tag": "ai",
-      "added": "2026-05-01"
+      "added": ""
     },
     {
       "id": "🟡 TD-COMPLIANCE-FINGERPRINT-WRITE-ON-RULE-CHANGE",
@@ -1834,12 +1842,12 @@ const DATA = {
       "added": "2026-05-01"
     },
     {
-      "id": "🟢 TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE",
-      "title": "docs:check flags per-phase commits as debt-ceiling violations",
-      "desc": "Recurring across BL-129 / BL-130 / BL-135 / BL-136 / BL-137: each phase commit (Phase 1 / 2 / 3) touches code/specs but the paper trail (FEATURE-MAP / PROJECT-STRUCTURE / etc.) is consolidated in the final phase or in the EOS commit. docs:check flags every interim phase as missing-paper-trail, and the violation accumulates in the unabsorbed-debt count (~14/119 today). Fix: adjust the rule to allow paper-trail consolidation in a follow-up commit within the same session, OR make the rule scan a sliding-window of the last N commits rather than per-commit. Ideally rolls into TD-26's generic-generator refactor scope.",
-      "files": "scripts/docs-check.mjs, WAYS-OF-WORKING.md § Documentation Governance",
-      "tag": "admin",
-      "added": "2026-05-01"
+      "id": "~~TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE~~ (D-305 + D-306)",
+      "title": "~~docs:check flags per-phase commits as debt-ceiling violations~~ — CLOSED 2026-05-05 → D-305 + D-306. Debt-ceiling half closed by D-305 (paid down 16 unabsorbed tickets across 4 architecture docs). Trigger-compliance half closed by D-306 (EOS Tag Protocol installed; cut v2.0.1; future EOSes re-anchor --since window via tag rollover). The structural fix (tagging) was a third path the original TD didn't anticipate but is cleaner than either of the original \"fix the script\" or \"make the rule sliding-window\" remediations — the script was already designed to slide forward via tags; we just hadn't been tagging. Original notes: Recurring across BL-129 / BL-130 / BL-135 / BL-136 / BL-137: each phase commit (Phase 1 / 2 / 3) touches code/specs but the paper trail (FEATURE-MAP / PROJECT-STRUCTURE / etc.) is consolidated in the final phase or in the EOS commit. docs:check flags every interim phase as missing-paper-trail. Ideally rolls into TD-26's generic-generator refactor scope.",
+      "desc": "scripts/docs-check.mjs, WAYS-OF-WORKING.md § Documentation Governance",
+      "files": "2026-05-01",
+      "tag": "compliance",
+      "added": ""
     },
     {
       "id": "🟢 TD-COMPLIANCE-DROP-ACCEPTANCE-PENDING-ALIAS",
@@ -1912,6 +1920,30 @@ const DATA = {
       "files": "New src/components/shared/CountryPicker.tsx",
       "tag": "admin",
       "added": "2026-05-01"
+    },
+    {
+      "id": "🟢 TD-LEGACY-PUBLIC-USERS-CLEANUP",
+      "title": "Drop the orphaned public.users table from production",
+      "desc": "Filed 2026-05-05 during D-304 CI hotfix. public.users exists in production with 7 rows. Migration 003 was authored to drop it but failed silently on FK dependents at the time. Today, zero FKs point at it, zero views reference it, no app code reads from it. The 7 rows are pre-Supabase-auth legacy data. Cleanup options: (a) bare DROP TABLE public.users, or (b) CREATE TABLE archive.legacy_users_20260505 AS SELECT * FROM public.users; DROP TABLE public.users for keep-the-data-just-in-case. Likely (b). ~30 min when picked up. Low priority — table is fully inert today.",
+      "files": "public.users (production)",
+      "tag": "ai",
+      "added": "2026-05-05"
+    },
+    {
+      "id": "~~TD-CI-SCHEMA-BASELINE-PROMOTE~~ (D-308)",
+      "title": "~~Move \"orphan\" tables into proper supabase/migrations/ so production + CI are reproducible from one source~~ — CLOSED 2026-05-06 → D-308. Pivoted from \"write per-table migrations\" to \"promote real pg_dump of staging public schema as the canonical CI baseline + sweep migrations for idempotency.\" 6-iteration arc on PR #1. tests/ci/schema-baseline.sql is now 324K with 103 tables (was 7.9K hand-crafted stub); 4 PG15 compat fixes applied to the dump. 31 migrations made idempotent across 4 guard patterns (mechanical CREATE/INDEX/POLICY/TRIGGER/ADD COLUMN sweep + DO-block guards for schema-drift cases). Apply migrations CI step now ✅ green from relation \"deals\" does not exist (red since 2026-04-30, CI #590+). New TD spawned by the green-CI moment: TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE (parity test caught real JS↔SQL divergence — separate concern, exactly what D-302's CI rig was designed to surface). New scripts/refresh-ci-baseline.sh documents the refresh flow. New WAYS-OF-WORKING.md § \"Migrations are idempotent by default\" codifies the 6 patterns + the 6 DO-block guard patterns. Old hand-crafted baseline preserved at tests/ci/schema-baseline.sql.old-stopgap pending Will's deletion sign-off. PR #1 awaits Will's merge decision. Original notes preserved below for historical context. Original notes: Filed 2026-05-05 during TD-COMPLIANCE-FINGERPRINT-CI-PARITY (D-302). DB-SCHEMA.md documents compliance_rules, organizations, agent_profiles, org_members, intel_cards, workflow_templates, market_profiles, compliance_evaluations, compliance_exceptions, qa_knowledge_base as \"Created: Outside tracked migrations\" — they live in production via Supabase Dashboard or one-off SQL but aren't in supabase/migrations/.",
+      "desc": "supabase/migrations/ (new files), tests/ci/schema-baseline.sql (delete after)",
+      "files": "2026-05-05",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "~~TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE~~ (D-310)",
+      "title": "~~BL-136 hotfix #4 parity test detects JS↔SQL canonical hash divergence on 2 fixtures~~ — CLOSED 2026-05-07 → D-310. 6-commit arc on PR #2 (td/compliance-fingerprint-parity-investigate). Two genuine root causes, both in the test rig — zero production code changes. (1) pg client returns timestamptz columns as JS Date objects; ruleFingerprint.ts's s() helper coerces non-string values via String(v), producing Date.prototype.toString() output (\"Thu Apr 30 2026 …\") that never matches the SQL canonical. PostgREST returns ISO strings, so production never sees the Date path. (2) Even with pg configured to return strings, the wire format is Postgres-native (2026-04-30 00:00:00+00 — space separator, short TZ), not PostgREST/ISO 8601 (2026-04-30T00:00:00+00:00). Fixes in tests/unit/__helpers__/db.ts: register type parsers for OIDs 1114/1184 + format-converting helper pgTimestampToIso(val) (replace(' ', 'T') + short-TZ pad). Two new WOW patterns in § Database parity tests: pg wire format ≠ PostgREST + diagnostic discipline (Jest --ci suppresses console.log; throw-based diagnostics surface unconditionally; never bundle diagnostic removal with the fix). Tag v2.0.3 cut at PR #2 squash-merge.",
+      "desc": "tests/unit/__helpers__/db.ts, tests/unit/ruleFingerprint.test.ts",
+      "files": "2026-05-06",
+      "tag": "compliance",
+      "added": ""
     }
   ],
   "bugs": [
@@ -2302,6 +2334,34 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-310",
+      "title": "TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE — CLOSED (CLOSES TD)",
+      "desc": "Live-DB parity test rig now matches PostgREST wire format. Two fixes in tests/unit/__helpers__/db.ts: pg type parsers for OIDs 1114/1184 + format converter from pg native 2026-04-30 00:00:00+00 to ISO 8601 2026-04-30T00:00:00+00:00. Zero production code changes. Closes parity gap surfaced by the D-302 CI rig finally executing end-to-end after D-308 unblocked the migration cascade. 6-commit arc on PR #2 (ea89f69 → a9d5d21 → 4c22082 → beacde4 → ffefa7c → D-310 close-out). Two new WOW patterns: pg wire format ≠ PostgREST; diagnostic discipline (Jest --ci suppresses console.log, throw-based wins; never bundle diagnostic removal with the fix). Tag v2.0.3 cut at PR #2 squash-merge.",
+      "completed": "2026-05-07",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-309",
+      "title": "EOS 2026-05-06 + SOS 2026-05-07 — paper trail for the day TD-CI-SCHEMA-BASELINE-PROMOTE shipped",
+      "desc": "Captures the 6-iteration arc on PR #1, the WOW pattern catalog as durable output, and the parity divergence as the rig working as designed (now filed as TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE 🔴). SOS for next session points priority #1 at the parity TD with bounded scope (print canonical strings, identify diverging side, adapter fix or BL-136 hotfix #5). Carries forward priorities #2–#5 from SOS-2026-05-06 unchanged (IT/CH source registries, CH multi-language ADR, MCP § 11 verification, optional 🟡/🟢 backlog TDs). No tag — v2.0.2 already cut at the D-308 merge commit edb6041.",
+      "completed": "2026-05-06",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-308",
+      "title": "TD-CI-SCHEMA-BASELINE-PROMOTE — real pg_dump baseline + 31 migrations made idempotent (CLOSES TD)",
+      "desc": "Pivoted from per-table migrations to dump-and-sweep. New baseline: 324K real pg_dump of staging public schema (103 tables, was 7.9K hand-crafted stub) + 4 PG15 compat fixes (restrict/unrestrict, transaction_timeout, CREATE SCHEMA public, extensions.\u003cfunc\u003e requalification). 31 migrations swept for idempotency across 4 guard patterns (mechanical CREATE TABLE/INDEX/POLICY/TRIGGER/ADD COLUMN + DO-block guards for schema-drift cases like documents.uploaded_at rename, compliance_rules.scope removal, property_viewings source-table drop, RAISE EXCEPTION on missing precondition). 6-iteration arc on feature branch — primary Apply Supabase migrations CI step ✅ green from relation \"deals\" does not exist (red since 2026-04-30, CI #590+). New TD spawned: TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE 🔴 (parity test now running and detecting real JS↔SQL hash divergence — exactly what D-302's CI rig was designed to surface, working as intended). New WOW § \"Migrations are idempotent by default\" codifies the 6 patterns + 6 DO-block guard patterns + refresh workflow. New scripts/refresh-ci-baseline.sh (renamed from session-only dump.sh). PR #1 awaits Will's merge decision; .old-stopgap baseline preserved per Commandment #6. No tag cut today — Will tags after merge per Commandment #7.",
+      "completed": "2026-05-06",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-307",
+      "title": "EOS 2026-05-05 — paper trail + next-session SOS",
+      "desc": "Long session arc closing: BL-133 + D-302/303/304/305/306. Documentation Governance Check moved 🔴 → ✅. Migration drift remains 🔴 (TD-CI-SCHEMA-BASELINE-PROMOTE, escalated 🔴, scheduled next session #1 — pre-AWS-migration blocker). Next-session priority list at docs/sessions/SOS-2026-05-06.md. No tag cut today — v2.0.1 already anchors the docs:check window. Pure paper trail.",
+      "completed": "2026-05-05",
+      "tag": "ai"
+    },
     {
       "id": "D-283",
       "title": "BG-84 — P0 RLS cross-tenant data leak fixed (CLOSES BG-84)",
@@ -4201,6 +4261,51 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-05-07",
+      "title": "D-310 — TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE 🔴 closed. 6-commit investigation arc on PR #2 (td/compliance-fingerprint-parity-investigate): ea89f69 console.log diagnostic (suppressed by Jest --ci); a9d5d21 throw-based diagnostic (surfaced cause #1: pg returns Date objects, JS s() does toString()); 4c22082 first fix attempt — pg type parsers as pass-through + diagnostic removed (incomplete fix; round-trip rebuilding diagnostic); beacde4 re-add diagnostic (surfaced cause #2: pg native format ≠ ISO 8601); ffefa7c format-converting type parser (CI green); D-310 (this commit) close-out paperwork. Two genuine root causes, both in test rig — zero production code changes. Tag v2.0.3 cut at PR #2 squash-merge. New WOW patterns added to § Database parity tests: pg wire format ≠ PostgREST; diagnostic discipline (throw-based diagnostics; never bundle removal with fix).",
+      "decisions": "Validation event, not regression: D-302 CI rig surfaced a real divergence on shipped code as designed. Investigation arc paid the bill TD-COMPLIANCE-FINGERPRINT-CI-PARITY anticipated. Process gap noted in EOS reflection: package.json was not bumped to 2.0.2 in D-309 close-out (tag v2.0.2 exists pointing at D-308 merge but package.json lagged at 2.0.1). Path A: today's bump goes 2.0.1 → 2.0.3, skipping 2.0.2 since the tag for that version already points at D-308 merge. New WOW one-liner under § End-of-Session Tag Protocol: bump package.json.version BEFORE cutting the tag."
+    },
+    {
+      "date": "2026-05-06",
+      "title": "D-309 — EOS 2026-05-06 + SOS 2026-05-07 paper trail. EOS doc at docs/sessions/EOS/EOS-2026-05-06.md distills the day: D-308 shipped, Apply Supabase migrations CI step ✅ green (first time since 2026-04-30), TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE 🔴 escalated. 6-iteration arc summarized one-line per iteration. WOW § \"Migrations are idempotent by default\" cited as the durable artifact. Honest reflection: 3 things Will did right (premise check at SOS open, bundled iterations, splitting 007 dev-loop fix) + 1 lost-time item (hostname-paste detour). SOS doc at docs/sessions/SOS-2026-05-07.md ranks priority #1 as parity divergence investigation (bounded 2-4 hrs); priorities #2-#5 carry forward from SOS-2026-05-06 unchanged. No tag — v2.0.2 already cut at the D-308 merge.",
+      "decisions": "The rig caught divergence on real production-shipped code — that's the system's first real validation event, not a regression. Hotfix #4 was the cost paid in production once; from v2.0.2 forward, the rig catches in CI before deploy. SOS priority #1 framing matters: investigate which side is diverging (3 candidate causes catalogued in ROADMAP TD entry), don't pre-commit to \"this is BL-136 hotfix #5.\" May close trivially as a pg-vs-PostgREST adapter fix in tests/unit/__helpers__/db.ts."
+    },
+    {
+      "date": "2026-05-06",
+      "title": "D-308 — TD-CI-SCHEMA-BASELINE-PROMOTE closed via pg_dump baseline + 31-migration idempotency sweep. 6-iteration arc on PR #1 (feature branch td/ci-schema-baseline-promote). Pivoted from per-table migrations to dump-and-sweep: replaced 7.9K hand-crafted stub baseline with 324K real pg_dump of staging public schema (103 tables); applied 4 PG15 compat fixes to the dump (restrict/unrestrict, transaction_timeout, CREATE SCHEMA public, extensions.\u003cfunc\u003e requalification). Made 31 migrations idempotent across 4 guard patterns: mechanical CREATE TABLE/INDEX/POLICY/TRIGGER/ADD COLUMN (case-insensitive), DROP CONSTRAINT IF EXISTS before ADD CONSTRAINT (no IF NOT EXISTS form for constraints), DO-block column-existence probes for schema-evolved cases (documents.uploaded_at, compliance_rules.scope, property_viewings), RAISE EXCEPTION → RAISE NOTICE; RETURN; for missing-precondition migrations (007). Iteration arc: (1) extensions.\u003cfunc\u003e stripped wrong → re-qualify with public. (2) (3) documents column-rename guards (4) dss_*_check ADD CONSTRAINT (5) BL-87 sister files lowercase-create case missed by initial sed (6) 11 ADD CONSTRAINTs across bl116/bl137/bl133. CI's Apply Supabase migrations step ✅ green from red-since-2026-04-30. New TD spawned and tagged 🔴: TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE (BL-136 hotfix #4 parity test now running and detecting real JS↔SQL hash mismatch on 2 of 3 fixtures — exactly what D-302 was designed to surface). New WOW § \"Migrations are idempotent by default\" codifies 6 mechanical patterns + 6 DO-block guard patterns + refresh workflow. New scripts/refresh-ci-baseline.sh (renamed from session-only dump.sh). PR #1 awaits Will's merge. .old-stopgap preserved per Commandment #6. No tag — Will tags after merge.",
+      "decisions": "Two methodological wins: (a) \"bundle confirmed-failing siblings when same root cause + concrete grep evidence\" — used in iteration 5 (BL-87 lowercase pair) and iteration 6 (3 ADD CONSTRAINT files). Saves CI roundtrips without speculating. (b) \"Strict per-migration on first failure, then bundle\" — concession to the iteration cap reality without sacrificing rigor. Lesson codified in WOW: every future migration is idempotent against post-application state by default; CI clean-slate replay is the test. The fingerprint divergence surfacing in Run unit tests is feature, not bug — the very class of regression D-302's CI rig was instrumented to catch, doing its job before production."
+    },
+    {
+      "date": "2026-05-05",
+      "title": "D-307 — EOS 2026-05-05 — paper trail + next-session SOS. Long session arc closing: 8 commits + 1 tag (v2.0.1) + 3 TDs closed (TD-DATA-COUNTRY-CODE-COLLISION value-half via BL-133, TD-COMPLIANCE-FINGERPRINT-CI-PARITY 🔴 via D-302, TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE via D-305+D-306) + 3 TDs filed/escalated (TD-LEGACY-PUBLIC-USERS-CLEANUP 🟢, TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT 🟡, TD-CI-SCHEMA-BASELINE-PROMOTE escalated 🟡 → 🔴). Strategic ship: BL-133 closes value-collision half of country-code TD and structurally unblocks BL-131 (IT) + BL-132 (CH). CI infrastructure arc: D-302 stood up Local Supabase in CI for JS↔SQL fingerprint parity; D-303 + D-304 hotfix iterations got the rig green; D-305 paid down 16 unabsorbed tickets across 4 architecture docs; D-306 installed EOS Tag Protocol + cut v2.0.1. Discoveries: 5-day silent CI red since 2026-04-30 commit e2b65ef (Vercel deploys masked it); ~10 production tables created outside migration history (orphan tables — surfaces as relation \"deals\" does not exist in CI clean-slate replay); public.users legacy table with 7 inert rows; seed-eu-agencies writes English country names. Open at end of session: CI's Apply migrations step still 🔴 (TD-CI-SCHEMA-BASELINE-PROMOTE — next session priority #1, ~4-6 hours via pg_dump-based baseline). Next-session priority list filed in docs/sessions/SOS-2026-05-06.md. No tag cut today — v2.0.1 (cut in D-306 at dc2ced7) still anchors the docs:check window correctly. Pure paper trail commit.",
+      "decisions": "Lessons codified in WAYS-OF-WORKING: open every red CI within the same session (Vercel deploys independently and is not a substitute); EOS Tag Protocol mandatory at every functional EOS; schema baselines need real migrations, not stubs (the D-302 stopgap is filed for promotion under TD-CI-SCHEMA-BASELINE-PROMOTE). Pattern that emerged: hotfix counter is an honest signal — D-302 needed 2 hotfixes (D-303 image, D-304 CASCADE) before the rig was actually green; that's a fingerprint-CI-parity-shaped problem (CI rig touches infrastructure across image + migration + auth shim layers, drift can lurk in any). Next bigger CI rig change should anticipate hotfix-style iteration."
+    },
+    {
+      "date": "2026-05-05",
+      "title": "D-306 — EOS Tag Protocol installed + cut v2.0.1 (closes trigger-compliance gate). scripts/docs-check.mjs defaults --since to most-recent-tag; the repo had no tags, so trigger-compliance window kept anchoring at 90588fd (BG-78 install) and accumulating violations across sessions. Bumped package.json 2.0.0 → 2.0.1, cut annotated tag v2.0.1 at HEAD (post-D-305 commit 69e9c50), pushed via git push --tags. New WAYS-OF-WORKING § End-of-Session Tag Protocol making semver tagging mandatory at every EOS going forward. Closes the trigger-compliance half of TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE structurally (by tagging) rather than via script change — third path the TD didn't anticipate but cleaner. Full TD now CLOSED (debt-ceiling half closed by D-305, trigger-compliance half by D-306). CI's Documentation Governance Check step now fully green; Apply migrations step still red — separate fight (TD-CI-SCHEMA-BASELINE-PROMOTE).",
+      "decisions": "Patch-bump rationale: D-302/303/304/305/306 are CI rig + paper trail + tooling — no user-facing change, no schema breaking change, so 2.0.1 not 2.1.0. Bump rules now codified in WOW: patch (default) / minor (new agent or admin surface) / major (breaking). The structural fix for the trigger-compliance gate aligns with how docs/check.mjs was already designed — tag-anchored windows; we just hadn't been tagging. Side effect: future sessions accumulate trigger-compliance violations against this tag if the rule is violated within the session — protocol prevents cross-session accumulation, doesn't absolve future commits."
+    },
+    {
+      "date": "2026-05-05",
+      "title": "D-305 — Pay down docs:check debt ceiling — CI debt-ceiling check unblocked. 16 unabsorbed tickets (BG-83, BG-84, BG-85, BG-86, BG-87, BL-126, BL-127, BL-128, BL-129, BL-130, BL-133, BL-134, BL-135, BL-136, BL-137, BL-141) absorbed into 4 architecture docs (INDEX.md, multi-tenancy.md, crm.md, qa-engine.md). CI's Documentation Governance Check step has been red since 2026-04-30 commit e2b65ef because the debt-ceiling threshold (DEBT_FAIL = 8) was crossed; Vercel kept deploying the whole time so the red gate sat unobserved. Closes the debt-ceiling half of TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE by execution. Scope deviation: prompt was drafted against an 8/113 snapshot, actual state was 16/121 — absorbing only the original 8 would have left 8 unabsorbed (still failing DEBT_FAIL = 8), so all 16 were absorbed to achieve the stated goal. WAYS-OF-WORKING § Documentation Governance gained the \"open every red CI within the same session\" lesson.",
+      "decisions": "Trigger-compliance check is frozen per-commit and cannot be retroactively cleared without amending old commits (forbidden) or cutting a tag (separate decision) — the trigger-compliance half of the TD remains open. The two failure modes have different blast radius: debt-ceiling recovers in a single absorption pass, trigger-compliance must be fixed before commits land. Pattern: when shipping multi-ticket sessions, write the absorption entry in the same EOS commit that closes the ticket — don't let it accumulate."
+    },
+    {
+      "date": "2026-05-05",
+      "title": "D-304 — CI hotfix #2: CASCADE on migration 003. D-303 fixed the image; CI #618 progressed through 001 + 002, then failed at 003 with cannot drop table users because other objects depend on it (FKs from properties.user_id + conversations.user_id created by migration 001). Added CASCADE to DROP TABLE IF EXISTS public.users. Production verified clean before fix: public.users has 7 inert rows, zero FKs/views/app reads point at it; migration ran-once already so CASCADE doesn't re-execute against prod. New TD-LEGACY-PUBLIC-USERS-CLEANUP filed for the 7-row archive + DROP cleanup when convenient (~30 min, low priority).",
+      "decisions": "CI clean-slate replays expose drift between tracked migrations and live schema mutations done outside the migration history. CASCADE is the right tool when (a) the migration's intent is \"drop this and everything that depends on it\" and (b) production verification confirms no live dependents. The fix is in the migration text, not a CI-only workaround — the migration is now correct under both clean-slate and prod-state semantics. Iteration loop is real: each clean-slate replay is likely to surface another drift point until the migration cascade is fully self-consistent."
+    },
+    {
+      "date": "2026-05-05",
+      "title": "D-303 — CI hotfix: Postgres image bundle PostGIS + pgvector. D-302 first CI run (#617, commit 4548c1f) failed at Apply migrations with extension \"vector\" is not available. Root cause: vanilla postgres:15 doesn't ship pgvector; 009_listing_intelligence.sql also requires PostGIS. Swapped postgres:15 → garapadev/postgres-postgis-pgvector:15-stable (Postgres 15.13 + PostGIS 3.4.2 + pgvector 0.7.4). Drop-in replacement — same env var contract, same port mapping, same health check. Pre-existing docs:check failures (TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE) remain a separate gate.",
+      "decisions": "Fixing the migration step doesn't unblock CI overall yet — docs:check is the next gate. Defensive idempotency (Commandment #6): kept the CREATE EXTENSION IF NOT EXISTS pgcrypto; CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\" step even though the new image's auto-init may already create them — IF NOT EXISTS makes it a no-op when redundant. Image choice rationale logged in CHANGELOG D-303 + comment above image: line in ci.yml."
+    },
+    {
+      "date": "2026-05-05",
+      "title": "D-302 — TD-COMPLIANCE-FINGERPRINT-CI-PARITY closed via Option A (Local Supabase in CI). GitHub Actions now runs the JS↔SQL fingerprint parity test against a real postgres:15 service container with the full supabase/migrations/ cascade applied. New rig: tests/ci/auth-schema-shim.sql (auth.users + auth.uid/role/jwt stubs + service_role/authenticated/anon roles), tests/ci/schema-baseline.sql (orphan tables documented in DB-SCHEMA as \"Created: Outside tracked migrations\"), tests/unit/__helpers__/db.ts (describeIfDb Jest-safe gate + getTestPgClient). Two new describeIfDb blocks in tests/unit/ruleFingerprint.test.ts — JS↔SQL parity over 3 fixtures (minimal / maximal / Unicode, each BEGIN/ROLLBACK-isolated) and pg_get_function_arguments shape-drift guards for compute_rule_fingerprint + jsonb_compact. New deps: pg + @types/pg. ADR docs/adr/0001-fingerprint-ci-parity.md documents Option A vs Option B + cost analysis. New TD spawned: TD-CI-SCHEMA-BASELINE-PROMOTE (move orphan tables into proper migrations so production + CI are reproducible from one source).",
+      "decisions": "Option A wins over Option B (PostgREST RPC against staging) because investment compounds across BL-131/BL-132 + future TDs, CI doesn't depend on staging health, and shape drift is detectable. The schema baseline is a CI-only stopgap until orphan tables get real migrations. describe.skipIf is Vitest, not Jest — caught at type-check time, replaced with conditional-describe pattern. Migrations apply alphabetically with ON_ERROR_STOP=1 after the auth shim + schema baseline, so any drift between live + tracked migrations would fail CI loudly. The same pattern (describeIfDb + getTestPgClient) is reusable for any future JS↔SQL invariant test — no CI changes needed beyond appending to the auth shim or schema baseline if a new symbol is referenced."
+    },
     {
       "date": "2026-04-28 (session 2)",
       "title": "Documentation Governance Protocol installed + Big Sync. 7 tickets in one session. BG-73 PROJECT-STRUCTURE.md sync (audit + patch, 8 stale / 3 wrong / 18 gaps fixed → 901b3e0). BG-74 docs/architecture/cache.md canonical reference for BL-106 Q&A cache → 6e25b84. BG-77 read-only audit found ARCHITECTURE.md 47 days / ~790 commits stale + AGENTIC-AI-STRATEGY.md (2026-02-09) actively misleading + 2026-04-02 cross-validated v1.1 thinking trapped in Process Atlas HTML. Cross-validated docs strategy with Gemini + ChatGPT, converged on hybrid-modular: thin entry point + docs/architecture/*.md per concern, no docs/adr/, mechanical triggers, fail-loud CI. BG-78 installed Documentation Governance Protocol replacing failed Living Documentation Protocol (47 days silent drift) — new WAYS-OF-WORKING.md § Documentation Governance, PROJECT-KNOWLEDGE-MANIFEST.md, scripts/docs-check.mjs (340 lines, 3 checks), CI integration → 90588fd. BG-79 Big Sync — extracted Process Atlas HTML to docs/architecture/STRATEGY.md (392 lines verbatim), created INDEX.md + 3 skeletons (agentic.md, multi-tenancy.md, qa-engine.md), retrofitted i18n.md and cache.md headers, deleted ARCHITECTURE.md, marked AGENTIC-AI-STRATEGY.md superseded, grandfathered 77 historical tickets → d75367f. BG-79c ghost-absorption sweep — added stripTodoBlocks() pre-filter so \"Likely tickets:\" lines don't ghost-absorb, re-grandfathered 17 ghosts (one was NU-27, surfaced via docs:check failure on first run — proof the fail-loud protocol works) → 878af6f. BG-75 + BG-76 filed in backlog → 6596146. BG-82a sync PROJECT-STRUCTURE.md for today's 7 file additions + 1 deletion that BG-78 trigger map didn't catch (4f8a7af). BG-82b add docs/ + scripts/ triggers + reusable effectiveSince per-rule mechanism replacing BG-78's bootstrap hack (ccba570 + fix-up ad9e422).",
