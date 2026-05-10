@@ -137,9 +137,17 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-07';
+const LAST_UPDATED = '2026-05-10';
 const DATA = {
   "inProgress": [
+    {
+      "id": "~~BL-131~~",
+      "title": "~~Italy Sale + Rental compliance ingestion~~",
+      "desc": "CLOSED 2026-05-08 → D-311 (cuts v2.0.4). 55 country-layer IT compliance rules (created_via='ingestion', country_code='IT') seeded from Agenzia delle Entrate / Notariato / Normattiva / MIMIT — 28 sale (12 doc + 4 fee + 4 tax + 6 legal + 2 agent) + 27 rental (8 doc + 3 fee + 8 legal + 3 deposit + 2 registration + 3 agent). New IT Sale (8 stages, locked: compromesso/rogito/post_rogito) + IT Rental (5 stages, locked: dossier_conduttore/contratto_locazione/registrazione) workflow templates with name/canonical-stage encoding (no deal_type column on this schema). Idempotency marker [seed:it-compliance-v1] in description; --dry-run / --force / --rollback / --scope=sale",
+      "files": "rental",
+      "tag": "compliance",
+      "added": "all flags. Mirrors seed-fr-compliance.mjs 1:1. Phase 0 STOP caught 8 spec-vs-schema divergences in v1 of the CC prompt before any DB write — v2 of the prompt mirrored the live schema exactly, retained the original spec for paper trail with a § 16 reality amendment. Compliance engine (BL-130) unchanged — engine still forces ingested rules to info-only severity until BL-136 admin acceptance. New shared util scripts/lib/strip-markdown-links.{cjs,mjs} extracted from FR seed (canonical CJS + ESM shim — works around ts-jest's CJS-default static-import path on .mjs); FR seed refactored to import. 7 unit tests green. CC-prompt deviations at execution time: v2 prompt assumed vitest (project uses jest — adapted globals); v2's .mjs-only helper unimportable by ts-jest in CJS mode (added .cjs canonical + .mjs shim). TDs filed: TD-COMPLIANCE-IT-PRIMA-CASA-FOLLOWUP 🟡, TD-COMPLIANCE-IT-REGIONS 🟢, TD-COMPLIANCE-IT-OFF-PLAN 🟢, TD-COMPLIANCE-IT-CASS-CASE-LAW 🟢, TD-SPEC-DB-SCHEMA-CROSS-CHECK 🔴 (second occurrence after BL-136). Unblocks BL-132 (CH)."
+    },
     {
       "id": "~~BG-84~~",
       "title": "~~P0 RLS cross-tenant leak — ai_action_cards + agent_daily_plans~~",
@@ -359,12 +367,140 @@ const DATA = {
       "added": "2026-04-30"
     },
     {
-      "id": "TD-COMPLIANCE-CATEGORIES",
+      "id": "🔴 TD-COMPLIANCE-CATEGORIES",
       "title": "Extend compliance_rules.category CHECK to add first-class taxonomy",
-      "desc": "BL-130 squeezed FR ingested rules into the existing CHECK allowlist (documentation, licensing, disclosure, financial, process, quality, communication) with these forced mappings: legal/timing rules → process, tax rules → financial, security_deposit rules → financial, agent obligations → licensing. This works but conflates real-estate-specific concepts under generic buckets — e.g. a tax rule and a security-deposit rule both end up as financial, and procedural rules of law (cooling-off period, DIA) sit in process next to internal workflow rules. Plan: once BL-131 (IT) and BL-132 (CH) are seeded and we can see the full cross-country category usage pattern, propose a CHECK extension adding legal, tax, and possibly security_deposit as first-class categories, then re-bucket the FR rows in a follow-up migration. Not urgent — info-only via created_via='ingestion' means no user-facing bucket leakage today. Sister ticket: BL-141 (closed 2026-05-01) was the same flavor of \"ingestion data quality\" tech debt — markdown auto-link syntax baked into source_* fields, fixed via REGEXP_REPLACE migration + seed-script defensive helper. Both belong to the same lineage: spec-text-into-DB issues that surface only after the first live seed and need a small follow-up migration to clean.",
-      "files": "compliance_rules (CHECK), scripts/seed-fr-compliance.mjs allowlist, FR rule re-bucket migration",
+      "desc": "Escalated 🟡 → 🔴 on 2026-05-08 with BL-132 — now seen across 3 countries (FR/IT/CH). BL-130 squeezed FR ingested rules into the existing CHECK allowlist (documentation, licensing, disclosure, financial, process, quality, communication) with these forced mappings: legal/timing rules → process, tax rules → financial, security_deposit rules → financial, agent obligations → licensing. This conflates real-estate-specific concepts under generic buckets — e.g. a tax rule and a security-deposit rule both end up as financial, and procedural rules of law (cooling-off period, DIA) sit in process next to internal workflow rules. With BL-132 (CH), AML rules and Lex Koller licensing rules also bucket under licensing alongside agent-obligations — the bucket is overloaded. Plan: propose CHECK extension adding legal, tax, security_deposit, and possibly aml as first-class categories; re-bucket FR/IT/CH rows in a follow-up migration. Not urgent — info-only via created_via='ingestion' means no user-facing bucket leakage today, but the SQL drift across 3 countries is now substantial enough to warrant treatment before BL-138 (cantonal) lands. Sister ticket: BL-141 (closed 2026-05-01).",
+      "files": "compliance_rules (CHECK), seed scripts allowlists, FR/IT/CH rule re-bucket migration",
       "tag": "comms",
       "added": "2026-05-01"
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-CH-CANTONAL",
+      "title": "BL-138 — CH cantonal-layer compliance ingestion deferred from BL-132",
+      "desc": "Filed 2026-05-08 with BL-132. Federal layer is live; cantonal rules (rate-setting, formular requirements, GEAK/CECB applicability) are the next deliverable. ADR-0002 v3 selectively reserves Option C (JSONB column with parallel URLs) for the cantonal layer because cantonal sources are non-mechanical (e.g. Fribourg BDLF, Geneva Bg, Vaud RSV). Wave 1 cantons recommended: ZH, BE, GE, VD, TI; later waves: FR-canton, VS, GR. Region-layer tables already populated by BL-132 with ISO CHECK constraints.",
+      "files": "new scripts/seed-ch-cantonal-compliance.mjs, compliance_rules.region_code rows",
+      "tag": "compliance",
+      "added": "2026-05-08"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-CH-TENANCY-RENT-REVIEW",
+      "title": "Tenancy rent-review rules tied to federal reference interest rate",
+      "desc": "Filed 2026-05-08 with BL-132. Engine doesn't currently support rate-tied triggers — would need a new condition type that reads from a federal reference interest-rate feed and recomputes when the rate moves. Not blocking; deferred. Severity LOW.",
+      "files": "engine condition types, federal reference-rate ingestion",
+      "tag": "core",
+      "added": "2026-05-08"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-CH-BGE-CASE-LAW",
+      "title": "Bundesgericht case law beyond high-impact tenancy precedent",
+      "desc": "Filed 2026-05-08 with BL-132. Federal Supreme Court (BGE) decisions occasionally clarify CO/ZGB articles in ways that affect compliance interpretation (e.g. abusive-rent calculation methods). Build process for monitoring + selective ingestion deferred. Severity LOW.",
+      "files": "content effort, possibly new case_law table",
+      "tag": "compliance",
+      "added": "2026-05-08"
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-CH-FEDLEX-CI-SMOKE",
+      "title": "CI smoke test: fetch Fedlex URL with each locale, assert 2xx",
+      "desc": "Filed 2026-05-08 with BL-132. The Fedlex URL adapter assumes parallel `/de",
+      "files": "/fr",
+      "tag": "core",
+      "added": "/it"
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-CH-PROPERTY-CANTON-LANG-OVERRIDE",
+      "title": "Property-canton language override in URL adapter",
+      "desc": "Filed 2026-05-08 with BL-132. Scenario: Geneva (FR-speaking) agent selling a Zurich (DE) property — agent UI is FR but property is in DE-speaking jurisdiction; per BL-138 we may want the source URL to default to DE for that property. Deferred until BL-138 ships canton context to the adapter. The current adapter doesn't have property-canton in its signature; the override is layered on top.",
+      "files": "getSourceUrlForLocale signature extension, BL-138 canton context plumbing",
+      "tag": "ux",
+      "added": "2026-05-08"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-CH-AML-REFORM-MONITOR",
+      "title": "Monitor GwG reform direction (CHF 100k cash threshold under-scopes future)",
+      "desc": "Filed 2026-05-08 with BL-132. Both ChatGPT and Gemini noted the CHF 100k cash threshold may be tightened or replaced by a transaction-volume threshold in upcoming GwG reform proposals. The CH-BOTH-AML-COMPLEX-STRUCTURE-001 rule (newly added in v2 spec) partially addresses this by treating opaque structures as triggering Abklärungspflicht regardless of cash threshold, but if the headline number changes we'll need to re-version the rule and notify accepted orgs via BL-136 law_update flow. Severity LOW; quarterly review.",
+      "files": "compliance_rules re-version, BL-136 notification",
+      "tag": "admin",
+      "added": "2026-05-08"
+    },
+    {
+      "id": "🟢 TD-DATA-AE-REGION-CODE-CANONICALIZATION-COMPLETE",
+      "title": "(paper-trail) BL-133's value-collision lineage now fully closed at both country and region levels",
+      "desc": "Filed 2026-05-08 with BL-132. Phase 6 ops surfaced 32 UAE Dubai rows in compliance_rules with non-ISO region_code ('Dubai' × 7, 'DXB' × 25) plus 1 row in workflow_templates ('DXB'); cleaned to canonical 'AE-DU' (ISO 3166-2:AE for Dubai emirate) before the BL-132 region_code CHECK constraint could land. BL-133 (D-301, 2026-05-05) closed the country-code half of TD-DATA-COUNTRY-CODE-COLLISION by canonicalizing 'UAE' → 'AE' across 5 tables; the region-code half was missed at the time. With this inline cleanup + the new compliance_rules_region_code_iso_format + workflow_templates_region_code_iso_format CHECK constraints, the lineage is now fully closed at both layers. Paper-trail TD; nothing to do; close on next housekeeping pass.",
+      "files": "(no action)",
+      "tag": "compliance",
+      "added": "2026-05-08"
+    },
+    {
+      "id": "🟡 TD-EOS-UNCOMMITTED-ARTIFACT-CHECK",
+      "title": "EOS protocol does not currently fail when spec/ADR/SOS files reference paths outside the repo (e.g. ~/Downloads/claude/)",
+      "desc": "Filed 2026-05-09 (BL-138 session start, surfaced via D-313). Should grep all docs touched in the session for cross-references that exit the repo and flag them at EOS time. The BL-132 session 2026-05-08-1 SOS explicitly noted \"saved in ~/Downloads/claude/, not committed to repo this session\" — a self-acknowledged WOW violation that wasn't caught at EOS, and the file then disappeared between sessions. Cost-of-fix: ~30 min — wire a grep step into the EOS protocol checklist in WAYS-OF-WORKING.md (canonical EOS Definition of Done). Cost-of-not-fixing: every session that creates research artifacts is at risk of dropping them.",
+      "files": "WAYS-OF-WORKING.md § EOS protocol, optional scripts/audit/eos-uncommitted-artifact-check.sh",
+      "tag": "ai",
+      "added": "2026-05-09"
+    },
+    {
+      "id": "🟡 TD-AUTH-SECDEF-SEARCHPATH",
+      "title": "Audit all SECURITY DEFINER functions for SET search_path + schema-qualification",
+      "desc": "Filed 2026-05-10 with D-315. Mid-session bug: public.sync_agent_profile_email() was created without SET search_path = public, pg_temp and used unqualified UPDATE agent_profiles .... GoTrue's session search_path didn't include public, so admin createUser() fired the trigger and the unqualified table reference failed name resolution with relation 'agent_profiles' does not exist. Latent since function creation. Hotfixed live in Supabase + saved as migration 20260510_eos_secdef_searchpath_hotfix.sql for CI replay parity. Audit query in WAYS-OF-WORKING.md § SECURITY DEFINER Function Discipline. Cost-of-fix: ~1-2h — run audit query, identify functions with NULL proconfig or missing search_path, single migration adding SET search_path = public, pg_temp + schema-qualifying table refs (same pattern as the hotfix). Cost-of-not-fixing: every SECURITY DEFINER function called from an unusual search_path context can latent-fail; bug surface includes any caller that doesn't manually set search_path before invoking.",
+      "files": "pg_proc / SECURITY DEFINER functions in public schema, single follow-up migration",
+      "tag": "comms",
+      "added": "2026-05-10"
+    },
+    {
+      "id": "🟡 TD-SEED-LISTUSERS-PAGINATION",
+      "title": "auth.admin.listUsers() defaults to perPage=50, breaks \"already-registered\" lookup on databases with \u003e50 users",
+      "desc": "Filed 2026-05-10 with D-315. scripts/seed-eu-agencies/seed-orgs-users.mjs and other seed scripts use auth.admin.listUsers() with no opts; production auth.users is now well past 50 rows, so the lookup quietly misses recent users and the seed re-attempts createUser() on already-existing emails (silent failure → mismatched org_member rows). Already mitigated in scripts/bl138/seed-bl138-mcp-test-orgs.mjs via auth.admin.listUsers({ perPage: 1000 }). Cost-of-fix: ~15-30 min — patch each seed script that calls listUsers to either (a) pass { perPage: 1000 } if expected user count \u003c1000, or (b) iterate pages until empty result. Cost-of-not-fixing: every BL-EU-SEED re-run silently misses recent users and the \"already-registered\" branch goes dead.",
+      "files": "scripts/seed-eu-agencies/seed-orgs-users.mjs, any other seed script that calls auth.admin.listUsers()",
+      "tag": "comms",
+      "added": "2026-05-10"
+    },
+    {
+      "id": "🟡 TD-AUTH-IDENTITIES-FK-CASCADE",
+      "title": "auth.identities.user_id may lack ON DELETE CASCADE; orphan identities possible when auth.users rows are deleted",
+      "desc": "Filed 2026-05-10 with D-315 (surfaced during this session's iteration debugging — turned out to be a false positive caused by case-sensitivity, but the cascade question stands). Verify whether auth.identities.user_id FK has ON DELETE CASCADE; if not, deleting an auth.users row leaves orphan rows in auth.identities that block subsequent createUser() calls for the same email (auth-side identity conflict). Cost-of-fix: ~15 min — query FK definition, add CASCADE if missing via ALTER TABLE auth.identities DROP CONSTRAINT ... ADD CONSTRAINT ... ON DELETE CASCADE. Cost-of-not-fixing: any operator-driven user delete that doesn't hand-clean auth.identities will silently corrupt the auth-side state for that email.",
+      "files": "auth.identities FK constraint, single follow-up migration",
+      "tag": "comms",
+      "added": "2026-05-10"
+    },
+    {
+      "id": "🟢 TD-DEBUG-CASE-INSENSITIVE-EMAIL",
+      "title": "Always use ILIKE or LOWER() when searching email columns; PostgreSQL LIKE is case-sensitive but Supabase Auth normalizes emails to lowercase",
+      "desc": "Filed 2026-05-10 with D-315. Cost ~10-15 min mid-session chasing a phantom \"user doesn't exist\" state when users were actually present — diagnostic query used LIKE 'will+AG-CH-%' (uppercase) but auth.users.email stored will+ag-ch-% (lowercase). Already documented in WAYS-OF-WORKING § Supabase email case-normalization mismatch (D-315 patch). Cost-of-fix: none beyond the WOW patch already in this commit. Cost-of-not-fixing: repeated discovery of this gotcha in future sessions.",
+      "files": "WAYS-OF-WORKING.md § Supabase email case-normalization mismatch (already patched D-315)",
+      "tag": "comms",
+      "added": "2026-05-10"
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-CH-LEGACY-MANUAL-RULE",
+      "title": "Pre-existing CH_CANTONAL_TAX_CLEARANCE (created 2026-03-15, created_via='manual') coexists with BL-132's 46 ingested federal rules; total federal CH count is 47, not 46",
+      "desc": "Filed 2026-05-10 with D-315 (sidebar finding during MCP step 11 verification). One pre-existing manual rule predates BL-132 entirely and has no clear ownership or citation. The 46-vs-47 question goes away when filtered by created_via='ingestion' — BL-132 still ingested exactly 46. Decision pending: deprecate the pre-BL-132 manual rule (it has no source attribution, doesn't fit any of the BL-132 applicability tiers cleanly), or accept the 47-rule coexistence and add it to the documentation. Cost-of-fix: ~30 min if deprecating (audit any orgs that have accepted it via BL-136, then DELETE + record in CHANGELOG) or ~15 min if accepting (just document). Cost-of-not-fixing: persistent 46-vs-47 confusion in any future rule-count assertion. Not blocking BL-138 wave 2.",
+      "files": "compliance_rules table, single rule by code CH_CANTONAL_TAX_CLEARANCE",
+      "tag": "admin",
+      "added": "2026-05-10"
+    },
+    {
+      "id": "🟢 TD-MCP-AUTH-TOKEN-INJECTION-PATTERN",
+      "title": "Document the reusable MCP auth + token injection pattern for read-only verification work",
+      "desc": "Filed 2026-05-10 with D-315 — already documented in WAYS-OF-WORKING § MCP Verification Patterns (D-315 addition). Logging in via direct /auth/v1/token?grant_type=password API call + writing the auth payload to housezoom-auth localStorage gives a full app session that the supabase-js client picks up; combined with direct /rest/v1/... queries from inside the page (using apikey + Authorization: Bearer headers), 14/14 verification steps ran in ~5 minutes vs. ~45 min of form-driving. Cost-of-fix: none beyond the WOW patch already in this commit. Cost-of-not-fixing: future MCP work re-discovers the pattern from scratch.",
+      "files": "WAYS-OF-WORKING.md § MCP Verification Patterns (already patched D-315)",
+      "tag": "infra",
+      "added": "2026-05-10"
+    },
+    {
+      "id": "🟢 TD-BL138-CANTON-LISTENER-WIRE-IN",
+      "title": "Canton-change listener (canton-change-listener.ts) is shipped and fully tested but not wired to a caller",
+      "desc": "Filed 2026-05-09 with BL-138 D-314. The listener onCantonChange(orgId, oldCanton, newCanton, hooks) exists in src/features/compliance/services/canton-change-listener.ts with 5 unit tests, but no production site calls it because no org-update API/UI exists in the repo today. BL-119 (canton-based default language) introduces the org-update settings UI and is the canonical wire-in ticket. Cost-of-fix: 1-line change in BL-119's settings handler (call await onCantonChange(orgId, oldCanton, newCanton, { onChange: ... }) after the canton UPDATE persists). Cost-of-not-fixing: canton changes don't trigger compliance re-validation until BL-119 ships. Production impact: none — no org has changed canton in production (the column was only populated for Zürich Premium Realty='CH-ZH' by BL-132 Phase 6 ops).",
+      "files": "src/features/compliance/services/canton-change-listener.ts, future BL-119 settings handler",
+      "tag": "compliance",
+      "added": "2026-05-09"
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-METADATA-COLUMN",
+      "title": "compliance_rules has no metadata JSONB column despite spec assumptions",
+      "desc": "Filed 2026-05-09 with BL-138 D-314 Phase 8. BL-138 spec § 6.2 said \"extend compliance_rules.metadata JSONB (existing)\" with staleness_review_due_at for the 8 Lex Koller cantonal rules and description_i18n for bilingual (BE) cantons. Live PostgREST schema introspection confirmed there is no metadata column — the seed's buildRow no longer attempts to write it. Rule data still carries metadata_extra and description_i18n for future use. Add column (metadata JSONB NOT NULL DEFAULT '{}') + migrate the 60 cantonal rows to populate the staleness flag (8 Lex Koller rules) and the BE description_i18n (10 rules). Required before Lex Koller staleness alerts (Q4 2026; staleness_review_due_at='2026-12-31'). Cost-of-fix: ~1h (small idempotent migration + UPDATE pass + future-proof tests). Cost-of-not-fixing: Lex Koller staleness review can't be auto-flagged when the date passes; BE bilingual descriptions can't render in FR locale (UI falls back to canon-primary text).",
+      "files": "compliance_rules schema (new column + idempotent migration), scripts/bl138/seed-ch-cantonal-compliance.mjs (re-enable metadata in buildRow), follow-up UPDATE migration to populate the 60 cantonal rows",
+      "tag": "compliance",
+      "added": "2026-05-09"
     },
     {
       "id": "~~BL-130~~",
@@ -749,6 +885,13 @@ const DATA = {
       "desc": "CLOSED 2026-04-26 — wire scope shipped. 5 waves over BG-50X foundation: 529 strings wired across 75+ files. Coverage 80.2% → 94.1% (+13.9pp). Missing rows 753 → 222 (~50 BG-60 service-layer deferred + ~170 audit-noise to be cleaned via BG-59 follow-up). MCP-verified 0 regressions. D-numbers: D-253 (BG-59 script) + D-254..D-258 (BG-50X 4b/4c/5b/audit-grouping) + D-259..D-263 (W1-W5).",
       "tag": "admin",
       "added": "docs/specs/BG-50-Spec-Agent-Context-Propagation.md"
+    },
+    {
+      "id": "~~BL-132~~",
+      "title": "~~Switzerland Sale + Rental compliance ingestion~~",
+      "desc": "CLOSED 2026-05-08 → D-312 (cuts v2.1.0). 46 federal-layer Swiss compliance rules (created_via='ingestion', country_code='CH') seeded from Fedlex / Bundesamt für Justiz / ESTV / BFE / SVIT — 22 sale + 20 rental + 4 AML across 3 applicability tiers (39 federal hard / 6 federal_base_canton_dependent / 1 market_practice). New CH Sale (8 stages, 4 locked: lex_koller_check / lex_koller_authorization / oeffentliche_beurkundung / grundbucheintrag) + CH Rental (5 stages, 3 locked: mietdossier / mietvertrag / kaution) workflow templates. ADR-0002 v3 implemented: src/features/compliance/adapters/fedlex-url.ts with runtime locale derivation; English flagged as informational_only per PublA art. 14. Schema: new compliance_rules.applicability column (4-tier enum CHECK), new organizations.canton column (ISO 3166-2:CH CHECK), CHECKs added to existing region_code columns on compliance_rules + workflow_templates. Engine: APPLICABILITY_ALWAYS_INFO set forces info+non-blocking on federal_base_canton_dependent + market_practice even after BL-136 acceptance. UI: conditional badges for the 2 new applicability tiers + Fedlex informational_only badge + 4 new i18n keys × 4 locales. Cross-validated with ChatGPT + Gemini before lock — both surfaced federal/cantonal leakage; v2 reclassified 6 rules + added 4 new rules (Lex Koller declaration rename, AML structure clarification, deposit release, initial-rent challenge). Spec v2.1 Phase 0 reality check caught region_code already existed; pre-empted Phase 0 STOP. Inline Phase 6 incidents fixed: UAE region_code legacy values (Dubai/DXB → AE-DU); workflow_templates.locked_steps is jsonb not text[] (3-spot fix in commit 18fe44f). MCP-verified end-to-end as Hans Müller at Zürich Premium Realty (15/15 steps). Unblocks BL-138 (CH cantonal — wave 1: ZH/BE/GE/VD/TI) + BL-119 (canton-based default language).",
+      "tag": "compliance",
+      "added": "scripts/seed-ch-compliance.mjs, src/features/compliance/adapters/fedlex-url.ts, tests/unit/fedlex-url.test.ts, src/features/admin/services/complianceEngine.ts, src/features/admin/components/ComplianceRuleDetailPanel.tsx, supabase/migrations/20260508_bl132_ch_*.sql, docs/specs/BL-132-Spec-CH-Compliance-Ingestion.md, messages/{en,fr,de,it}.json, src/types/index.ts, CHANGELOG.md, FEATURE-MAP.md, DB-SCHEMA.md, WAYS-OF-WORKING.md"
     },
     {
       "id": "BL-119",
@@ -1944,6 +2087,78 @@ const DATA = {
       "files": "2026-05-06",
       "tag": "compliance",
       "added": ""
+    },
+    {
+      "id": "🔴 TD-SPEC-DB-SCHEMA-CROSS-CHECK (D-311 escalation)",
+      "title": "Specs are written against an imagined schema, not the live one — second occurrence after BL-136 hotfix #1. Filed 2026-05-08 with BL-131. v1 of the BL-131 CC prompt assumed columns (compliance_rules.deal_type, metadata, title) that don't exist on the live schema, plus 5 other CHECK / column / status divergences (workflow_templates.deal_type, published not in CHECK list, etc.). Phase 0 STOP caught all 8 before any DB write — but the cost (a second draft of a ~1,400-line CC prompt) is the bill. First occurrence: BL-136 hotfix #1 (2026-05-01) was an analogous spec/schema mismatch on a column name. Process change to evaluate: before authoring CC prompts that touch compliance_rules / workflow_templates, mandate a Phase 0 reading of tests/ci/schema-baseline.sql for the affected tables and emit the column / CHECK list inline in the spec § \"Schema invariants\". Could be folded into TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE follow-ups or live as its own WOW § Spec-vs-schema cross-check. Severity escalated 🔴 because pattern is now habitual; cost compounds with each new country (CH next).",
+      "desc": "WAYS-OF-WORKING.md § new \"Spec-vs-schema cross-check\" pattern; possibly scripts/audit/ helper that emits column/CHECK summary",
+      "files": "2026-05-08",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-IT-PRIMA-CASA-FOLLOWUP",
+      "title": "Need post-deal residency-transfer reminder mechanism for prima casa tax benefit. Filed 2026-05-08 with BL-131. The IT-SALE-TAX-REGISTRO-ROGITO-001 rule mentions \"2% prima casa with trasferimento residenza entro 18 mesi\" but there's no post-rogito follow-up that fires 12 months after deal close to remind the buyer to transfer residence. Options: (a) new compliance_action.type='reminder' with relative date offset; (b) intel_card scheduled card on deal close; (c) handled by deal stage workflow's post_completion phase + a new agent task. Severity: MEDIUM — failure to transfer residence in 18 months means buyer pays 9% standard registry tax retroactively (significant client liability if the agent forgets to remind).",
+      "desc": "compliance_rules (IT-SALE-TAX-REGISTRO-ROGITO-001 follow-up), possibly intel_cards schedule, complianceEngine.ts reminder branch",
+      "files": "2026-05-08",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-IT-REGIONS",
+      "title": "Regional / comune-level IT rules deferred. Filed 2026-05-08 with BL-131. Country-layer rules cover national obligations (TUR, Legge 431/1998, etc.) but skip regional variations: e.g. accordo territoriale rates differ per comune for canone concordato (3+2) contracts; some Lombardy / Veneto comuni have separate notice templates; ZTL/CIN tourism rentals (post-Decreto Anticipi 2024) operate at comune level. Region-layer is supported by the schema (compliance_rules.layer='region' + region_code) — content effort only. Severity: LOW — country-layer is the 80% case; region rules are signal-grade refinements. Pick up after BL-132 (CH) when we see the cross-country region usage pattern.",
+      "desc": "compliance_rules region-layer rows, source registry research per region",
+      "files": "2026-05-08",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-IT-OFF-PLAN",
+      "title": "D.Lgs 122/2005 buyer protection for off-plan sales not yet ingested. Filed 2026-05-08 with BL-131. Off-plan (acquisto su carta) requires fideiussione bancaria + assicurazione decennale; preliminare must include construction completion + delivery dates. The 55 BL-131 rules apply to existing-property sales only. Blocked on: new property.construction_status field (or computed property type) so the engine can scope these rules to off-plan deals only. Severity: LOW — off-plan is a small slice of HouseZoom's IT use case today; can be revisited when we have an IT off-plan org or seed scenario.",
+      "desc": "properties.construction_status (new column), compliance_rules rows for D.Lgs 122/2005",
+      "files": "2026-05-08",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-IT-CASS-CASE-LAW",
+      "title": "Cassazione case-law citation expansion beyond Cass. 24534/2022. Filed 2026-05-08 with BL-131. The energy-class-in-advertising rule cites Cass. Sez. II 24534/2022 — that's our only Cassazione citation across the 55 IT rules. Italian compliance often pivots on Cassazione interpretations (e.g. CIL/CILA conformity disputes, condominium spese ripartizione). Survey relevant Cassazione cases per current rule, expand source_citation where a major case has reshaped a statute's effective scope. Severity: LOW — current citations are statute-grade and defensible; case-law expansion is a quality lift, not a correctness fix.",
+      "desc": "compliance_rules IT rows' source_citation fields, source registry research",
+      "files": "2026-05-08",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "~~TD-BL136-BOOTSTRAP-COUNTRY-FLAG~~",
+      "title": "~~bl136-bootstrap-cards.mjs ignores --country= flag, hardcoded to FR~~ — CLOSED 2026-05-08 (within D-311). Surfaced during BL-131 Phase 6 when --country=IT silently ran FR scope: the parser only recognized --scope=, so --country= was dropped as an unknown arg and scopeArg defaulted to fr. Fix: parse both --country= (canonical) and --scope= (legacy alias); abort if both provided with conflicting values; default to FR if neither given; validate ISO 3166-1 alpha-2 format. Backward compat verified (no-flag and --scope=fr both reproduce prior FR output: 60 rules / 1 org / 60 skipped). Result: 55 IT cards emitted for Milano Prestige same session. No tag bump (fits inside v2.0.4).",
+      "desc": "scripts/bl136-bootstrap-cards.mjs",
+      "files": "2026-05-08",
+      "tag": "admin",
+      "added": ""
+    },
+    {
+      "id": "🟢 TD-ADMIN-COMPLIANCE-SIDEPANEL-METADATA-FETCH",
+      "title": "Admin compliance rule side panel shows literal \"Failed to fetch\" text inside the Metadati section where the Modificable / Blocco normativo / Blocking field values should render. Reproduced on IT-SALE-DOC-APE-001 and IT-SALE-DOC-VISURA-001 during BL-131 Phase 7 MCP verification (2026-05-08). Pre-existing — not introduced by BL-131; affects FR ingestion rules too. Likely a fetch failure inside ComplianceRulePanel swallowing the field render. Investigate the panel's metadata fetcher and add a graceful empty-state fallback.",
+      "desc": "src/features/admin/components/ComplianceRulePanel* (and any sub-component that fetches per-rule metadata)",
+      "files": "2026-05-08",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟢 TD-ADMIN-COMPLIANCE-SIDEPANEL-STALE-STATE",
+      "title": "After clicking Accetta / Rifiuta / Posticipa in the admin compliance rule side panel, the badge row in the panel header still shows the previous state (\"In attesa di revisione\") until the user closes/reopens the panel or navigates away. Network shows POST /api/admin/compliance/acceptance returning 200 and the parent list filter correctly recomputes (e.g. rule disappears from \"Solo in attesa\") — pure UI staleness inside the panel. Add an optimistic state update or react-query invalidation on mutation success so the panel reflects the new state immediately. Surfaced during BL-131 Phase 7 (2026-05-08).",
+      "desc": "src/features/admin/components/ComplianceRulePanel*",
+      "files": "2026-05-08",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-SEED-IT-ROLLBACK-SCOPE-FLAG",
+      "title": "`scripts/seed-it-compliance.mjs --rollback --scope=sale",
+      "desc": "rental ignores the scope filter and deletes ALL rows matching [seed:it-compliance-v1] regardless of which scope was requested. Surfaced during BL-131 Phase 8 idempotency test (2026-05-08): --rollback --scope=sale deleted 55 rows (full set) instead of the 28 sale rows. Header line correctly parses and prints scope: sale but the DELETE statement filters only by marker, not by code prefix. Fix: when --scope=sale",
+      "files": "rental is passed alongside --rollback, add AND code LIKE 'IT-SALE-%' (or IT-RENTAL-%) to the rollback filter. Same class of bug we just patched in bl136-bootstrap-cards.mjs (TD-BL136-BOOTSTRAP-COUNTRY-FLAG). Verify parallel fix needed in scripts/seed-fr-compliance.mjs — its rollback path likely has identical bug. Pre-emptive: also fix in any future seed-ch-compliance.mjs` (BL-132). Operationally rare but if anyone ever relies on partial rollback they'll silently lose rental data when meaning to rollback sale only.",
+      "tag": "compliance",
+      "added": "scripts/seed-it-compliance.mjs, scripts/seed-fr-compliance.mjs (verify), future scripts/seed-ch-compliance.mjs"
     }
   ],
   "bugs": [
@@ -2334,6 +2549,41 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-315",
+      "title": "BL-138 wave 1 Phase 9 MCP verification PASSED → v2.2.0",
+      "desc": "14/14 active steps PASS across 5 cantons (ZH/BE/GE/VD/TI). Step 15 (canton-change listener) deferred to BL-119 wire-in per spec. Test infrastructure: 4 new MCP test orgs provisioned (Berne Realty/Lac Léman Estates/Lausanne Properties/Ticino Sole Realty), 1 admin each, mirrors seed-eu-agencies/seed-orgs-users.mjs pattern. ZH covered by Hans Müller from BL-EU-SEED. Verification approach: direct DB queries through running app session via browser-side apikey + Authorization: Bearer injection (~10× faster than UI form-driving). UI-rendering checks (cantonal badge \"Region/Kritisch/Importiert\" on GE LDTR row; BE locale toggle DE↔FR URL swap via getCantonalSourceUrlForLocale) confirmed via DOM inspection. Mid-session: 1 hotfix (TD-AUTH-SECDEF-SEARCHPATH — sync_agent_profile_email() SECURITY DEFINER schema-qualification + SET search_path fix), 1 sidebar finding (47 federal CH rules not 46 — pre-existing manual CH_CANTONAL_TAX_CLEARANCE from 2026-03-15 coexists with BL-132's 46 ingestion rules; no BL-132 drift). 7 TDs filed. Spec § 10 / SOS-2026-05-09-1 priority #1 — CLOSED. Tag v2.2.0 at HEAD. Unblocks BL-138 wave 2 (FR-canton/VS/GR) + BL-119 (canton-based default language).",
+      "completed": "scripts/bl138/seed-bl138-mcp-test-orgs.mjs, supabase/migrations/20260510_eos_secdef_searchpath_hotfix.sql, docs/sessions/SOS-2026-05-11.md, CHANGELOG.md, ROADMAP.md, FEATURE-MAP.md, WAYS-OF-WORKING.md, PROJECT-STRUCTURE.md, package.json",
+      "tag": "comms"
+    },
+    {
+      "id": "D-314",
+      "title": "BL-138 — Switzerland cantonal compliance ingestion (Wave 1: ZH/BE/GE/VD/TI)",
+      "desc": "60 cantonal rules across 5 cantons (8/10/15/15/12) ingested as created_via='ingestion', layer='region', region_code='CH-XX'. 4 hard blockers (rule_type='block', severity='critical'): GE-LDTR, VD-LPPPL, VD/TI Lex Koller holiday-home quotas. 9 federal_base_canton_dependent rules (cantonal Lex Koller authority paths + tenancy reference-rate disclosure) stay info+non-blocking forever per BL-132 engine override. 8 Lex Koller cantonal rules carry metadata_extra.staleness_review_due_at='2026-12-31' (Federal Council April 2026 consultation; six-month review window). Three new cantonal Sale workflow templates (Genève/Vaud/Ticino, 9 stages each, \"Notary booking & due diligence\" canonical=pre_contract inserted between offer and pre_contract). New schema column compliance_rules.source_url_translations JSONB NOT NULL DEFAULT '{}' + GIN index implementing ADR-0002 v3 Option C; BE rules (DE+FR canton) populate the field, others leave empty. New cantonal-url.ts adapter (14 unit tests) + 7 i18n keys × 4 locales. App-layer canton-change listener shipped without wire-in (BL-119 will wire — TD-BL138-CANTON-LISTENER-WIRE-IN 🟢). TI transfer tax web-verified (DC TI site 2026-05-09): no transfer tax exists; only registration fees + capital-gains-on-real-estate. Phase 0 reality check caught spec arithmetic error (47 vs 46 federal CH count); spec amended v2.1 → v2.2 in 31b4924. Phase 6 inline incident: compliance_rules.metadata column doesn't exist (spec assumption); staleness flags drop to documentation only — TD-COMPLIANCE-METADATA-COLUMN 🟡 filed. 3 commit gates: Gate 1 schema (c64a1fe), Gate 2 adapter+engine+listener (224ded0), Gate 3 rules+UI+paper-trail (this commit). Cross-validated by ChatGPT + Gemini (spec v1 → v2 → v2.2). Phase 9 MCP verification deferred to Will + Claude desktop chat. Unblocks BL-138 wave 2+ (FR-canton/VS/GR/etc), BL-119 (canton-based default language).",
+      "completed": "2026-05-09",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-313",
+      "title": "Commit BL-132 source registry research to repo (paper-trail closeout)",
+      "desc": "Closes paper-trail gap from BL-132 session 2026-05-08-1 — research file was saved to ~/Downloads/claude/ but never committed. Recovered from another Claude session, committed to docs/audits/BL-132-ch-source-registry-research.md (189 lines, ~20KB). References from BL-132 spec + ADR-0002 + 2 SOS files now resolve. New TD filed: TD-EOS-UNCOMMITTED-ARTIFACT-CHECK 🟡 (EOS protocol should grep for cross-references that exit the repo).",
+      "completed": "2026-05-09",
+      "tag": "ai"
+    },
+    {
+      "id": "D-312",
+      "title": "BL-132 — Switzerland federal compliance ingestion (CLOSES BL-132) → v2.1.0",
+      "desc": "46 country-layer CH compliance rules across 3 applicability tiers (39 federal / 6 federal_base_canton_dependent / 1 market_practice). 22 sale + 20 rental + 4 AML cross-cutting (CH-BOTH-*). Sources: Fedlex (OR/ZGB/RPG/BewG/GwG/DSG/ZWG/StHG) + Bundesamt für Justiz / ESTV / BFE / SVIT. ADR-0002 v3 implemented via fedlex-url.ts adapter with URL API + informational_only flag for English (PublA art. 14); 14 unit tests. New CH Sale (8 stages, 4 locked) + CH Rental (5 stages, 3 locked) workflow templates. New schema: compliance_rules.applicability (NOT NULL CHECK 4-tier), organizations.canton (CHECK CH-XX); CHECKs added to existing region_code columns on compliance_rules + workflow_templates. Engine forces info+non-blocking on canton-dependent + market-practice tiers regardless of BL-136 acceptance. UI badges conditionally render for the 2 new tiers + Fedlex informational_only flag for English; 16 new i18n strings. Cross-validated with ChatGPT + Gemini — caught federal/cantonal leakage on 6 rules + Lex Koller declaration rename + AML structure clarification + 2 missing federal rules (CO 257e deposit-release, CO 270 initial-rent challenge). Spec v2.1 Phase 0 reality check caught region_code already existed (BL-129 era). Phase 6 inline fixes: UAE region_code legacy values (Dubai/DXB → AE-DU, 32 rows in compliance_rules + 1 in workflow_templates) — closes BL-133 region-code half via TD-DATA-AE-REGION-CODE-CANONICALIZATION-COMPLETE 🟢; workflow_templates.locked_steps is jsonb not text[] (3-spot fix, commit 18fe44f). MCP-verified end-to-end as Hans Müller at Zürich Premium Realty (15/15 steps green; tier counts 39/6/1 confirmed; 92 acceptance_pending intel cards emitted). Tag v2.1.0 at HEAD. Unblocks BL-138 (cantonal layer) + BL-119 (canton-based default language).",
+      "completed": "2026-05-08",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-311",
+      "title": "BL-131 — Italy Sale + Rental compliance ingestion (CLOSES BL-131) → v2.0.4",
+      "desc": "55 country-layer IT compliance rules ingested as created_via='ingestion', country_code='IT'. Seed scripts/seed-it-compliance.mjs ([seed:it-compliance-v1]) — 28 sale (12 doc + 4 fee + 4 tax + 6 legal + 2 agent) + 27 rental (8 doc + 3 fee + 8 legal + 3 deposit + 2 registration + 3 agent). Sources: Agenzia delle Entrate / Notariato / Normattiva / MIMIT. New IT Sale (8 stages, locked: compromesso/rogito/post_rogito) + IT Rental (5 stages, locked: dossier_conduttore/contratto_locazione/registrazione) workflow templates. Compliance engine unchanged (BL-130 forced info+non-blocking). Schema unchanged (BL-129+BL-130). New shared util scripts/lib/strip-markdown-links.{cjs,mjs} (canonical CJS + ESM shim; FR seed refactored to import). Phase 0 STOP discovered 8 spec-vs-schema divergences — corrected via v2 CC prompt before any DB writes; FR seed shape mirrored 1:1. MCP-verified end-to-end as Marco at Milano Prestige (8 of 8 steps). Two CC-prompt deviations applied + documented: (1) jest not vitest; (2) ts-jest CJS-default loader required .cjs + .mjs shim via createRequire. Hotfix in same session — TD-BL136-BOOTSTRAP-COUNTRY-FLAG closed inside D-311 (commit 4d7156d): scripts/bl136-bootstrap-cards.mjs --country= flag wired (canonical) alongside --scope= (legacy alias) with conflict detection + ISO format validation; 55 IT cards emitted. 3 TDs filed from Phase 7+8 observations (commit 859aad6): TD-ADMIN-COMPLIANCE-SIDEPANEL-METADATA-FETCH 🟢 (pre-existing \"Failed to fetch\" in side panel metadata), TD-ADMIN-COMPLIANCE-SIDEPANEL-STALE-STATE 🟢 (panel badge doesn't refresh after accept/reject), TD-SEED-IT-ROLLBACK-SCOPE-FLAG 🟡 (--rollback --scope= ignores scope filter; FR seed needs verification, CH seed must be pre-emptively fixed). ADR-0002 v3 committed same session (commit 4dc70f5) as architectural prereq for BL-132: Option D — single canonical Fedlex URL stored, runtime locale derivation via fedlex-url.ts adapter; zero schema impact; cross-validated with ChatGPT + Gemini. Tag v2.0.4 at commit 3421114. Unblocks BL-132 (CH).",
+      "completed": "2026-05-08",
+      "tag": "compliance"
+    },
     {
       "id": "D-310",
       "title": "TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE — CLOSED (CLOSES TD)",
@@ -4261,6 +4511,11 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-05-10",
+      "title": "D-315 — BL-138 wave 1 Phase 9 MCP green → cut v2.2.0. 14/14 active steps PASS, 1 deferred (canton-change listener gated on BL-119). 4 new MCP test orgs provisioned (Berne Realty / Lac Léman Estates / Lausanne Properties / Ticino Sole Realty) via scripts/bl138/seed-bl138-mcp-test-orgs.mjs. ZH covered by Hans Müller (BL-EU-SEED). All 5 canton logins verified via auth API. 14 verifications run via direct DB queries through running app session + 2 UI-rendering checks (cantonal badge on GE LDTR row, BE locale toggle be.ch/de/... ↔ be.ch/fr/... via getCantonalSourceUrlForLocale). Mid-session hotfix: sync_agent_profile_email() SECURITY DEFINER missing schema-qualification + SET search_path — fixed live + saved as migration. 7 TDs filed (TD-AUTH-SECDEF-SEARCHPATH 🟡, TD-SEED-LISTUSERS-PAGINATION 🟡, TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT 🟡 confirmed open, TD-AUTH-IDENTITIES-FK-CASCADE 🟡, TD-DEBUG-CASE-INSENSITIVE-EMAIL 🟢, TD-COMPLIANCE-CH-LEGACY-MANUAL-RULE 🟢, TD-MCP-AUTH-TOKEN-INJECTION-PATTERN 🟢). Sidebar: 47 federal CH rules, not 46 — pre-existing CH_CANTONAL_TAX_CLEARANCE (2026-03-15, manual) predates BL-132; no drift in BL-132 itself. Unblocks BL-138 wave 2 (FR/VS/GR cantons) + BL-119 (canton-based default language).",
+      "decisions": "2026-05-10"
+    },
     {
       "date": "2026-05-07",
       "title": "D-310 — TD-COMPLIANCE-FINGERPRINT-PARITY-TEST-DIVERGENCE 🔴 closed. 6-commit investigation arc on PR #2 (td/compliance-fingerprint-parity-investigate): ea89f69 console.log diagnostic (suppressed by Jest --ci); a9d5d21 throw-based diagnostic (surfaced cause #1: pg returns Date objects, JS s() does toString()); 4c22082 first fix attempt — pg type parsers as pass-through + diagnostic removed (incomplete fix; round-trip rebuilding diagnostic); beacde4 re-add diagnostic (surfaced cause #2: pg native format ≠ ISO 8601); ffefa7c format-converting type parser (CI green); D-310 (this commit) close-out paperwork. Two genuine root causes, both in test rig — zero production code changes. Tag v2.0.3 cut at PR #2 squash-merge. New WOW patterns added to § Database parity tests: pg wire format ≠ PostgREST; diagnostic discipline (throw-based diagnostics; never bundle removal with fix).",
