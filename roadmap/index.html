@@ -137,7 +137,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-10';
+const LAST_UPDATED = '2026-05-12';
 const DATA = {
   "inProgress": [
     {
@@ -279,9 +279,9 @@ const DATA = {
   ],
   "nextUp": [
     {
-      "id": "BL-107",
-      "title": "Seed property cleanup (deferred — plan upgrade scheduled)",
-      "desc": "Was hard deadline 2026-05-10 due to Supabase storage limit. Will is upgrading plan next week (2026-W19), removing the deadline pressure. Ticket stays open as quality work but no longer blocks.",
+      "id": "~~BL-107~~",
+      "title": "~~Seed property cleanup~~",
+      "desc": "CLOSED 2026-05-11 — Supabase Pro plan upgraded; storage limit removed. The ticket only existed because of the 2026-05-10 free-tier deadline. Quality cleanup re-emerges as a separate ticket if/when it becomes worthwhile. No code changes required.",
       "files": "Storage, seed scripts",
       "tag": "infra",
       "added": "2026-04-25"
@@ -2159,6 +2159,38 @@ const DATA = {
       "files": "rental is passed alongside --rollback, add AND code LIKE 'IT-SALE-%' (or IT-RENTAL-%) to the rollback filter. Same class of bug we just patched in bl136-bootstrap-cards.mjs (TD-BL136-BOOTSTRAP-COUNTRY-FLAG). Verify parallel fix needed in scripts/seed-fr-compliance.mjs — its rollback path likely has identical bug. Pre-emptive: also fix in any future seed-ch-compliance.mjs` (BL-132). Operationally rare but if anyone ever relies on partial rollback they'll silently lose rental data when meaning to rollback sale only.",
       "tag": "compliance",
       "added": "scripts/seed-it-compliance.mjs, scripts/seed-fr-compliance.mjs (verify), future scripts/seed-ch-compliance.mjs"
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-FR-CECB-CITATION",
+      "title": "CH-FR-SALE-CECB-MANDATORY shipped at downgraded severity flag/warning instead of spec-mandated block/critical. Filed 2026-05-12 with BL-138-wave2A (commit 686ef8b, Gate 2). The Fribourg cantonal energy-law citation could not be locked via WebFetch (3 attempts: fr.ch/sites/.../cecb.pdf / fr.ch/dee/energie/.../cecb / bdlf.fr.ch/data/770.1/fr — all returned 404 / no statute text; landing page resolved but pointed to BDLF which returned LexWork shell only). Spec § 4.4 fallback engaged. Cost-of-fix: manual BDLF research path (search BDLF for \"CECB\" / \"GEAK\" / \"certificat énergétique cantonal des bâtiments\" / \"aliénation\" / \"mutation immobilière\") or contact Fribourg Service de l'énergie (SdE) for the current applicable article. Cost-of-not-fixing: rule remains at flag/warning — agents see a warning but not a hard blocker; less defensive than the full block/critical claim the spec authorized. Restore path: once the article is located, edit scripts/bl138/data/wave2-rules.mjs to restore rule_type='block' + severity='critical' + populate source_citation with the article reference, re-seed FR rules (--scope=fr --force), MCP-verify against Marie Dubois at Fribourg Real Estate. Documented in spec § 14.2 deviation #1; resolvable in any wave-2B+ session without blocking other work.",
+      "desc": "scripts/bl138/data/wave2-rules.mjs, BDLF research (manual)",
+      "files": "2026-05-12",
+      "tag": "ai",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-CONDITIONAL-BLOCK",
+      "title": "CH-FR-LEX-KOLLER-AUTH ships with conditions JSONB populated documenting the conditional-block intent (buyer_profile = 'person_abroad' → block/critical; else flag/warning), but src/features/admin/services/complianceEngine.ts doesn't yet evaluate buyer_profile against the conditions shape — the rule falls through to its base rule_type='flag' / severity='warning' regardless of buyer profile. Filed 2026-05-12 with BL-138-wave2A (commit 686ef8b, Gate 2). Verified via grep at Gate 2 reconnaissance: zero hits for default_type_when_unmatched / buyer_profile / conditions..*operator in the engine. Cost-of-fix: add default_type_when_unmatched + default_severity_when_unmatched support to the engine's condition evaluator. Read existing condition evaluation in complianceEngine.ts; extend to read the default_type_when_unmatched keys from conditions JSONB and apply them when the buyer_profile condition doesn't match incoming deal context. MCP verification gap: spec § 9 step 15 (conditional-block test with 2 buyer-profile fixtures) currently passes against the warn fallback but doesn't exercise the actual block path. Cost-of-not-fixing: wave-2A's conditional-block design ships as documentation-only; FR-LK rule fires identically for all buyer profiles. The engine work also gates any future canton-specific conditional blocks (likely needed when BL-126 federal Lex Koller revision lands and \"person abroad\" definition broadens). Documented in spec § 14.2 deviation #2.",
+      "desc": "src/features/admin/services/complianceEngine.ts, future MCP re-test of CH-FR-LEX-KOLLER-AUTH per spec § 9 step 15, docs/specs/BL-126-Spec-Federal-Lex-Koller-2026-Consultation.md § 4 (DoD checks this is re-evaluated at BL-126 reopen)",
+      "files": "2026-05-12",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "~~TD-COMPLIANCE-VS-QUOTA-COMMUNES~~",
+      "title": "~~VS Lex Koller commune-level wording uses regions-by-reputation (Verbier, Zermatt, Crans-Montana) — no commune-level audit CSV~~ — CLOSED 2026-05-12 (wave 2B research artifact landed). CSV committed at docs/audits/BL-138-wave-2-vs-quota-communes.csv — 85 rows covering every VS commune over the 20% ZWG threshold per ARE Wohnungsinventar Q1 2026 (ZWG_2026_Q1.xlsx, published 2026-03-31; source https://opendata.swiss/de/dataset/wohnungsinventar-und-zweitwohnungsanteil). Language split 51 DE / 34 FR via Wikipedia-validated Haut-Valais DE commune list + umlaut fallback. lex_koller_quota_status_2026 = unknown_at_research_date on all rows because ZWG ≠ Lex Koller and the cantonal LK quota register is not publicly available — separate query at MCP time required. Wave 2A rule wording (CH-VS-LEX-KOLLER-QUOTA, CH-VS-LEX-KOLLER-HOLIDAY-HOME) stays generic by design; CSV gives the audit trail for the commune coverage claim. Filed + closed same day (wave 2A landed db04f98 2026-05-12; wave 2B CSV landed within hours).",
+      "desc": "docs/audits/BL-138-wave-2-vs-quota-communes.csv",
+      "files": "2026-05-12",
+      "tag": "ai",
+      "added": ""
+    },
+    {
+      "id": "~~TD-COMPLIANCE-GR-GRUNDBUCHAMT-LIST~~",
+      "title": "~~GR Grundbuchamt list (~11 regional offices for 101 communes) referenced in CH-GR-SALE-LAND-REGISTRY-COMMUNAL rule without canonical list~~ — CLOSED 2026-05-12 (wave 2B research artifact landed). CSV committed at docs/audits/BL-138-wave-2-gr-grundbuchamt-list.csv — 17 rows matching the canonical gr.ch Grundbuchkreise table (https://www.gr.ch/DE/institutionen/verwaltung/dvs/giha/grundbuch/grundbuchkreise/Seiten/default.aspx). Language split 11 DE / 4 RM / 2 IT (all three GR official languages represented). Includes registrar names, addresses, phone numbers, emails in notes field. Spec-relevant communes covered: Davos (own GBA), Klosters (own GBA), St. Moritz (Maloja), Pontresina (Maloja), Flims, Laax, Vals. Earlier Phase 0 estimate of \"~11 regional offices\" was low — actual count is 17 (still decentralised, just more granular than initial estimate). Wave 2A rule wording stands.",
+      "desc": "docs/audits/BL-138-wave-2-gr-grundbuchamt-list.csv",
+      "files": "2026-05-12",
+      "tag": "comms",
+      "added": ""
     }
   ],
   "bugs": [

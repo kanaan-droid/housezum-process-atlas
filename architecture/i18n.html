@@ -425,7 +425,152 @@ User:
 <p>  The final wave of BG-50 wire scope. Pattern at this stage: each surface gets one focused commit (not a megacommit), MCP-verified before marking done. 12 surfaces consolidated. Closes BG-50 wire scope at 94.1% (then BG-59 audit-noise tightening took it to 98.6%).</p>
 <h3>Planned / open work</h3>
 <ul><li><strong>BL-125</strong> — Split <code>messages/&amp;lt;locale&amp;gt;.json</code> into per-namespace chunks for lazy loading <em>([planned, no commit yet])</em> — <em>files: <code>src/app/layout.tsx</code>, <code>src/i18n/request.ts</code>, <code>messages/</code>, <code>scripts/i18n/translate-locale.mjs</code></em></li></ul>
-<p>  Each locale file is ~140KB / ~3,700 keys. Full dictionary bundled into every page render. With 4 locales (5 once BL-121 lands), that's ~700KB of translation overhead in the bundle even for routes touching a few namespaces. <code>next-intl</code> supports per-namespace loading via <code>getMessages({ namespace })</code> per route. Refactor scope: layout, server resolver, every consumer using full-tree dictionaries, plus the translation pipeline (script-side splitting + recombining). MEDIUM priority — current is acceptable, becomes a problem as locales grow + payload-sensitive routes (Capacitor mobile, slow connections) get profiled.</p></div>
+<p>  Each locale file is ~140KB / ~3,700 keys. Full dictionary bundled into every page render. With 4 locales (5 once BL-121 lands), that's ~700KB of translation overhead in the bundle even for routes touching a few namespaces. <code>next-intl</code> supports per-namespace loading via <code>getMessages({ namespace })</code> per route. Refactor scope: layout, server resolver, every consumer using full-tree dictionaries, plus the translation pipeline (script-side splitting + recombining). MEDIUM priority — current is acceptable, becomes a problem as locales grow + payload-sensitive routes (Capacitor mobile, slow connections) get profiled.</p>
+<hr/>
+<h2>19. Compliance source URL adapters (BL-132 / BL-138 wave 1)</h2>
+<p>Locale resolution (§4) handles UI strings via <code>messages/&amp;lt;locale&amp;gt;.json</code>. <strong>Compliance rule source URLs</strong> — links to statutes, ordinances, cantonal authority pages — needed a parallel resolver because each rule's source has its own per-locale URL form. Two adapters, sister behaviour, different storage strategies per <a href="../adr/0002-ch-multi-language-rule-storage.html">ADR-0002 v3</a>.</p>
+<h3>19.1 Two adapters, two storage strategies</h3>
+<table><thead><tr><th>Adapter</th><th>Ticket</th><th>Stored shape</th><th>URL strategy</th></tr></thead><tbody><tr><td><code>getSourceUrlForLocale</code></td><td>BL-132</td><td>Single canonical <code>source_url</code> (German Fedlex)</td><td>Path-segment swap <code>/de</code> ↔ <code>/fr</code> / <code>/it</code> / <code>/en</code></td></tr><tr><td><code>getCantonalSourceUrlForLocale</code></td><td>BL-138 w1</td><td><code>source_url_translations</code> JSONB map (locale → URL) on the rule</td><td>Lookup with RM→DE fallback; EN-fallback flagged <code>informational_only</code></td></tr></tbody></table>
+<p><strong>Which fires when:</strong> UI compliance panels call the cantonal adapter when <code>rule.region_code</code> is set (cantonal layer); else the Fedlex adapter (federal + non-CH layers). The two share a return shape (<code>{url, informational_only}</code>) so the UI badge logic is identical.</p>
+<h3>19.2 Fedlex adapter (BL-132)</h3>
+<p><code>src/features/compliance/adapters/fedlex-url.ts</code>:</p>
+<pre><code class="lang-ts">export interface FedlexUrlResult {
+  url: string
+  /** True if the URL points to an English Fedlex page (informational only per PublA art. 14). */
+  informational_only: boolean
+}
+
+export function getSourceUrlForLocale(
+  storedUrl: string,
+  locale: string,
+): FedlexUrlResult</code></pre>
+<p>Behaviour:</p>
+<ul><li>Empty / malformed / non-Fedlex URL → returned unchanged, <code>informational_only=false</code>.</li><li>Fedlex URL without a <code>/de|/fr|/it|/en</code> path segment → returned unchanged.</li><li>Unsupported locale (e.g. <code>'rm'</code>, <code>'ar'</code>) → swap to <code>/de</code>.</li><li>Supported locale → segment swapped; query / fragment / trailing slash preserved.</li><li><strong><code>'en'</code> → segment swapped AND <code>informational_only=true</code></strong> per PublA art. 14 (only DE/FR/IT are official languages of the Federal Publication; English Fedlex pages are advisory).</li></ul>
+<p>Stored URL convention: German canonical (e.g. <code>https://www.fedlex.admin.ch/eli/cc/.../de</code>). Federal rules ingested under BL-132 use this convention exclusively. Non-Fedlex URLs (e.g. <code>https://www.svit.ch/...</code>) pass through unchanged — non-mechanical sources don't get auto-translated.</p>
+<p>Test coverage: <strong>14 unit tests</strong> at <code>tests/unit/fedlex-url.test.ts</code>.</p>
+<h3>19.3 Cantonal adapter (BL-138 w1)</h3>
+<p><code>src/features/compliance/adapters/cantonal-url.ts</code>:</p>
+<pre><code class="lang-ts">export interface CantonalUrlResult {
+  url: string
+  informational_only: boolean
+}
+
+export interface RuleWithCantonalUrls {
+  source_url: string
+  source_url_translations: Record&lt;string, string&gt; | null | undefined
+}
+
+export function getCantonalSourceUrlForLocale(
+  rule: RuleWithCantonalUrls,
+  locale: string,
+): CantonalUrlResult</code></pre>
+<p>Behaviour (per spec v2.2 § 4):</p>
+<ul><li>Empty <code>{}</code> translations → <code>source_url</code>, <code>informational_only=false</code>. (Empty is the post-migration default; federal rules stay empty and fall through cleanly.)</li><li>Direct locale-key hit → that URL, <code>informational_only=false</code>.</li><li><strong><code>'rm'</code> (Romansh) fallback chain:</strong> <code>rm</code> key → <code>de</code> key → <code>source_url</code>, all <code>informational_only=false</code>. Romansh has legal force where present, but our wave-1/2A cantons don't publish in RM.</li><li><strong><code>'en'</code> fallback:</strong> <code>source_url</code> + <code>informational_only=true</code>. Mirrors the Fedlex PublA art. 14 stance — cantonal English translations (where they exist) are advisory.</li><li>Any other unknown locale → <code>source_url</code>, <code>informational_only=false</code> (the canton's primary-language URL is the safe default).</li></ul>
+<p>Test coverage: <strong>14 unit tests</strong> at <code>tests/unit/cantonal-url.test.ts</code>.</p>
+<h3>19.4 <code>source_url_translations</code> JSONB pattern</h3>
+<p>The column is the dedicated storage slot for the cantonal adapter:</p>
+<pre><code class="lang-sql">ALTER TABLE compliance_rules
+  ADD COLUMN source_url_translations JSONB NOT NULL DEFAULT '{}';
+
+CREATE INDEX compliance_rules_source_url_translations_gin
+  ON compliance_rules USING GIN (source_url_translations);</code></pre>
+<p>Population pattern by canton language profile:</p>
+<table><thead><tr><th>Profile</th><th>Cantons</th><th><code>source_url_translations</code> keys</th><th>Notes</th></tr></thead><tbody><tr><td>Monolingual DE</td><td>ZH, LU, UR, SZ, OW, NW, GL, ZG, SO, BS, BL, SH, AR, AI, SG, AG, TG</td><td><code>{}</code> (empty)</td><td>Adapter falls back to <code>source_url</code></td></tr><tr><td>Bilingual DE+FR</td><td>BE, FR, VS</td><td><code>{de, fr}</code></td><td>VS rules with FR-only canonical URLs ALSO populate <code>de</code> for Haut-Valais</td></tr><tr><td>Monolingual FR</td><td>GE, VD, NE, JU</td><td><code>{}</code> (empty)</td><td>FR <code>source_url</code> is canonical</td></tr><tr><td>Trilingual DE+IT+RM</td><td>GR</td><td><code>{de, it}</code></td><td><strong>RM keys intentionally NOT populated</strong> — adapter falls back to DE per ADR-0002 v3</td></tr><tr><td>Monolingual IT</td><td>TI</td><td><code>{}</code> (empty)</td><td>IT <code>source_url</code> is canonical</td></tr></tbody></table>
+<p>The cantonal seed scripts (<code>scripts/bl138/seed-ch-cantonal-compliance.mjs</code> for wave 1, <code>scripts/bl138/seed-bl138-wave2-rules.mjs</code> for wave 2A) populate the column at ingest time per these profiles.</p>
+<p>Canonical decision record: <a href="../adr/0002-ch-multi-language-rule-storage.html">ADR-0002 v3 Option C</a> (parallel-language URLs in JSONB, reserved for the cantonal layer; federal layer uses Option D = path-segment swap).</p>
+<hr/>
+<h2>20. Canton → language default (BL-119)</h2>
+<p>Building on the inheritance model (§5), Swiss orgs get a <strong>canton-driven default language</strong> that flows through to org members' UI locale when admins change the canton field. This is the only canton-coupled UI-language path in the app today.</p>
+<h3>20.1 Constants module</h3>
+<p><code>src/lib/constants/swiss-cantons.ts</code>:</p>
+<pre><code class="lang-ts">export const SWISS_CANTONS = [
+  'CH-ZH', 'CH-BE', 'CH-LU', 'CH-UR', 'CH-SZ', 'CH-OW', 'CH-NW',
+  'CH-GL', 'CH-ZG', 'CH-SO', 'CH-BS', 'CH-BL', 'CH-SH', 'CH-AR',
+  'CH-AI', 'CH-SG', 'CH-GR', 'CH-AG', 'CH-TG',          // DE (19)
+  'CH-GE', 'CH-VD', 'CH-NE', 'CH-JU', 'CH-FR', 'CH-VS', // FR (6)
+  'CH-TI',                                              // IT (1)
+] as const
+
+export type SwissCantonCode = (typeof SWISS_CANTONS)[number]
+export type SwissDefaultLanguage = 'de' | 'fr' | 'it'
+
+export const CANTON_DEFAULT_LANGUAGE:
+  Record&lt;SwissCantonCode, SwissDefaultLanguage&gt;
+
+export function getCantonDefaultLanguage(
+  canton: string
+): SwissDefaultLanguage   // throws TypeError on unknown canton
+
+export function isSwissCantonCode(value: string): value is SwissCantonCode</code></pre>
+<p>The 26-canton mapping is sealed by <a href="../specs/BL-119-Swiss-Canton-Language-Default.html">BL-119 spec § 3</a>. RM is not a candidate default — the app has no <code>'rm'</code> UI locale, and no canton's RM speakers are the majority.</p>
+<h3>20.2 Bilingual / trilingual canton edge cases</h3>
+<p>Four cantons are officially multilingual but get a single <code>v1</code> default per spec § 3:</p>
+<table><thead><tr><th>Canton</th><th>Official languages</th><th>v1 default</th><th>Rationale</th></tr></thead><tbody><tr><td>BE (Bern)</td><td>DE + FR</td><td><code>de</code></td><td>DE-majority canton-wide; Berner Jura (FR) is a minority district</td></tr><tr><td>FR (Fribourg)</td><td>DE + FR</td><td><code>fr</code></td><td>FR-majority; See/Lac district (DE) is the minority</td></tr><tr><td><strong>VS (Valais)</strong></td><td>DE + FR</td><td><strong><code>fr</code></strong></td><td>FR-majority despite formal bilingual status; Haut-Valais (DE) is minority. <strong>Explicit spec § 3 override</strong> — CC's BL-119 implementation report flagged this as a deviation worth recording</td></tr><tr><td>GR (Graubünden)</td><td>DE + IT + RM</td><td><code>de</code></td><td>DE-majority; IT (Mesolcina/Bregaglia/Poschiavo) + RM (Sursilvan/Sutsilvan/Surmiran/Puter/Vallader) are minorities</td></tr></tbody></table>
+<p>VS → <code>fr</code> was a documented spec-vs-prompt deviation surfaced in CC's BL-119 final report — the original execution prompt's mapping table had <code>VS → de</code>; CC followed spec § 3 ("French-majority") per Commandment #1, and Will accepted the override. Recorded here to prevent a future regression by a fresh Claude reading the prompt.</p>
+<h3>20.3 Sync mechanism</h3>
+<p><code>src/features/agencies/services/cantonLanguageSync.ts</code>:</p>
+<pre><code class="lang-ts">export async function syncOrgMembersLanguageOnCantonChange({
+  orgId,
+  oldCanton,
+  newCanton,
+  supabase,                  // service-role; bypasses RLS on agent_profiles
+}: SyncOrgMembersLanguageInput): Promise&lt;SyncOrgMembersLanguageResult&gt;</code></pre>
+<p>Single-writer service. When <code>organizations.canton</code> changes:</p>
+<ol><li>Compute <code>oldDefault = getCantonDefaultLanguage(oldCanton)</code> + <code>newDefault = getCantonDefaultLanguage(newCanton)</code>.</li><li><strong>Same-default short-circuit:</strong> if <code>oldDefault === newDefault</code> (e.g. CH-ZH → CH-LU, both <code>de</code>), do nothing — not even a no-op UPDATE. Count org members for the <code>skipped</code> field, emit one audit log line, return.</li><li><strong>Real shift:</strong> <code>UPDATE agent_profiles SET language = newDefault WHERE org_id = $orgId AND language = oldDefault</code>. Members whose language differs from the old default are presumed to have <strong>explicitly overridden</strong> (via profile settings, login locale-cookie, or seed override) and are left untouched.</li><li>Audit log via structured <code>console.info</code>:  ``<code>ts  {event: 'canton_language_sync', orgId, oldCanton, newCanton,   oldDefault, newDefault, updated, skipped, shifted, ts}  </code>``  Vercel-log-ingestible; future promotion to a real audit table is non-blocking.</li></ol>
+<p>The "explicit-override heuristic" is intentionally conservative — a member who happens to manually pick <code>de</code> while in a CH-BE org will be flipped if the canton moves CH-BE → CH-GE. Same outcome as if their language had been auto-set; documented edge case.</p>
+<h3>20.4 Listener wire-in (BL-138 w1 hook)</h3>
+<p><code>organizations.canton</code> changes go through <code>/api/admin/organization/canton</code> POST. The route handler persists the canton UPDATE, then calls the BL-138 wave-1 listener at <code>src/features/compliance/services/canton-change-listener.ts</code>:</p>
+<pre><code class="lang-ts">export async function onCantonChange(
+  orgId: string,
+  oldCanton: CantonValue,                       // string | null
+  newCanton: CantonValue,
+  hooks: CantonChangeHooks = {},
+): Promise&lt;CantonChangeResult&gt;
+
+export interface CantonChangeHooks {
+  onChange?: (
+    orgId: string,
+    oldCanton: CantonValue,
+    newCanton: CantonValue,
+  ) =&gt; Promise&lt;void&gt; | void
+}</code></pre>
+<p><strong>Signature gotcha:</strong> <code>hooks.onChange(orgId, oldCanton, newCanton)</code> is <strong>positional 3-arg</strong>, NOT destructured single-object. BL-119's v1 pseudocode used a destructured shape and CC's implementation report flagged the discrepancy at D-316. A future fresh Claude session referencing this signature should copy verbatim from source, not from spec pseudocode.</p>
+<p>Wire-in (simplified, real handler in <code>src/app/api/admin/organization/canton/route.ts</code>):</p>
+<pre><code class="lang-ts">// 1. Persist canton UPDATE
+await supabase.from('organizations').update({ canton: newCanton }).eq('id', orgId)
+
+// 2. Fire listener; callback re-uses the same orgId/oldCanton/newCanton positionally
+await onCantonChange(orgId, oldCanton, newCanton, {
+  onChange: async (orgId, oldCanton, newCanton) =&gt; {
+    await syncOrgMembersLanguageOnCantonChange({
+      orgId, oldCanton, newCanton, supabase: serviceRoleSupabase,
+    })
+  },
+})</code></pre>
+<p>The listener is a no-op when <code>oldCanton === newCanton</code>, so the wire-in callsite can fire it unconditionally without side-effects.</p>
+<h3>20.5 Locale-aware canton labels</h3>
+<p>All 26 canton codes (<code>CH-ZH</code>, ..., <code>CH-JU</code>) have i18n keys:</p>
+<pre><code>compliance.canton.{CH-XX}    × 4 locales (en/fr/de/it) = 104 strings</code></pre>
+<p>Shipping breakdown:</p>
+<table><thead><tr><th>Wave</th><th>Ticket</th><th>Canton labels shipped</th><th>Surface</th></tr></thead><tbody><tr><td>Wave 1</td><td>BL-138 D-314</td><td>20 (5 cantons × 4 locales)</td><td>Compliance side panel for ZH/BE/GE/VD/TI rules</td></tr><tr><td>BL-119 D-316</td><td>BL-119</td><td>84 (21 cantons × 4 locales)</td><td>Admin canton dropdown — needed all 26 codes</td></tr><tr><td><strong>Total</strong></td><td>—</td><td><strong>104</strong></td><td>—</td></tr></tbody></table>
+<p>MCP-verified locale-aware rendering for German ("Zürich", "Bern", "Genf"), French ("Genève", "Berne"), Italian ("Ginevra"). All 26 labels respect the agent's active locale — the canton dropdown re-renders on locale change without re-fetch.</p>
+<hr/>
+<h2>21. Workflow template locale-aware naming (BL-138 w1 + w2A)</h2>
+<p>Cantonal Sale workflow templates (introduced wave 1, extended wave 2A) follow two conventions:</p>
+<h3>21.1 Template names are locale-neutral English</h3>
+<p>Templates use English names with the canton's German/French exonym in parentheses:</p>
+<table><thead><tr><th>Wave</th><th>Template name</th><th><code>region_code</code></th></tr></thead><tbody><tr><td>Wave 1</td><td>Switzerland Property Sale (Genève)</td><td>CH-GE</td></tr><tr><td>Wave 1</td><td>Switzerland Property Sale (Vaud)</td><td>CH-VD</td></tr><tr><td>Wave 1</td><td>Switzerland Property Sale (Ticino)</td><td>CH-TI</td></tr><tr><td>Wave 2A</td><td>Switzerland Property Sale (Fribourg)</td><td>CH-FR</td></tr><tr><td>Wave 2A</td><td>Switzerland Property Sale (Valais)</td><td>CH-VS</td></tr><tr><td>Wave 2A</td><td>Switzerland Property Sale (Graubünden)</td><td>CH-GR</td></tr></tbody></table>
+<p>Template names are intentionally NOT translated — they're admin-facing internal identifiers, scoped by <code>region_code</code> for tenant routing. This keeps the workflow-template query simple (no locale join needed at routing time).</p>
+<h3>21.2 Stage labels are i18n keys (NOT literal strings)</h3>
+<p>Stage labels follow the standard i18n keying convention (§8.2). Each cantonal template has 9 stages — the federal 8 plus an inserted notary-booking stage between <code>offer</code> (Kaufzusage) and <code>pre_contract</code> (Notarvertragsentwurf). The inserted stage's key differs per canton:</p>
+<table><thead><tr><th>Cantons</th><th>Stage key</th><th>Render in DE</th></tr></thead><tbody><tr><td>FR / VS / VD / GE / TI</td><td><code>workflow.stage.notary_booking_due_diligence</code></td><td>"Notartermin &amp; Due Diligence"</td></tr><tr><td>GR</td><td><code>workflow.stage.communal_grundbuchamt_pre_check</code></td><td>"Kommunale Grundbuchamt-Vorprüfung &amp; Notartermin"</td></tr></tbody></table>
+<p>GR's divergence is structural — Graubünden's land registry operates at 17 regional Grundbuchämter (covering 101 communes; per <code>docs/audits/BL-138-wave-2-gr-grundbuchamt-list.csv</code>), so the workflow needs a distinct pre-check stage. Same <code>canonical='pre_contract'</code> for engine routing parity, just a different key + label.</p>
+<hr/>
+<h2>22. Cross-references — i18n surface evolution post-BL-120</h2>
+<table><thead><tr><th>Ticket</th><th>Closure</th><th>i18n surface added</th></tr></thead><tbody><tr><td>BL-132</td><td>D-312 (2026-05-09)</td><td>Fedlex URL adapter (path-segment swap, EN→<code>informational_only</code>); applicability tier badges in compliance panel; <strong>16 federal-tier i18n strings</strong></td></tr><tr><td>BL-138 wave 1</td><td>D-314 (2026-05-09)</td><td>Cantonal URL adapter; <code>source_url_translations</code> JSONB + GIN index; <strong>20 cantonal i18n keys</strong> (5 cantons × 4 locales); canton-change listener (BL-119 wire-in)</td></tr><tr><td>BL-119</td><td>D-316 (2026-05-11)</td><td>Canton-default-language constants; <code>cantonLanguageSync</code> service; admin canton dropdown; <strong>84 canton labels</strong> (21 cantons × 4 locales); listener wire-in via positional 3-arg hook</td></tr><tr><td>BL-138 wave 2A</td><td>D-317 (2026-05-12)</td><td>3 new cantonal Sale workflow templates (FR/VS/GR); GR-specific stage key <code>workflow.stage.communal_grundbuchamt_pre_check</code>; <strong>zero new canton labels</strong> (BL-119 shipped all 26)</td></tr><tr><td>BL-138 wave 2B</td><td>(2026-05-12)</td><td>Research-only — VS quota CSV (85 rows) + GR Grundbuchamt list CSV (17 rows). No code; closes 2 TDs.</td></tr></tbody></table>
+<p><strong>Operator procedures</strong> for canton change, locale switching, and audit-log inspection live in <a href="../../WAYS-OF-WORKING.html"><code>WAYS-OF-WORKING.md</code> § Locale operations (BL-120 — 2026-04-28)</a>. This doc owns <em>architecture</em>; WOW owns <em>runbook</em>.</p>
+<p><strong>Future work tied to this surface:</strong></p>
+<ul><li>BL-126 (federal Lex Koller 2026 consultation impact) may re-word source URLs across 16 LK rules — adapter behaviour is unchanged but data is in flight. See <a href="../specs/BL-126-Spec-Federal-Lex-Koller-2026-Consultation.html"><code>docs/specs/BL-126-Spec-Federal-Lex-Koller-2026-Consultation.md</code></a>.</li><li><code>TD-COMPLIANCE-METADATA-COLUMN</code> 🟡 (live schema has no <code>compliance_rules.metadata</code> JSONB column) blocks structured staleness flags. When it lands, the staleness-review markers currently carried in seed-script <code>metadata_extra</code> move into the column proper.</li></ul></div>
 </main>
 <footer>
   HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/i18n.md</code>
