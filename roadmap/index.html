@@ -37,10 +37,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .filter-chip.active{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-glow)}
 .filter-chip:hover:not(.active){border-color:var(--border-hover);color:var(--text-muted)}
-.kanban{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:20px 24px;max-width:1600px;margin:0 auto}
-@media(max-width:1300px){.kanban{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:900px){.kanban{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.kanban{grid-template-columns:1fr}}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(280px,1fr));gap:12px;padding:20px 24px;max-width:1600px;margin:0 auto;overflow-x:auto}
+@media(max-width:600px){.kanban{grid-template-columns:1fr;overflow-x:visible}}
 .column{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden}
 .column-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
 .column-dot{width:10px;height:10px;border-radius:3px}
@@ -137,7 +135,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-12';
+const LAST_UPDATED = '2026-05-13';
 const DATA = {
   "inProgress": [
     {
