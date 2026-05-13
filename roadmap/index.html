@@ -37,7 +37,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .filter-chip.active{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-glow)}
 .filter-chip:hover:not(.active){border-color:var(--border-hover);color:var(--text-muted)}
-.kanban{display:grid;grid-template-columns:repeat(5,minmax(280px,1fr));gap:12px;padding:20px 24px;max-width:1600px;margin:0 auto;overflow-x:auto}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(220px,1fr));gap:12px;padding:20px 24px;max-width:1600px;margin:0 auto;overflow-x:auto}
 @media(max-width:600px){.kanban{grid-template-columns:1fr;overflow-x:visible}}
 .column{background:var(--surface);border-radius:14px;border:1px solid var(--border);overflow:hidden}
 .column-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
@@ -1727,12 +1727,12 @@ const DATA = {
   ],
   "techDebt": [
     {
-      "id": "🟢 TD-ATLAS-ALL-TAB-COLUMN-FILTER",
-      "title": "Atlas roadmap \"All\" tab hides TECH DEBT & DONE columns",
-      "desc": "Filed 2026-05-12 with D-321. Atlas at https://kanaan-droid.github.io/housezum-process-atlas/roadmap/ — clicking \"All\" filter shows 3 columns (IN PROGRESS / NEXT UP / BACKLOG); clicking \"Core\" filter shows 5 columns (same 3 + TECH DEBT & BUGS + DONE). Render filter inverted; \"All\" should be a superset of every category filter by definition. Data is correct (D-320 atlas regen put correct data into the HTML); only render filter conditional is broken. Cost-of-fix: ~15-30 min CC — find the column-render conditional in the atlas generator (likely in housezum-app's scripts/generate-roadmap-html.mjs or one of the composite npm run docs:html scripts), invert the condition so TECH DEBT + DONE columns render unconditionally on \"All\", regenerate, push to atlas repo. Cost-of-not-fixing: stakeholders viewing the \"All\" tab don't see TECH DEBT & DONE columns; must remember to use category filters. Cosmetic only; no data drift.",
-      "files": "scripts/generate-roadmap-html.mjs (housezum-app) or atlas template column-render logic",
+      "id": "~~TD-ATLAS-ALL-TAB-COLUMN-FILTER~~ (D-322)",
+      "title": "~~Atlas roadmap \"All\" tab hides TECH DEBT & DONE columns~~ — CLOSED 2026-05-13 → D-322. Fixed in 6b88c41 (housezum-app) + 45d5958 (atlas). Root cause was NOT a render-filter inversion (the original hypothesis) — all 5 column divs were always present in the DOM regardless of filter. The bug was filter-independent CSS responsive breakpoints (@media(max-width:1300px){.kanban{grid-template-columns:repeat(3,1fr)}} + 900px → 2 cols) wrapping columns 4+5 to a second row at 901-1300px viewports. With \"All\" filter, columns 1-3 were tall (many items) so wrapped row 2 was far below the fold; with sparse filters, row 2 was visible without scrolling. Same DOM either way — only perceived column count differed. Fix: drop the 1300px + 900px breakpoints; use overflow-x:auto + minmax(280px,1fr) for horizontal-scroll kanban convention. Kept the 600px → 1-col mobile fallback. Live-verified at https://kanaan-droid.github.io/housezum-process-atlas/roadmap/ — all 8 filter chips (\"All\" + 7 category chips) now render the full 5-column kanban. Original notes preserved below for historical context. Original notes: Filed 2026-05-12 with D-321. Atlas at https://kanaan-droid.github.io/housezum-process-atlas/roadmap/ — clicking \"All\" filter shows 3 columns (IN PROGRESS / NEXT UP / BACKLOG); clicking \"Core\" filter shows 5 columns (same 3 + TECH DEBT & BUGS + DONE). Render filter inverted; \"All\" should be a superset of every category filter by definition. Data is correct (D-320 atlas regen put correct data into the HTML); only render filter conditional is broken. Cost-of-fix: ~15-30 min CC — find the column-render conditional in the atlas generator (likely in housezum-app's scripts/generate-roadmap-html.mjs or one of the composite npm run docs:html scripts), invert the condition so TECH DEBT + DONE columns render unconditionally on \"All\", regenerate, push to atlas repo. Cost-of-not-fixing: stakeholders viewing the \"All\" tab don't see TECH DEBT & DONE columns; must remember to use category filters. Cosmetic only; no data drift.",
+      "desc": "scripts/generate-roadmap-html.mjs (housezum-app)",
+      "files": "2026-05-12",
       "tag": "admin",
-      "added": "2026-05-12"
+      "added": ""
     },
     {
       "id": "🟡 TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT",
@@ -2587,6 +2587,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-322",
+      "title": "TD-ATLAS-ALL-TAB-COLUMN-FILTER fixed — \"All\" tab now renders all 5 columns",
+      "desc": "Cosmetic bug filed at EOS 2026-05-12 (D-321) → fixed next session (2026-05-13) before any other work. Phase 0 root-cause analysis disproved the original \"render filter inverted\" hypothesis: all 5 column divs (col-progress / col-next / col-backlog / col-debt / col-done) are always written to the DOM by renderKanban() regardless of activeFilter value, and filterItems() only filters card items inside columns. Real cause: filter-independent CSS responsive breakpoints (@media(max-width:1300px){.kanban{grid-template-columns:repeat(3,1fr)}} + 900px → 2 cols) wrapped columns 4+5 to a second grid row at viewports 901-1300px. With \"All\" filter, columns 1-3 became tall (many items) → wrapped row 2 was far below the fold → user perceived \"3 columns\". With sparse filters, columns short → row 2 visible → user perceived \"5 columns\". Same DOM, filter-dependent perception. Fix scope: 1 CSS rule edit (scripts/generate-roadmap-html.mjs:210-213) — drop the 1300px + 900px breakpoints; use overflow-x:auto + repeat(5,minmax(280px,1fr)) for horizontal-scroll kanban convention. Kept 600px → 1-col mobile fallback. Live-verified at https://kanaan-droid.github.io/housezum-process-atlas/roadmap/ — all 8 filter chips (\"All\" + 7 category chips) render the full 5-column kanban (IN PROGRESS / NEXT UP / BACKLOG / TECH DEBT & BUGS / DONE).",
+      "completed": "scripts/generate-roadmap-html.mjs (housezum-app) 6b88c41, ~/Apps/housezum-process-atlas/roadmap/index.html (atlas) 45d5958",
+      "tag": "admin"
+    },
     {
       "id": "D-321",
       "title": "Atlas roadmap \"All\" tab render bug filed → TECH DEBT",
