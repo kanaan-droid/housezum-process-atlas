@@ -135,7 +135,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-13';
+const LAST_UPDATED = '2026-05-14';
 const DATA = {
   "inProgress": [
     {
@@ -1727,11 +1727,75 @@ const DATA = {
   ],
   "techDebt": [
     {
-      "id": "~~TD-ATLAS-ALL-TAB-COLUMN-FILTER~~ (D-322)",
-      "title": "~~Atlas roadmap \"All\" tab hides TECH DEBT & DONE columns~~ — CLOSED 2026-05-13 → D-322. Fixed in 6b88c41 (housezum-app) + 45d5958 (atlas). [Follow-up a75f022 2026-05-13]: Initial fix used minmax(280px,1fr) which required 1448px content width; user-reported continued issue on laptop viewports \u003c1450px (columns 4+5 hidden behind macOS-style invisible scrollbar). Reduced column min to 220px so 5 columns fit on any ≥1200px viewport. Root cause was NOT a render-filter inversion (the original hypothesis) — all 5 column divs were always present in the DOM regardless of filter. The bug was filter-independent CSS responsive breakpoints (@media(max-width:1300px){.kanban{grid-template-columns:repeat(3,1fr)}} + 900px → 2 cols) wrapping columns 4+5 to a second row at 901-1300px viewports. With \"All\" filter, columns 1-3 were tall (many items) so wrapped row 2 was far below the fold; with sparse filters, row 2 was visible without scrolling. Same DOM either way — only perceived column count differed. Fix: drop the 1300px + 900px breakpoints; use overflow-x:auto + minmax(220px,1fr) for horizontal-scroll kanban convention. Kept the 600px → 1-col mobile fallback. Live-verified at https://kanaan-droid.github.io/housezum-process-atlas/roadmap/ — all 8 filter chips (\"All\" + 7 category chips) now render the full 5-column kanban. Original notes preserved below for historical context. Original notes: Filed 2026-05-12 with D-321. Atlas at https://kanaan-droid.github.io/housezum-process-atlas/roadmap/ — clicking \"All\" filter shows 3 columns (IN PROGRESS / NEXT UP / BACKLOG); clicking \"Core\" filter shows 5 columns (same 3 + TECH DEBT & BUGS + DONE). Render filter inverted; \"All\" should be a superset of every category filter by definition. Data is correct (D-320 atlas regen put correct data into the HTML); only render filter conditional is broken. Cost-of-fix: ~15-30 min CC — find the column-render conditional in the atlas generator (likely in housezum-app's scripts/generate-roadmap-html.mjs or one of the composite npm run docs:html scripts), invert the condition so TECH DEBT + DONE columns render unconditionally on \"All\", regenerate, push to atlas repo. Cost-of-not-fixing: stakeholders viewing the \"All\" tab don't see TECH DEBT & DONE columns; must remember to use category filters. Cosmetic only; no data drift.",
+      "id": "~~TD-ATLAS-ALL-TAB-COLUMN-FILTER~~ (D-322 partial / D-323 root-cause)",
+      "title": "~~Atlas roadmap \"All\" tab hides TECH DEBT & DONE columns~~ — CLOSED 2026-05-13 → D-323 (root-cause fix). D-322 was a partial fix that addressed CSS sizing; the real bug was HTML escaping. See D-323 entry in Done table for full root cause. Earlier history: D-322 fixed in 6b88c41 (housezum-app) + 45d5958 (atlas). [Follow-up a75f022 2026-05-13]: Initial fix used minmax(280px,1fr) which required 1448px content width; user-reported continued issue on laptop viewports \u003c1450px (columns 4+5 hidden behind macOS-style invisible scrollbar). Reduced column min to 220px so 5 columns fit on any ≥1200px viewport. Root cause was NOT a render-filter inversion (the original hypothesis) — all 5 column divs were always present in the DOM regardless of filter. The bug was filter-independent CSS responsive breakpoints (@media(max-width:1300px){.kanban{grid-template-columns:repeat(3,1fr)}} + 900px → 2 cols) wrapping columns 4+5 to a second row at 901-1300px viewports. With \"All\" filter, columns 1-3 were tall (many items) so wrapped row 2 was far below the fold; with sparse filters, row 2 was visible without scrolling. Same DOM either way — only perceived column count differed. Fix: drop the 1300px + 900px breakpoints; use overflow-x:auto + minmax(220px,1fr) for horizontal-scroll kanban convention. Kept the 600px → 1-col mobile fallback. Live-verified at https://kanaan-droid.github.io/housezum-process-atlas/roadmap/ — all 8 filter chips (\"All\" + 7 category chips) now render the full 5-column kanban. Original notes preserved below for historical context. Original notes: Filed 2026-05-12 with D-321. Atlas at https://kanaan-droid.github.io/housezum-process-atlas/roadmap/ — clicking \"All\" filter shows 3 columns (IN PROGRESS / NEXT UP / BACKLOG); clicking \"Core\" filter shows 5 columns (same 3 + TECH DEBT & BUGS + DONE). Render filter inverted; \"All\" should be a superset of every category filter by definition. Data is correct (D-320 atlas regen put correct data into the HTML); only render filter conditional is broken. Cost-of-fix: ~15-30 min CC — find the column-render conditional in the atlas generator (likely in housezum-app's scripts/generate-roadmap-html.mjs or one of the composite npm run docs:html scripts), invert the condition so TECH DEBT + DONE columns render unconditionally on \"All\", regenerate, push to atlas repo. Cost-of-not-fixing: stakeholders viewing the \"All\" tab don't see TECH DEBT & DONE columns; must remember to use category filters. Cosmetic only; no data drift.",
       "desc": "scripts/generate-roadmap-html.mjs (housezum-app)",
       "files": "2026-05-12",
       "tag": "admin",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE",
+      "title": "Build the missing evaluateComplianceForDeal() service. Filed 2026-05-14 (D-325). The engine NOW supports ConditionalRuleResolution (D-325) and CH-FR-LEX-KOLLER-AUTH ships with the new shape, but NO caller hydrates entityData.buyer_lex_koller_residency_statuses from deal_participants.lex_koller_residency_status — the rule will fall through to when_unevaluable (or when_unmatched) on every deal because the data is never populated. Build a service that: (a) queries deal_participants for the deal's buyers, (b) hydrates entityData.buyer_lex_koller_residency_statuses (array of non-NULL, non-'unknown' status values), (c) hydrates entityData.buyer_lex_koller_residency_statuses_have_missing (true if any participant has NULL or 'unknown'), (d) calls evaluateCompliance() with entityType='deal', trigger='deal.stage_change'. Hydration contract specified in D-325 spec § 4.2. Wires into a UI surface (likely a DealComplianceBanner component or admin dashboard). Includes the wave 2A spec § 9 step 5 end-to-end MCP verification that wave 2A could not complete. Cost-of-fix: ~4-6h.",
+      "desc": "new file in src/features/deals/services/ (TBD), src/components/shared/DealComplianceBanner.tsx (TBD), MCP re-test of CH-FR-LEX-KOLLER-AUTH end-to-end",
+      "files": "2026-05-14",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-LEX-KOLLER-ENUM-EXPANSION",
+      "title": "Expand the 4-value Lex Koller residency enum. Filed 2026-05-14 (D-325). Current deal_participants_lex_koller_residency_status_check accepts only person_abroad / swiss_resident / swiss_resident_with_permit / unknown — oversimplifies BewG. Cross-validation (ChatGPT + Gemini) recommended a 5-value enum that distinguishes EU/EFTA vs third-country B-permit holders + commercial-property exemption. Implementation: CHECK constraint expansion (single migration) + seed-script + rule logic update (CH-FR-LEX-KOLLER-AUTH match values, future VS/GR rules). Requires Swiss-law research session of its own to lock the canonical category set. Cost-of-fix: ~3-4h.",
+      "desc": "supabase/migrations/, deal_participants CHECK, scripts/bl138/data/wave2-rules.mjs",
+      "files": "2026-05-14",
+      "tag": "admin",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-LEX-KOLLER-LEGAL-ENTITIES",
+      "title": "Lex Koller status for legal-entity buyers. Filed 2026-05-14 (D-325). A legal-entity buyer (LLC, foundation, etc.) has Lex Koller status determined by controlling-interest tests (looking through to ultimate beneficial owners), not direct residency. deal_participants.external_party_info JSONB on participants without contact_id currently has no shape for this; Phase 0 reality check confirmed 0/27 production buyers use external_party_info today so this is anticipatory. Design needs: schema for the look-through chain + UI capture + engine hook (likely a derived effective_lex_koller_status field hydrated server-side). Cost-of-fix: ~4-6h.",
+      "desc": "deal_participants.external_party_info shape, hydration logic, agent UI",
+      "files": "2026-05-14",
+      "tag": "admin",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-SNAPSHOT-ON-DEAL-CLOSE",
+      "title": "Snapshot compliance evaluation results on deal close. Filed 2026-05-14 (D-325). When a deal closes (won/lost), the compliance evaluation results should be snapshotted to the deal. Otherwise: law changes 2 years later → closed deal from 2026 starts showing errors when re-evaluated against 2028 engine. Audit requirement (Swiss compliance retention). Implementation: deals.compliance_snapshot JSONB column + write-on-close hook + read-from-snapshot UI path for closed deals. Cost-of-fix: ~3-5h.",
+      "desc": "deals schema, deal-close handlers, ComplianceBanner read-path",
+      "files": "2026-05-14",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-VS-GR-LEX-KOLLER-WIRE-IN",
+      "title": "Migrate VS + GR Lex Koller rules to ConditionalRuleResolution shape. Filed 2026-05-14 (D-325). VS rules (CH-VS-LEX-KOLLER-QUOTA, CH-VS-LEX-KOLLER-HOLIDAY-HOME) and GR rules (CH-GR-LEX-KOLLER-QUOTA, CH-GR-LEX-KOLLER-HOLIDAY-HOME) currently ship as static block/critical rules — they fire on every CH-VS/CH-GR deal regardless of buyer residency. With D-325 landed, they should be migrated to the same conditional shape as CH-FR-LEX-KOLLER-AUTH: block when buyer is person_abroad, warn otherwise. Quick follow-up once D-325 verified end-to-end via TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE. Depends on TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE landing first. Cost-of-fix: ~1-2h.",
+      "desc": "scripts/bl138/data/wave2-rules.mjs (VS + GR Lex Koller rule blocks)",
+      "files": "2026-05-14",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟡 TD-CRM-UI-LEX-KOLLER-RESIDENCY",
+      "title": "Agent UI to capture lex_koller_residency_status on deal participants. Filed 2026-05-14 (D-325). The column exists in DB (D-325 migration) but no UI writes to it. Need: modal or inline field on participant card / deal flow that prompts the agent to classify each buyer. Should also future-proof for external_party_info buyers (legal entities — TBD JSONB shape per TD-COMPLIANCE-LEX-KOLLER-LEGAL-ENTITIES). Wire into the deal stage progression UI; can be a side panel or required-field prompt at the appropriate workflow stage. Cost-of-fix: ~4-6h.",
+      "desc": "src/features/deals/ UI components, agent_profiles routing",
+      "files": "2026-05-14",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-MULTI-MODIFIER-COMPOSABILITY",
+      "title": "Support multiple ConditionalRuleResolution modifiers per rule. Filed 2026-05-14 (D-325). D-325 ships with single-modifier-per-rule enforced via seed-script validation + engine warning. Real-world compliance often stacks modifiers (e.g., \"if buyer abroad + property rural → both Lex Koller and LDFR apply with different severities\"). Will require engine extension (resolution composition order: AND vs OR semantics, conflict resolution, error reporting). Cost-of-fix: ~6-8h. Not blocking; file when the first real use case emerges.",
+      "desc": "src/features/admin/services/complianceEngine.ts, seed validators",
+      "files": "2026-05-14",
+      "tag": "compliance",
+      "added": ""
+    },
+    {
+      "id": "🟢 TD-COMPLIANCE-REGULATORY-NAMESPACE-REFACTOR",
+      "title": "Refactor entityData regulatory field naming. Filed 2026-05-14 (D-325). Once ≥3 regulatory rule families exist (Lex Koller, AML/KYC, PEP), the flat entityData.buyer_lex_koller_residency_statuses etc. naming will sprawl. Refactor to namespaced entityData.regulatory.lexKoller.buyer_statuses etc. Cross-val recommendation from ChatGPT D-325 review. Touches: hydration layer + every rule's match.field path + tests. Backward-compat shim possible. Cost-of-fix: ~2-3h.",
+      "desc": "hydration services, all regulatory rules in scripts/bl138/data/, test fixtures",
+      "files": "2026-05-14",
+      "tag": "core",
       "added": ""
     },
     {
@@ -2167,17 +2231,25 @@ const DATA = {
       "added": "scripts/seed-it-compliance.mjs, scripts/seed-fr-compliance.mjs (verify), future scripts/seed-ch-compliance.mjs"
     },
     {
-      "id": "🟡 TD-COMPLIANCE-FR-CECB-CITATION",
-      "title": "CH-FR-SALE-CECB-MANDATORY shipped at downgraded severity flag/warning instead of spec-mandated block/critical. Filed 2026-05-12 with BL-138-wave2A (commit 686ef8b, Gate 2). The Fribourg cantonal energy-law citation could not be locked via WebFetch (3 attempts: fr.ch/sites/.../cecb.pdf / fr.ch/dee/energie/.../cecb / bdlf.fr.ch/data/770.1/fr — all returned 404 / no statute text; landing page resolved but pointed to BDLF which returned LexWork shell only). Spec § 4.4 fallback engaged. Cost-of-fix: manual BDLF research path (search BDLF for \"CECB\" / \"GEAK\" / \"certificat énergétique cantonal des bâtiments\" / \"aliénation\" / \"mutation immobilière\") or contact Fribourg Service de l'énergie (SdE) for the current applicable article. Cost-of-not-fixing: rule remains at flag/warning — agents see a warning but not a hard blocker; less defensive than the full block/critical claim the spec authorized. Restore path: once the article is located, edit scripts/bl138/data/wave2-rules.mjs to restore rule_type='block' + severity='critical' + populate source_citation with the article reference, re-seed FR rules (--scope=fr --force), MCP-verify against Marie Dubois at Fribourg Real Estate. Documented in spec § 14.2 deviation #1; resolvable in any wave-2B+ session without blocking other work.",
+      "id": "🟡 TD-COMPLIANCE-FR-CECB-EXCEPTIONS",
+      "title": "Encode CECB carve-outs for CH-FR-SALE-CECB-MANDATORY",
+      "desc": "Filed 2026-05-14 with D-324. The rule now ships at the spec-intended block/critical severity, but several carve-out scenarios known from secondary Fribourg state-energy-service sources have not yet been encoded (require LEn + REn full-text reading to confirm before encoding). Known candidate carve-outs: donations; inheritance transfers between spouses; post-divorce transfers; industrial / commercial buildings (already out of scope per art. 11a LEn limitation to SIA 380/1 categories — residential / administrative / schools); copropriété / PPE special handling (REn art. 5 says CECB established by copropriety on first request from any co-owner, not per-transaction). Implementation: extend rule's conditions JSONB to exclude carve-out scenarios, or add separate sibling rules per exception. Depends on TD-COMPLIANCE-CONDITIONAL-BLOCK 🟡 landing first (engine support for buyer_profile-style condition evaluation; today the engine doesn't evaluate conditions.buyer_profile against deal context). Cost-of-fix: ~1-2h (BDLF read of LEn 770.1 + REn 770.11 full text + rule shape decision). Cost-of-not-fixing: rule fires block/critical on edge-case transfers (donations / inheritance / industrial sales) where the cantonal obligation does not apply; agents may need to override the block manually. Documented in metadata_extra.carve_outs_pending_td.",
+      "files": "scripts/bl138/data/wave2-rules.mjs, BDLF LEn (RSF 770.1) + REn (RSF 770.11) full-text reading, depends on TD-COMPLIANCE-CONDITIONAL-BLOCK",
+      "tag": "compliance",
+      "added": "2026-05-14"
+    },
+    {
+      "id": "~~TD-COMPLIANCE-FR-CECB-CITATION~~ (D-324)",
+      "title": "~~CH-FR-SALE-CECB-MANDATORY shipped at downgraded severity flag/warning instead of spec-mandated block/critical~~ — CLOSED 2026-05-14 → D-324. Citation locked from canonical Fribourg state-energy-service page (https://www.fr.ch/deef/sde/pourquoi-etablir-un-cecb) + BDLF: art. 11a LEn (RSF/SGF 770.1) primary + art. 5 REn (RSF/SGF 770.11) secondary. Rule data updated in scripts/bl138/data/wave2-rules.mjs: rule_type='block', severity='critical', blocking=true, source_type='statute', full description rewrite citing both articles + SIA 380/1 building-class scope, source_url + source_url_translations point to BDLF FR/DE articles, source_authority = \"Service de l'énergie (SdE), Etat de Fribourg\", source_citation = \"art. 11a LEn / EnGe (RSF/SGF 770.1) + art. 5 REn / EnR (RSF/SGF 770.11) — obligatoire pour toute vente immobilière depuis 2013\". Re-seeded via --scope=fr --force (rolled back 10 wave-2-v1 FR rows + re-inserted, all other 27 wave-2 rows untouched). DB-verified post-seed: all 6 assertions PASS (rule_type=block, severity=critical, blocking=true, source_url starts bdlf.fr.ch, source_authority contains \"Service de l'énergie\", rows.length=1). New TD spawned: TD-COMPLIANCE-FR-CECB-EXCEPTIONS 🟡 (carve-outs for donations / inheritance / divorce / industrial / copropriété — require LEn+REn full-text reading; depends on TD-COMPLIANCE-CONDITIONAL-BLOCK). Original notes preserved below for historical context. Original notes: Filed 2026-05-12 with BL-138-wave2A (commit 686ef8b, Gate 2). The Fribourg cantonal energy-law citation could not be locked via WebFetch (3 attempts: fr.ch/sites/.../cecb.pdf / fr.ch/dee/energie/.../cecb / bdlf.fr.ch/data/770.1/fr — all returned 404 / no statute text; landing page resolved but pointed to BDLF which returned LexWork shell only). Spec § 4.4 fallback engaged.",
       "desc": "scripts/bl138/data/wave2-rules.mjs, BDLF research (manual)",
       "files": "2026-05-12",
-      "tag": "ai",
+      "tag": "compliance",
       "added": ""
     },
     {
-      "id": "🟡 TD-COMPLIANCE-CONDITIONAL-BLOCK",
-      "title": "CH-FR-LEX-KOLLER-AUTH ships with conditions JSONB populated documenting the conditional-block intent (buyer_profile = 'person_abroad' → block/critical; else flag/warning), but src/features/admin/services/complianceEngine.ts doesn't yet evaluate buyer_profile against the conditions shape — the rule falls through to its base rule_type='flag' / severity='warning' regardless of buyer profile. Filed 2026-05-12 with BL-138-wave2A (commit 686ef8b, Gate 2). Verified via grep at Gate 2 reconnaissance: zero hits for default_type_when_unmatched / buyer_profile / conditions..*operator in the engine. Cost-of-fix: add default_type_when_unmatched + default_severity_when_unmatched support to the engine's condition evaluator. Read existing condition evaluation in complianceEngine.ts; extend to read the default_type_when_unmatched keys from conditions JSONB and apply them when the buyer_profile condition doesn't match incoming deal context. MCP verification gap: spec § 9 step 15 (conditional-block test with 2 buyer-profile fixtures) currently passes against the warn fallback but doesn't exercise the actual block path. Cost-of-not-fixing: wave-2A's conditional-block design ships as documentation-only; FR-LK rule fires identically for all buyer profiles. The engine work also gates any future canton-specific conditional blocks (likely needed when BL-126 federal Lex Koller revision lands and \"person abroad\" definition broadens). Documented in spec § 14.2 deviation #2.",
-      "desc": "src/features/admin/services/complianceEngine.ts, future MCP re-test of CH-FR-LEX-KOLLER-AUTH per spec § 9 step 15, docs/specs/BL-126-Spec-Federal-Lex-Koller-2026-Consultation.md § 4 (DoD checks this is re-evaluated at BL-126 reopen)",
+      "id": "~~TD-COMPLIANCE-CONDITIONAL-BLOCK~~ (D-325)",
+      "title": "~~CH-FR-LEX-KOLLER-AUTH ships with conditions JSONB documenting the conditional-block intent but engine doesn't evaluate~~ — CLOSED 2026-05-14 → D-325. Engine extended with ConditionalRuleResolution discriminated union in src/features/admin/services/complianceEngine.ts. New array_contains operator. New resolveConditionalModifier() helper with match-first semantics + _have_missing flag handling for incomplete-data fallback. Applicability-tier APPLICABILITY_ALWAYS_INFO forcing exempted when rule is resolved via modifier. Malformed-shape defensive guard for legacy non-array conditions. CH-FR-LEX-KOLLER-AUTH re-seeded with new shape (conditions: [{kind: 'conditional_rule_resolution', match: [{field: 'buyer_lex_koller_residency_statuses', operator: 'array_contains', value: 'person_abroad'}], when_matched: {block/critical/blocking=true}, when_unmatched: {flag/warning/blocking=false}, when_unevaluable: {flag/warning/blocking=false}}]). New migration supabase/migrations/20260514_d325_lex_koller_residency_status.sql adds deal_participants.lex_koller_residency_status TEXT + 4-value CHECK (person_abroad / swiss_resident / swiss_resident_with_permit / unknown). 19 new Jest unit tests in tests/unit/complianceEngine-d325.test.ts covering 4 test groups: modifier resolution (incl. match-first bug coverage in 5.1.d), array_contains operator, applicability-tier exemption, malformed-shape defensive guard. All 29 complianceEngine tests pass (19 new + 10 wave-1 BL-138). End-to-end MCP verification deferred to TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE 🟡 (no caller yet hydrates entityData.buyer_lex_koller_residency_statuses from deal_participants). 7 follow-up TDs filed (enum expansion, legal entities, snapshot-on-close, VS/GR wire-in, multi-modifier composability, namespace refactor, CRM UI). Original notes preserved below for historical context. Original notes: Filed 2026-05-12 with BL-138-wave2A (commit 686ef8b, Gate 2). Verified via grep at Gate 2 reconnaissance: zero hits for default_type_when_unmatched / buyer_profile / conditions..*operator in the engine. Cost-of-fix: add default_type_when_unmatched + default_severity_when_unmatched support to the engine's condition evaluator. MCP verification gap: spec § 9 step 15.",
+      "desc": "src/features/admin/services/complianceEngine.ts, scripts/bl138/data/wave2-rules.mjs, scripts/bl138/seed-bl138-wave2-rules.mjs, supabase/migrations/20260514_d325_lex_koller_residency_status.sql, tests/unit/complianceEngine-d325.test.ts",
       "files": "2026-05-12",
       "tag": "compliance",
       "added": ""
@@ -2587,6 +2659,27 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-325",
+      "title": "Compliance engine — ConditionalRuleResolution extension + lex_koller_residency_status column + CH-FR-LEX-KOLLER-AUTH rule update",
+      "desc": "Closes TD-COMPLIANCE-CONDITIONAL-BLOCK 🟡. Opens 8 new TDs (incl. TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE 🟡 as primary follow-up). Engine extension (src/features/admin/services/complianceEngine.ts): split RuleCondition into discriminated union `StandardCondition",
+      "completed": "ConditionalRuleResolution with type guards isStandardCondition / isConditionalRuleResolution; added array_contains operator to evaluateCondition; new resolveConditionalModifier() helper with match-first semantics + \u003cfield\u003e_have_missing flag handling for incomplete-data fallback; updated evaluateConditions to gate only on standard conditions (modifiers handled separately in evaluateRule); updated evaluateRule to build effectiveRule from modifier resolution + propagate rule_type/severity/blocking/actions/applicability through all 3 return paths (skipped / accepted-ingestion / non-accepted-ingestion / non-ingestion); added !resolvedViaModifier exemption to APPLICABILITY_ALWAYS_INFO forcing so modifier-resolved rules don't get info-flattened; defensive guard logs + skips on non-array conditions (legacy malformed shapes). Internal helpers evaluateCondition, evaluateRule, resolveConditionalModifier exported with @internal JSDoc for unit-test access. Migration (supabase/migrations/20260514_d325_lex_koller_residency_status.sql): adds deal_participants.lex_koller_residency_status TEXT NULL + CHECK accepting NULL or one of person_abroad / swiss_resident / swiss_resident_with_permit / unknown + COMMENT documenting deal-scoped semantics. Will applied manually via Supabase SQL Editor before Phase 2. Seed rule (scripts/bl138/data/wave2-rules.mjs): CH-FR-LEX-KOLLER-AUTH rewritten — description rewritten in French explaining dynamic resolution, conditions now [{kind: 'conditional_rule_resolution', match: [{field: 'buyer_lex_koller_residency_statuses', operator: 'array_contains', value: 'person_abroad'}], when_matched: {block/critical/blocking=true}, when_unmatched: {flag/warning/blocking=false}, when_unevaluable: {flag/warning/blocking=false}}], metadata_extra drops conditional_block_intent + td_ref (engine now native). Seed validation (scripts/bl138/seed-bl138-wave2-rules.mjs): extended preflightValidate() to reject multiple modifiers per rule, invalid resolved rule_type/severity/blocking shapes, and empty match arrays. Re-seeded FR scope via --scope=fr --force (rolled back 10 + re-inserted, VS+GR untouched). DB-verified new shape persisted correctly with base values = unmatched defaults. Jest tests (tests/unit/complianceEngine-d325.test.ts): 19 tests across 4 groups — 5.1 modifier resolution (incl. critical 5.1.d match-first bug coverage: array=['person_abroad'] + _have_missing=true resolves to when_matched), 5.2 array_contains operator (6 cases), 5.3 applicability-tier exemption when resolved-via-modifier (4 cases incl. pending-ingestion preservation of original_severity), 5.4 malformed-conditions defensive guard (3 cases). All 29 complianceEngine tests pass (19 new + 10 wave-1 BL-138 untouched). Spec annex appended at docs/specs/BL-138-Spec-CH-Cantonal-Compliance-Wave-2-v2.md § 15 (v2.1 annex). Standalone D-325 spec committed at docs/specs/D-325-Conditional-Block-Engine-v2.1.md. Phase 0 corrections surfaced: migration directory is canonical supabase/migrations/ not bare migrations/` (last 7 migrations all there). No tag bump. Atlas regen deferred to EOS. Out-of-scope honored: no deal-evaluation pipeline / no UI for residency capture / no VS/GR rule migration / no enum expansion / no migration applied by CC — all tracked in new TDs.",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-324",
+      "title": "BL-138 Wave 2A close-out — CH-FR-SALE-CECB-MANDATORY upgraded to block/critical with locked BDLF citation",
+      "desc": "Closes TD-COMPLIANCE-FR-CECB-CITATION 🟡 → ✅. Opens TD-COMPLIANCE-FR-CECB-EXCEPTIONS 🟡. Citation locked from official Fribourg state-energy-service page (fr.ch/deef/sde/pourquoi-etablir-un-cecb) which directly links both binding BDLF articles: primary art. 11a LEn (RSF/SGF 770.1) + secondary art. 5 REn (RSF/SGF 770.11). Rule data edit at scripts/bl138/data/wave2-rules.mjs: added 6 new URL constants (BDLF FR/DE × LEn 11a + REn 5; SDE CECB page FR/DE), deleted stale FR_SDE constant (was the only consumer), replaced full rule object — rule_type='block', severity='critical', blocking=true, source_type='statute', description rewrite explicitly citing both articles + SIA 380/1 building-class scope (residential + administrative + schools; industrial/commercial out of scope per art. 11a LEn). source_url + source_url_translations point to BDLF FR/DE article 11a; secondary URLs (REn art. 5 + SDE page) carried in metadata_extra.source_secondary_urls. Re-seeded via node --env-file=.env.local scripts/bl138/seed-bl138-wave2-rules.mjs --scope=fr --force (rolled back 10 wave-2-v1 FR rows + re-inserted; VS=14 + GR=13 untouched; final wave-2 count = 37 unchanged). DB-verified post-seed: all 6 assertions PASS (rows.length=1, rule_type=block, severity=critical, blocking=true, source_url starts bdlf.fr.ch, source_authority contains \"Service de l'énergie\"). Phase 0 surfaced 3 prompt corrections before execution: prompt's seed script name was seed-wave2-rules.mjs (actual: seed-bl138-wave2-rules.mjs); prompt's --org-id flag doesn't exist (wave 2A rules are layer='region' org-agnostic with org_id=NULL — engine evaluates per-org at runtime); MCP verification filter org_id=eq.\u003cuuid\u003e would return 0 rows against org_id=NULL (used code filter only). Will approved adjustments before execution. Spawned TD-COMPLIANCE-FR-CECB-EXCEPTIONS 🟡: carve-outs (donations, inheritance between spouses, post-divorce transfers, industrial/commercial out-of-scope, copropriété PPE per-copropriety handling) require LEn+REn full-text reading; depends on TD-COMPLIANCE-CONDITIONAL-BLOCK landing first (engine evaluation of conditions JSONB). No schema migration. No tag bump. Atlas regen deferred to EOS per WOW.",
+      "completed": "scripts/bl138/data/wave2-rules.mjs (constants block + FR-5 rule replaced; bare FR_SDE constant deleted), ROADMAP.md (TD ledger close + new EXCEPTIONS TD + this D-324 entry), CHANGELOG.md",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-323",
+      "title": "TD-ATLAS-ALL-TAB-COLUMN-FILTER — root cause fix (HTML escaping)",
+      "desc": "D-322 fixed the wrong layer (CSS sizing). Real root cause: unescaped HTML in 2 of the 251 BACKLOG cards (BL-121 description with literal \u003chtml dir=\"rtl\"\u003e; BL-125 title messages/\u003clocale\u003e.json + description with \u003clocale\u003e / \u003cX\u003e placeholders) corrupted the DOM tree during runtime innerHTML assignment in scripts/generate-roadmap-html.mjs template literals. The browser silently recovered by closing col-backlog early and nesting subsequent siblings (col-debt + col-done) inside col-backlog as descendants — so they were no longer CSS Grid items, hence the visual \"3 columns\" on \"All\" view. Verified pre-fix via DevTools console: [...document.querySelector('.kanban').children].filter(el =\u003e el.classList.contains('column')).length === 3 (expected 5); col-backlog.querySelectorAll('.column').length === 2 (debt + done trapped inside). Build-time JSON.stringify().replace(/\u003c/g,'u003c') (lines 168-169 of generator) safely encodes data INTO the script tag, but the browser de-escapes back to raw \u003c at parse time; the unsafe step was the subsequent ${item.desc} interpolation into innerHTML at runtime. Fix: added escapeHtml() helper to the embedded runtime \u003cscript\u003e block, applied to 24 user-sourced template-literal interpolations across renderCard / renderTimeline / renderSessions / showModal. Programmatic/computed values (TAGS color/label, column keys, counts) left unescaped — they're safe enums. Also reverted D-322's minmax(220px,1fr) → minmax(260px,1fr) since CSS no longer needs to compensate. Lesson codified in WAYS-OF-WORKING.md § Atlas generator discipline (D-323): every user-sourced field in runtime template literals MUST be wrapped in escapeHtml(); verify after generator changes via the DevTools .kanban.children snippet.",
+      "completed": "scripts/generate-roadmap-html.mjs (housezum-app) a6bc66c, ~/Apps/housezum-process-atlas/roadmap/index.html (atlas) ed559d6, WAYS-OF-WORKING.md (this commit)",
+      "tag": "admin"
+    },
     {
       "id": "D-322",
       "title": "TD-ATLAS-ALL-TAB-COLUMN-FILTER fixed — \"All\" tab now renders all 5 columns",
@@ -5217,6 +5310,27 @@ function specUrl(id, title) {
 }
 const TAGS={comms:{label:'Comms',color:'cyan'},compliance:{label:'Compliance',color:'rose'},admin:{label:'Admin',color:'purple'},core:{label:'Core',color:'blue'},infra:{label:'Infra',color:'amber'},ai:{label:'AI',color:'green'},ux:{label:'UX',color:'indigo'},integrations:{label:'Integrations',color:'integrations'}};
 let activeView='kanban',activeFilter='all';
+/**
+ * escapeHtml — REQUIRED for every user-sourced HTML injection in template literals.
+ *
+ * Why this exists: D-322/D-323 (2026-05-12/13). Unescaped `<`, `>`, `&`, or quote
+ * chars in ROADMAP.md content (e.g. BL-121's `<html dir="rtl">` or BL-125's `<locale>`)
+ * silently corrupt the DOM tree. Browser parser closes parent prematurely;
+ * subsequent siblings nest as descendants. Visible symptom: "All" filter shows
+ * fewer kanban columns than category filters. No console error.
+ *
+ * Rule: wrap ANY ${expression} sourced from ROADMAP.md / FEATURE-MAP.md /
+ * CHANGELOG.md in escapeHtml(). Safe to leave unwrapped: hardcoded enum keys,
+ * CSS class names defined in code, counts/indices, JSON.stringify output
+ * (which already escapes </>).
+ *
+ * Verify after any generator change with this DevTools snippet on the live page:
+ *   [...document.querySelector('.kanban').children]
+ *     .filter(el => el.classList.contains('column')).length
+ * Must return 5 on every filter state. If <5, an injection point was missed.
+ *
+ * Full runbook: docs/debug-runbooks/atlas-rendering.md
+ */
 function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
 function renderStats(){const e=document.getElementById('stats'),c={'In Progress':DATA.inProgress.length,'Next Up':DATA.nextUp.length,'Backlog':DATA.backlog.length,'Done':DATA.done.length};e.innerHTML=Object.entries(c).map(([l,v])=>`<div class="stat"><div class="stat-val">${v}</div><div class="stat-label">${l}</div></div>`).join('')}
 function renderFilters(){const e=document.getElementById('filterBar'),a=['all',...Object.keys(TAGS)];e.innerHTML=a.map(t=>`<button class="filter-chip ${t===activeFilter?'active':''}" data-filter="${t}">${t==='all'?'All':TAGS[t].label}</button>`).join('')}
