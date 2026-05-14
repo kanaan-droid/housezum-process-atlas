@@ -445,12 +445,12 @@ const DATA = {
       "added": "2026-05-10"
     },
     {
-      "id": "🟡 TD-SEED-LISTUSERS-PAGINATION",
-      "title": "auth.admin.listUsers() defaults to perPage=50, breaks \"already-registered\" lookup on databases with \u003e50 users",
-      "desc": "Filed 2026-05-10 with D-315. scripts/seed-eu-agencies/seed-orgs-users.mjs and other seed scripts use auth.admin.listUsers() with no opts; production auth.users is now well past 50 rows, so the lookup quietly misses recent users and the seed re-attempts createUser() on already-existing emails (silent failure → mismatched org_member rows). Already mitigated in scripts/bl138/seed-bl138-mcp-test-orgs.mjs via auth.admin.listUsers({ perPage: 1000 }). Cost-of-fix: ~15-30 min — patch each seed script that calls listUsers to either (a) pass { perPage: 1000 } if expected user count \u003c1000, or (b) iterate pages until empty result. Cost-of-not-fixing: every BL-EU-SEED re-run silently misses recent users and the \"already-registered\" branch goes dead.",
-      "files": "scripts/seed-eu-agencies/seed-orgs-users.mjs, any other seed script that calls auth.admin.listUsers()",
+      "id": "~~TD-SEED-LISTUSERS-PAGINATION~~ (D-328)",
+      "title": "~~auth.admin.listUsers() defaults to perPage=50, breaks \"already-registered\" lookup on databases with \u003e50 users~~ — CLOSED 2026-05-14 → D-328. Back-port from scripts/bl138/seed-bl138-mcp-test-orgs.mjs canonical applied to scripts/seed-eu-agencies/seed-orgs-users.mjs:139: auth.admin.listUsers({ perPage: 1000 }). Error message also extended to surface the 1000-row mitigation hint for \u003e1000-user DBs. Other seed scripts using listUsers() not audited in this commit; filed as scope note in CHANGELOG. Mitigation: covers dev DBs up to 1000 users; for \u003e1000-user prod DBs, page iteration deferred (low priority — surface as fresh TD when first crossed). Original notes: Filed 2026-05-10 with D-315. scripts/seed-eu-agencies/seed-orgs-users.mjs and other seed scripts use auth.admin.listUsers() with no opts; production auth.users is now well past 50 rows, so the lookup quietly misses recent users and the seed re-attempts createUser() on already-existing emails (silent failure → mismatched org_member rows). Already mitigated in scripts/bl138/seed-bl138-mcp-test-orgs.mjs via auth.admin.listUsers({ perPage: 1000 }).",
+      "desc": "scripts/seed-eu-agencies/seed-orgs-users.mjs",
+      "files": "2026-05-10",
       "tag": "comms",
-      "added": "2026-05-10"
+      "added": ""
     },
     {
       "id": "🟡 TD-AUTH-IDENTITIES-FK-CASCADE",
@@ -1806,12 +1806,12 @@ const DATA = {
       "added": ""
     },
     {
-      "id": "🟡 TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT",
-      "title": "seed-eu-agencies writes English country names to agent_profiles.operating_country",
-      "desc": "Discovered 2026-05-05 during BL-133 Phase 3 CHECK application. 21 rows (7 each FR/IT/CH) had operating_country set to English names ('France', 'Italy', 'Switzerland') instead of ISO alpha-2 codes. Same regression class as scripts/bl60/seed-qa-knowledge-base.mjs:168 (patched in BL-133). The CHECK constraint added in BL-133 Phase 3 (agent_profiles_operating_country_iso_format) now blocks this at INSERT time, but the seed-script source is still wrong. Next time a seed-eu-agencies re-run is attempted, it will fail with a CHECK violation. Fix: patch the seed script to write ISO codes (FR/IT/CH/AE) instead of English names; add comment marker // BL-133 seed regression — see TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT so future grep surfaces lineage. ~10 min standalone fix; could also be folded into the next BL-126-adjacent ticket. Filed: 2026-05-05.",
-      "files": "scripts/seed-eu-agencies/seed-orgs-users.mjs (likely site; verify location), or wherever agent_profiles rows are inserted in the EU seed flow",
-      "tag": "ai",
-      "added": "2026-05-05"
+      "id": "~~TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT~~ (D-328)",
+      "title": "~~seed-eu-agencies writes English country names to agent_profiles.operating_country~~ — CLOSED 2026-05-14 → D-328. Back-port from scripts/bl138/seed-bl138-mcp-test-orgs.mjs canonical applied to scripts/seed-eu-agencies/seed-orgs-users.mjs:184: operating_country: org.country_code (ISO alpha-2) instead of org.country_default (English name). org.country_code was already present on the org config (BL-137 dual-write at lines 26/35/44), so no new hardcoding required — pure property swap. Future BL-EU-SEED re-runs will pass the agent_profiles_operating_country_iso_format CHECK. Production data already canonicalized in the BL-133 Phase 3 session (21 rows hand-fixed). Original notes: Discovered 2026-05-05 during BL-133 Phase 3 CHECK application. 21 rows (7 each FR/IT/CH) had operating_country set to English names ('France', 'Italy', 'Switzerland') instead of ISO alpha-2 codes. Same regression class as scripts/bl60/seed-qa-knowledge-base.mjs:168 (patched in BL-133).",
+      "desc": "scripts/seed-eu-agencies/seed-orgs-users.mjs",
+      "files": "2026-05-05",
+      "tag": "admin",
+      "added": ""
     },
     {
       "id": "🟡 TD-DATA-COUNTRY-CODE-COLLISION",
@@ -2666,6 +2666,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-328",
+      "title": "TD-SEED back-ports — listUsers pagination + operating_country ISO",
+      "desc": "Closes 2 TDs in one commit: TD-SEED-LISTUSERS-PAGINATION 🟡 + TD-SEED-EU-AGENCIES-COUNTRY-NAME-FORMAT 🟡. Both fixes back-ported from scripts/bl138/seed-bl138-mcp-test-orgs.mjs (canonical source — both fixes verified present at lines 205 + 251) to the original scripts/seed-eu-agencies/seed-orgs-users.mjs (drifted). Edit 1 (line 139): auth.admin.listUsers() → auth.admin.listUsers({ perPage: 1000 }); inline comment cites the TD. Error message extended to surface the 1000-row mitigation hint for \u003e1000-user DBs. Edit 2 (line 184): operating_country: org.country_default (English name) → operating_country: org.country_code (ISO alpha-2); inline comment cites BL-133 + TD lineage. org.country_code was already present on the org config (BL-137 dual-write at lines 26/35/44), so the fix is a pure property swap — Commandment #1 satisfied (no new hardcoding). File header extended with back-port note for future-CC discoverability. Static sanity checks: perPage: 1000 count = 2 (1 code + 1 header note), org.country_code count = 2 (1 code + 1 header note); remaining country_default usages are intentional (BL-137 dual-write to organizations, team region derivation, countryTag mapping — none in operating_country context). No DB run (production data already canonicalized in BL-133 Phase 3 session, 21 rows hand-fixed 2026-05-05). No new tests (data-only behavioral fix; regression-guard against future re-runs). Other seed scripts not audited; if any other listUsers() callsites exist they need a separate TD per CHANGELOG scope note.",
+      "completed": "scripts/seed-eu-agencies/seed-orgs-users.mjs, CHANGELOG.md, ROADMAP.md, PROJECT-STRUCTURE.md",
+      "tag": "admin"
+    },
     {
       "id": "D-327",
       "title": "VS + GR Lex Koller → ConditionalRuleResolution wire-in",
