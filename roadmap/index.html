@@ -135,7 +135,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-19';
+const LAST_UPDATED = '2026-05-20';
 const DATA = {
   "inProgress": [
     {
@@ -904,6 +904,20 @@ const DATA = {
       "desc": "Highest complexity in the BL-143 portfolio due to migration risk: ~61 UAE compliance rules pre-date BL-130's ingestion model and fire today via the original get_applicable_rules RPC path with full blocking behavior. UAE is currently Tier 0.5 (legacy-functional) per § 11. Retrofit goal: bring UAE into BL-130/135/136/142 audit-trail discipline (citation columns, acceptance flow, snapshot-on-close) without disrupting active enforcement. Option A LOCKED per cross-val Round 1: coexistence — backfill source_url/source_citation on manual rows non-destructively, keep created_via='manual', skip acceptance gate (engine already does), reuse only the snapshot-on-close writer. Option B (re-ingest) deferred to a future BL with sunset criterion in spec § 3.4 (shadow-run + parity tests on ≥100 historical deals + transactional rollback verified + Will go/no-go). Citation backfill requires ~2h source-registry research (RERA/DLD/Ejari). AML namespace refactor (TD-COMPLIANCE-REGULATORY-NAMESPACE-REFACTOR 🟢) out of scope — separate sprint. Blocked on: BL-142 (snapshot writer only; mostly independent under Option A). ~3-6h effort (Option A). Cross-val REQUIRED at execution time — UAE is the most-used production market; retrofit risks live agent workflow. Must honor § 5 architectural contracts from BL-143 v2 (snapshot schema, UI surface adapter; hydration adapter + acceptance walkthrough N/A under Option A).",
       "tag": "compliance",
       "added": "docs/specs/BL-143-Spec-Multi-Country-Engine-Activation.md § 3.4, RERA/DLD/Ejari source-registry research (to be filed under docs/audits/ during BL-150 execution)"
+    },
+    {
+      "id": "BL-151",
+      "title": "Architecture documentation for compliance subsystem (docs/architecture/compliance.md)",
+      "desc": "Write docs/architecture/compliance.md covering: 4-layer rule engine (country/canton/jurisdiction/org), compliance evaluation lifecycle (triggers, status codes, exception path), workflow gating architecture (stage advance enforcement, blocker rules, RPC vs trigger choice), ADR-0002 (Fedlex multi-language URL swap), country-layer rule ingestion pattern (BL-130/131/138/142/143 family), known gaps from D-341 Phase 3 Axis 6 audit findings. Absorbs on close: BG-90 / BG-91 / BG-92 / BG-93 / BG-94 / BG-97 / BG-98 / BG-103 / BG-104 + BL-131 (currently in ABSORBED_NON_ARCH set in scripts/docs-check.mjs). On close, remove those entries from ABSORBED_NON_ARCH. Effort: 1-2h. Origin: D-341 docs:check absorption deferral.",
+      "tag": "compliance",
+      "added": "docs/architecture/compliance.md (NEW)"
+    },
+    {
+      "id": "BL-152",
+      "title": "Flesh out docs/architecture/qa-engine.md beyond BG-79b skeleton",
+      "desc": "Convert docs/architecture/qa-engine.md from 116-line skeleton (\"TBD in BG-79b\") into a real architecture doc. Required content: per-field staleness invariant (BG-89 — null timestamps mean isStale()→false, not synthesized from row-level properties.updated_at), LLM model override pattern (BL-107 — process.env.\u003cFEATURE\u003e_MODEL_OVERRIDE primitive + log-resolved-model observability invariant), Q&A engine 4-branch context resolution (property+deal / property-only / deal-only / neither), schema fallback service for unmapped attributes, Haiku column classifier whitelist. Absorbs on close: BG-89 + BL-107 (currently in ABSORBED_NON_ARCH set in scripts/docs-check.mjs). On close, remove those entries from ABSORBED_NON_ARCH. Effort: 30-60min. Origin: D-341 docs:check absorption deferral.",
+      "tag": "admin",
+      "added": "docs/architecture/qa-engine.md (rewrite)"
     },
     {
       "id": "BL-147",
@@ -1897,6 +1911,14 @@ const DATA = {
       "added": "2026-05-19"
     },
     {
+      "id": "🟡 TD-FRICTION-TAXONOMY-EXTRACT-TO-RULES",
+      "title": "Model F1/F2/F4/F6/F7/F8/F9 (currently free-text strings in deals.notes_internal + deals.tags) as queryable compliance_rules rows so frictions are structured + gating-capable",
+      "desc": "Filed 2026-05-19 in Phase 3 Axis 6 Check A (D-341) — friction taxonomy consistency. F3/F10 are already rule-driven (via cantonal CH-ZH compliance rule rows) and behave gate-capable; the other 7 BL-144 friction codes are notes-only and therefore can't trigger compliance evaluation, badge surfaces, or stage-advance gates. Fix: extract each F* friction into a compliance_rules row with an explicit trigger + action + severity. Cost-of-fix: ~2-4h. Blocked on: Phase 4 fixes for BG-104 (engine has no deal-event wiring) — extracting frictions into rules makes sense only after rule evaluation actually fires on deal events.",
+      "files": "scripts/seed-eu-locales.mjs (for new rule rows); compliance_rules table; BL-144 seed friction string parsing",
+      "tag": "compliance",
+      "added": "2026-05-19"
+    },
+    {
       "id": "🟢 TD-DD-TRACKER-UPDATER-IDEMPOTENT-ADD",
       "title": "update-tracker.py add_row action is non-idempotent — re-running same spec adds duplicate rows",
       "desc": "Filed 2026-05-19 with D-339. scripts/dd-hardening/update-tracker.py follows SQL INSERT-semantics on add_row: re-running the same spec twice would add 7 duplicate TD Ledger rows + 1 duplicate Changelog row. update+set_cell are idempotent (no-op writes when same value), but add_row isn't. Fix: add find_by semantics to add_row — \"if a row matching key_column=value already exists, skip; otherwise insert\". Each add_row op declares its key column (e.g. \"key_column\": \"TD Code\" for the TD Ledger). Cost-of-fix: ~30 min + test the safe-replay scenario. Cost-of-not-fixing: users must remember not to re-run the same spec, OR remove add_row ops from a spec after they've been applied. Acceptable for a low-volume tool; cheap to fix later.",
@@ -2802,9 +2824,121 @@ const DATA = {
       "desc": "Lead detail page shows Residency Status: resident (raw enum value) instead of humanized Resident/Non-Resident. Same class as BL-105 — humanize lead enum values across detail surfaces. Pre-existing, surfaced during BG-50 W5 MCP testing. Low severity.",
       "tag": "admin",
       "added": "2026-04-26"
+    },
+    {
+      "id": "BG-90",
+      "title": "F3 Lex Koller red friction does NOT block stage advance — direct PATCH deals.current_stage_key succeeds with no server-side guard (kanban + detail UI both bypass)",
+      "desc": "🔴 Critical — highest-priority Phase 4 fix. Filed in Phase 3 Axis 6 (D-341). Pairs with BG-104 (engine has no deal-event wiring).",
+      "tag": "admin",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-91",
+      "title": "Kanban deal-list query omits compliance_status from workflow_instances select — UI cannot render block indicator because the data isn't fetched",
+      "desc": "🔴 Critical (trivial fix; large visual impact). Filed in Phase 3 Axis 6 (D-341).",
+      "tag": "compliance",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-92",
+      "title": "UI stage stepper renders 5 hardcoded English-style stages instead of the workflow_template's actual stages (8 stages for CH Federal Sale). lex_koller_authorization stage never appears in UI.",
+      "desc": "🔴 Critical. Filed in Phase 3 Axis 6 (D-341).",
+      "tag": "admin",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-93",
+      "title": "deal_stage_history accepts POST with arbitrary from_stage_key/to_stage_key without validating against workflow template or current deal state. Audit log can be polluted with illegal transitions. Compounded by RLS-immutable DELETE (positive finding, but means pollution is permanent).",
+      "desc": "🔴 Critical. Filed in Phase 3 Axis 6 (D-341). Pairs with BG-90.",
+      "tag": "admin",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-94",
+      "title": "Schema dual-column drift: deals.stage vs deals.current_stage_key (both populated identically by seed; UI PATCH updates only current_stage_key causing drift). Same pattern in deal_stage_history.from_stage/from_stage_key/to_stage/to_stage_key.",
+      "desc": "🟡 Significant. Filed in Phase 3 Axis 6 (D-341). Spec § 5.3 said \"Use current_stage_key (v2). Legacy stage filled in parallel.\" — not DB-enforced.",
+      "tag": "admin",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-95",
+      "title": "Confirm modal lacks ARIA semantics: no role=\"dialog\", no aria-modal=\"true\", no aria-labelledby, no focus trap. Pattern across multiple confirm modals.",
+      "desc": "🟡 Significant (systemic a11y). Filed in Phase 3 Axis 6 (D-341).",
+      "tag": "ux",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-96",
+      "title": "No \"view deal detail\" affordance from kanban. Card click triggers BOTH detail panel AND stage-advance modal simultaneously. ⋮ menu has \"Bearbeiten/Abschliessen/Löschen\" — no \"Anzeigen\". All kanban interactions are mutating.",
+      "desc": "🟡 Significant UX. Filed in Phase 3 Axis 6 (D-341).",
+      "tag": "admin",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-97",
+      "title": "Property compliance UI shows \"Konform\" + \"Alle Compliance-Anforderungen erfüllt\" when ZERO compliance_evaluations rows exist for the property. UI fails open to \"compliant\" instead of \"unknown\". Actively misleading for P4 which has GEAK missing per spec.",
+      "desc": "🔴 Critical (actively misleading). Filed in Phase 3 Axis 6 (D-341). Compounds with BG-98 + BG-104.",
+      "tag": "compliance",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-98",
+      "title": "Compliance engine not wired into BL-144 INSERT path — engine works (10 add_listing evaluations exist; 46 intel_cards from BL-136 active) but 0 evaluations exist for any BL-144 deal or workflow_instance. Spec § 10 expected ~30-50 firings; got 0 deal-side.",
+      "desc": "🔴 Critical. Filed in Phase 3 Axis 6 (D-341). Distinguishes from BG-104 — this is \"seed bypassed event paths\", BG-104 is \"no event paths exist for deal events\".",
+      "tag": "compliance",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-99",
+      "title": "/admin/deals page-load query activity_events?...&order=created_at.desc returns 400 — column created_at does not exist; actual column is occurred_at. Recent-activity surface silently broken.",
+      "desc": "🟡 Significant. Filed in Phase 3 Axis 6 (D-341).",
+      "tag": "admin",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-100",
+      "title": "Buttons across the app lack aria-label: →, ⋮, ×, and others on kanban cards, listing rows, modal close. Pattern app-wide.",
+      "desc": "🟢 Polish (systemic). Filed in Phase 3 Axis 6 (D-341). Consider ESLint rule.",
+      "tag": "admin",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-101",
+      "title": "Card and row divs not keyboard-accessible: kanban cards and listing \u003ctr\u003e rows have onclick + cursor-pointer but no tabindex, no role=\"button\". Tab key cannot reach them.",
+      "desc": "🟢 Polish (systemic). Filed in Phase 3 Axis 6 (D-341). Could fix alongside BG-96.",
+      "tag": "admin",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-102",
+      "title": "Property detail \"Lex Koller Relevant\" label renders no value when boolean is false. Should render \"Nein\" or hide the label.",
+      "desc": "🟢 Polish. Filed in Phase 3 Axis 6 (D-341).",
+      "tag": "ai",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-103",
+      "title": "BL-144 seed does not populate any agent-facing card/signal surface for the 10 friction states. intel_cards for ZH org = 46 rows, ALL compliance_acceptance_pending (BL-136 unrelated). ai_action_cards/external_events/inbound_signals = 0 rows each. Frictions are discoverable only via raw deals.notes_internal text. Originally filed (v1) as \"no task/appointment/reminder infrastructure exists\" — RETRACTED after DB-SCHEMA.md review showed infrastructure is well-architected (intel_cards has 30+ card_types). Re-filed as seed-completeness gap. Originally proposed as BG-78 but renumbered after BG collision precheck found BG-78 already shipped (Documentation Governance Protocol).",
+      "desc": "🟡 Significant (was 🔴 v1). Filed + retracted + re-filed in Phase 3 Axis 6 (D-341). Course-correction documented in findings doc.",
+      "tag": "compliance",
+      "added": "2026-05-19"
+    },
+    {
+      "id": "BG-104",
+      "title": "Compliance engine has NO wiring for deal-related events (deal.create, deal.stage_change, workflow_instance.create, deal_participant.add). Only add_listing trigger fires. Spec § 10 firing matrix lists ~15 rule codes that should fire on deal events — none do.",
+      "desc": "🔴 Critical, architectural. Filed in Phase 3 Axis 6 (D-341). Distinguishes from BG-98 — this is \"no wiring exists\", BG-98 is \"wiring exists but seed bypassed it\". Likely overlaps with BG-90 fix scope.",
+      "tag": "compliance",
+      "added": "2026-05-19"
     }
   ],
   "done": [
+    {
+      "id": "D-341",
+      "title": "Pillar 1 Phase 3 Axis 6 (Friction States) walkthrough + course-correction",
+      "desc": "Walked F3 (Lex Koller red, hard-block class), F10 (GEAK missing on P4, warning class), F7 (seller traveling, warn class, read-only). F3 confirmed 🔴 hard-stop bypass — direct PATCH deals.current_stage_key from due_diligence to closing succeeds with no server gate, no compliance check, no UI warning. F10 confirmed actively misleading \"Konform\" badge when no compliance_evaluation exists. F7 confirmed friction surfaces only in raw notes_internal text. Course-correction event 2026-05-19: initial BG-103 v1 (originally proposed as BG-78, \"no task/appointment/reminder infrastructure exists\") was filed wrong based on 6-table negative-probe drift; retracted and re-filed as v2 (seed-completeness gap) after reading DB-SCHEMA.md. Schema actually has rich infrastructure (intel_cards with 30+ card_types, ai_action_cards, external_events, inbound_signals, viewings, disclosure_requests, compliance_evaluations). New WOW subsection \"Schema-first discipline\" filed under MCP Verification Patterns. 15 BG tickets filed (BG-90 / BG-91 / BG-92 / BG-93 / BG-94 / BG-95 / BG-96 / BG-97 / BG-98 / BG-99 / BG-100 / BG-101 / BG-102 / BG-103 / BG-104, renumbered from BG-65..79 after collision precheck found all 15 numbers in use from BG-50/i18n/docs-governance era): 7 🔴 critical (BG-90 / BG-91 / BG-92 / BG-93 / BG-97 / BG-98 / BG-104), 5 🟡 significant (BG-94 / BG-95 / BG-96 / BG-99 / BG-103), 3 🟢 polish (BG-100 / BG-101 / BG-102). 1 TD filed: TD-FRICTION-TAXONOMY-EXTRACT-TO-RULES 🟡. Test artifact: 1 row in deal_stage_history (RLS-immutable for admin DELETE; service-role cleanup SQL provided in findings doc). No code change, no package.json bump, no tag. Findings: docs/dd-hardening/phase-3-axis-6-findings.md. Phase 4 fix priority order embedded in findings doc: BG-104 → BG-90 → BG-98 → BG-97 → BG-103 → others.",
+      "completed": "NEW docs/dd-hardening/phase-3-axis-6-findings.md, MODIFIED WAYS-OF-WORKING.md (new subsection), MODIFIED docs/sessions/STANDING-OBLIGATIONS.md (rows 1/2/4/5/6 bumped + History entry), MODIFIED docs/dd-hardening/dd-hardening-tracker.xlsx (v0.2.1 → v0.2.2), NEW scripts/dd-hardening/tracker-updates/2026-05-19-d341.json, MODIFIED ROADMAP.md, CHANGELOG.md, PROJECT-STRUCTURE.md",
+      "tag": "compliance"
+    },
     {
       "id": "D-340",
       "title": "Phase 3 axis prompts (6/2/5) drafted + tracker → v0.2.1 + STANDING-OBLIGATIONS row 7",
