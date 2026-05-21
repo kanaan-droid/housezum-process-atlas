@@ -135,7 +135,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-20';
+const LAST_UPDATED = '2026-05-21';
 const DATA = {
   "inProgress": [
     {
@@ -908,14 +908,14 @@ const DATA = {
     {
       "id": "BL-151",
       "title": "Architecture documentation for compliance subsystem (docs/architecture/compliance.md)",
-      "desc": "Write docs/architecture/compliance.md covering: 4-layer rule engine (country/canton/jurisdiction/org), compliance evaluation lifecycle (triggers, status codes, exception path), workflow gating architecture (stage advance enforcement, blocker rules, RPC vs trigger choice), ADR-0002 (Fedlex multi-language URL swap), country-layer rule ingestion pattern (BL-130/131/138/142/143 family), known gaps from D-341 Phase 3 Axis 6 audit findings. Absorbs on close: BG-90 / BG-91 / BG-92 / BG-93 / BG-94 / BG-97 / BG-98 / BG-103 / BG-104 + BL-131 (currently in ABSORBED_NON_ARCH set in scripts/docs-check.mjs). On close, remove those entries from ABSORBED_NON_ARCH. Effort: 1-2h. Origin: D-341 docs:check absorption deferral.",
+      "desc": "Write docs/architecture/compliance.md covering: 4-layer rule engine (country/canton/jurisdiction/org), compliance evaluation lifecycle (triggers, status codes, exception path), workflow gating architecture (stage advance enforcement, blocker rules, RPC vs trigger choice), ADR-0002 (Fedlex multi-language URL swap), country-layer rule ingestion pattern (BL-130/131/138/142/143 family), known gaps from D-341 Phase 3 Axis 6 audit findings. Absorbs on close: BG-90 / BG-91 / BG-92 / BG-93 / BG-94 / BG-97 / BG-98 / BG-103 / BG-104 + BL-131 (currently in ABSORBED_NON_ARCH set in scripts/docs-check.mjs). On close, remove those entries from ABSORBED_NON_ARCH. (BG-105 was originally tagged for absorption here but RESOLVED by D-343 RLS migration before BL-151 execution; entry remains in ABSORBED_NON_ARCH as a resolution marker.) Effort: 1-2h. Origin: D-341 + D-342 docs:check absorption deferral.",
       "tag": "compliance",
       "added": "docs/architecture/compliance.md (NEW)"
     },
     {
       "id": "BL-152",
       "title": "Flesh out docs/architecture/qa-engine.md beyond BG-79b skeleton",
-      "desc": "Convert docs/architecture/qa-engine.md from 116-line skeleton (\"TBD in BG-79b\") into a real architecture doc. Required content: per-field staleness invariant (BG-89 — null timestamps mean isStale()→false, not synthesized from row-level properties.updated_at), LLM model override pattern (BL-107 — process.env.\u003cFEATURE\u003e_MODEL_OVERRIDE primitive + log-resolved-model observability invariant), Q&A engine 4-branch context resolution (property+deal / property-only / deal-only / neither), schema fallback service for unmapped attributes, Haiku column classifier whitelist. Absorbs on close: BG-89 + BL-107 (currently in ABSORBED_NON_ARCH set in scripts/docs-check.mjs). On close, remove those entries from ABSORBED_NON_ARCH. Effort: 30-60min. Origin: D-341 docs:check absorption deferral.",
+      "desc": "Convert docs/architecture/qa-engine.md from 116-line skeleton (\"TBD in BG-79b\") into a real architecture doc. Required content: per-field staleness invariant (BG-89 — null timestamps mean isStale()→false, not synthesized from row-level properties.updated_at), LLM model override pattern (BL-107 — process.env.\u003cFEATURE\u003e_MODEL_OVERRIDE primitive + log-resolved-model observability invariant), Q&A engine 4-branch context resolution (property+deal / property-only / deal-only / neither), schema fallback service for unmapped attributes, Haiku column classifier whitelist. Absorbs on close: BG-89 + BL-107 + BG-108 (D-342 added — audit-table hydration / observability invariant) (currently in ABSORBED_NON_ARCH set in scripts/docs-check.mjs). On close, remove those entries from ABSORBED_NON_ARCH. Effort: 30-60min. Origin: D-341 + D-342 docs:check absorption deferral.",
       "tag": "admin",
       "added": "docs/architecture/qa-engine.md (rewrite)"
     },
@@ -2929,9 +2929,93 @@ const DATA = {
       "desc": "🔴 Critical, architectural. Filed in Phase 3 Axis 6 (D-341). Distinguishes from BG-98 — this is \"no wiring exists\", BG-98 is \"wiring exists but seed bypassed it\". Likely overlaps with BG-90 fix scope.",
       "tag": "compliance",
       "added": "2026-05-19"
+    },
+    {
+      "id": "~~BG-105~~",
+      "title": "~~Agent RLS allows read of ALL org deals — SELECT policy on deals is org_id = get_user_org_id() only, no role-based narrowing. Confirmed empirically: Nina (junior agent) returns 26 rows including 23 she doesn't own. Spec: agents see only own + participating deals.~~ RESOLVED by D-343 (2026-05-21) — new SELECT policy gates on assigned_user_id = auth.uid() OR EXISTS join to deal_participants.user_id; managers+ see all.",
+      "desc": "🔴 Critical. Filed in Phase 3 Axis 5 (D-342); closed in D-343 RLS consolidation.",
+      "tag": "admin",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "~~BG-106~~",
+      "title": "~~Dual ownership columns (owner_user_id and assigned_user_id) coexist on deals with no documented semantic. RLS write policy uses assigned_user_id; BL-144 seed wrote owner_user_id; UI reads assigned_user_id only. BL-116 intended dual-semantic but never completed.~~ RESOLVED by D-342 (2026-05-21) — dropped owner_user_id, backfilled into assigned_user_id.",
+      "desc": "🔴 Critical. Filed + closed in Phase 3 Axis 5 (D-342).",
+      "tag": "admin",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "~~BG-107~~",
+      "title": "~~Deal kanban shows \"Nicht zugewiesen\" for 16 BL-144 deals because UI reads only assigned_user_id.~~ RESOLVED by D-342 (2026-05-21) — backfill populated the 16 BL-144 rows into assigned_user_id; the column the UI reads now has the agent values.",
+      "desc": "🟡 Significant. Filed + closed in Phase 3 Axis 5 (D-342).",
+      "tag": "admin",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "BG-108",
+      "title": "Audit infrastructure exists across 7 tables (audit_log, activity_log, activity_events, media_events, external_events, lead_source_events, deal_stage_history) but audit_log, activity_log, activity_events are ENTIRELY EMPTY. No reassignment, no ownership change, no admin action writes to any of them.",
+      "desc": "🔴 Critical. Filed in Phase 3 Axis 5 (D-342).",
+      "tag": "admin",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "BG-109",
+      "title": "DELETE on RLS-protected row returns 204 No Content despite no actual deletion. PostgREST default behavior — misleading for client error handling. Mitigation: API routes should use Prefer: count=exact and verify count, or wrap deletes in route handlers with explicit existence checks.",
+      "desc": "🟢 Polish. Filed in Phase 3 Axis 5 (D-342).",
+      "tag": "admin",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "~~BG-110~~",
+      "title": "~~activity_events.created_at missing.~~ WITHDRAWN (D-342 2026-05-21) — not a real bug. Original claim was created_at column missing; reality is the column is named occurred_at. Schema is fine; query was wrong.",
+      "desc": "n/a",
+      "tag": "ai",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "BG-111",
+      "title": "Lukas Frei (second admin in ZH org, user_id = 4f6644ee-feb7-4166-87b0-02b965e00757) owns 0 deals. Either intentional (backend admin) — needs documentation — or seed coverage gap.",
+      "desc": "🟢 Polish. Filed in Phase 3 Axis 5 (D-342).",
+      "tag": "admin",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "~~BG-112~~",
+      "title": "~~RLS write policy on deals is USING ((org_id = get_user_org_id()) AND ((assigned_user_id = auth.uid()) OR user_has_role('manager'))) — references assigned_user_id only. BL-144 deals (where owner_user_id set, assigned_user_id NULL) were uneditable by their named owners.~~ RESOLVED by D-342 (2026-05-21) — backfill populates assigned_user_id for the 16 BL-144 rows; policy now matches.",
+      "desc": "🔴 Critical. Filed + closed in Phase 3 Axis 5 (D-342).",
+      "tag": "admin",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "~~BG-113~~",
+      "title": "~~leads SELECT policy \"Org members can view leads\" is org_id = get_user_org_id() only — no role narrowing. Same bug class as BG-105: any org member (including assistants/viewers) reads all org leads regardless of ownership.~~ RESOLVED by D-343 (2026-05-21) — new SELECT policy gates on assigned_user_id = auth.uid(); managers+ see all. UPDATE/DELETE also split out per role. Filed retroactively as part of D-343 since the bug class was identified during the same Axis 5 walkthrough as BG-105 but leads was not separately enumerated at filing time.",
+      "desc": "🔴 Critical. Filed + closed in Phase 3 Axis 5 (D-343 retroactive).",
+      "tag": "admin",
+      "added": "2026-05-21"
+    },
+    {
+      "id": "~~BG-114~~",
+      "title": "~~requirements had a single FOR ALL policy \"requirements_org_access\" with org_id = get_user_org_id() only — broader than BG-105/113. Any org member could SELECT/INSERT/UPDATE/DELETE any requirement. No per-command split, no role narrowing.~~ RESOLVED by D-343 (2026-05-21) — replaced monolithic FOR ALL with 4 per-command policies: SELECT/UPDATE narrowed to assigned_user_id = auth.uid() for non-managers; INSERT requires user_has_role('assistant') (= non-viewer); DELETE managers+ only. Filed retroactively as part of D-343 since the bug class was identified during the same Axis 5 walkthrough as BG-105 but requirements was not separately enumerated at filing time.",
+      "desc": "🔴 Critical. Filed + closed in Phase 3 Axis 5 (D-343 retroactive).",
+      "tag": "admin",
+      "added": "2026-05-21"
     }
   ],
   "done": [
+    {
+      "id": "D-343",
+      "title": "RLS read-scope fix on deals / leads / requirements (closes BG-105 / BG-113 / BG-114)",
+      "desc": "Phase 3 Axis 5 walkthrough (2026-05-21) found deals SELECT policy was org_id = get_user_org_id() only — no role-based narrowing. Empirical confirmation: Nina (junior agent) returned 26 rows of which she owned only 3. Will's parallel SQL audit revealed the same bug class on leads (same shape) and a worse instance on requirements (monolithic FOR ALL policy with org-only scope — any org member could SELECT/INSERT/UPDATE/DELETE any requirement). Decision (Will, 2026-05-21): fix all three in one migration. Locked spec — viewer: SELECT own + (deals only) participating, no writes; assistant/agent: SELECT + UPDATE own + (deals only) participating; manager/admin/owner: all-org read + write (hierarchy via user_has_role). Viewer exclusion from writes is achieved by gating UPDATE/INSERT/DELETE on user_has_role('assistant') which is true for assistant+ (= non-viewer) per the hierarchy ['viewer','assistant','agent','manager','admin','owner']. Migration supabase/migrations/20260521151856_d343_bg105_rls_read_scope_fix.sql: drops 5 old policies (Org members can view deals, Agents can update assigned deals, managers can update all, Org members can view leads, Agents can update assigned leads, managers can update all, requirements_org_access) and creates 11 new ones (3 deals + 3 leads + 4 requirements + INSERT on requirements). Preserves the existing INSERT policies on deals and leads (Agents can create deals/leads) per dispatch. leads and requirements have no participants concept (no lead_participants / requirement_participants tables exist) — confirmed via information_schema.columns. Indexes added (per Step 0 pre-flight): idx_requirements_assigned_user_id partial (WHERE assigned_user_id IS NOT NULL); idx_deal_participants_user_id partial (WHERE user_id IS NOT NULL — many participants are contact-only). Retroactively filed: BG-113 (leads RLS read scope, 🔴) and BG-114 (requirements monolithic FOR ALL, 🔴) — same bug class as BG-105, not separately enumerated at filing time. DB-SCHEMA.md updated per-table — new RLS sections for leads/requirements/deals with explicit SELECT/INSERT/UPDATE/DELETE per role; deal_participants Indexes section gains idx_deal_participants_user_id. Gates: tsc --noEmit clean; npm run build clean. Boundary: No production DB execution — Will runs the migration in Supabase SQL Editor and runs the post-merge verification harness (pg_policy enumeration + Nina-as-agent count probe → expect 3 deals, was 26 pre-fix). No commit. package.json 2.6.10 → 2.6.11.",
+      "completed": "NEW supabase/migrations/20260521151856_d343_bg105_rls_read_scope_fix.sql, MODIFIED DB-SCHEMA.md, ROADMAP.md, CHANGELOG.md, PROJECT-STRUCTURE.md, package.json (2.6.10 → 2.6.11)",
+      "tag": "admin"
+    },
+    {
+      "id": "D-342",
+      "title": "Drop vestigial deals.owner_user_id column — consolidate on assigned_user_id",
+      "desc": "Phase 3 Axis 5 walkthrough (2026-05-21) confirmed deals had two redundant ownership columns and the dual-semantic intended at BL-116 phase 2.4 never completed. Code-side audit at docs/dd-hardening/d342-dual-column-audit.md established: owner_user_id is write-only (0 UI reads, 0 RLS reads, 0 SELECTs anywhere — only 5 hits in the entire codebase including a stale comment); assigned_user_id is the canonical column (used by RLS read+write policies, all UI surfaces, the only index idx_deals_assigned_user_id, plus leads and requirements). Decision (Will, 2026-05-21): drop owner_user_id, consolidate on assigned_user_id. Migration (supabase/migrations/20260521143732_d342_drop_deals_owner_user_id.sql) backfills assigned_user_id = owner_user_id where the former is NULL (saves the 16 BL-144 fixture deals from data loss; they were the entire source of the dual-column divergence in prod), then DROP COLUMN owner_user_id cascading to drop deals_owner_user_id_fkey. Pre-flight pg_proc scan returned 0 functions referencing the column. Code cleanup: removed owner_user_id write at src/features/deals/services/dealService.ts:81 (dual-write site that masked the production divergence); flipped BL-144 seed scripts/bl144/data/zh-deals.cjs:215 from owner_user_id → assigned_user_id; removed owner_user_id field from DealV2 interface in src/types/index.ts; updated phase0-reality-check.mjs column probe; updated seed-eu-locales.mjs header comment; fixed stale aiInsightsService.ts:197 comment claiming \"deals don't have assigned_user_id\" (false — comment now flags TODO for per-agent stats); removed owner_user_id: null from tests/unit/dealHealthService.test.ts fixture (caught by tsc gate). DB-SCHEMA.md updated — column row removed from deals table, gotcha row added with D-342 reference, BL-116 sync note clarified. 8 BG tickets filed (Phase 3 Axis 5): 3 resolved by D-342 (BG-106 dual columns 🔴; BG-107 kanban \"Nicht zugewiesen\" 🟡; BG-112 RLS write blocks BL-144 owners 🔴) + 1 withdrawn (BG-110 — activity_events.created_at claim was wrong; column is named occurred_at) + 4 open (BG-105 🔴 agent RLS read over-scoped; BG-108 🔴 audit tables empty across mutation paths; BG-109 🟢 PostgREST DELETE 204 misleading; BG-111 🟢 Lukas Frei owns 0 deals — possibly intentional admin role, needs doc or seed coverage). Gates: tsc --noEmit clean; eslint clean on edited files (npm run lint is pre-broken — Next.js dropped next lint subcommand, separate from D-342); npm run build succeeded. Boundary: No RLS policy changes (BG-105 fix is a separate ticket); no DB execution (Will runs the migration manually in Supabase SQL Editor); npx supabase gen types typescript --linked fails (project not linked — no generated types file exists in repo; types are hand-maintained in src/types/index.ts and were updated directly). WAYS-OF-WORKING.md also bundled here — the 18-line Commandment #11 schema-scan checklist (uncommitted from a prior session) was finalized via D-342's audit + bundles in this commit.",
+      "completed": "NEW supabase/migrations/20260521143732_d342_drop_deals_owner_user_id.sql, NEW docs/dd-hardening/d342-dual-column-audit.md, MODIFIED src/features/deals/services/dealService.ts, src/types/index.ts, src/features/admin/services/aiInsightsService.ts, scripts/bl144/data/zh-deals.cjs, scripts/bl144/phase0-reality-check.mjs, scripts/seed-eu-locales.mjs, tests/unit/dealHealthService.test.ts, DB-SCHEMA.md, WAYS-OF-WORKING.md, ROADMAP.md, CHANGELOG.md, package.json (2.6.9 → 2.6.10)",
+      "tag": "admin"
+    },
     {
       "id": "D-341",
       "title": "Pillar 1 Phase 3 Axis 6 (Friction States) walkthrough + course-correction",
