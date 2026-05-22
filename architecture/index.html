@@ -27,7 +27,7 @@ a:hover{text-decoration:underline}
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
 .nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
 .nav-brand span{color:var(--purple)}
-.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
 .nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
 .nav-links a.active{color:var(--purple);background:var(--purple3)}
@@ -75,6 +75,9 @@ footer a{color:var(--text2)}
   <div class="nav-links">
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
   </div>
 </nav>
@@ -226,8 +229,7 @@ footer a{color:var(--text2)}
 <ul><li><strong>BL-129</strong> (D-289) — Compliance ingestion schema extensions: 7 new columns on <code>compliance_rules</code> (source<em>url / source</em>citation / source<em>authority / source</em>verified<em>at / valid</em>from / valid<em>to / workflow</em>stage_canonical), 2 CHECK constraints, 2 partial indexes. Schema-only foundation for BL-130/131/132 ingestion.</li><li><strong>BL-130</strong> (D-292) — France compliance ingestion: 60 FR rules seeded with full provenance + workflow<em>stage</em>canonical + <code>created_via='ingestion'</code> provenance marker.</li><li><strong>BL-134</strong> (D-291) — Legal &amp; compliance atlas section published. Foundational liability-posture doc plus <code>scripts/generate-legal-compliance-html.mjs</code> rendering it into the Process Atlas. Created the canonical compliance architecture home.</li><li><strong>BL-135</strong> (D-293) — Citation rendering on <code>ComplianceBanner</code> + admin compliance side panel. Per-rule source attribution + sticky disclaimer footer + new <code>ComplianceRuleDetailPanel</code> component (matches <code>DealDetailPanel</code> pattern).</li><li><strong>BL-136</strong> (D-297) — Admin acceptance flow: per-org accept/reject/snooze/revoke over <code>created_via='ingestion'</code> rules with full audit trail. New <code>compliance_rule_org_acceptance</code> table, <code>compute_rule_fingerprint</code> SQL function mirrored byte-for-byte by JS, <code>v_compliance_rule_acceptance_state</code> view, <code>AcceptanceActionFooter</code> + <code>RuleDiffPanel</code> UI. The canonical example of a JS↔SQL invariant — TD-COMPLIANCE-FINGERPRINT-CI-PARITY (D-302) wired the parity test into CI.</li><li><strong>BL-141</strong> (D-291) — Strip markdown auto-link syntax from BL-130 source_* fields. Data-cleanup migration + <code>stripMarkdownLinks()</code> helper in <code>seed-fr-compliance.mjs</code>. New "Known data quality issues" section in <code>legal-compliance/ARCHITECTURE.md</code>.</li></ul></div>
 </main>
 <footer>
-  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/INDEX.md</code>
-  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/INDEX.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
 </footer>
 </body>
 </html>

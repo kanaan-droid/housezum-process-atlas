@@ -27,7 +27,7 @@ a:hover{text-decoration:underline}
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
 .nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
 .nav-brand span{color:var(--purple)}
-.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
 .nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
 .nav-links a.active{color:var(--purple);background:var(--purple3)}
@@ -75,6 +75,9 @@ footer a{color:var(--text2)}
   <div class="nav-links">
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
   </div>
 </nav>
@@ -162,8 +165,7 @@ footer a{color:var(--text2)}
 <ul><li><a href="multi-tenancy.html"><code>multi-tenancy.md</code></a> — service-role bypass pattern (the bedrock under BL-81j), Zod input validation on signing routes (BL-92b), security boundary discipline.</li><li><a href="crm.html"><code>crm.md</code></a> — deal-document linking, Documents tab surfaces, where the deal-side of a signed document lives.</li><li><a href="strategy.html"><code>STRATEGY.md</code></a> — pdf-lib as a strategic tool choice; tech stack rules around AWS migration that affect the cron + bucket boundaries.</li><li>Spec: <code>docs/specs/NU-7-SIGNING-SPEC.md</code>.</li><li>WAYS-OF-WORKING: <code>## Signing Architecture Learnings</code> — the operational rule list (this doc explains <em>why</em>).</li></ul></div>
 </main>
 <footer>
-  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/signing.md</code>
-  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/signing.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
 </footer>
 </body>
 </html>

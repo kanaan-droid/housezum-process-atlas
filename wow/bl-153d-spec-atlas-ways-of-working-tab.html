@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — BL-153d — Atlas "Ways of Working" Tab (Governance Section)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/" class="active">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Ways of working</a> / BL-153d-Spec-Atlas-Ways-of-Working-Tab.md</div>
+  
+  <div class="content"><h1>BL-153d — Atlas "Ways of Working" Tab (Governance Section)</h1>
+<p><strong>Spec version:</strong> v0.1 (draft, awaiting Will review) <strong>Filed:</strong> 2026-05-22 <strong>Author:</strong> Claude.ai web (this session) <strong>Status:</strong> SPEC — not yet locked, not yet implemented <strong>Parent spec:</strong> <code>docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md</code> (BL-153 / Phases A/B/C)</p>
+<blockquote><p><strong>Provenance:</strong> Referenced as out-of-scope in BL-153 spec. Filed as a separate spec because it's a generator-side change to <code>scripts/generate-*-html.mjs</code> + atlas index config, with no functional overlap with BL-153 A/B/C. Drafted same session to lock the design while context was fresh.</p></blockquote>
+<hr/>
+<h2>TL;DR</h2>
+<p>Add a "Ways of Working" section to the Process Atlas at:</p>
+<pre><code>kanaan-droid.github.io/housezum-process-atlas/wow/</code></pre>
+<p>This section renders governance docs (WOW, STANDING-OBLIGATIONS, ClaudeAccess, this spec, the BL-153 spec, future ADRs and governance docs) as HTML pages with cross-linking, plus a rolling view of the latest N drift reports from <code>docs/audits/</code>.</p>
+<p>The Atlas already has 4 sections (<code>/roadmap/</code>, <code>/architecture/</code>, <code>/data-environments/</code>, <code>/legal-compliance/</code>) generated by 4 near-identical scripts. <strong>BL-153d is the trigger to do the long-deferred TD-26b refactor</strong> — collapse the 4 generators into 1 config-driven generator, then add the 5th section.</p>
+<p><strong>Total work: ~4-5h.</strong> Refactor cost gets amortized across the existing 4 sections + the new 5th + any 6th in future.</p>
+<hr/>
+<h2>Why filing as a separate spec</h2>
+<p>Three reasons:</p>
+<ol><li><strong>Different scope.</strong> BL-153 is "validate the paper trail." BL-153d is "render governance docs to HTML." Same parent but orthogonal.</li><li><strong>Different urgency.</strong> BL-153 is corrective action for two recent 🔴 drift events. BL-153d is nice-to-have surface; doesn't block anything.</li><li><strong>Different actor.</strong> BL-153 implementation is Claude.ai web (prompts) + CC (workflow). BL-153d is purely CC + Will (HTML generator changes).</li></ol>
+<p>BL-153d depends on no other BL-153 phase, and vice versa. They can ship in any order.</p>
+<hr/>
+<h2>Current state (audit before designing)</h2>
+<h3>What the Atlas already does</h3>
+<table><thead><tr><th>Section</th><th>URL path</th><th>Generator</th><th>Status</th></tr></thead><tbody><tr><td>Roadmap</td><td><code>/roadmap/</code></td><td><code>scripts/generate-roadmap-html.mjs</code></td><td>Stable (D-278 era)</td></tr><tr><td>Architecture</td><td><code>/architecture/</code></td><td><code>scripts/generate-architecture-html.mjs</code></td><td>Stable (D-278)</td></tr><tr><td>Data environments</td><td><code>/data-environments/</code></td><td><code>scripts/generate-data-environments-html.mjs</code></td><td>Stable (D-281); spawned TD-26</td></tr><tr><td>Legal compliance</td><td><code>/legal-compliance/</code></td><td><code>scripts/generate-legal-compliance-html.mjs</code></td><td>Stable (D-291); spawned TD-26b (escalated)</td></tr><tr><td>Atlas index</td><td><code>/</code></td><td><code>scripts/generate-atlas-index.mjs</code></td><td>Config-driven (<code>ATLAS_SECTIONS</code> block)</td></tr></tbody></table>
+<h3>TD-26 / TD-26b context (must be read before this spec is implemented)</h3>
+<p><strong>TD-26</strong> was filed at D-281 when the second near-identical generator was added (data-environments). It pointed out the duplication and proposed a refactor into a config-driven generator.</p>
+<p><strong>TD-26b</strong> was filed at D-291 when the third near-identical generator was added (legal-compliance). It escalated TD-26's severity since the duplication compounded: 3 generators × ~400 lines each = ~1200 lines of near-identical code.</p>
+<p><strong>With BL-153d adding a 4th content section</strong> (governance/wow), it becomes 4 generators × ~400 lines = ~1600 lines. This is the trigger to actually do the refactor. The cost-benefit flipped a long time ago.</p>
+<hr/>
+<h2>Scope decision: refactor first, then add the WOW section</h2>
+<p>Two paths considered:</p>
+<table><thead><tr><th>Path</th><th>Pros</th><th>Cons</th></tr></thead><tbody><tr><td><strong>(a) Just add <code>generate-wow-html.mjs</code> as the 5th generator</strong></td><td>Fast (~1h). Ships the WOW tab today.</td><td>Worsens TD-26b. 5 generators × 400 lines = 2000 lines. Will hate this in 3 weeks.</td></tr><tr><td><strong>(b) Refactor to config-driven first, then add WOW section as config entry</strong> ← my recommendation</td><td>Closes TD-26 + TD-26b. Adding future sections becomes trivial (~30 min). Sets the right precedent.</td><td>More upfront work (~4-5h). WOW tab ships in 1 day not 1 hour.</td></tr></tbody></table>
+<p>Path (b) wins. The refactor was overdue at TD-26b filing; doing it now and bundling the WOW tab is the right time.</p>
+<p>If Will disagrees and wants speed over cleanup, this spec collapses to path (a) — a ~50-line addendum.</p>
+<hr/>
+<h2>Design — config-driven generator</h2>
+<h3>Target structure</h3>
+<pre><code>scripts/
+├── generate-atlas-section.mjs       # NEW: single config-driven generator (replaces 4 existing)
+├── generate-atlas-index.mjs         # UNCHANGED — already config-driven
+├── lib/
+│   └── atlas-section-config.mjs     # NEW: configuration for each section
+└── _DEPRECATED/                     # NEW dir for the 4 old generators
+    ├── generate-roadmap-html.mjs.deprecated
+    ├── generate-architecture-html.mjs.deprecated
+    ├── generate-data-environments-html.mjs.deprecated
+    └── generate-legal-compliance-html.mjs.deprecated</code></pre>
+<p>The 4 old generators are NOT deleted (Commandment #6). They're moved to <code>scripts/_DEPRECATED/</code> with <code>.deprecated</code> suffix and a one-line README explaining the deprecation pointer to <code>generate-atlas-section.mjs</code>.</p>
+<h3>Config schema (per-section)</h3>
+<p><code>scripts/lib/atlas-section-config.mjs</code> exports an array of section configs:</p>
+<pre><code class="lang-js">export const ATLAS_SECTIONS = [
+  {
+    id: 'roadmap',                              // URL path slug
+    label: 'Roadmap',                           // Atlas index display label
+    sourceGlob: 'ROADMAP.md',                   // What markdown to render
+    outputDir: 'roadmap',                       // Atlas-side directory
+    layout: 'single-page',                      // 'single-page' | 'multi-page' | 'rolling'
+    crossLinkRewrite: false,                    // Convert .md → .html in links?
+    sortBy: null,                               // null | 'date-desc' | 'alpha'
+    npmScript: 'docs:html:roadmap',             // For backward-compat scripts in package.json
+  },
+  {
+    id: 'architecture',
+    label: 'Architecture',
+    sourceGlob: 'docs/architecture/*.md',
+    outputDir: 'architecture',
+    layout: 'multi-page',                       // One HTML per source MD
+    crossLinkRewrite: true,                     // INDEX.md → INDEX.html in links
+    sortBy: 'alpha',
+    npmScript: 'docs:html:architecture',
+    indexFile: 'INDEX.md',                      // Multi-page mode: which file is the landing
+  },
+  {
+    id: 'data-environments',
+    label: 'Data environments',
+    sourceGlob: 'docs/data-environments/*.md',
+    outputDir: 'data-environments',
+    layout: 'multi-page',
+    crossLinkRewrite: true,
+    sortBy: 'alpha',
+    npmScript: 'docs:html:data-environments',
+  },
+  {
+    id: 'legal-compliance',
+    label: 'Legal compliance',
+    sourceGlob: 'docs/legal-compliance/*.md',
+    outputDir: 'legal-compliance',
+    layout: 'multi-page',
+    crossLinkRewrite: true,
+    sortBy: 'alpha',
+    npmScript: 'docs:html:legal-compliance',
+  },
+  // NEW — the BL-153d section
+  {
+    id: 'wow',
+    label: 'Ways of working',
+    sources: [                                  // Explicit list, not a glob — mixed locations
+      'WAYS-OF-WORKING.md',
+      'docs/sessions/STANDING-OBLIGATIONS.md',
+      'docs/ClaudeAccess.md',
+      'docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md',
+      'docs/specs/BL-153d-Spec-Atlas-Ways-of-Working-Tab.md',
+      // future entries added here
+    ],
+    outputDir: 'wow',
+    layout: 'multi-page',
+    crossLinkRewrite: true,
+    sortBy: 'alpha',
+    npmScript: 'docs:html:wow',
+    indexFile: 'INDEX.md',                      // generated synthetic landing page (see below)
+    augments: [                                 // Mixed-content section: also include rolling content
+      {
+        type: 'rolling-drift-reports',
+        sourceGlob: 'docs/audits/drift-report-*.md',
+        limit: 7,                               // Last 7 reports
+        sortBy: 'date-desc',                    // Newest first
+        outputSubdir: 'audits',                 // /wow/audits/
+      },
+    ],
+  },
+];</code></pre>
+<h3>Generator behavior</h3>
+<p><code>generate-atlas-section.mjs</code> accepts a section ID:</p>
+<pre><code class="lang-bash">node scripts/generate-atlas-section.mjs roadmap
+node scripts/generate-atlas-section.mjs wow
+node scripts/generate-atlas-section.mjs all       # All sections</code></pre>
+<p>Reads <code>ATLAS_SECTIONS</code>, looks up the config, runs the layout-appropriate rendering pipeline:</p>
+<ul><li><code>single-page</code> layout: pre-existing roadmap pipeline (one big page with collapsible sections)</li><li><code>multi-page</code> layout: pre-existing arch/data/legal pipeline (one HTML per MD + cross-link rewriting + landing page)</li><li><code>rolling</code> layout (NEW): for time-series content like drift reports — landing page lists the last N entries with dates, links to each</li></ul>
+<p><code>augments</code> extend a multi-page section with additional rolling-content subdirectories (the drift-reports use case).</p>
+<h3>Backward compat</h3>
+<p><code>package.json</code> keeps the existing 4 npm scripts (<code>docs:html:roadmap</code>, etc.) pointing at the new generator:</p>
+<pre><code class="lang-json">{
+  "scripts": {
+    "docs:html:roadmap": "node scripts/generate-atlas-section.mjs roadmap",
+    "docs:html:architecture": "node scripts/generate-atlas-section.mjs architecture",
+    "docs:html:data-environments": "node scripts/generate-atlas-section.mjs data-environments",
+    "docs:html:legal-compliance": "node scripts/generate-atlas-section.mjs legal-compliance",
+    "docs:html:wow": "node scripts/generate-atlas-section.mjs wow",
+    "docs:html:atlas-index": "node scripts/generate-atlas-index.mjs",
+    "docs:html": "node scripts/generate-atlas-section.mjs all &amp;&amp; npm run docs:html:atlas-index"
+  }
+}</code></pre>
+<p>Old scripts still callable, exact same I/O contract. No retraining needed.</p>
+<hr/>
+<h2>What the WOW section will look like</h2>
+<h3>Landing page (<code>/wow/INDEX.html</code> — synthetic)</h3>
+<p>Synthetic — generated by the tool, not from a <code>wow/INDEX.md</code> source file (none exists).</p>
+<p>Structure:</p>
+<pre><code>Ways of Working
+===============
+
+Read these in order at session start:
+
+1. WAYS-OF-WORKING.md — the 11 Commandments + governance protocols (link to wow/WAYS-OF-WORKING.html)
+2. STANDING-OBLIGATIONS.md — recurring obligations + Last touched dates (link)
+3. ClaudeAccess.md — capability matrix per Claude surface (link)
+
+Active governance specs:
+
+- BL-153 — Background Drift Audit Agents (link)
+- BL-153d — Atlas Ways of Working Tab — THIS SPEC (link)
+
+Recent drift reports (latest 7):
+
+- 2026-05-22 — Manual Phase 0 backfill — 2 🔴 findings (link)
+- (more as generated)
+
+Future specs / governance docs added here as filed.
+
+Last regenerated: &lt;timestamp&gt;</code></pre>
+<p>The "Read these in order at session start" header anchors the WOW section's purpose. Session-start workflow becomes: "open Atlas → WOW tab → top 3 links."</p>
+<h3>Per-doc pages</h3>
+<p>Each markdown file in the <code>sources</code> array gets its own HTML page. Cross-links between them work (e.g., <a href="ways-of-working.html"><code>WAYS-OF-WORKING.md</code></a> references <a href="standing-obligations.html"><code>STANDING-OBLIGATIONS.md</code></a> → in HTML, the link rewrites to <code>STANDING-OBLIGATIONS.html</code>).</p>
+<h3>Drift report subdirectory (<code>/wow/audits/</code>)</h3>
+<p>Latest 7 drift reports rendered as HTML with a sub-index page listing them by date.</p>
+<p>When the BL-153a agent runs nightly and writes a new report, the next regen picks it up automatically. Reports older than 7 stay in <code>docs/audits/</code> but aren't surfaced in the Atlas (they'd flood the index). Filing them is the agent's job; surfacing is the generator's.</p>
+<p>If Will wants more than 7, change <code>limit</code> in the config. 7 is the default for fresh-attention surface.</p>
+<hr/>
+<h2>Atlas index integration</h2>
+<p><code>scripts/generate-atlas-index.mjs</code> reads the same <code>ATLAS_SECTIONS</code> config. Currently lists 4 sections in the Atlas root index. After BL-153d, it lists 5.</p>
+<p>No code change needed in <code>generate-atlas-index.mjs</code> — it's already config-driven. Just gets one more entry from the imported config.</p>
+<hr/>
+<h2>CSS / visual language</h2>
+<p>Match existing Atlas Purple palette (<code>#0f0f11</code> background, the established typography). Reuse <code>.arch-diagram</code> / <code>.arch-diagram-caption</code> classes if any of the governance docs include SVG diagrams (none currently, but BL-153 spec could grow them).</p>
+<p>No new visual language. The WOW tab visually looks like the architecture tab.</p>
+<hr/>
+<h2>Decisions (some need Will, some are recommendations)</h2>
+<table><thead><tr><th>#</th><th>Decision</th><th>Lock</th></tr></thead><tbody><tr><td>1</td><td><strong>Path (b) — refactor first.</strong> Collapses 4 generators into 1 config-driven generator, then adds WOW as a config entry. Closes TD-26 + TD-26b.</td><td>LOCKED ✅</td></tr><tr><td>2</td><td>BL number BL-153d (sub-ticket of BL-153, precedented in BL-81 series)</td><td>LOCKED ✅</td></tr><tr><td>3</td><td>Old generators <strong>moved</strong> to <code>scripts/_DEPRECATED/*.deprecated</code> (NOT deleted — per Commandment #6)</td><td>LOCKED ✅</td></tr><tr><td>4</td><td>Drift report surfacing limit: <strong>7 latest</strong></td><td>LOCKED ✅</td></tr><tr><td>5</td><td>Landing page <strong>synthetic</strong> — generated by the tool, no <code>wow/INDEX.md</code> source file</td><td>LOCKED ✅</td></tr><tr><td>6</td><td>No <code>docs/governance/</code> directory pre-created. Sources explicit in config; new dir filed only when needed.</td><td>LOCKED ✅</td></tr><tr><td>7</td><td>No "latest 7" symlink. Generator picks 7 by file mtime / filename date.</td><td>LOCKED ✅</td></tr><tr><td>8</td><td>npm script name: <code>docs:html:wow</code></td><td>LOCKED ✅</td></tr><tr><td>9</td><td>Atlas URL path: <code>/wow/</code></td><td>LOCKED ✅</td></tr><tr><td>10</td><td>Atlas index displays section as <strong>"Ways of working"</strong> (full name; "WOW" used as shorthand inside the section only)</td><td>LOCKED ✅</td></tr></tbody></table>
+<hr/>
+<h2>Work breakdown</h2>
+<table><thead><tr><th>Task</th><th>Time</th><th>Owner</th><th>Phase</th></tr></thead><tbody><tr><td>Read this spec + lock open decisions</td><td>15 min</td><td>Will</td><td>Pre-impl</td></tr><tr><td>Read TD-26 + TD-26b ROADMAP entries fully</td><td>10 min</td><td>CC (start of impl session)</td><td>Pre-impl</td></tr><tr><td>Read the 4 existing generators to identify shared patterns + per-section quirks</td><td>30 min</td><td>CC</td><td>Pre-impl</td></tr><tr><td>Write <code>scripts/lib/atlas-section-config.mjs</code> with 5 section entries</td><td>30 min</td><td>CC</td><td>Refactor</td></tr><tr><td>Write <code>scripts/generate-atlas-section.mjs</code> (3 layouts: single-page, multi-page, rolling)</td><td>90 min</td><td>CC</td><td>Refactor</td></tr><tr><td>Move 4 old generators to <code>_DEPRECATED/</code> with <code>.deprecated</code> suffix + README</td><td>15 min</td><td>CC</td><td>Refactor</td></tr><tr><td>Update <code>package.json</code> scripts to point at new generator</td><td>10 min</td><td>CC</td><td>Refactor</td></tr><tr><td>Regen all 4 existing sections via new generator + diff against old output (should be byte-identical or visually identical)</td><td>30 min</td><td>CC + Will</td><td>Validation</td></tr><tr><td>Add WOW section sources (5 governance docs + drift reports glob)</td><td>5 min</td><td>CC</td><td>New section</td></tr><tr><td>Generate WOW section first time</td><td>5 min</td><td>CC</td><td>New section</td></tr><tr><td>Visual review of WOW landing + per-doc pages + drift report subdir</td><td>20 min</td><td>Will</td><td>Validation</td></tr><tr><td>Push to Atlas repo</td><td>5 min</td><td>Will</td><td>Deploy</td></tr><tr><td>Close TD-26 + TD-26b in ROADMAP</td><td>5 min</td><td>CC</td><td>Paper trail</td></tr><tr><td>Update PROJECT-STRUCTURE.md + CHANGELOG.md + STANDING-OBLIGATIONS.md</td><td>15 min</td><td>CC</td><td>Paper trail</td></tr><tr><td><strong>Total</strong></td><td><strong>~4.5h</strong></td><td>mixed</td><td></td></tr></tbody></table>
+<p>If Will picks path (a) instead of (b), drops to ~1h (just add <code>generate-wow-html.mjs</code> as the 5th generator). TD-26b stays open and worsens.</p>
+<hr/>
+<h2>Success criteria</h2>
+<ol><li>New <code>generate-atlas-section.mjs</code> generates byte-identical (or visually identical) output for the 4 pre-existing sections compared to the old 4 generators</li><li>New <code>/wow/</code> section renders, all governance docs cross-link correctly, drift reports subdir lists the latest 7 entries</li><li><code>npm run docs:html</code> runs all 5 sections + atlas index in one invocation, no errors</li><li>Atlas index at root URL lists 5 sections</li><li>CI passes (<code>docs-check.mjs</code> doesn't flag generator changes as unabsorbed)</li><li>TD-26 + TD-26b closed</li><li>Will reads the WOW section landing page after first deploy and reports: "this is where I'd start a new session-start protocol"</li></ol>
+<hr/>
+<h2>Rollback</h2>
+<p>If the refactor breaks anything:</p>
+<ol><li>Revert the <code>package.json</code> script changes (point back at old generators)</li><li>Move generators back from <code>_DEPRECATED/</code> to <code>scripts/</code></li><li>Delete <code>generate-atlas-section.mjs</code> + <code>lib/atlas-section-config.mjs</code></li></ol>
+<p>Reversal is ~5 min via git.</p>
+<p>The <code>_DEPRECATED/</code> move (not delete) per Commandment #6 means rollback is always possible. This is intentional friction-prevention.</p>
+<hr/>
+<h2>Risks</h2>
+<table><thead><tr><th>Risk</th><th>Likelihood</th><th>Mitigation</th></tr></thead><tbody><tr><td>Refactor introduces subtle output drift (e.g., link rewriting differs by one edge case)</td><td>Medium</td><td>Validation step (regen all 4 + diff against old) catches before commit</td></tr><tr><td>Drift reports flood the WOW landing</td><td>Low</td><td><code>limit: 7</code> config. Older reports stay in repo, just not surfaced.</td></tr><tr><td>Future governance docs added without updating the sources array</td><td>Medium</td><td>docs-check.mjs Check 4-style soft warn: "new file in <code>docs/governance/</code> not in atlas-section-config.mjs". Filed as 🟢 TD after this spec lands.</td></tr><tr><td>Spec drift inside WOW section itself (irony)</td><td>Low</td><td>BL-153a's drift audit will catch any drift in the WOW source docs (they're part of paper trail)</td></tr><tr><td>Atlas regen forgotten</td><td>Already addressed</td><td>STANDING-OBLIGATIONS row #2 already enforces post-paper-trail regen</td></tr><tr><td>Refactor cost &gt; expected (4.5h becomes 8h)</td><td>Medium</td><td>Path (a) escape hatch — fall back if refactor proves harder than expected</td></tr></tbody></table>
+<hr/>
+<h2>Out of scope (explicitly)</h2>
+<ul><li>Adding <code>docs/governance/</code> directory and a 6th governance doc class</li><li>Auto-publishing drift reports to a Slack channel / email digest</li><li>Atlas search across all sections</li><li>Atlas table-of-contents on individual long pages (e.g., WAYS-OF-WORKING.md is ~1900 lines — would benefit from a sticky TOC, but that's a separate UX ticket)</li><li>Touch-up of existing Atlas section CSS / typography</li><li>Mobile/iOS rendering of the Atlas (still desktop-focused)</li><li>Versioning of WOW docs (e.g., showing "v0.1" of BL-153 spec inline) — already covered by the doc's own History table</li></ul>
+<hr/>
+<h2>Decisions (all locked 2026-05-22)</h2>
+<p>See Decisions table above. All 10 locked by Will at v0.1 sign-off.</p>
+<hr/>
+<h2>Implementation order (gate-driven, mirrors BL-153)</h2>
+<ol><li><strong>THIS SESSION:</strong> Will reviews this spec. Locks v0.1.</li><li><strong>NEXT SESSION:</strong> CC reads TD-26 + TD-26b + the 4 existing generators. Writes <code>atlas-section-config.mjs</code> + <code>generate-atlas-section.mjs</code>.</li><li><strong>SAME SESSION:</strong> CC regens all 4 existing sections via new generator. Diffs output. Will validates.</li><li><strong>GATE 1:</strong> Diff is clean (byte-identical or visually identical). If yes, proceed. If no, fix until clean.</li><li><strong>AFTER GATE 1:</strong> Add WOW section config entry. Regen. Will visual review.</li><li><strong>GATE 2:</strong> WOW section renders correctly with all 5 governance docs + drift report subdir.</li><li><strong>AFTER GATE 2:</strong> Close TD-26 + TD-26b. Paper trail. Push.</li></ol>
+<p>No calendar commitments. Gates open when quality is met.</p>
+<hr/>
+<h2>Cross-references</h2>
+<ul><li>Parent: <code>docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md</code></li><li>Closes: <code>TD-26</code>, <code>TD-26b</code> (atlas generator refactor)</li><li>Depends on: <code>scripts/generate-atlas-index.mjs</code> (already config-driven, just adds a config entry)</li><li>Depended on by: Nothing — purely additive surface</li></ul>
+<hr/>
+<h2>History</h2>
+<table><thead><tr><th>Date</th><th>Version</th><th>Change</th><th>Author</th></tr></thead><tbody><tr><td>2026-05-22</td><td>v0.1 (draft)</td><td>Initial draft</td><td>Claude.ai web (same session as parent BL-153 spec)</td></tr><tr><td>2026-05-22</td><td>v0.1 (locked)</td><td>All 10 decisions locked. Path (b) refactor-first. Old generators moved to <code>_DEPRECATED/</code>. Display label "Ways of working".</td><td>Will</td></tr></tbody></table></div>
+</main>
+<footer>
+  HouseZoom.ai Ways of working · Auto-generated from <code>docs/specs/BL-153d-Spec-Atlas-Ways-of-Working-Tab.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

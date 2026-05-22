@@ -27,7 +27,7 @@ a:hover{text-decoration:underline}
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
 .nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
 .nav-brand span{color:var(--purple)}
-.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
 .nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
 .nav-links a.active{color:var(--purple);background:var(--purple3)}
@@ -75,6 +75,9 @@ footer a{color:var(--text2)}
   <div class="nav-links">
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
   </div>
 </nav>
@@ -573,8 +576,7 @@ await onCantonChange(orgId, oldCanton, newCanton, {
 <ul><li>BL-126 (federal Lex Koller 2026 consultation impact) may re-word source URLs across 16 LK rules — adapter behaviour is unchanged but data is in flight. See <a href="../specs/BL-126-Spec-Federal-Lex-Koller-2026-Consultation.html"><code>docs/specs/BL-126-Spec-Federal-Lex-Koller-2026-Consultation.md</code></a>.</li><li><code>TD-COMPLIANCE-METADATA-COLUMN</code> 🟡 (live schema has no <code>compliance_rules.metadata</code> JSONB column) blocks structured staleness flags. When it lands, the staleness-review markers currently carried in seed-script <code>metadata_extra</code> move into the column proper.</li></ul></div>
 </main>
 <footer>
-  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/i18n.md</code>
-  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/i18n.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
 </footer>
 </body>
 </html>

@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Ways of Working — Claude + Will</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/" class="active">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Ways of working</a> / WAYS-OF-WORKING.md</div>
+  
+  <div class="content"><h1>Ways of Working — Claude + Will</h1>
+<blockquote><p>This file loads at the start of every session. Follow these protocols.</p></blockquote>
+<h1>The 10 Commandments</h1>
+<p>These principles override any other instruction. If a prompt or task conflicts with any commandment below, STOP and surface the conflict to Will before acting.</p>
+<ol><li><strong>Never hardcode anything.</strong> No <code>'AED'</code>, <code>'USD'</code>, <code>'EUR'</code>, <code>'CHF'</code>, <code>'sqft'</code>, <code>'sqm'</code>, <code>'en'</code>, <code>'fr'</code>, <code>'de'</code>, <code>'it'</code> literals in <code>.tsx</code> files outside the explicit whitelist (utility config maps, dropdown options). No hardcoded fallback values for currency, language, measurement_unit, locale, country in source code. Always source from <code>useAgentPreferences()</code> or pass as props.</li></ol>
+<ol><li><strong>If you want to hardcode for any reason, let Will know first.</strong> Surface the request explicitly in the commit summary or session report — never bury it under "minor type fixes" or "build unblocking". Will decides, not CC.</li></ol>
+<ol><li><strong>We are building the BEST REAL ESTATE AI POWERED CRM AND ASSISTANT IN THE WORLD.</strong> Code quality, architectural choices, and craftsmanship reflect this ambition.</li></ol>
+<ol><li><strong>This is NOT a demo anymore. We are building V1 and beyond.</strong> No demo-driven shortcuts. No "good enough for the prospect on Tuesday" patches. Every commit ships toward a production-grade product.</li></ol>
+<ol><li><strong>Do not take shortcuts.</strong> If a task requires 6 hours of careful work, do 6 hours. If you find yourself reaching for a quick fix that papers over a deeper problem, STOP and surface the deeper problem.</li></ol>
+<ol><li><strong>Do NOT delete anything from the repo without asking.</strong> This includes documentation, audit reports, CSVs, JSON keys, source files, migrations. Deletion requires explicit Will approval, even when reverting a feature.</li></ol>
+<ol><li><strong>Do not decide to end any session before asking.</strong> Sessions end when Will says they end. CC does not unilaterally close out, summarize-and-stop, or declare work complete.</li></ol>
+<ol><li><strong>Talk to Will in a structured way, never too verbose.</strong> Will asks for more detail when needed. Default to terse, scannable output. Tables and bullets over paragraphs. Headlines first, evidence second.</li></ol>
+<ol><li><strong>Source code must be well documented for both Will and CC to understand.</strong> Every file gets a header comment explaining its purpose. Every non-trivial function gets a docstring. Every magic number gets a constant + comment. Future-Will and future-CC must be able to open any file and understand it without context.</li></ol>
+<ol><li><strong>Everything matters: UI/UX, AI, Security, Robustness, Reusability, i18n.</strong> Do not decide unilaterally to skip any of these dimensions to save energy or token budget. We pay high cost later. We have had very hard lessons.</li></ol>
+<ol><li><strong>Before adding or deleting ANYTHING in the DB schema, do a FULL DB schema scan first.</strong> This includes: adding a column, dropping a column, renaming a column, adding/dropping a constraint, adding/dropping an index, adding/altering an RLS policy, adding/altering a trigger or function, adding/dropping a table, changing a FK target. <strong>No exceptions.</strong> The cost of a 5-minute scan is far less than the cost of a redundant column / orphaned policy / silent shadow-write that lives in production for months and corrupts data. We have already paid this cost once (D-342: dual <code>owner_user_id</code> / <code>assigned_user_id</code> columns on <code>deals</code> — RLS uses one, UI uses one, BL-144 seed uses the other, agents cannot edit their own deals as a result). It will not happen again. The full scan is mandatory <strong>even if the change seems trivial</strong>, because the entire point is that the impact is not visible from the proposed change alone.</li></ol>
+<h3>What "full schema scan" means (Commandment #11)</h3>
+<p>Before ANY schema change is proposed, executed, or merged, run ALL of the following and include the outputs in the migration spec / PR / session report:</p>
+<ol><li><strong>Column inventory across all tables.</strong> <code>SELECT table_name, column_name, data_type FROM information_schema.columns WHERE table_schema = 'public' AND column_name ILIKE '%&amp;lt;concept&amp;gt;%' ORDER BY table_name;</code> — replace <code>&amp;lt;concept&amp;gt;</code> with every keyword the change touches (e.g. for an ownership change: <code>user_id</code>, <code>owner</code>, <code>assigned</code>, <code>agent</code>).</li><li><strong>RLS policies referencing the column or table.</strong> <code>SELECT schemaname, tablename, polname, polcmd, pg_get_expr(polqual, polrelid) AS using_expr, pg_get_expr(polwithcheck, polrelid) AS check_expr FROM pg_policy p JOIN pg_class c ON c.oid = p.polrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE pg_get_expr(polqual, polrelid) ILIKE '%&amp;lt;column&amp;gt;%' OR pg_get_expr(polwithcheck, polrelid) ILIKE '%&amp;lt;column&amp;gt;%';</code></li><li><strong>Triggers and functions referencing the column.</strong> <code>SELECT n.nspname, p.proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = 'public' AND pg_get_functiondef(p.oid) ILIKE '%&amp;lt;column&amp;gt;%';</code></li><li><strong>Indexes involving the column.</strong> <code>SELECT tablename, indexname, indexdef FROM pg_indexes WHERE schemaname = 'public' AND indexdef ILIKE '%&amp;lt;column&amp;gt;%';</code></li><li><strong>FK constraints involving the column.</strong> <code>SELECT conrelid::regclass AS table, conname, pg_get_constraintdef(oid) FROM pg_constraint WHERE pg_get_constraintdef(oid) ILIKE '%&amp;lt;column&amp;gt;%';</code></li><li><strong>Repo-wide grep for the column name and any synonym.</strong> <code>grep -rn "&amp;lt;column&amp;gt;" src/ scripts/ supabase/ --include="*.ts" --include="*.tsx" --include="*.sql" --include="*.mjs" --include="*.py"</code> — both the column itself AND any obvious synonym (e.g. <code>owner</code> and <code>assigned</code> for ownership changes). Output goes in the migration spec, file:line referenced.</li><li><strong>DB-SCHEMA.md cross-check.</strong> Compare the live schema against <code>docs/DB-SCHEMA.md</code>. If they have drifted, file a 🟡 TD before proceeding with the new change.</li></ol>
+<p>The output of all 7 scans must be embedded in the migration spec OR the PR description OR the session report. If any of the 7 outputs reveals usage Will did not know about, <strong>STOP</strong> and re-spec — do not proceed on the assumption that "it's probably fine."</p>
+<p>This commandment applies to CC, Claude.ai, Claude Desktop, and Will himself. No actor is exempt.</p>
+<h2>Hardcoding — expanded detail (Commandment #1)</h2>
+<p>The whitelist for the literal-prohibition rule:</p>
+<ul><li>Utility config maps in <code>src/lib/utils.ts</code> (<code>COUNTRY_CONFIG</code>, <code>CURRENCY_CONFIG</code>)</li><li>Dropdown option arrays for the settings form</li><li>Type unions / discriminated unions</li><li>Constants exported by <code>*Service.ts</code> / <code>*Repository.ts</code> files explicitly tagged as the source of truth</li></ul>
+<p>When writing CC prompts that touch locale, currency, or measurement code, the prompt itself must include "no hardcoded defaults". CC follows the spec literally; if the spec omits the guard, the guard goes missing in the diff.</p>
+<p>If a future commit introduces a hardcoded literal without flagging it, force-revert and start over rather than patching forward — the cumulative cost of patching is higher than the cost of restarting cleanly.</p>
+<h1>File Location Conventions</h1>
+<p>At the end of every session (or whenever a file is created), CC MUST save artifacts to the correct location below. If unsure, STOP and ask Will.</p>
+<table><thead><tr><th>Artifact type</th><th>Location</th><th>Filename pattern</th></tr></thead><tbody><tr><td>Session log (SOS)</td><td><code>docs/sessions/</code></td><td><code>SOS-YYYY-MM-DD.md</code></td></tr><tr><td>End-of-session prompt (EOS)</td><td><code>docs/sessions/EOS/</code></td><td><code>EOS-YYYY-MM-DD.md</code></td></tr><tr><td>Spec documents</td><td><code>docs/specs/</code></td><td><code>&amp;lt;TICKET&amp;gt;-Spec-&amp;lt;descriptive-name&amp;gt;.md</code></td></tr><tr><td>Audit reports</td><td><code>docs/audits/</code></td><td><code>&amp;lt;name&amp;gt;-YYYY-MM-DD.{md,csv}</code></td></tr><tr><td>Cleanup/migration reports</td><td><code>docs/audits/</code></td><td><code>&amp;lt;name&amp;gt;-YYYY-MM-DD.md</code></td></tr><tr><td>Architecture Decision Records (ADRs)</td><td><code>docs/adr/</code></td><td><code>NNNN-&amp;lt;descriptive-title&amp;gt;.md</code> (zero-padded sequential number)</td></tr><tr><td>SQL scripts (migrations, seeds, one-offs)</td><td><code>supabase/</code></td><td>follow existing structure (migrations/, seeds/, etc.)</td></tr><tr><td>Node/shell scripts</td><td><code>scripts/</code></td><td>descriptive name with purpose prefix (e.g. <code>seed-eu-data.mjs</code>, <code>verify-storage.sh</code>)</td></tr><tr><td>Top-level project files</td><td>repo root</td><td><code>CHANGELOG.md</code>, <a href="ways-of-working.html"><code>WAYS-OF-WORKING.md</code></a>, <code>PROJECT-STRUCTURE.md</code>, <code>FEATURE-MAP.md</code>, <code>ROADMAP.md</code>, <code>DB-SCHEMA.md</code>, <code>ENV-INVENTORY.md</code></td></tr></tbody></table>
+<p>Notes:</p>
+<ul><li>If a directory does not exist, CC creates it (e.g. first time <code>docs/sessions/EOS/</code> is needed).</li><li>Filenames use kebab-case unless the table above specifies a different pattern (e.g. <code>SOS-</code>, <code>EOS-</code>, <code>BL-</code> prefixes stay as shown).</li><li>Dates are ISO format <code>YYYY-MM-DD</code>, never <code>MM-DD-YYYY</code> or <code>DD-MM-YYYY</code>.</li><li>For sessions spanning midnight, the filename uses the date the session STARTED (e.g. a session running 22:00 → 02:00 next day uses the start date). This rule applies to the filename itself; the <code>**Created:**</code> header inside the file can reflect any date.</li><li>Never write outside these locations without explicit Will approval.</li><li><strong>Artifact preambles must not contradict this table.</strong> If an SOS/EOS/spec's own header says "lives in X" and X differs from the table above, the table wins. CC must flag the contradiction to Will before writing and never treat a preamble as overriding authority.</li><li><strong>If a user instruction (including an EOS prompt) contradicts this table, CC flags the contradiction before executing.</strong> User instructions override the table only after explicit acknowledgment from Will.</li><li><strong>Multiple sessions on the same start-date:</strong> First session = unsuffixed (<code>SOS-YYYY-MM-DD.md</code>). Subsequent sessions get <code>-2</code>, <code>-3</code>, etc. (<code>SOS-YYYY-MM-DD-2.md</code>). Sequence is by session start time. Applies to SOS and EOS filenames.</li></ul>
+<h2>Communication Style</h2>
+<ul><li>Keep answers concise. Will asks follow-ups if needed.</li><li>Don't explain what Will already knows.</li><li>When building, draft CC prompts — Will runs them via Claude Code (CC) in terminal.</li><li>VERY VERY VERY IMPORTANT: During chat with Will in a session window: Will likes straightforward answers in a structure style form, not too verbose and not in a newspaper style. If needed Will will ask for more clarification. Do not give too much unecessary explanations unless asked for!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!</li></ul>
+<h2>Development Workflow</h2>
+<ol><li><strong>Claude</strong> drafts specs, types, services, CC prompts</li><li><strong>CC</strong> (Claude Code in terminal) implements, adapts imports, fixes type errors</li><li><strong>Will</strong> runs SQL migrations manually in Supabase SQL Editor</li><li><strong>Will</strong> pushes to Vercel for deployment</li></ol>
+<h2>Git Commands</h2>
+<p>Always use <strong>single quotes</strong> for commit messages (zsh breaks on <code>!</code> in double quotes):</p>
+<pre><code class="lang-bash">git add -A
+git commit -m 'your message here'
+git push origin main</code></pre>
+<h2>Seed Script</h2>
+<pre><code class="lang-bash">node --env-file=.env.local scripts/seed-dubai.mjs</code></pre>
+<ul><li><code>source .env.local</code> does NOT work (multiline RSA key breaks export)</li><li>Node 20+ required (uses <code>--env-file</code> flag)</li><li>Script is idempotent — skips if data exists. To re-seed, delete first via SQL.</li></ul>
+<h2>Seed Script Discipline (D-282 — distilled from BL-126)</h2>
+<p>Hard rules that apply to every seed/migration-style script before live execution.</p>
+<h3>1. <code>DB-SCHEMA.md</code> is a hint, not a contract</h3>
+<ul><li>Live <code>pg_constraint</code> is canonical. <code>DB-SCHEMA.md</code> drifts and has been wrong on multiple occasions in 2026 (BL-126 hit 4 stale entries in one script's worth).</li><li>Run the canonical <code>pg_get_constraintdef</code> query in <code>docs/data-environments/SEEDED-DATA.md</code> § 5.1 before any insert-heavy work. The output is cached in § 5.2; refresh whenever a migration lands.</li><li>BG-83 (filed 2026-04-29) will add a CI/EOS audit script that diffs against live constraint state.</li></ul>
+<h3>2. NOT NULL audits are table-scoped, not column-scoped</h3>
+<ul><li>Lesson from BL-126: hit <code>viewing_feedback.user_id</code> NOT NULL, patched it, immediately hit <code>viewing_feedback.org_id</code> NOT NULL on the next iteration. Two iterations on the same table because the first audit only patched the column that fired.</li><li>Before inserting into a table the script touches for the first time, list every column from <code>information_schema.columns WHERE table_name = '&amp;lt;table&amp;gt;'</code> AND nullability. Populate every NOT NULL column. Optional columns can be NULL.</li></ul>
+<h3>3. CHECK constraint failures cascade — audit the whole script in one pass</h3>
+<ul><li>When a CHECK violation surfaces, also audit free-text-into-enum-column risk across the WHOLE script before re-running, not just the offending field.</li><li>BL-126 hit <code>viewing_feedback.next_step</code> enum CHECK after already iterating on <code>leads.purpose</code>, <code>viewing_feedback.user_id</code>, and <code>viewing_feedback.org_id</code>. A single full-script audit at iteration 2 would have prevented iterations 3-4.</li></ul>
+<h3>4. Marker convention for seed data</h3>
+<ul><li>Every seeded row gets <code>[seed:&amp;lt;scope&amp;gt;-v&amp;lt;n&amp;gt;]</code> appended to its <code>notes</code> field. Examples: <code>[seed:eu-v1]</code> (BL-126 EU locales), <code>[seed:uae-v1]</code> (BL-127 — pending UAE retrofit).</li><li>The marker is the idempotency anchor + rollback discriminator. Don't introduce a dedicated <code>is_seed</code> boolean column — that's schema noise.</li><li>Org-config UPDATEs (e.g. <code>organizations.default_locale</code>) are NOT marked — those are real correctness fixes that persist independent of the demo data lifecycle.</li></ul>
+<h3>5. Required CLI flags</h3>
+<p>Every seed/migration-style script MUST support:</p>
+<ul><li><code>--dry-run</code> — log projected inserts, write nothing. <strong>MANDATORY</strong> for first run (per the corpus-pollution lesson in <code>userMemories</code>).</li><li><code>--force</code> — rollback (delete by marker) + re-seed in one command. The iterative-demo-prep ergonomic.</li><li><code>--rollback</code> — clean only, no re-seed.</li><li><code>--locale=&amp;lt;x&amp;gt;</code> (or scope analog) — narrow execution for debugging.</li></ul>
+<h3>6. Defensive payload over minimal payload</h3>
+<p>When in doubt about whether a column is nullable, populate it. The cost of populating a column that turns out to be nullable is one line of seed data; the cost of NOT populating one that turns out to be NOT NULL is one full iteration cycle. BL-126's <code>viewing_feedback</code> insert went through 3 patch iterations; "populate every plausibly-NOT-NULL column" got us to clean on iteration 4.</p>
+<h3>7. Phase 0 CHECK constraint snapshot is mandatory (D-336 — distilled from BL-144 + audit)</h3>
+<p>Every seed script's Phase 0 reality check MUST satisfy three layers. Each layer alone is necessary but not sufficient.</p>
+<p><strong>Layer 1 — Consult <code>DB-SCHEMA.md</code> BEFORE writing the spec.</strong> Before claiming any column's value set in a spec, grep <code>DB-SCHEMA.md</code> for the table and read the documented CHECK clauses (most live at the column row's Notes column; master-constraint reference table starts ~L2364). If DB-SCHEMA documents a value set, <strong>use those values</strong> — do not invent. Anti-example from BL-144 (D-335): spec § 5.2 claimed <code>service_provider</code> for <code>deal_participants.role</code>; DB-SCHEMA L884 already documented the live CHECK as <code>buyer/seller/listing_agent/buyer_agent/notary/bank/trustee/developer_rep/guarantor</code>. Spec author didn't consult; 30-error live arc followed.</p>
+<p><strong>Layer 2 — Call <code>scripts/lib/pg-constraint-snapshot.mjs</code> to validate spec claims against live CHECKs.</strong> Two-mode pattern (PostgREST cannot reach <code>pg_catalog</code>, so the snapshot SQL runs in Supabase SQL Editor):</p>
+<pre><code class="lang-bash"># Part 1 — print the SQL
+node scripts/&lt;seed-dir&gt;/phase0-reality-check.mjs --print-constraint-sql &gt; /tmp/sql.sql
+# Will runs /tmp/sql.sql in Supabase SQL Editor, saves the JSON result to /tmp/snapshot.json
+# Part 2 — validate spec claims against the snapshot
+node scripts/&lt;seed-dir&gt;/phase0-reality-check.mjs --check-constraints=/tmp/snapshot.json</code></pre>
+<p>Hardcoded <code>&amp;lt;SEED&amp;gt;_CLAIMS</code> in the phase0 script enumerate <code>(table, column, expectedValues[])</code> triples. <code>validateSpecValues()</code> exits non-zero on any unknown_values mismatch — fails fast BEFORE any live INSERT. Reference implementations: <code>scripts/bl144/phase0-reality-check.mjs</code> + <code>scripts/bl138/phase0-reality-check.mjs</code>. Tests: <code>tests/unit/pg-constraint-snapshot.test.ts</code>.</p>
+<p><strong>Layer 3 — Wrap every live INSERT with <code>scripts/lib/check-error-detector.mjs</code>.</strong> The 23514 runtime detector parses <code>(table, constraint_name)</code> from any Postgres CHECK violation and attaches structured fields to the error so the orchestrator can decide rollback strategy. Necessary even with layers 1+2 because layer 2 only validates <strong>value-set claims the spec author made</strong> — a column with a value-set CHECK the author didn't claim, or a multi-column composite CHECK (e.g. <code>properties_rent_frequency_required_on_rent</code> which BL-144 also hit), still surfaces at INSERT time. Tests: <code>tests/unit/check-error-detector.test.ts</code>.</p>
+<p><strong>Why all three layers exist.</strong> The CHECK-mismatch-at-live-insert class hit us three times (BL-131 v2 caught it pre-write, BL-138 wave 1 narrowly avoided due to table-scope luck, BL-144 30-error live arc). Root-cause audit at <code>docs/dd-hardening/td-pg-constraint-snapshot-audit.md</code> (D-335) documents both the tooling gap (PostgREST blocks <code>pg_catalog</code>) and the process gap (spec authors not consulting DB-SCHEMA). All three layers together close both.</p>
+<p><strong>Anti-pattern caught:</strong> a Phase 0 script whose <strong>header comment claims § 4.1 is covered but whose body never queries <code>pg_constraint</code></strong>. BL-144's phase0 did exactly this — the header said "behavioural probes on columns" and that was actually § 4.2's description, not § 4.1's. The audit (D-335) calls this out explicitly. Header comments MUST match the body's actual checks (Commandment 9 — "every file gets a header comment explaining its purpose" implicitly demands accuracy).</p>
+<h3>Cross-references</h3>
+<ul><li><code>docs/data-environments/SEEDED-DATA.md</code> — the canonical doc this section consolidates rules from.</li><li><code>BG-83</code> (filed) — recurring constraint-drift audit script.</li><li><code>BL-127</code> (filed) — UAE seed retrofit to the marker convention.</li><li><code>docs/dd-hardening/td-pg-constraint-snapshot-audit.md</code> — D-335 root-cause audit anchoring Rule 7.</li><li><code>scripts/lib/pg-constraint-snapshot.{cjs,mjs}</code> — value-set snapshot helper (Rule 7 layer 2).</li><li><code>scripts/lib/check-error-detector.{cjs,mjs}</code> — 23514 runtime detector (Rule 7 layer 3).</li></ul>
+<h2>Demo Data Realism (D-335 — distilled from BL-144 Gate 3)</h2>
+<p>When seed-script contacts represent real-world organizations (banks, notary offices, government bureaus, regulatory agencies, courts), apply the <strong>real-org + real-address + fictionalized-person</strong> pattern.</p>
+<h3>The rule</h3>
+<ol><li><strong>Organization name = real.</strong> Use the actual name as it appears on the org's public website / register (e.g. <code>Notariat, Grundbuch- und Konkursamt Riesbach-Zürich</code>, <code>UBS Switzerland AG</code>, <code>Zürcher Kantonalbank</code>).</li><li><strong>Address = real.</strong> Web-verify the street, postal code, and city against the organization's official source (e.g. <code>notariate.zh.ch</code>, the bank's branch locator). Do NOT invent an address.</li><li><strong>Contact person = fictionalized.</strong> Never use the real office head / branch manager / department lead. The fictional name must be <strong>clearly distinct</strong> from the real one — not a transliteration or homophone.</li></ol>
+<h3>Why all three components matter</h3>
+<ul><li><strong>Real org name</strong> anchors the data in plausible reality. A demo with <code>Acme Notary Inc.</code> reads as toy data; <code>Notariat Horgen</code> reads as production.</li><li><strong>Real address</strong> withstands Phase 3 audit scrutiny. An auditor cross-checking the demo against the real notariate.zh.ch will find consistency, not divergence. A fictionalized address fails audit on first lookup.</li><li><strong>Fictionalized contact person</strong> prevents (a) impersonation risk if the demo leaks, (b) liability under data-protection law (real persons in seed data require consent), (c) reputational damage to the real office head.</li></ul>
+<h3>Anti-pattern (caught at BL-144 Gate 3)</h3>
+<p>The initial BL-144 spec proposed 3 notary contacts at fictionalized addresses:</p>
+<ul><li>"Dr. Martin Hürlimann, Notariat Horgen, Seestrasse 124, 8810 Horgen" — wrong (real address: Dorfplatz 1)</li><li>"Dr. Beatrice Naef, Notariat Riesbach-Zürich (Kreis VIII), Genferstrasse 11, 8002 Zürich" — wrong (real address: Kreuzstrasse 42, 8008; Genferstrasse 11 is in Kreis 2 Enge, wrong district)</li><li>"Dr. Andreas Brügger, Notariat Meilen, Bahnhofstrasse 27, 8706 Meilen" — wrong (real address: Dorfstrasse 81)</li></ul>
+<p>Plus a coincidental near-match: the fictionalized "Dr. Beatrice Naef" was too close to the real office head <strong>Beat Buxcel</strong> (shared "Beat-" prefix). Renamed to <strong>Dr. Cornelia Brunschwiler</strong> at Will's decision.</p>
+<h3>Procedure</h3>
+<p>When the seed script touches a contacts table:</p>
+<ol><li><strong>Identify real-org contacts.</strong> Per buildRow inventory, flag every contact whose <code>contact_type='service_provider'</code> (or equivalent) and whose role is "represents external organization" — typically notaries, bank reps, government officials, brokers.</li><li><strong>Web-verify each address</strong> before any INSERT. Surface the verification snippet (URL + 3-sentence excerpt) to Will at Gate 3 for sign-off.</li><li><strong>Fictionalize the contact person</strong> with a name that has zero phonetic/orthographic overlap with the real office head. If the script doesn't know who the real head is, search-engine the office for current personnel before locking the fictional name.</li><li><strong>Tag the contact</strong> in the seed data with a discoverable marker (e.g. <code>[real-org real-address fictionalized-person]</code> inline note + <code>org_name</code> field set to the real org).</li><li><strong>Document in the spec</strong> (§ contacts) the real-org list and the fictionalization rule, so reviewers see the discipline applied.</li></ol>
+<h3>Cross-references</h3>
+<ul><li><code>docs/specs/BL-144-Spec-Zurich-Premium-Realty-Seed.md</code> — first formal application of the pattern; 3 ZH Bezirksnotariat + 4 banks + 1 independent broker.</li><li><code>scripts/bl144/data/zh-contacts.cjs</code> — implementation; 11 of 40 contacts carry the pattern.</li><li><code>tests/unit/bl144-seed.integration.test.ts</code> case 16 — assertion that all 3 notary contacts carry the <code>[real-org real-address fictionalized-person]</code> tag with verified addresses.</li></ul>
+<h2>Standing Obligations Discipline (D-338)</h2>
+<p>Cross-session recurring obligations live in <code>docs/sessions/STANDING-OBLIGATIONS.md</code>. This is a curated short file, not a TODO heap.</p>
+<h3>Session-start protocol</h3>
+<p>Read the Open Obligations table. For each row, judge whether its trigger applies to the work planned this session. If yes, plan to update "Last touched" at EOS.</p>
+<h3>EOS protocol</h3>
+<p>Before declaring EOS, for each Open Obligation:</p>
+<ol><li>If the trigger matched session work → update "Last touched" to today's date in the same EOS commit.</li><li>If the trigger did NOT match → add one line to the SOS under § Standing Obligations: "{Obligation name} — not touched ({reason})".</li></ol>
+<p>Enforced at three levels:</p>
+<ul><li><strong>WOW rule:</strong> this section.</li><li><strong>Soft warn:</strong> <code>scripts/docs-check.mjs</code> Check 4 parses <a href="standing-obligations.html"><code>STANDING-OBLIGATIONS.md</code></a> and warns when triggers appear matched but "Last touched" wasn't bumped. Check 4 NEVER fails the script — it only reminds.</li><li><strong>Self-check:</strong> review the file at session start.</li></ul>
+<h3>Why this exists (anti-pattern)</h3>
+<p>In 2026-05-17 and 2026-05-19 sessions, <code>dd-hardening-tracker.xlsx</code> was not updated despite both sessions shipping Pillar 1 work. Standard mechanisms (BL/TD tickets, ROADMAP, WOW rules buried in 1800+ lines, SOS records) didn't catch this because the obligation is <strong>recurring-until-done</strong>, not one-shot. D-338 created the standing-obligations register specifically for cross-session recurring work.</p>
+<h3>Adding a new obligation</h3>
+<p>When a new cross-session obligation surfaces:</p>
+<ol><li>Add a row to Open Obligations with all 5 columns filled (<code># / Obligation / Trigger / Closes when / Last touched</code>).</li><li>Document the addition in the History / amendments table at the bottom of <a href="standing-obligations.html"><code>STANDING-OBLIGATIONS.md</code></a>.</li><li>Mention the addition in the commit message.</li></ol>
+<h3>Retiring an obligation</h3>
+<p>When an obligation's "Closes when" condition is met:</p>
+<ol><li>Move its row from Open Obligations to the Closed Obligations archive section.</li><li>Add the closure date.</li><li>Document in History / amendments.</li></ol>
+<h3>Cross-references</h3>
+<ul><li><code>docs/sessions/STANDING-OBLIGATIONS.md</code> — the register.</li><li><code>scripts/docs-check.mjs</code> Check 4 — soft warn implementation.</li><li>See also: § End-of-Session Protocol (this file) calls back here at EOS.</li></ul>
+<hr/>
+<h2>Ticket Numbering Discipline (D-337 — distilled from BL-145+BL-144 collisions)</h2>
+<h3>Rule 1 — BL number collision precheck is mandatory</h3>
+<p>Before any of the following three actions, run:</p>
+<pre><code class="lang-bash">node scripts/check-bl-collision.mjs &lt;N&gt;</code></pre>
+<p>Confirm exit code 0 before proceeding.</p>
+<p><strong>Three trigger points:</strong></p>
+<ol><li><strong>Before saving a new spec</strong> under <code>docs/specs/BL-&amp;lt;N&amp;gt;-Spec-*.md</code></li><li><strong>Before adding a new row</strong> to <code>ROADMAP.md</code> with <code>BL-&amp;lt;N&amp;gt;</code> as the ticket ID</li><li><strong>Before creating a new directory</strong> under <code>scripts/bl&amp;lt;N&amp;gt;/</code></li></ol>
+<p><strong>Why this exists.</strong> BL-number collisions surfaced twice in May 2026:</p>
+<ul><li>2026-05-17 — BL-145 (Reservationsvertrag, freshly drafted) collided with existing BL-145 (IT Compliance Engine Activation, part of BL-143 portfolio). Renamed to BL-147.</li><li>2026-05-19 (D-335) — BL-144 (executed Zürich Premium Realty seed) collided with existing BL-144 (FR Compliance Engine Activation, BL-143 portfolio). NOT caught at spec-save; surfaced at doc-updates pre-commit. BL-143 portfolio renumbered: BL-144→148 / BL-145→149 / BL-146→150.</li></ul>
+<p>Both required rename cascades after late detection. Third collision is statistically likely without an explicit guard. The precheck is a 1-second <code>grep</code> that prevents the cascade.</p>
+<p><strong>Anti-pattern:</strong> Assigning a BL number based on "next in sequence" memory without grepping the repo. ROADMAP rows in the Done section + historical CHANGELOG entries + spec files all hold reservations on past numbers. Memory is not authoritative.</p>
+<p><strong>Word-boundary discipline:</strong> the script uses <code>\bBL-&amp;lt;N&amp;gt;\b</code> to ensure <code>BL-14</code> does NOT match <code>BL-144</code>. Real BL-14 ticket continues to exist in ROADMAP after the BL-144 era.</p>
+<h3>Cross-references</h3>
+<ul><li><code>scripts/check-bl-collision.mjs</code> — the guard.</li><li><code>tests/unit/check-bl-collision.test.ts</code> — 11 cases including word-boundary regression.</li><li><code>docs/dd-hardening/td-pg-constraint-snapshot-audit.md</code> § Finding 2-related — pattern of late detection.</li><li>ROADMAP <code>~~TD-PROCESS-BL-NUMBER-COLLISION-PRECHECK~~</code> (D-337 closure).</li></ul>
+<hr/>
+<h2>RLS Policy Discipline (D-283 — distilled from BG-84)</h2>
+<p>A misconfigured "service role bypass" policy on <code>ai_action_cards</code> and <code>agent_daily_plans</code> caused a P0 cross-tenant data leak. Hard rules below prevent recurrence.</p>
+<h3>1. Service-role bypass policies must always be <code>TO service_role</code></h3>
+<p>Wrong (creates a global <code>qual: true</code> permissive policy that OR's with every other policy on the table):</p>
+<pre><code class="lang-sql">CREATE POLICY "Service role full access" ON my_table
+  FOR ALL USING (true);  -- ❌ defaults to roles = {public}</code></pre>
+<p>Right:</p>
+<pre><code class="lang-sql">CREATE POLICY "Service role full access" ON my_table
+  AS PERMISSIVE
+  FOR ALL
+  TO service_role        -- ✅ scoped to service-role JWT only
+  USING (true)
+  WITH CHECK (true);</code></pre>
+<h3>2. Multiple PERMISSIVE policies on one table are OR'd together</h3>
+<p>If table T has policies A (<code>auth.uid() = user_id</code>) and B (<code>true</code>), then for a SELECT against T the row passes if <code>A OR B</code> — and B always wins.</p>
+<p>When adding a permissive policy alongside an existing user-scoped one, the new policy is by default an <strong>expansion</strong> of access, not a restriction. Always verify the matrix of (policy, role) before shipping.</p>
+<h3>3. Audit query — must return zero rows for non-public tables</h3>
+<p>Before every release that touches RLS, run:</p>
+<pre><code class="lang-sql">SELECT tablename, policyname, permissive, roles, cmd, qual
+FROM pg_policies
+WHERE schemaname = 'public'
+  AND roles = '{public}'
+  AND (qual = 'true' OR with_check = 'true')
+ORDER BY tablename, policyname;</code></pre>
+<p>Expected matches are only:</p>
+<ul><li>Truly public read tables (<code>market_*</code>, <code>building_stats</code>, <code>portal_*</code> reference data) — explicit allowlist documented inline below.</li><li>Token-gated public-write paths (<code>document_field_values</code>, <code>media_events</code>, <code>listing_outcomes</code>, <code>checklist_share_tokens</code>) — the API route layer enforces the gate; the policy is the second line of defense.</li></ul>
+<p>Any other row in the result set is a potential cross-tenant leak. Investigate before merging.</p>
+<h3>4. The intentional <code>roles = {public}</code> allowlist (as of 2026-04-29)</h3>
+<table><thead><tr><th>Table</th><th>Policy shape</th><th>Why public is correct</th></tr></thead><tbody><tr><td><code>building_stats</code></td><td>SELECT, qual: true</td><td>Aggregate market data, no PII</td></tr><tr><td><code>market_area_stats</code></td><td>SELECT, qual: true</td><td>Same</td></tr><tr><td><code>market_profiles</code></td><td>SELECT, qual: true</td><td>Same</td></tr><tr><td><code>market_transactions</code></td><td>SELECT, qual: true</td><td>DLD public open-data</td></tr><tr><td><code>portal_community_mappings</code></td><td>SELECT, qual: true</td><td>Static reference data</td></tr><tr><td><code>portal_field_requirements</code></td><td>SELECT, qual: true</td><td>Static reference data</td></tr><tr><td><code>checklist_share_tokens</code></td><td>SELECT, qual: true</td><td>Public sharing flow; API validates token before insert</td></tr><tr><td><code>document_field_values</code></td><td>INSERT/UPDATE, qual: null/true</td><td>Unauthenticated signers via <code>/sign/[token]</code>; route validates token</td></tr><tr><td><code>media_events</code></td><td>INSERT, qual: null</td><td>Public listing-page view tracking</td></tr><tr><td><code>listing_outcomes</code></td><td>INSERT, qual: null</td><td>Public listing-page conversion tracking</td></tr></tbody></table>
+<p>If a future migration changes one of these, it must update this table. New entries here require an explicit ADR (<code>docs/adr/</code>) explaining why public access is correct.</p>
+<h3>Cross-references</h3>
+<ul><li><code>docs/sessions/SOS-2026-04-29-2.md</code> (this session's debugging trail)</li><li><code>BG-85</code> (filed) — recurring RLS audit script</li><li><code>supabase/migrations/2026-04-29-bg-84-rls-cross-tenant-fix.sql</code></li></ul>
+<h2>File Locations</h2>
+<ul><li>CC downloads go to: <code>~/Downloads/claude/</code></li><li>CC prompts should tell CC to read files from <code>~/Downloads/claude/</code></li><li><code>.env.local</code> is in project root (<code>housezum-app/.env.local</code>)</li><li>Hidden files in Finder: <code>Cmd + Shift + .</code></li><li>Project root in Finder/terminal: <code>~/Apps/housezum-app/</code></li><li>All file paths shared in chat must start with <code>~/Apps/housezum-app/</code> so they can be pasted directly into Finder</li></ul>
+<h3>File Path Convention</h3>
+<p>When asking Will for a file, always provide the full path starting from <code>~</code>:</p>
+<ul><li>✅ <code>~/Apps/housezum-app/src/features/walkthrough/components/WalkthroughPlayer.tsx</code></li><li>❌ <code>WalkthroughPlayer.tsx</code></li><li>❌ <code>src/features/walkthrough/components/WalkthroughPlayer.tsx</code></li></ul>
+<p>Will uses Ctrl+Cmd+G to locate files — full paths are required for this to work.</p>
+<h2>CC Prompt Protocol</h2>
+<p>When drafting prompts for CC:</p>
+<ul><li>Always specify source files location (<code>~/Downloads/claude/</code> if applicable)</li><li>Always specify target file paths in <code>src/</code></li><li>Always give the prompt and the instructions for CC where to read it from: "Read and execute ~/Downloads/claude/PromptXX.md</li><li>Always end with: <code>npx tsc --noEmit</code> verification</li><li>Tell CC NOT to run SQL migrations</li><li>Tell CC to match existing import patterns (check <code>supabase</code> singleton vs <code>createClient()</code>)</li></ul>
+<h2>Desktop App Workflow (April 2026+)</h2>
+<p>As of April 14, 2026, Will uses the redesigned Claude Code desktop app with project isolation.</p>
+<h3>Window Isolation</h3>
+<ul><li><strong>HouseZoom</strong> runs in its own desktop app window.</li><li><strong>Xalaxy</strong> runs in a separate desktop app window.</li><li>Never merge the two into one window. Cross-project parallelism is unreliable in the current release.</li></ul>
+<h3>Session Management</h3>
+<ul><li>Group sessions by feature area: <code>signing</code>, <code>ai</code>, <code>data</code>, <code>infra</code>, <code>ui</code>, <code>bug</code> (see CLAUDE.md).</li><li>Tag each session with its area in the session name (e.g., "BG-27 thumbnail fix [bug]").</li><li>Use Side Chat (⌘+;) for clarifying questions — do not derail the main thread.</li></ul>
+<h3>Parallel Sessions (within HouseZoom only)</h3>
+<ul><li>Up to 3 sessions in parallel on independent files/features.</li><li>Never parallelize work touching the same file.</li><li>Run <code>git status</code> at the start of every session to confirm clean state.</li></ul>
+<h3>Routines</h3>
+<p>Three Routines are defined in <code>.claude/routines/</code>:</p>
+<ol><li><code>nightly-roadmap-regen.md</code> — nightly HTML regen of ROADMAP for Process Atlas</li><li><code>session-start-healthcheck.md</code> — on-demand read-only diagnostic</li><li><code>bl60-audit-sweep.md</code> — weekly BL-60 spec compliance audit</li></ol>
+<p>Routines run on Anthropic's cloud infrastructure. They do not require the local machine to be online. Review each Routine's output before acting on findings.</p>
+<h3>Prompt File Migration</h3>
+<ul><li>Legacy flow: markdown prompts in <code>~/Downloads/claude/</code> run via <code>Read and execute ~/Downloads/claude/&amp;lt;file&amp;gt;.md</code></li><li>New flow: project-scoped prompts live in <code>.claude/prompts/</code>; one-off prompts still go to <code>~/Downloads/claude/</code></li><li>Existing <code>~/Downloads/claude/</code> prompts remain valid — do not break the legacy flow.</li></ul>
+<h2>CC Prompt Delivery Conventions</h2>
+<p>Every CC prompt Claude drafts must include two things at the end:</p>
+<h3>1. Copyable run command</h3>
+<p>Always end the prompt file with a copyable block containing the exact terminal command to run it:</p>
+<pre><code>Read and execute ~/Downloads/claude/[filename].md</code></pre>
+<p>This saves Will from typing the path manually and reduces typos.</p>
+<h3>2. Push to production (when build is involved)</h3>
+<p>If the prompt involves any code changes (components, services, API routes, scripts), the final git step must always be:</p>
+<pre><code class="lang-bash">git add -A &amp;&amp; git commit -m 'BL-XX: message' &amp;&amp; git push origin main</code></pre>
+<p>Pushing to <code>main</code> auto-deploys to Vercel. CC must include this as the last step in every build prompt — never leave it as an optional or separate manual step.</p>
+<h3>Rule</h3>
+<p>Claude applies both conventions automatically when writing CC prompts. No need for Will to request them each time.</p>
+<h2>Vercel Deployment (Web)</h2>
+<ul><li>Pushing to <code>main</code> auto-deploys to Vercel</li><li>New env vars require <strong>redeploy</strong> after adding in Vercel dashboard</li><li>Production URL: <code>https://housezoom.ai</code></li><li><strong>Deploy command</strong> (always use this exact sequence):</li></ul>
+<pre><code class="lang-bash">git add -A &amp;&amp; git commit -m 'BL-XX: message' &amp;&amp; git push origin main</code></pre>
+<h2>TestFlight Deployment (iOS)</h2>
+<p>Only needed for native changes (Capacitor config, app icons, splash screens, native plugins). <strong>NOT needed for web UI changes</strong> — those deploy via Vercel automatically.</p>
+<p><strong>Full TestFlight build process:</strong></p>
+<pre><code class="lang-bash">cd ~/Apps/housezum-app
+npm run build
+npx cap sync
+open ~/Apps/housezum-app/ios/App/App.xcodeproj</code></pre>
+<p>Then in Xcode: Product → Archive → Distribute App → App Store Connect → Upload.</p>
+<p><strong>If Xcode upload fails with auth error:</strong></p>
+<ul><li>Xcode → Settings (⌘,) → Apple Accounts → Sign Out → Sign back in</li><li>Teams should repopulate — retry upload from Organizer</li></ul>
+<p><strong>Rule:</strong> Web UI changes (components, pages, styles, API routes) = Vercel only. Native changes = TestFlight required.</p>
+<h2>Environment Variables</h2>
+<ul><li>Add new env vars to BOTH <code>.env.local</code> (local) and Vercel dashboard (production)</li><li>Vercel: house-zum → Settings → Environment Variables → all environments</li></ul>
+<h2>Testing Protocol</h2>
+<h3>Manual smoke (always)</h3>
+<ul><li>Always push + deploy before testing</li><li>Test on <code>housezoom.ai</code> as Fatima (Gulf Horizon Realty seed agent)</li><li>Share screenshots for visual verification</li><li>Check Vercel logs for API errors</li><li>Check Supabase tables for data verification</li></ul>
+<h3>Automated test suites</h3>
+<p>Three suites run in CI: Playwright E2E, Playwright performance, Jest unit. All authoritative configuration lives in <code>playwright.config.ts</code> (E2E + perf) and <code>tests/unit/</code> (Jest). The conventions below are absorbed from the BL-71 / BL-72 / BL-74 / BL-75 / BL-76 / BL-77 build-out.</p>
+<h4>Playwright E2E suite (BL-72)</h4>
+<p>11 specs under <code>tests/e2e/</code>. Test-ID prefix convention by domain:</p>
+<table><thead><tr><th>Prefix</th><th>Domain</th><th>Spec</th></tr></thead><tbody><tr><td><code>A-*</code></td><td>Auth (login / logout / session)</td><td><code>auth.spec.ts</code></td></tr><tr><td><code>P-*</code></td><td>Properties (list / detail / create)</td><td><code>properties.spec.ts</code></td></tr><tr><td><code>C-*</code></td><td>Contacts</td><td><code>contacts.spec.ts</code></td></tr><tr><td><code>V-*</code></td><td>Viewings</td><td><code>viewings.spec.ts</code></td></tr><tr><td><code>AA-*</code> / <code>AM-*</code> / <code>AD-*</code> / <code>AC-*</code></td><td>Admin auth / members / deals / compliance</td><td><code>admin-*.spec.ts</code></td></tr><tr><td><code>DD-*</code> / <code>LC-*</code> / <code>QF-*</code> / <code>IC-*</code> / <code>CS-*</code></td><td>Deal detail / leads / qualification form / intel cards / public checklist</td><td>various</td></tr></tbody></table>
+<p><strong>Auth fixtures</strong> live in <code>tests/fixtures/</code>:</p>
+<ul><li><code>auth.ts</code> — shared login fixture + credential exports</li><li><code>adminAuth.ts</code> — BL-72b admin auth setup; saves <code>tests/.auth/admin.json</code> storage state</li><li><code>agentAuth.ts</code> — BL-74 agent auth setup; saves <code>tests/.auth/agent.json</code> storage state</li></ul>
+<p>Use <code>storageState</code> projects in <code>playwright.config.ts</code> so specs don't re-login per test.</p>
+<h4>Performance test suite (BL-74, BL-75, BL-77)</h4>
+<p><code>tests/e2e/performance.spec.ts</code> covers 11 pages with three thresholds:</p>
+<table><thead><tr><th>Threshold</th><th>When</th></tr></thead><tbody><tr><td><strong>3000 ms</strong></td><td>Default for warm pages</td></tr><tr><td><strong>3500 ms</strong></td><td>Analytics page only — cold-start tolerance for query aggregation (BL-75)</td></tr><tr><td><strong>8000 ms</strong></td><td>Extreme cold-start tolerance for first-load specs (BL-77) — pre-warming via <code>beforeAll</code> is preferred when feasible</td></tr></tbody></table>
+<p>Tests assert page-load time &lt; threshold using Playwright's <code>page.evaluate(() =&amp;gt; performance.now())</code> after <code>domcontentloaded</code>. Don't gate on <code>networkidle</code> (flaky on long-poll pages).</p>
+<h4>Jest unit suite (BL-76)</h4>
+<p>34 tests in <code>tests/unit/</code> covering pure-compute services:</p>
+<ul><li><code>dealHealthService.test.ts</code> — Deal Health Score formulas</li><li><code>analyticsService.test.ts</code> — analytics aggregations</li><li><code>aiInsightsService.test.ts</code> — AI insights type tests</li><li><code>scoreDecayService.test.ts</code> — exponential decay formula</li></ul>
+<p>Shared <strong>Supabase mock</strong> at <code>tests/unit/__mocks__/supabase.ts</code> — Jest module-mock pattern. Unit tests must not hit the network or a live Supabase. Service code being tested should accept an injectable client when possible, or the service file imports <code>supabase</code> from a path that the mock substitutes.</p>
+<p>Run via <code>npm test</code>; CI runs <code>npm test -- --ci --passWithNoTests</code> (per <code>.github/workflows/ci.yml</code>).</p>
+<h4>Database parity tests (TD-COMPLIANCE-FINGERPRINT-CI-PARITY — D-302)</h4>
+<p>Some Jest unit tests need a real Postgres to validate that JS and SQL agree on a hashed/canonical contract — the canonical example is <code>tests/unit/ruleFingerprint.test.ts</code>, which proves <code>compute_rule_fingerprint(compliance_rules)</code> (SQL) and <code>computeRuleFingerprint(rule)</code> (JS) emit byte-equal sha256 hex for the same row. Without a live DB this assertion is unreachable, which is exactly the gap that BL-136 hotfix #4 (<code>c799079</code>) was the bill for skipping. ADR: <code>docs/adr/0001-fingerprint-ci-parity.md</code>.</p>
+<p>The rig:</p>
+<table><thead><tr><th>Piece</th><th>Path</th><th>What it does</th></tr></thead><tbody><tr><td>CI Postgres service</td><td><code>.github/workflows/ci.yml</code></td><td>Spins up <code>postgres:15</code> per CI run, exposes 5432, sets <code>TEST_DATABASE_URL</code> for the test step.</td></tr><tr><td>Auth schema shim</td><td><code>tests/ci/auth-schema-shim.sql</code></td><td>Creates <code>auth.users</code> + stubs <code>auth.uid()</code> / <code>auth.role()</code> / <code>auth.jwt()</code> + <code>service_role</code> / <code>authenticated</code> / <code>anon</code> roles so live migrations apply against bare Postgres. CI-only — never run in production.</td></tr><tr><td>Schema baseline</td><td><code>tests/ci/schema-baseline.sql</code></td><td>Real <code>pg_dump</code> of staging public schema (324K, 103 tables — promoted from a hand-crafted stopgap in D-308 / TD-CI-SCHEMA-BASELINE-PROMOTE). Refreshed via <code>bash scripts/refresh-ci-baseline.sh</code> followed by 4 PG15 compat fixes (see § "Migrations are idempotent by default"). Old hand-crafted version preserved at <code>tests/ci/schema-baseline.sql.old-stopgap</code> until Will signs off on deletion.</td></tr><tr><td>Migration cascade</td><td><code>supabase/migrations/*.sql</code></td><td>Applied in alphabetical order with <code>ON_ERROR_STOP=1</code> after the shim + baseline.</td></tr><tr><td>Test pg client</td><td><code>tests/unit/__helpers__/db.ts</code></td><td>Exports <code>hasTestDb</code>, <code>describeIfDb</code> (resolves to <code>describe</code> in CI, <code>describe.skip</code> locally — Jest doesn't expose <code>describe.skipIf</code>), and <code>getTestPgClient()</code>. Use <code>describeIfDb('block', () =&amp;gt; { ... })</code> to gate live-DB tests.</td></tr></tbody></table>
+<p>Pattern for new parity tests:</p>
+<pre><code class="lang-ts">import { describeIfDb, getTestPgClient } from './__helpers__/db'
+import { Client } from 'pg'
+
+describeIfDb('my SQL ↔ JS invariant', () =&gt; {
+  let client: Client
+  beforeAll(async () =&gt; { client = await getTestPgClient() })
+  afterAll(async () =&gt; { await client.end() })
+  beforeEach(async () =&gt; { await client.query('BEGIN') })
+  afterEach(async () =&gt; { await client.query('ROLLBACK') })
+  // INSERT fixture, compare JS vs SQL output, assert byte-equal.
+})</code></pre>
+<p>Each test BEGINs + ROLLBACKs around its own fixture rows so nothing leaks. Local dev (<code>TEST_DATABASE_URL</code> unset) skips these blocks gracefully — the structural + hardcoded-fixture blocks in the same file still run, so pre-commit feedback isn't lost. Adding a new <code>auth.*</code> symbol to the shim or a new orphan table to the baseline is appropriate when a migration needs it; prefer backfilling a real migration when the work is bounded.</p>
+<h5><code>pg</code> client wire format ≠ PostgREST wire format (D-310)</h5>
+<p>Live-DB parity tests use the <code>pg</code> client (via <code>tests/unit/__helpers__/db.ts</code>). <code>pg</code>'s defaults differ from PostgREST in two ways that matter for fingerprint parity:</p>
+<ul><li><strong>Timestamps:</strong> <code>pg</code> parses <code>timestamp</code> (OID 1114) and <code>timestamptz</code> (OID 1184) into JS <code>Date</code> objects. PostgREST returns ISO 8601 strings. The fingerprint canonical contract assumes ISO strings (per § Compliance Acceptance Flow #1). Without intervention, <code>s()</code> on a <code>Date</code> produces <code>Date.prototype.toString()</code> ("Thu Apr 30 2026..."), which never matches the SQL canonical.</li><li><strong>Even when configured to return strings, <code>pg</code> emits Postgres-native format</strong> (<code>2026-04-30 00:00:00+00</code> — space separator, short TZ), not PostgREST/ISO 8601 (<code>2026-04-30T00:00:00+00:00</code>).</li></ul>
+<p>The fix lives in <code>tests/unit/__helpers__/db.ts</code>: register type parsers for OIDs 1114 + 1184 that convert pg's native format to ISO 8601 (<code>pgTimestampToIso(val)</code>):</p>
+<ul><li><code>replace(' ', 'T')</code> for date/time separator</li><li><code>replace(/([+-]\d{2})$/, '$1:00')</code> for short-TZ padding</li></ul>
+<p>JSONB is not affected — <code>pg</code> parses jsonb into JS objects, and <code>JSON.stringify</code> produces compact JSON matching the SQL <code>jsonb_compact()</code> helper byte-for-byte.</p>
+<p>When adding a new live-DB parity test (e.g. another hash function in some future feature), use <code>getTestPgClient()</code> and the type parsers fire automatically.</p>
+<h5>Diagnostic discipline for parity test failures (D-310)</h5>
+<p>When a live-DB parity test fails, instrument <strong>before</strong> fixing. Two ways the standard <code>console.log</code> approach can mislead:</p>
+<ul><li><strong>Jest in <code>--ci</code> mode buffers/suppresses <code>console.log</code> output.</strong> Use throw-based diagnostics instead — build a string payload and throw <code>new Error(payload)</code> when the divergence triggers. Jest always renders assertion error messages.</li><li><strong>Don't remove the diagnostic in the same commit as the fix.</strong> Land the fix first, verify CI green, remove the diagnostic in the close-out commit. The first fix attempt for D-310 (commit <code>4c22082</code>) bundled diagnostic removal with the fix; the fix was incomplete, and we lost a round-trip rebuilding the diagnostic (<code>beacde4</code>).</li></ul>
+<p>The diagnostic shape that worked for D-310: re-derive the JS canonical TWICE — once from the <code>dbRow</code> (what JS sees), once from a separate <code>SELECT ... ::text</code> query (what SQL canonicalizes from). If the two re-derivations differ, JS preprocessing diverges. If they're equal but the sha256s differ, the SQL function body diverges. This collapses three candidate causes (genuine drift / wire-format / fixture edge case) into a single boolean read on the CI log.</p>
+<h3>Test scoping discipline (BL-77)</h3>
+<ul><li><strong>Test IDs go on the row, not the parent container.</strong> <code>data-testid="lead-row"</code> on the <code>&amp;lt;tr&amp;gt;</code> itself, not on the <code>&amp;lt;tbody&amp;gt;</code>. Lets specs target one row deterministically when the list updates.</li><li><strong>Sections need addressable anchors.</strong> <code>data-testid="intel-cards-section"</code> placed on the section that scopes Intel Cards on the dashboard, so specs can <code>locator(...).getByText(...)</code> within scope. Avoid global <code>getByText</code> when the same text could appear elsewhere on the page.</li><li><strong>Don't depend on visual ordering.</strong> Tests assert the row exists and matches expected fields; ordering is a separate assertion only when ordering is itself the feature under test.</li><li><strong>Cold-start specs go first or are isolated.</strong> A cold-start expectation in the middle of a serial run will fail because earlier tests warmed the page. Either run cold-start specs first, or mark them with their own project that bypasses storageState.</li></ul>
+<h3>When in doubt</h3>
+<ul><li>Prefer manual smoke before adding an E2E test — E2E maintenance cost is real.</li><li>Add Jest unit coverage when a function has multiple branches and no UI surface (<code>scoreDecayService</code> is the canonical example).</li><li>Don't add a perf threshold without a documented baseline measurement — see BL-75 for the analytics 3500ms exception.</li></ul>
+<h2>Migrations are idempotent by default (D-308 / TD-CI-SCHEMA-BASELINE-PROMOTE)</h2>
+<p>CI clean-slate replays every migration from <code>tests/ci/schema-baseline.sql</code> (a real <code>pg_dump</code> of staging) + the full <code>supabase/migrations/</code> cascade. <strong>Every migration must be safe to re-run on a database that already represents its post-application state.</strong> Production runs each migration once via the Supabase Dashboard SQL Editor; CI runs them many times. CI is now the source of truth for "would this migration apply cleanly tomorrow."</p>
+<h3>The 6 patterns</h3>
+<table><thead><tr><th>Statement type</th><th>Idempotent form</th></tr></thead><tbody><tr><td><code>CREATE TABLE x</code></td><td><code>CREATE TABLE IF NOT EXISTS x</code></td></tr><tr><td><code>CREATE INDEX x</code> / <code>CREATE UNIQUE INDEX x</code></td><td><code>CREATE INDEX IF NOT EXISTS x</code></td></tr><tr><td><code>CREATE FUNCTION x</code></td><td><code>CREATE OR REPLACE FUNCTION x</code></td></tr><tr><td><code>CREATE TRIGGER x ON tbl</code></td><td><code>DROP TRIGGER IF EXISTS x ON tbl;</code> then <code>CREATE TRIGGER x ON tbl ...</code></td></tr><tr><td><code>CREATE POLICY "x" ON tbl</code></td><td><code>DROP POLICY IF EXISTS "x" ON tbl;</code> then <code>CREATE POLICY "x" ON tbl ...</code></td></tr><tr><td><code>ALTER TABLE x ADD CONSTRAINT name ...</code></td><td><code>ALTER TABLE x DROP CONSTRAINT IF EXISTS name;</code> then <code>ALTER TABLE x ADD CONSTRAINT name ...</code></td></tr><tr><td><code>ALTER TABLE x ADD COLUMN y</code></td><td><code>ALTER TABLE x ADD COLUMN IF NOT EXISTS y</code></td></tr></tbody></table>
+<p><code>CREATE TYPE</code> has no <code>IF NOT EXISTS</code> form — wrap in a <code>pg_type</code> check inside a <code>DO $$ ... END $$;</code> block.</p>
+<h3>When mechanical idempotency isn't enough — DO-block guards</h3>
+<p>Some statements reference state that has evolved away in production (column renamed, source table dropped, schema CHECK constraints added). Wrap such statements in a <code>DO $$ BEGIN IF EXISTS (...) THEN &amp;lt;statement&amp;gt;; END IF; END $$;</code> guard that probes <code>information_schema</code> for the precondition. Six concrete patterns shipped in D-308:</p>
+<ul><li><strong>Source table no longer exists</strong> — <code>INSERT INTO X SELECT ... FROM legacy_table</code> where <code>legacy_table</code> was dropped. Probe: <code>information_schema.tables</code>. Example: <code>20260307_consolidate_viewings.sql</code>.</li><li><strong>Source table column renamed/dropped</strong> — old INSERT references <code>compliance_rules.scope</code> (renamed). Probe: <code>information_schema.columns</code>. Example: <code>20260315_checklist_compliance_rules.sql</code> uses <code>scope</code> as a "still has old shape?" probe.</li><li><strong>Index references dropped column</strong> — <code>CREATE INDEX … ON documents(uploaded_at DESC)</code> where <code>uploaded_at</code> was renamed to <code>created_at</code>. Same column-existence probe. Example: <code>001_initial_schema.sql:91-92</code>.</li><li><strong>Backfill INSERT without natural key</strong> — INSERTs from one table to another without ON CONFLICT support. Add <code>WHERE NOT EXISTS (SELECT 1 FROM target WHERE &amp;lt;key&amp;gt;)</code>. Example: <code>20260310_deal_entity_v2.sql</code>.</li><li><strong>Seed INSERT without unique constraint</strong> — Wrap entire seed block in a "table populated for this scope?" check. Example: <code>20260308_portal_simulator.sql</code> checks <code>(portal=bayut, market=UAE)</code> before seeding.</li><li><strong>Pre-condition <code>RAISE EXCEPTION</code></strong> — migration aborts if a CI-absent precondition is missing (e.g. <code>kanaan@gmail.com</code> user). Convert <code>RAISE EXCEPTION</code> to <code>RAISE NOTICE; RETURN;</code> so CI silently skips. Dev-loop guidance preserved in the NOTICE. Example: <code>007_seed_test_data.sql</code>.</li></ul>
+<p>Every guarded statement carries an inline <code>Idempotency sweep — TD-CI-SCHEMA-BASELINE-PROMOTE</code> comment for greppability.</p>
+<h3>When to refresh the baseline</h3>
+<p>Refresh <code>tests/ci/schema-baseline.sql</code> from staging when <strong>a migration references a table that doesn't exist in the current baseline AND isn't created by an earlier tracked migration</strong>. That's the orphan-table case CI surfaces as <code>relation "X" does not exist</code>. The baseline is a snapshot of staging's public schema at refresh time; anything ALTERed thereafter in tracked migrations needs the baseline to know about its starting state.</p>
+<h3>How to refresh the baseline</h3>
+<pre><code class="lang-bash">bash scripts/refresh-ci-baseline.sh</code></pre>
+<p>Prompts for the staging Postgres password, runs <code>pg_dump</code> against the Session Pooler (IPv4 — see § "GitHub Actions → Supabase = Session Pooler"), writes <code>tests/ci/schema-baseline.sql.new</code>. Then apply 4 PG15 compat fixes:</p>
+<pre><code class="lang-bash"># 1. strip pg_dump 18.x metacommands
+sed -i '' -E '/^\\(restrict|unrestrict)/d' tests/ci/schema-baseline.sql.new
+
+# 2. strip PG17+ GUC
+sed -i '' -E '/^SET transaction_timeout/d' tests/ci/schema-baseline.sql.new
+
+# 3. defuse public schema collision
+sed -i '' -E 's/^CREATE SCHEMA public;$/CREATE SCHEMA IF NOT EXISTS public;/' tests/ci/schema-baseline.sql.new
+
+# 4. requalify Supabase-namespaced extension functions
+sed -i '' -E 's/extensions\.(gen_random_bytes|uuid_generate_v4)/public.\1/g' tests/ci/schema-baseline.sql.new</code></pre>
+<p>Then promote, preserving the prior version as a rollback:</p>
+<pre><code class="lang-bash">mv tests/ci/schema-baseline.sql tests/ci/schema-baseline.sql.old-stopgap-$(date +%Y%m%d)
+mv tests/ci/schema-baseline.sql.new tests/ci/schema-baseline.sql</code></pre>
+<p>Push to a feature branch, watch CI. Iterate on whatever drift surfaces — the iteration pattern is "fix the failing migration" with a sub-rule "bundle confirmed-failing siblings (same root cause + concrete grep evidence) when the prompt's per-migration discipline allows".</p>
+<h3>Why this exists</h3>
+<p>Pre-D-308 the migration cascade ran successfully in production but failed CI's clean-slate replay because production schema had drifted away from migration history (orphan tables, columns renamed, constraints added inline). The fix wasn't to abandon CI; it was to (a) make CI start from a real production-schema snapshot, and (b) make every migration idempotent against post-application state. Both halves are required — only the second is on every future migration's author.</p>
+<h2>Tech Stack Reference</h2>
+<ul><li>Next.js 14, TypeScript, Tailwind CSS</li><li>Supabase (DB, Auth, Storage, RLS)</li><li>Vercel (hosting, auto-deploy from main)</li><li>Capacitor (iOS via remote URL)</li><li>Resend (email), Twilio (WhatsApp), DocuSign (e-sign)</li><li>Anthropic API (AI features) — claude-sonnet-4-5-20250514 for fast/cheap generation</li><li>i18n: 4 locales (en, fr, de, it) — always update all 4</li></ul>
+<h2>Infra Gotchas (Learned the Hard Way)</h2>
+<h3>Next.js Cron Routes Need <code>force-dynamic</code></h3>
+<p>Any Vercel cron route (<code>src/app/api/cron/*/route.ts</code>) MUST export:</p>
+<pre><code class="lang-ts">export const dynamic = 'force-dynamic'
+export const revalidate = 0</code></pre>
+<p>Without these, Next.js can cache the response and Vercel's scheduler records served-from-cache without executing the handler. Symptoms: manual "Run" button works (200, logs present), scheduled invocations produce zero logs, no visible error. Documented in https://vercel.com/kb/guide/troubleshooting-vercel-cron-jobs (item #6). First bit us 2026-04-21 (BG-47).</p>
+<h3>GitHub Actions → Supabase = Session Pooler, Not Direct</h3>
+<p>Since Jan 15 2024, <code>db.&amp;lt;project-ref&amp;gt;.supabase.co</code> resolves to IPv6 only. GitHub Actions runners are IPv4-only. Any workflow that connects directly (pg_dump, psql, migrations) must use the Session Pooler:</p>
+<ul><li>Host: <code>aws-&amp;lt;n&amp;gt;-&amp;lt;region&amp;gt;.pooler.supabase.com</code> (get from Supabase Dashboard → Connect → Direct → Session pooler)</li><li>Port: 5432 (session mode — required for <code>pg_dump</code> because of prepared statements)</li><li>Username: <code>postgres.&amp;lt;project-ref&amp;gt;</code> (NOT just <code>postgres</code>)</li><li>Database: <code>postgres</code> (unchanged)</li><li>Password: same DB password</li></ul>
+<h3>pg_dump Version Must Match Server Major Version</h3>
+<p>Supabase upgraded to Postgres 17 in early 2026. Ubuntu 24.04 default <code>postgresql-client</code> is v16, which refuses to dump from v17 with <code>server version mismatch</code>. Install the exact version from the official PGDG apt repo:</p>
+<pre><code class="lang-bash">sudo install -d /usr/share/postgresql-common/pgdg
+sudo curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
+echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+sudo apt-get update &amp;&amp; sudo apt-get install -y postgresql-client-17</code></pre>
+<h3>GitHub Actions <code>GITHUB_TOKEN</code> is Read-Only by Default</h3>
+<p>Workflows that push commits back to the same repo need an explicit job-level permission:</p>
+<pre><code class="lang-yaml">jobs:
+  myjob:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - ...</code></pre>
+<p>Without this, <code>git push</code> fails with <code>remote: Write access to repository not granted. ... 403</code>.</p>
+<h3>Supabase auth.users INSERT vs <code>sync_agent_profile_email</code> trigger</h3>
+<p>The trigger <code>on_auth_user_created</code> fires AFTER INSERT on <code>auth.users</code> and runs <code>sync_agent_profile_email()</code> (UPDATE on agent<em>profiles). When seeding via <code>supabase.auth.admin.createUser()</code>, this trigger reliably causes a <strong>500 unexpected</em>failure</strong> ("Database error creating new user") even though direct SQL INSERTs to auth.users succeed cleanly. Root cause appears to be permission scope on the GoTrue connection that runs the trigger.</p>
+<p><strong>Workaround for bulk seeding:</strong></p>
+<pre><code class="lang-sql">-- Before seed
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
+-- Run seed script
+
+-- After seed
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION sync_agent_profile_email();</code></pre>
+<p>Discovered 2026-04-22 (BL-EU-SEED Step 1). Wasted ~1 hour debugging via "Confirm Email" rate limit red herring before isolating the trigger.</p>
+<h3>Supabase email case-normalization mismatch</h3>
+<p><code>auth.users.email</code> is automatically lowercased by Supabase per RFC 5321. But application-layer inserts to <code>agent_profiles.email</code> preserve the original case provided by the client. This means <code>auth.users WHERE email = 'will+AG-FR-jean@...'</code> returns 0 rows (stored as <code>will+ag-fr-jean@...</code>) but <code>agent_profiles WHERE email = 'will+AG-FR-jean@...'</code> returns 1.</p>
+<p><strong>Defenses installed 2026-04-22:</strong></p>
+<ol><li>New <code>BEFORE INSERT OR UPDATE</code> trigger on <code>agent_profiles</code> that auto-lowercases email:  ``<code>sql  CREATE OR REPLACE FUNCTION normalize_agent_profile_email() ...  CREATE TRIGGER normalize_agent_profile_email_trigger ...  </code>``</li><li>All seed scripts must <code>.toLowerCase()</code> email before lookup against <code>auth.users</code>. See <code>seed-fr-properties.mjs</code> line 29 for reference.</li><li><strong>Always use <code>ILIKE</code> or <code>LOWER()</code> when searching email columns from SQL.</strong> PostgreSQL <code>LIKE</code> is case-sensitive; an uppercase pattern against lowercased Supabase Auth data returns 0 rows even when records exist. D-315 burned ~15 minutes on this during BL-138 MCP verification. Diagnostic queries against <code>auth.users.email</code>, <code>auth.identities.identity_data-&amp;gt;&amp;gt;'email'</code>, or <code>agent_profiles.email</code> should never use <code>LIKE</code> — always <code>ILIKE</code>.</li></ol>
+<h2>Mid-Session Documentation Updates</h2>
+<p>At natural breakpoints (after each major task/prompt), update these files:</p>
+<ul><li><strong>CHANGELOG.md</strong> — version history</li><li><strong>FEATURE-MAP.md</strong> — feature → file reference</li><li><strong>PROJECT-STRUCTURE.md</strong> — file tree</li></ul>
+<p>Feature Tracking Protocol Every BL item that gets built must have a complete paper trail. No exceptions. Definition of "Done" for any BL item:</p>
+<p>ROADMAP.md changelog — entry with description + key decisions/gotchas FEATURE-MAP.md — row(s) with feature name + file paths Spec file (if non-trivial) — saved under docs/specs/ and uploaded to Project Knowledge</p>
+<p>Rules:</p>
+<p>Never mark a BL complete in ROADMAP without all three above being done Never write TODO: BL-XX in code or chat — if it's a follow-up task, add it to the ROADMAP backlog with a description before closing the session Small follow-ups (bug fixes, minor enhancements off the back of a BL) get their own backlog entry if they touch files or schema — not just a mental note End-of-session checklist — before committing docs, verify every new/completed BL has all three artifacts</p>
+<h2>End-of-Session Protocol (CC Responsibility)</h2>
+<blockquote><p>Also see § Standing Obligations Discipline above — cross-session recurring obligations must be checked at EOS per the protocol there. <code>docs/sessions/STANDING-OBLIGATIONS.md</code> Open Obligations table is the canonical list.</p></blockquote>
+<p>At the end of every session, CC must run the EOS prompt which:</p>
+<ol><li>Updates ROADMAP.md — marks completed BLs as Done, adds changelog entries</li><li>Updates FEATURE-MAP.md — adds rows for every new file created</li><li>Updates PROJECT-STRUCTURE.md — adds new files to tree</li><li>Creates <code>docs/sessions/SOS-[DATE].md</code> — session log with what was built, decisions, gotchas, pending actions, next up</li></ol>
+<h3>Roadmap HTML Generation (REQUIRED every session)</h3>
+<p>After updating ROADMAP.md, regenerate the Process Atlas HTML:</p>
+<pre><code class="lang-bash">cd ~/Apps/housezum-process-atlas
+# The script reads from ~/Apps/housezum-app/ROADMAP.md
+# Run from housezum-app:
+cd ~/Apps/housezum-app
+npm run docs:html:roadmap
+cd ~/Apps/housezum-process-atlas
+git add -A &amp;&amp; git commit -m 'roadmap: [session date] update' &amp;&amp; git push origin main</code></pre>
+<p>URL: https://kanaan-droid.github.io/housezum-process-atlas/roadmap/</p>
+<h3>Architecture HTML Regeneration</h3>
+<p>When <code>docs/architecture/*.md</code> changes (new arch doc added, content updated, ticket absorbed in BG-79b-style passes), regenerate the Atlas:</p>
+<pre><code class="lang-bash">cd ~/Apps/housezum-app &amp;&amp; npm run docs:html:architecture
+cd ~/Apps/housezum-process-atlas &amp;&amp; git add -A &amp;&amp; git commit -m "regen architecture docs" &amp;&amp; git push</code></pre>
+<p>URL: https://kanaan-droid.github.io/housezum-process-atlas/architecture/</p>
+<p>Auto-runs are not wired yet — manual until set up. <code>npm run docs:html</code> runs both roadmap + architecture in one go.</p>
+<h3>Atlas generator discipline (D-323 — lesson from D-321→D-322→D-323 arc)</h3>
+<p>Every user-sourced field injected into HTML via runtime template literals (in the embedded <code>&amp;lt;script&amp;gt;</code> block of <code>scripts/generate-roadmap-html.mjs</code>) MUST be wrapped in <code>escapeHtml()</code>. Unescaped <code>&amp;lt;</code>, <code>&amp;gt;</code>, <code>&amp;amp;</code>, or quote chars in ROADMAP.md content silently break the DOM tree — corruption appears as misplaced/missing columns or stray text, NOT as a parser error.</p>
+<p>Build-time <code>JSON.stringify(DATA).replace(/&amp;lt;/g, '\\u003c')</code> (lines 168-169) safely encodes data INTO the script tag, but the browser then de-escapes back to raw <code>&amp;lt;</code> at parse time. The unsafe step is the subsequent <code>${item.desc}</code> interpolation into <code>innerHTML</code>. <code>escapeHtml()</code> runs at that interpolation site to keep the DOM tree intact.</p>
+<p><strong>Verify after any generator change</strong> by opening the regenerated HTML in a browser and running in DevTools:</p>
+<pre><code class="lang-javascript">// Expected: 5 (one of each: progress / next / backlog / debt / done)
+[...document.querySelector('.kanban').children].filter(el =&gt; el.classList.contains('column')).length</code></pre>
+<p>If this returns &lt; 5 on any filter state, an injection point is unescaped. Programmatic/computed values (tag colors, column keys, item counts, hardcoded labels from <code>TAGS</code>) don't need escaping; user-sourced fields from ROADMAP rows (title, desc, decisions, files, id, dates) do.</p>
+<p>History: D-321 filed the symptom (3 columns visible on "All" view). D-322 fixed the wrong layer (CSS sizing — <code>repeat(5,minmax(280px,1fr))</code> then <code>220px</code>). D-323 (this entry) is the actual root-cause fix.</p>
+<p><strong>SOS file format:</strong> <code>docs/sessions/SOS-YYYY-MM-DD.md</code> <strong>SOS file must include:</strong></p>
+<ul><li>What was built (BL number + description + key files)</li><li>Key decisions and gotchas</li><li>Pending actions (manual steps required)</li><li>Next up (priority order from ROADMAP)</li></ul>
+<p><strong>Why:</strong> The SOS file gives the next session instant context without relying on memory or chat history. It is the single source of truth for "what happened last session".</p>
+<h3>End-of-Session Tag Protocol (D-306, 2026-05-05)</h3>
+<p>Every EOS commit is followed by a semver-tagged release. <strong>Mechanical reason:</strong> <code>scripts/docs-check.mjs</code> defaults <code>--since</code> to the most recent git tag; without regular tagging, the trigger-compliance window stays anchored at the BG-78 protocol install commit (<code>90588fd</code>) and accumulates drift session over session. The 5-day CI red gate that started 2026-04-30 (commit <code>e2b65ef</code>) was the bill for not tagging at EOS — see CHANGELOG D-306.</p>
+<p><strong>Bump rules:</strong></p>
+<ul><li><strong>Patch</strong> (<code>x.y.Z</code>) — closed BLs/TDs, hotfixes, paper trail. Default for most EOSes.</li><li><strong>Minor</strong> (<code>x.Y.0</code>) — new agent-facing or admin-facing feature surface ships. Examples: BL-131 IT compliance going live, BL-132 CH ingestion landing.</li><li><strong>Major</strong> (<code>X.0.0</code>) — breaking changes to data model, public API, or core agent flows. Rare.</li></ul>
+<p><strong>Workflow at EOS:</strong></p>
+<ol><li>EOS commit lands on main with all paper trail (CHANGELOG, ROADMAP, FEATURE-MAP, PROJECT-STRUCTURE, DB-SCHEMA as applicable).</li><li>Bump <code>package.json.version</code> in that same commit (or in a dedicated bump commit immediately after — both acceptable; same-commit preferred).</li><li>Cut annotated tag at HEAD: <code>git tag -a vX.Y.Z -m 'EOS YYYY-MM-DD: D-### summary'</code>.</li><li>Push tag: <code>git push --tags</code>.</li><li>Verify: <code>npm run docs:check</code> should exit 0 (window now starts at the new tag; zero commits between tag and HEAD = zero trigger-compliance violations).</li></ol>
+<p><strong>Bump <code>package.json.version</code> BEFORE cutting the tag</strong> (D-310 lesson): D-309 cut tag <code>v2.0.2</code> at the D-308 PR #1 merge but missed bumping <code>package.json.version</code> from 2.0.1 → 2.0.2 in the same commit, leaving tag and <code>package.json</code> out of sync by one patch level until D-310 went 2.0.1 → 2.0.3 directly. The package.json bump is part of step 2 above; never split it from the tag step.</p>
+<p><strong>Side effect awareness:</strong> the next session's commits will accumulate trigger-compliance violations against this tag if the rule is violated. The protocol does not absolve future commits; it just prevents the accumulator from spanning multiple sessions silently.</p>
+<p><strong>Discoverable from CI:</strong> if <code>Documentation Governance Check</code> is red on a fresh push, the most likely cause is either (a) the current session's commits have unabsorbed work, or (b) the previous session shipped without cutting a tag. Open the CI log within the same session it lands — Vercel deploys independently and is not a substitute for green CI.</p>
+<p>Cross-reference: <a href="ways-of-working.html"><code>WAYS-OF-WORKING.md</code></a> § Documentation Governance describes the three <code>docs:check</code> checks and how trigger-compliance windows back to the most-recent-tag anchor; this Tag Protocol section is the operational counterpart that keeps that anchor moving.</p>
+<p>Why this matters: BL numbers without descriptions are dead weight. Future sessions (and future team members) cannot reconstruct what was built, what files were touched, or what decisions were made. A missing spec = lost architecture context permanently.</p>
+<p>These are project knowledge files. Updating them mid-session preserves context if the session ends unexpectedly or we hit the context limit.</p>
+<p>Spec File Protocol</p>
+<p>All spec files live in docs/specs/ in the main repo — this is the source of truth Naming convention: BL-[number]-[SHORT-NAME]-SPEC.md Every spec must be committed to main before or alongside the feature build Every ROADMAP.md backlog/done entry must have a Spec column referencing the filename (empty = no spec, which should be rare for major features) Uploading to Claude Project Knowledge is secondary — always commit to repo first</p>
+<p>Session Log is the single changelog. CHANGELOG.md is deprecated. Every session log entry must include:</p>
+<p>What was built (feature name + BL number) Key files added or modified Key decisions and gotchas Any known bugs or follow-up items opened</p>
+<p>DEVLOG.md is deprecated — skip it.</p>
+<p>File header comments — every new file created (components, services, hooks, API routes) must start with: typescript/**  <em> BL-[number] — [Feature Name]  </em> [One line: what this file does]  <em> [Optional: key dependencies or context]  </em>/ CC must include this in every file it creates. Existing files get headers added when touched.</p>
+<p>Data migrations from old tables: always check if enum/check constraint values use dashes vs underscores. buyer<em>profiles.urgency stored '1-3 months' (dashes) but requirements.urgency constraint expects '1</em>3<em>months' (underscores). Use REPLACE() to normalize on insert. Also: old tables may lack org</em>id — join via contacts to get it.</p>
+<h2>Session-Start Doc Verification (Claude's Responsibility)</h2>
+<p>At the start of every session, after reading ROADMAP.md, Claude must verify that the previous session's completed work is properly recorded. This is Claude's job — not CC's.</p>
+<p><strong>How:</strong></p>
+<ol><li>Claude reads the <code>Last updated</code> line and the top of the Done table in ROADMAP.md</li><li>Claude cross-checks against what Will reports was completed last session</li><li>If any BL items are missing from the Done table OR session log → flag immediately, before starting new work</li><li>Draft a patch prompt for CC to fix it on the spot</li></ol>
+<p><strong>Why CC can't self-verify:</strong> CC self-reports compliance and takes shortcuts on doc updates (confirmed pattern). The only reliable check is Claude reading the actual committed file at session start.</p>
+<p><strong>Rule:</strong> Never start building new features if the previous session's Done entries are missing. Fix the paper trail first.</p>
+<h2>Accidental Send Detection</h2>
+<p>If Will's message appears chopped off, incomplete, or ends mid-sentence — <strong>ask if he's finished before responding.</strong> He likely hit "Go" by mistake. Don't waste energy responding to a partial message.</p>
+<h2>Domain Ownership Rules (Non-Negotiable)</h2>
+<ul><li><strong>Hooks and components NEVER import <code>supabase</code> directly</strong> — ESLint will catch violations</li><li><strong>Service files own all DB access</strong> for their domain</li><li><strong>Cross-domain data</strong>: pass as function arguments, never query another domain's tables</li><li><strong>Before adding a cross-domain query</strong>: check <code>BOUNDED-CONTEXTS.md</code> first</li><li><strong>New service files</strong> must export explicit TypeScript input/output types (no implicit any/returns)</li><li>See <code>BOUNDED-CONTEXTS.md</code> for the full domain map</li></ul>
+<h3>Incremental Supabase Cleanup (CC Responsibility)</h3>
+<p>95 existing files import <code>@/lib/supabase</code> directly in hooks/components (pre-existing debt tracked as TD-16). <strong>Every time CC touches an existing file for any reason</strong>, it must:</p>
+<ol><li>Check if that file has a direct <code>supabase</code> import</li><li>If yes — refactor it to import from the appropriate domain service instead</li><li>Report the cleanup in the session summary: "Cleaned up supabase import in X.tsx → now uses [service]"</li></ol>
+<p>This is non-optional. If CC touches a file and leaves a direct supabase import, it is in violation of this rule. The ESLint rule will warn (yellow) on any remaining violations — CC must not ignore these warnings.</p>
+<h2>Fetch Credentials Rule (Non-Negotiable)</h2>
+<p><strong>Every <code>fetch()</code> call to an API route MUST include <code>credentials: 'include'</code>.</strong></p>
+<pre><code class="lang-typescript">// ✅ Correct
+const res = await fetch('/api/signing/create', { method: 'POST', credentials: 'include', ... })
+
+// ❌ Wrong — auth cookies not sent, request silently fails
+const res = await fetch('/api/signing/create', { method: 'POST', ... })</code></pre>
+<p>This was the systemic root cause of BG-24, BG-24b, BG-25e (signing send hanging, annotation queue failing). Without <code>credentials: 'include'</code>, auth cookies are not sent to same-origin API routes on some deployment configurations. CC must include this on every new fetch call.</p>
+<h2>Common Gotchas</h2>
+<ul><li>zsh: use single quotes for commit messages with special chars</li><li><code>.env.local</code>: cannot <code>source</code> it — use <code>--env-file</code> flag</li><li>Supabase RLS: new tables need policies or service_role key for API routes</li><li>Capacitor iOS: remote URL mode — native plugins don't work</li><li>Google OAuth: app in "Testing" mode — must add test users manually</li><li><strong>AppShell safe-area (iOS WKWebView):</strong> The AppShell outer div height must be <code>calc(52px + env(safe-area-inset-top, 0px))</code> — NOT just <code>52px</code>. Without this, the safe-area zone above the inner bar has no background and page content scrolls through it visually. Page content padding stays at <code>pt-[52px]</code> — do NOT also add safe-area to page content (that creates double whitespace). The fix is AppShell height only.</li></ul>
+<ul><li><strong>Data migration enum normalization:</strong> old tables may store enum values with dashes (e.g. <code>'1-3 months'</code>) while new tables use underscores (<code>'1_3_months'</code>). Always check CHECK constraints before INSERT migration. Use <code>REPLACE()</code> to normalize on insert.</li><li><strong>Data migration org_id:</strong> old tables may lack <code>org_id</code> column. Join via <code>contacts</code> table to resolve: <code>JOIN contacts c ON c.id = old_table.contact_id</code> then use <code>c.org_id</code>.</li></ul>
+<h3><code>ai_autonomy_settings</code> column is <code>max_level</code> not <code>level</code></h3>
+<p>The autonomy level column in <code>ai_autonomy_settings</code> is <code>max_level</code> (integer), NOT <code>level</code>. Always verify with <code>information_schema.columns</code> before writing queries against this table. Using <code>level</code> causes a silent query failure returning null, which blocks all L2 execution.</p>
+<h3>Absent org ceiling in <code>ai_autonomy_settings</code> = no restriction</h3>
+<p>When <code>ai_autonomy_settings</code> has no row with <code>user_id IS NULL</code> for a given <code>org_id + action_type</code>, it means the org has not configured a ceiling — treat as unrestricted (<code>ceilingLevel = 2</code>). Do NOT default to 0, which silently blocks all L2 auto-execution for orgs that haven't explicitly configured ceilings.</p>
+<hr/>
+<h2>Documentation Governance</h2>
+<blockquote><p>Replaces the previous "Living Documentation Protocol" (which silently failed for 47 days / ~790 commits). Core principle: <strong>automation-coupled docs live; prose-heavy docs die.</strong> Triggers are mechanical, scope is bounded, enforcement is loud.</p></blockquote>
+<h3>Architecture as a folder, not a file</h3>
+<p>Architecture documentation lives in <code>docs/architecture/</code> — one file per cross-cutting concern. There is no top-level <code>ARCHITECTURE.md</code> (deleted intentionally — it became a mirror of the modular files and diverged within weeks).</p>
+<p>Entry point for fresh readers (humans, fresh-context Claude sessions): <code>docs/architecture/INDEX.md</code>. This is a System Topology Map: stack, data flow, module map, invariants. Everything else is a link out.</p>
+<table><thead><tr><th>File</th><th>Owns</th></tr></thead><tbody><tr><td><code>docs/architecture/INDEX.md</code></td><td>Navigation map + invariants. Read first.</td></tr><tr><td><code>docs/architecture/STRATEGY.md</code></td><td>Strategic "why" — AI strategy, AWS migration, GDPR, multilingual graph, priority queue, autonomy levels.</td></tr><tr><td><code>docs/architecture/agentic.md</code></td><td>BL-97 Agentic Mode — L0/L1/L2, Action Cards, AI Actions Inbox.</td></tr><tr><td><code>docs/architecture/qa-engine.md</code></td><td>BL-60 / BL-114 / BL-115 / BL-115b Q&amp;A engine pipeline.</td></tr><tr><td><code>docs/architecture/cache.md</code></td><td>BL-106 Upstash Redis cache + extension patterns.</td></tr><tr><td><code>docs/architecture/i18n.md</code></td><td>BL-120 i18n architecture — locale matrix, integration surfaces, browser auto-translate guard.</td></tr><tr><td><code>docs/architecture/multi-tenancy.md</code></td><td>RLS, org_id, RBAC, tenant isolation patterns.</td></tr></tbody></table>
+<p>The historical <code>docs/specs/AGENTIC-AI-STRATEGY.md</code> (2026-02-09) is <strong>superseded</strong> by the <code>agentic.md</code> + <code>STRATEGY.md</code> split. Header note added at retirement.</p>
+<h3>Update triggers (the mechanical part)</h3>
+<p>The following file-path globs trigger required architecture-doc updates <strong>in the same commit</strong>:</p>
+<table><thead><tr><th>File pattern changed</th><th>Doc to update</th></tr></thead><tbody><tr><td><code>src/services/ai/agentic/**</code></td><td><code>docs/architecture/agentic.md</code></td></tr><tr><td><code>src/services/ai/qa-*.ts</code></td><td><code>docs/architecture/qa-engine.md</code></td></tr><tr><td><code>src/services/ai/cache*.ts</code>, <code>src/services/ai/*-cache.ts</code></td><td><code>docs/architecture/cache.md</code></td></tr><tr><td><code>src/i18n/**</code>, <code>src/messages/**</code></td><td><code>docs/architecture/i18n.md</code></td></tr><tr><td><code>src/middleware.ts</code>, <code>**/rls/**</code>, RLS-related migrations</td><td><code>docs/architecture/multi-tenancy.md</code></td></tr><tr><td><code>supabase/migrations/**</code></td><td><code>DB-SCHEMA.md</code></td></tr><tr><td>New file in <code>src/features/**</code></td><td><code>FEATURE-MAP.md</code></td></tr><tr><td>New top-level folder under <code>src/</code></td><td><code>PROJECT-STRUCTURE.md</code></td></tr><tr><td><code>.env.example</code>, <code>vercel.json</code> env vars</td><td><code>ENV-INVENTORY.md</code></td></tr></tbody></table>
+<p>If a commit touches files matching these patterns and the corresponding doc is not also touched in the same commit, <strong>CI fails</strong>.</p>
+<h3>Commit message contract</h3>
+<p>Every commit message must include a <code>Docs impact:</code> line, listing the doc files updated or <code>none</code> with justification:</p>
+<pre><code>BL-XX: &lt;feature description&gt;
+
+Docs impact: docs/architecture/agentic.md, FEATURE-MAP.md</code></pre>
+<pre><code>BG-XX: fix typo in button label
+
+Docs impact: none — UI string only, no architectural change</code></pre>
+<p><strong>Silence is no longer permission.</strong> Commits without a <code>Docs impact:</code> line fail CI.</p>
+<h3>Per-file headers (every architecture doc)</h3>
+<p>Every file in <code>docs/architecture/</code> opens with this block:</p>
+<pre><code class="lang-markdown">&gt; **Last verified:** YYYY-MM-DD
+&gt; **Status:** Living
+&gt; **Update triggers:** &lt;list of file paths/conditions that should bring you back here&gt;
+&gt; **Owner:** Will (solo) — review on every commit touching update triggers</code></pre>
+<p>The "Update triggers" line makes the trigger map self-documenting <em>inside</em> each doc. Anyone editing the doc sees what changes should bring them back here.</p>
+<h3>Debt Ceiling</h3>
+<p>The codebase and architecture docs must remain in sync. To prevent silent drift:</p>
+<ul><li><strong>Soft ceiling: 5 unabsorbed shipped tickets.</strong> When ROADMAP shows 5+ closed tickets (<code>BL-XX</code> or <code>BG-XX</code>) that have not been reflected in any <code>docs/architecture/*.md</code> update, <code>npm run docs:check</code> warns.</li><li><strong>Hard ceiling: 8 unabsorbed shipped tickets.</strong> New feature work (new BL-XX builds) is blocked. Bugfixes (BG-XX) and doc work itself are exempt.</li></ul>
+<p>"Absorbed" = the ticket's load-bearing changes are reflected in at least one architecture doc, OR the ticket was explicitly marked <code>Docs impact: none — &amp;lt;reason&amp;gt;</code> in its commit.</p>
+<h3>CI enforcement: <code>npm run docs:check</code></h3>
+<p>Three checks. All run in CI on every PR. Local <code>npm run docs:check</code> mirrors them for pre-commit visibility (no local enforcement — agents bypass local hooks; CI is louder).</p>
+<ol><li><strong>Trigger compliance.</strong> For each commit since <code>main</code>'s last tag (or last 20 commits if untagged), check every changed file against the trigger map. If a file matches a trigger glob and the corresponding doc wasn't also touched in the same commit, fail.</li><li><strong>Header freshness.</strong> For each file in <code>docs/architecture/</code>, check the "Last verified" date. If older than 30 days AND the trigger files have been touched since that date, fail with a list of stale docs and the commits that should have updated them.</li><li><strong>Debt ceiling.</strong> Count shipped tickets in ROADMAP not yet referenced in any architecture doc. Warn at 5. Fail at 8.</li></ol>
+<h3>Project Knowledge manifest</h3>
+<p>Fresh Claude sessions read uploaded files at session start. Stale uploads = blind debugging even when repo docs are current. The repo-root <code>PROJECT-KNOWLEDGE-MANIFEST.md</code> lists exactly what to upload, in priority order. Updated when a new architecture file is added.</p>
+<h3>Why this works (post-mortem of the old protocol)</h3>
+<p>The previous "Living Documentation Protocol" said <em>"update ARCHITECTURE.md every session."</em> It died because:</p>
+<ul><li><strong>Vague trigger.</strong> "Every session" — which session? what changes count? CC silently degraded enforcement until it stopped.</li><li><strong>Unbounded scope.</strong> ARCHITECTURE.md only grew. Every update required re-reading the whole file. Cost compounded.</li><li><strong>Trigger at the wrong moment.</strong> "Session end" is when everyone is tired. By the time you remember, you've forgotten what changed.</li></ul>
+<p>The new protocol fixes all three: triggers are mechanical (file paths), scope is bounded (one doc per concern, ≤~400 lines target), enforcement is at commit time (the moment of impact), and the system fails LOUD via CI when ignored.</p>
+<h3>Debt-ceiling 2026-05-05 lesson — open every red CI within the same session</h3>
+<p>CI was red for 5 days starting commit <code>e2b65ef</code> (2026-04-30) because the debt ceiling crossed <code>DEBT_FAIL = 8</code> (16/121 unabsorbed by the time it was caught). Vercel deployments were unaffected the whole time (independent pipeline), so the CI red gate sat unobserved. The fix in D-305 was to pay down the absorption debt by referencing all 16 tickets in their relevant <code>docs/architecture/*.md</code> files — execution rather than relaxing the rule.</p>
+<p><strong>Pattern going forward:</strong> when CI shows red, open it within the same session — even if Vercel is green. CI is the project's paper-trail tripwire, and silence on it accumulates fast. The two failure modes — debt-ceiling (aggregate) and trigger-compliance (per-commit, frozen at commit time) — have different blast radius:</p>
+<ul><li><strong>Debt ceiling</strong> is recoverable in a single absorption pass (D-305 pattern): identify unabsorbed tickets, write 2–3 sentence absorption entries in the relevant <code>docs/architecture/*.md</code> file, re-run <code>docs:check</code>. Don't skip this when shipping multi-ticket sessions; the count compounds otherwise.</li><li><strong>Trigger compliance</strong> is per-commit and <em>cannot</em> be retroactively cleared without amending old commits (forbidden) or cutting a tag (advances the <code>--since</code> window). The right time to fix a trigger-compliance violation is <em>before</em> the commit lands. Phased BLs that consolidate paper trail in a final commit accumulate trigger-compliance debt that survives until a tag is cut — TD-DOCS-CHECK-PHASED-COMMIT-ALLOWANCE captures the script-side mitigation options.</li></ul>
+<hr/>
+<h2>Country-Agnostic Architecture</h2>
+<p>HouseZoom operates across UAE, France, Switzerland, and Italy. All country-specific UI must use <strong>lookup map patterns</strong>, never if/else chains.</p>
+<h3>Principle</h3>
+<p>Country-specific values (labels, prefixes, currencies, regulatory terms) live in a single lookup map constant. Components read from the map using the agent's <code>operating_country</code>. If a key is missing, fall back to a sensible default.</p>
+<h3>Patterns</h3>
+<p><strong>LICENSE_META</strong> — country-specific license labels and prefixes:</p>
+<pre><code class="lang-typescript">const LICENSE_META: Record&lt;string, { label: string; prefix: string }&gt; = {
+  UAE: { label: 'RERA License', prefix: 'RERA-' },
+  France: { label: 'CPI License', prefix: 'CPI-' },
+  Switzerland: { label: 'BF License', prefix: 'BF-' },
+  Italy: { label: 'Patentino', prefix: 'Pat.-' },
+}
+// Usage: LICENSE_META[operatingCountry] ?? LICENSE_META['UAE']</code></pre>
+<p><strong>setAgentCurrency</strong> — module-level singleton for currency resolution outside React context:</p>
+<pre><code class="lang-typescript">// In lib/utils.ts
+let _agentCurrency: string | null = null
+export function setAgentCurrency(c: string) { _agentCurrency = c }
+// formatCurrency resolution: explicit arg &gt; _agentCurrency &gt; fallback</code></pre>
+<p><strong>Phone country codes</strong> — dropdown options tied to operating country default.</p>
+<h3>Rules</h3>
+<ul><li>Never hardcode "AED", "RERA", or any single-country value in components</li><li>Every country-specific string must have a lookup map or i18n key</li><li>Default to UAE values only as a fallback, not as the primary path</li><li>When adding a new market, add one entry to each lookup map — no component changes needed</li></ul>
+<h3>The "No Hardcoding" Principle (Non-Negotiable)</h3>
+<p><strong>Never hardcode market-specific, environment-specific, or configuration values in components.</strong></p>
+<p>This includes:</p>
+<ul><li>Currency codes (<code>'AED'</code>, <code>'CHF'</code>, <code>'USD'</code>) → use <code>orgCurrency</code> from <code>useOrg()</code></li><li>Country names or codes → use lookup maps</li><li>License labels (<code>'RERA'</code>, <code>'CPI'</code>) → use <code>LICENSE_META</code> map</li><li>API URLs → use environment variables</li><li>Pixel values that depend on device/platform → use CSS variables or <code>env()</code></li><li>Any value that differs by market, org, or device</li></ul>
+<p><strong>The test:</strong> If you change markets tomorrow (UAE → France), would this value need to change? If yes → it must come from config, not be hardcoded.</p>
+<p>Violations discovered late cost 10x more to fix than violations caught at write time. CC must flag any hardcoded market-specific value before committing.</p>
+<h3>Currency Rule (Non-Negotiable)</h3>
+<p><strong>Never hardcode currency codes (<code>'AED'</code>, <code>'CHF'</code>, <code>'USD'</code>, <code>'EUR'</code>) in any component.</strong></p>
+<p>Always use <code>orgCurrency</code> from <code>useOrg()</code>:</p>
+<pre><code class="lang-typescript">const { currency: orgCurrency } = useOrg()
+// Then pass to formatCurrency:
+formatCurrency(amount, orgCurrency)
+// Or as fallback:
+const currency = deal.currency || orgCurrency || 'AED'</code></pre>
+<p>Exceptions (legitimate hardcoding):</p>
+<ul><li>Currency dropdown option arrays (display only)</li><li><code>src/lib/utils.ts</code> config maps</li><li><code>OrgProvider.tsx</code> default state values</li></ul>
+<p>Any <code>.tsx</code> file with a currency literal outside these exceptions is a violation. CC must grep for violations before committing: <code>grep -rn "'AED'\|'CHF'\|'USD'\|'EUR'" src --include="*.tsx"</code></p>
+<h3>Audit i18n before seeding multi-country data (BL-EU-SEED lesson)</h3>
+<p>The 4-locale infrastructure (en/fr/de/it) and <code>agent_profiles.language</code> + <code>measurement_unit</code> columns existing does NOT mean the UI honors them. Phase 1 was UAE single-tenant; many components hardcode <code>'AED'</code>, <code>'sqft'</code>, English. Before seeding any multi-country test data:</p>
+<ol><li>Grep <code>src/</code> for hardcoded <code>'AED' | 'USD' | 'EUR' | 'CHF' | 'sqft' | 'ft²'</code> literals</li><li>Verify <code>formatCurrency()</code> accepts the country format stored in DB (full names vs codes)</li><li>Verify locale resolution reads from <code>agent_profiles.language</code> (not just localStorage/browser)</li><li>Verify <code>OrgProvider</code> exposes <code>measurement_unit</code> to consumers</li></ol>
+<p>If any check fails, log the gap as a backlog item BEFORE seeding so demo expectations are calibrated.</p>
+<p>This rule was created 2026-04-22 after EU seed exposed 18 hardcoded currency fallbacks + 12 hardcoded sqft literals + a locale resolution chain that never reads <code>agent_profiles.language</code>. Tracked under BG-50.</p>
+<h3>i18n key audit before adding new components (BG-50A lesson)</h3>
+<p>When introducing a new component or surface that uses <code>useTranslations()</code>, run <code>node scripts/audit/i18n-audit.mjs</code> after development to confirm <code>MISSING_IN_EN: 0</code>. The audit catches keys referenced in code but missing from <code>messages/en.json</code> (which would otherwise render as raw key names in the UI).</p>
+<p>The audit also reports orphaned keys (defined in en.json but never used) — these are low-priority cleanup but worth noting in PRs.</p>
+<p>Reference: BG-50A discovered an entire <code>fieldMode.*</code> namespace (15 keys) had been silently rendering as key names in the FieldMode component since it shipped, plus 1 orphan in the list-property wizard. The audit script lives at <code>scripts/audit/i18n-audit.mjs</code> and is part of the standard pre-merge checklist for any UI work.</p>
+<p>Note on namespace collisions: if a single file contains multiple <code>const t = useTranslations('NS')</code> bindings in different scopes (e.g. one component-level, one inner-component), the audit script tries every bound namespace as a candidate before reporting MISSING<em>IN</em>EN. This was added in BG-50A after <code>dashboard/page.tsx</code> (binds <code>'intel'</code> AND <code>'dashboard'</code> to <code>t</code>) produced 5 false positives.</p>
+<h3>Reuse existing keys before creating new ones (BG-50K lesson — 2026-04-23)</h3>
+<p>When wiring a hardcoded string, first search <code>messages/en.json</code> for the same English value — if it exists under an appropriate namespace, reuse it. Creating duplicate keys with identical values fragments the translation surface and increases maintenance cost. Example: <code>propertiesHooks.imageTypeError</code> and <code>propertiesHooks.imageSizeError</code> were introduced in BG-50H and reused in BG-50K's <code>useProperty.ts</code> rather than re-created under a new key. A quick check is <code>grep -l '"Please select an image file"' messages/en.json</code> before adding a new key with the same value.</p>
+<h3>Architectural smells surfaced by i18n audit (BG-50D/H lessons)</h3>
+<p>The BG-50 migration exposed several files that contain multiple in-file sub-components, each requiring its own <code>useTranslations()</code> binding. Examples:</p>
+<ul><li><code>ContactDetailPage.tsx</code> — 6 in-file sub-components (EditContactModal, InfoTab, SellerTab, SellerProfileCard, ActivityTab, SellerModal) all need their own bindings since the parent's <code>t</code> is not in scope inside each (BG-50D)</li><li><code>PropertyDetailPage.tsx</code> AND <code>prop-detail.tsx</code> — both files contain identical <code>PropertyActivityTab</code> sub-components; <code>prop-detail.tsx</code> is <strong>dead code</strong> (not imported anywhere in <code>src/</code>) that was left behind during a rename (BG-50H)</li></ul>
+<p>These are candidates for future file-splitting refactors: extract each sub-component into its own file so each has a single top-level <code>useTranslations()</code> call. Deferred until migration completes.</p>
+<h3>Pre-migration check: always read bindings before assuming (BG-50H lesson)</h3>
+<p>The audit's "zero i18n infra" flag can be wrong when there are nested imports, sub-components with their own bindings, or hooks-in-hooks that the script doesn't trace. <strong>Always</strong> <code>grep -n "useTranslations" &amp;lt;file&amp;gt;</code> before assuming a file needs a new binding — in BG-50H, the spec said "5 files have zero i18n wiring" but 3 of them already had partial bindings. Retro-fitting a new binding where one exists causes key-path drift (e.g. <code>t('addPerson')</code> vs <code>t('connections.addPerson')</code>).</p>
+<h3>Duplicate JSON key blocks silently override (BG-50 W5 / 4c-wire lesson — 2026-04-26)</h3>
+<p>JSON parsers take <strong>last-key-wins</strong> when a key appears twice at the same nesting level. When extending an existing namespace in <code>messages/en.json</code>, ALWAYS edit the existing block — never append a new top-level entry with the same key. Caught us 3 times in one day:</p>
+<ul><li>W5: appended <code>"intel": { "cardItem": ... }</code> at file-end → silently overrode the existing 70-key <code>intel.*</code> namespace (heresYourDay, sectionUrgent, snoozeTitle, label.<em>, calendar.</em>, ai.<em>, email.</em>). Surfaced as MISSING<em>IN</em>EN: 40 spike.</li><li>W5: same shape with <code>portalSimulator:</code> block.</li><li>4c-wire: nested duplicate <code>errors:</code> block under <code>admin.deals.verify</code> — added keys never resolved.</li></ul>
+<p><strong>Detection:</strong> include <code>MISSING_IN_EN</code> count in your post-edit sanity check (<code>node scripts/audit/i18n-audit.mjs</code>). Any spike from the prior baseline = check for duplicate top-level (or sub-namespace) keys via:</p>
+<pre><code class="lang-bash">node -e "
+const txt = require('fs').readFileSync('messages/en.json','utf8').split('\n');
+const keys = {}; for (let i=0; i&lt;txt.length; i++) {
+  const m = txt[i].match(/^  \"([^\"]+)\":/); if (!m) continue;
+  (keys[m[1]] = keys[m[1]] || []).push(i+1);
+}
+for (const [k,l] of Object.entries(keys)) if (l.length&gt;1) console.log('DUP '+k+': '+l);
+"</code></pre>
+<h3>Server vs client component check mandatory for <code>app/**/page.tsx</code> (BG-50 W2/W4 lesson — 2026-04-26)</h3>
+<p>Before adding i18n to any <code>app/**/page.tsx</code> file, check the first line for <code>'use client'</code>:</p>
+<ul><li><strong>Has <code>'use client'</code>:</strong> use <code>useTranslations</code> from <code>next-intl</code> as normal.</li><li><strong>No directive</strong> (server component): use <code>getTranslations</code> from <code>next-intl/server</code>, <code>await</code> it inside the async page function. Wrong API = tsc failure.</li></ul>
+<p>Example (server):</p>
+<pre><code class="lang-ts">import { getTranslations } from 'next-intl/server'
+export default async function Page() {
+  const t = await getTranslations('publicContact')
+  return &lt;div&gt;{t('header.transactionProgress')}&lt;/div&gt;
+}</code></pre>
+<p><code>features/**</code> and <code>components/**</code> files are always client/hook — use <code>useTranslations</code>.</p>
+<h3>Multi-screen components with separate return blocks (BG-46 / W5 ViewingMode lesson)</h3>
+<p>Components that early-return different JSX trees for different screen states (loading / error / ready) must put the <code>useTranslations</code> binding at component-root scope (above the early returns), not inside individual return blocks. Example: <code>ViewingMode.tsx</code> has 3 separate returns — the top-level <code>const t = useTranslations('viewing')</code> at L98 is in scope across all 3, so any <code>t('key')</code> call inside any return block works without rebinding. If you need a new namespace inside a sub-component (e.g. an inline <code>function Card()</code> defined within the same file), that sub-component needs its OWN <code>useTranslations</code> call.</p>
+<h3>TTS / voice fixtures are NOT next-intl strings (BG-50 W4 lesson)</h3>
+<p>When you find a const-map keyed by user voice/locale preference (e.g. <code>VOICE_SAMPLES = { en: 'Hello, I am your real estate assistant.', fr: 'Bonjour, je suis votre assistant immobilier.', ... }</code>), these are <strong>language-coded fixtures</strong>, not UI strings. They drive <code>SpeechSynthesisUtterance</code> based on the user's <code>voice_language</code> preference (which is independent of next-intl's UI locale). Wiring them through next-intl would be a category error.</p>
+<p>Skip with a custom comment:</p>
+<pre><code class="lang-ts">// BG-50: language-coded TTS sample, not UI string — voice synthesis fixture keyed by user's voice language preference
+const VOICE_SAMPLES: Record&lt;string, string&gt; = { /* … */ }</code></pre>
+<h3>Pure-emoji const-maps stay as-is (BG-50 W3/W4/W5)</h3>
+<p>Const-maps whose values are pure emoji (e.g. <code>TASK_ICONS = { viewing: '📅', compliance: '⚠️', ... }</code>, country flag emojis <code>🇦🇪🇨🇭🇫🇷🇮🇹</code>) are glyph-by-ID, not user-readable text. Leave them alone — wiring an emoji through <code>t()</code> is just a t-call wrapping the same emoji.</p>
+<h3>No-gates execution model for routine batch work (BG-50 W2-W5 — 2026-04-26)</h3>
+<p>For repeatable, well-scoped batches (e.g. "wire surface X using audit-output/Y.csv"), prefer the no-gates model over the Step 0 gate model:</p>
+<ol><li><strong>Self-contained prompt</strong> — all decisions baked in (namespace mapping, consolidation rules, skip categories with verbatim comments, hard-stop conditions, expected coverage delta).</li><li><strong>CC executes end-to-end</strong> — no mid-batch stop-and-ask. If genuine ambiguity arises, default to most conservative choice and report in final summary.</li><li><strong>Single end-of-batch report</strong> — one message back covering all the items the prompt requested.</li><li><strong>MCP-verify after deploy.</strong></li></ol>
+<p>Saves 2-3 round trips per batch. Proven across BG-50 W2-W5 (4 batches, 411 strings shipped in single sessions). Use Step 0 gate only when the scope itself is uncertain (e.g. surface counts off, namespace decisions ambiguous).</p>
+<h3>Service-layer i18n (BG-60)</h3>
+<p>Pure service files (<code>src/**/services/*.ts</code>, <code>src/lib/*.ts</code> — anything not a hook or component) cannot call <code>useTranslations()</code>. They communicate translatable content to the UI layer via two conventions:</p>
+<p><strong>For error throws (Shape A):</strong></p>
+<p>Services throw <code>i18n:</code> prefixed keys via the helper:</p>
+<pre><code class="lang-ts">import { throwI18nError } from '@/lib/i18n/throwI18nError'
+
+throwI18nError('deals.errors.failedToLoad')
+throwI18nError('deals.errors.deleteFailed', { id: dealId })</code></pre>
+<p>Catch sites translate via the partner helper:</p>
+<pre><code class="lang-ts">import { translateError } from '@/lib/i18n/translateError'
+
+const t = useTranslations()
+try {
+  await fetchDeals(orgId)
+} catch (err) {
+  setError(translateError(err, t))
+}</code></pre>
+<p>NEVER do <code>setError(err.message)</code> for errors originating from our service files — it surfaces the raw <code>i18n:...</code> key to users. The audit script (BG-59 follow-up) flags this pattern via Detector A.</p>
+<p>NEVER do <code>throw new Error('English literal')</code> in service files — always use <code>throwI18nError</code>. The audit script flags this pattern via Detector B.</p>
+<p><strong>For const-map labels (Shape B):</strong></p>
+<p>Services export raw enums (<code>ROOM_TYPES</code>, <code>INTENT_CARD_TYPES</code>, etc.) as <code>as const</code> arrays or unions. Display labels live in <code>messages/en.json</code> under appropriate namespaces (e.g. <code>rooms.labels.*</code>, <code>intentCards.labels.*</code>). Translation happens at render time in the consuming component, NEVER inside the service.</p>
+<pre><code class="lang-ts">// ❌ DO NOT — service exports labels
+export const ROOM_TYPE_LABELS = { living_room: 'Living Room', ... }
+
+// ✅ DO — service exports keys, en.json holds labels
+export const ROOM_TYPES = ['living_room', 'master_bedroom', ...] as const
+export type RoomType = typeof ROOM_TYPES[number]
+
+// Component:
+const t = useTranslations('rooms.labels')
+&lt;span&gt;{t(roomType)}&lt;/span&gt;</code></pre>
+<p><strong>Why:</strong> services run in client, server, and cron/webhook contexts — <code>useTranslations</code> only works in the first. Stable i18n keys also give us clean Sentry/Datadog grouping (errors aggregate by key, not by fluctuating English string).</p>
+<p>See <code>docs/specs/BG-60-Spec-Service-Layer-i18n.md</code> for the full strategy.</p>
+<h3>BG-60 grep semantics — 1 comment per location, not per audit row (BG-50 W3/W5)</h3>
+<p>When deferring service-layer strings via <code>// BG-60: service-layer i18n deferred — throw stays in English until shared service strategy lands</code> markers, place ONE comment per code location (above a throw, above a const-map declaration), not one per audit row. A const-map with 21 string-value entries gets 1 comment, not 21. Verify total via:</p>
+<pre><code class="lang-bash">git grep "BG-60: service-layer" -- 'src/**/*.ts' 'src/**/*.tsx' | wc -l</code></pre>
+<p>The grep count is the number of code sites — not the number of audit rows covered.</p>
+<h2>Locale operations (BL-120 — 2026-04-28)</h2>
+<p>Canonical reference: <code>docs/architecture/i18n.md</code>. The procedures below are the operator-facing checklists that land in this file because they're consulted at the start of every locale-touching session.</p>
+<h3>Adding a new locale</h3>
+<p>Pre-requisites:</p>
+<ul><li>Locale code agreed (<code>ar</code>, <code>pt-br</code>, etc.)</li><li>Country anchor + tone decisions made (formal <code>vous</code>/<code>Sie</code>/<code>Lei</code> etc.)</li></ul>
+<p>Procedure:</p>
+<pre><code class="lang-bash"># 1. Add the locale code to the supported set
+# Edit src/i18n/request.ts → locales array
+# Edit src/i18n/locale-utils.ts → locales array (mirrored, intentionally duplicated to keep server/client paths separate)
+# Edit src/components/shared/CapacitorIntlProvider.tsx → SUPPORTED_LOCALES array
+
+# 2. Confirm DB CHECK constraints already accept the code
+#    organizations.default_locale CHECK + agent_profiles.language CHECK
+#    BL-120 forward-compat included 'ar' for free; any new code beyond that needs a migration
+
+# 3. Generate the per-locale glossary draft (~30 sec, ~$0.01)
+node --env-file=.env.local scripts/i18n/generate-glossary.mjs --target &lt;code&gt;
+# Review messages/_glossary.&lt;code&gt;.json before bulk translate
+
+# 4. Bulk translate (~3 min/locale, ~$1-2)
+node --env-file=.env.local scripts/i18n/translate-locale.mjs --target &lt;code&gt;
+
+# 5. Verify parity
+node -e "
+const en = require('./messages/en.json'), tgt = require('./messages/&lt;code&gt;.json');
+function flat(o,p='',out={}){for(const[k,v]of Object.entries(o)){const key=p?p+'.'+k:k; if(v&amp;&amp;typeof v==='object'&amp;&amp;!Array.isArray(v))flat(v,key,out);else out[key]=v;}return out;}
+const E=flat(en), T=flat(tgt); let m=0,t=0;
+for(const k in E){if(typeof E[k]==='string'){if(T[k]===undefined)m++;else if(T[k]!==E[k])t++;}}
+console.log('translated:',t,'missing:',m,'(missing should be ~6 — proper nouns/emojis)');
+"
+
+# 6. Hand-fix any nested ICU select/plural keys flagged in messages/_review.&lt;code&gt;.csv
+#    The flat-translation prompt mishandles nested ICU. Spot-check NEEDS_REVIEW rows.
+
+# 7. tsc + commit
+npx tsc --noEmit
+git add messages/&lt;code&gt;.json messages/_glossary.&lt;code&gt;.json messages/_review.&lt;code&gt;.csv \
+        src/i18n/request.ts src/i18n/locale-utils.ts src/components/shared/CapacitorIntlProvider.tsx</code></pre>
+<p>For locales requiring RTL (Arabic, Hebrew, Farsi), shipping the JSON dictionary is <strong>not enough</strong> — the layout pass is the bulk of the work. See BL-121 spec (when filed).</p>
+<h3>Updating existing locale to track new EN keys</h3>
+<p>Same <code>translate-locale.mjs</code> invocation, idempotent. Re-runnable safely.</p>
+<pre><code class="lang-bash"># After adding new keys to messages/en.json, sync all locales
+for loc in fr de it; do
+  node --env-file=.env.local scripts/i18n/translate-locale.mjs --target $loc
+done</code></pre>
+<p>The script is delta-only — already-translated keys are skipped. Same-day re-runs cost cents.</p>
+<h3>MCP locale smoke checklist</h3>
+<p>Every locale-touching change should run through this before close:</p>
+<ol><li><strong>Auth refresh</strong> — sign out + sign back in on the MCP browser to clear any stale <code>AuthRetryableFetchError</code> from prior sessions. The LocaleDetector silently no-ops on auth failures.</li></ol>
+<ol><li><strong>DB → cookie reconciliation</strong> — log in as a test account (Camille FR, Claudia DE, Alessandro IT — DO NOT alter their DB locales). Verify the cookie matches DB:  ``<code>js  document.cookie.match(/NEXT_LOCALE=([^;]+)/)?.[1]  </code>``</li></ol>
+<ol><li><strong>Server-side render</strong> — verify <code>&amp;lt;html lang&amp;gt;</code> matches the locale via DevTools Elements panel. Run a fetch diagnostic:  ``<code>js  fetch('/dashboard').then(r =&amp;gt; r.text()).then(t =&amp;gt; console.log(t.match(/&amp;lt;html[^&amp;gt;]*lang="[^"]*"/)?.[0]))  </code>``</li></ol>
+<ol><li><strong>Browser auto-translate guard</strong> — in Chrome's address bar, the Translate icon should NOT be present next to the bookmark star. If it is, <code>translate="no"</code> isn't being applied to the <code>&amp;lt;html&amp;gt;</code> element. Right-click anywhere → "Translate to English" should NOT be offered as a context-menu item.</li></ol>
+<ol><li><strong>Five surfaces per locale</strong> — admin dashboard, property detail, settings/profile, signing flow, action cards. Spot-check translated text matches glossary expectations (e.g. IT "broker" → "mediatore", DE "commission" → "Provision").</li></ol>
+<ol><li><strong>API errors</strong> — trigger 2-3 errors (bad payload, unauthorized) and verify response body has <code>errorKey</code> field that translates correctly via <code>translateError</code> on the client.</li></ol>
+<ol><li><strong>User switch</strong> — log out → log in as a different-locale user → verify the destination page renders in the NEW user's locale on first paint, no stale-cookie carryover.</li></ol>
+<ol><li><strong>Org-level inheritance</strong> — set Gulf Horizon Realty <code>default_locale = 'fr'</code> via SQL, send a test invite, verify <code>agent_profiles.language = 'fr'</code> after acceptance + override-via-switcher wins.</li></ol>
+<ol><li><strong>Vercel function logs</strong> — confirm <code>[i18n/request] resolved</code> log lines have <code>resolution: 'cookie'</code> and matching <code>cookieValue</code> for the user. If <code>envCapacitor: true</code> appears on web, <code>NEXT_PUBLIC_API_BASE_URL</code> is mis-set in Vercel env.</li></ol>
+<h3>Test accounts (regression matrix)</h3>
+<table><thead><tr><th>Account</th><th>Locale</th><th>Use for</th></tr></thead><tbody><tr><td><code>will+ag-fr-camille@housezoom.ai</code></td><td>FR</td><td>French + Romandie</td></tr><tr><td><code>will+ag-ch-claudia@housezoom.ai</code></td><td>DE</td><td>German + Deutschschweiz</td></tr><tr><td><code>will+ag-it-alessandro@housezoom.ai</code></td><td>IT</td><td>Italian + Ticino</td></tr></tbody></table>
+<p><strong>Do not alter their <code>agent_profiles.language</code> values</strong> — they're the regression smoke baseline.</p>
+<h2>Property Schema Conventions (BL-EU-SEED — 2026-04-22)</h2>
+<h3><code>source</code> enum values</h3>
+<ul><li><code>manual</code> — agent typed it in</li><li><code>mls_import</code> — bulk import from MLS feed</li><li><code>scan</code> — document scan / OCR</li><li><code>seed</code> — seed scripts (test data, demos)</li><li><code>portal_sync</code> — auto-synced from a portal (DLD, Homegate, etc.)</li></ul>
+<h3><code>properties.country</code> is a country NAME, not a code</h3>
+<p>Stored values: <code>France</code>, <code>Switzerland</code>, <code>Italy</code>, <code>United Arab Emirates</code>. Some helpers expect 2-letter codes (<code>FR</code>, <code>CH</code>, <code>IT</code>, <code>AE</code>) — use <code>formatCurrency()</code> (which accepts both) instead of hand-rolling country lookups.</p>
+<h3><code>finishings</code> jsonb structure</h3>
+<p>Free-form per-property. Common keys established:</p>
+<ul><li><code>kitchen_brand</code> (string), <code>bathroom_tier</code> (string: standard/premium/luxury)</li><li><code>window_material</code> (string), <code>flooring_detail</code> (string)</li><li><code>notable_features</code> (array of strings — selling points)</li><li><code>tier</code> (string: standard/premium/luxury — overall property tier)</li><li><code>_generated_fields</code> may live in <code>listing_metadata</code> for seed audit (NOT in finishings)</li></ul>
+<h3><code>market_data</code> is jurisdiction-specific</h3>
+<ul><li>France: <code>dpe_letter</code>, <code>ges_letter</code>, <code>carrez_surface_sqm</code>, <code>copropriete_lots</code>, <code>copropriete_annual_budget_eur</code></li><li>Switzerland: <code>pieces</code>, <code>minergie_certified</code>, <code>geak_class</code>, building/canton info</li><li>Italy: <code>ape_class</code>, <code>ape_kwh_m2_year</code>, <code>vani_locali</code>, <code>ownership_type</code> (piena<em>proprieta vs nuda</em>proprieta), <code>spese_condominiali_*</code></li><li>UAE: <code>dld_*</code>, service charges</li></ul>
+<h2>Data verification before debugging rendering</h2>
+<p>When a CRM field doesn't populate in a form:</p>
+<ol><li>FIRST verify the data exists in DB for the specific entity (SQL query)</li><li>SECOND verify the data is actually reaching the component (console.log)</li><li>ONLY THEN debug rendering/timing issues</li></ol>
+<p>The BL-81h hydration bug spent 12+ iterations on React timing when the root cause was a contacts query with limit(200) silently dropping contacts alphabetically beyond position 200. "Yuki Al Rashid" starts with Y.</p>
+<p>Rule: never use limit() on a contacts/entities query when you know the specific IDs you need. Always fetch by .in('id', specificIds).</p>
+<h2>Signing Architecture Learnings</h2>
+<ul><li><strong>createPortal for full-screen modals</strong>: Any modal that needs to be truly full-screen must use <code>createPortal(jsx, document.body)</code> if it's rendered inside a <code>fixed</code> positioned parent (e.g. deal drawer). Otherwise the parent's stacking context traps the modal's z-index.</li><li><strong>AcroForm hydration</strong>: Never hydrate the currently focused field — use <code>document.activeElement</code> check (<code>hydrateFromPropsSkipFocused</code>). Use <code>change</code> listener (not <code>input</code>) to capture values only on blur.</li><li><strong>Per-recipient field filtering</strong>: When creating signing requests for multiple recipients, filter fields by <code>assigned_contact_id</code> in the API route before passing to the service. Each recipient only gets their own fields + agent fields.</li><li><strong>base-documents bucket</strong>: Base document PDFs live in <code>base-documents</code> bucket. Placeholder <code>documents</code> records prefix <code>file_path</code> with <code>base-documents/</code> to indicate bucket. PDF proxy route (<code>/api/signing/[token]/pdf</code>) handles bucket detection server-side — client never needs to know.</li></ul>
+<h3>PDF signing pipeline (pdf-lib + Next.js/Vercel)</h3>
+<ul><li>NEVER use form.flatten() for signer view — it silently fails on reportlab/pdfrw PDFs</li><li>ALWAYS use draw-then-strip approach: drawText() onto page content → strip Widget annotations → remove /AcroForm from catalog</li><li>NEVER use constructor.name for pdf-lib type checks in production — class names are mangled. Use instanceof PDFTextField, instanceof PDFCheckBox</li><li>When drawing text at widget positions: use BASELINE_NUDGE = 0.08 (8% of fontSize) not hardcoded +2px — avoids overlay drift</li><li>Recipient-owned fields must be excluded from PDF baking — fetch document<em>field</em>values for recipient's assigned fields, build exclusion set by value</li><li>Load PDFs with <code>PDFDocument.load(bytes, { ignoreEncryption: true })</code> for best compatibility</li><li><code>(await pdfDoc.save()).buffer</code> is unsafe — use <code>saved.buffer.slice(saved.byteOffset, saved.byteOffset + saved.byteLength)</code> for correct ArrayBuffer extraction from Uint8Array</li><li>Cache-Control: no-store during signing flow — max-age=300 causes stale PDFs during debugging</li><li>External validation (Gemini/ChatGPT) was critical for pdf-lib issues — use for complex PDF/rendering problems</li><li><strong>role_label case mismatch</strong>: <code>signing_template_fields.role_label</code> is Title Case (<code>Seller</code>, <code>Buyer</code>, <code>Agent</code>) — <code>deal_participants.role</code> is lowercase (<code>seller</code>, <code>buyer</code>, <code>listing_agent</code>). Always normalise with <code>.toLowerCase()</code> when mapping between the two. Also: template uses <code>"Agent"</code> but DB uses <code>"listing_agent"</code> — alias both directions.</li><li>Rebuild from base PDF on every signer submission — never stack signed PDFs. Widgets are stripped after signer 1, making widget-based text drawing impossible for signer 2+. Always fetch ALL field values + signatures across ALL requests for the document and rebuild in one pass from the original base.</li><li>useCallback deps must include all state used inside — stale closures silently submit empty data. Always include fieldValues, signedFields, etc. in deps array.</li></ul>
+<h2>Browser Testing</h2>
+<ul><li>Claude in Chrome extension is connected — live browser testing available from claude.ai in Chrome going forward</li></ul>
+<h2>MCP &amp; File Access Rules</h2>
+<ul><li><strong>Full file path always:</strong> When referencing any source file, always give the full path from root (e.g. <code>~/Apps/housezum-app/src/app/admin/photo-intelligence/annotate/page.tsx</code>). Will uses Ctrl+Cmd+G to open files directly from the path.</li><li><strong>No local file access:</strong> Claude cannot access files in the local directory. Do not attempt <code>grep</code>, <code>find</code>, or <code>cat</code> on local paths — it will always fail. Read files by asking Will to upload them or share their contents.</li><li><strong>Ask before MCP testing:</strong> Before using MCP browser tools to test anything, ask Will first — he may want to test manually or ask questions before automated testing runs. Always synchronize before acting.</li></ul>
+<h2>Timestamping generated docs (established 2026-04-18)</h2>
+<p>All CC prompts, SOS, and EOS docs include a <code>**Created:** YYYY-MM-DD CET</code> header on the first line after the title. Claude UI doesn't show message timestamps, so this is the paper trail. Applies to:</p>
+<ul><li><code>CC-Prompt-*.md</code> files (pre-CC-execution prompts)</li><li><code>SOS-*.md</code> files (start-of-session briefs)</li><li><code>EOS-*.md</code> files (end-of-session closeouts)</li></ul>
+<p>SOS filename convention includes date: <code>SOS-YYYY-MM-DD.md</code>.</p>
+<h2>LLM Model Override Pattern</h2>
+<p>Every LLM call must read its model from a per-call env override that falls back to the default constant defined in the service's types/config file.</p>
+<p><strong>Pattern:</strong></p>
+<pre><code class="lang-typescript">const modelUsed = process.env.&lt;FEATURE&gt;_MODEL_OVERRIDE || MODEL_&lt;FEATURE&gt;;
+const response = await client.messages.create({
+  model: modelUsed,
+  // ...
+});
+console.debug(`[service] model=${modelUsed} ...`);</code></pre>
+<p><strong>Why:</strong> A/B testing models, emergency fallback during a model outage, and cost/latency comparisons all become a one-env-var change instead of a code change + redeploy.</p>
+<p><strong>Naming convention:</strong></p>
+<ul><li>Env var: <code>&amp;lt;FEATURE&amp;gt;_MODEL_OVERRIDE</code> (uppercase, underscored). Examples: <code>POLISH_MODEL_OVERRIDE</code>, <code>INTENT_MATCH_MODEL_OVERRIDE</code>, <code>EMAIL_DRAFT_MODEL_OVERRIDE</code>.</li><li>Default constant: <code>MODEL_&amp;lt;FEATURE&amp;gt;</code> exported from the service's types file.</li></ul>
+<p><strong>CRITICAL — Observability rule:</strong> Log lines emitted by a service using this pattern MUST log the <strong>resolved value</strong> (<code>modelUsed</code>), not the default constant. Logging the constant silently undermines the override — you cannot tell whether the env var is active. Capture the resolved value in a <code>const</code> and use it in both the API call and the log.</p>
+<p><strong>Required:</strong> Apply this pattern to all new LLM calls. When touching existing LLM calls for any reason, retrofit them as part of the change.</p>
+<p><strong>Active overrides</strong> (document production overrides here so they're discoverable):</p>
+<ul><li><em>none currently</em></li></ul>
+<p><strong>Known overrides tested &amp; reverted:</strong></p>
+<ul><li><code>INTENT_MATCH_MODEL_OVERRIDE=claude-haiku-4-5-20251001</code> — tested 2026-04-18, reverted due to E026 classification miss.</li></ul>
+<h2>Cache Invalidation Mental Model (BL-106)</h2>
+<p>The Upstash Redis Q&amp;A cache has two TTL tiers:</p>
+<ul><li><strong>Scoped</strong> (deal<em>id or property</em>id present): 15 minutes</li><li><strong>Org-only</strong> (no deal/property scope): 24 hours</li></ul>
+<p><strong>No active invalidation is in place for v1</strong> — TTL is the only safety net. This is intentional for v1 simplicity. Known consequence: if a deal/property is updated, cached answers for that scope remain valid for up to 15 minutes.</p>
+<p><strong>Before shipping any feature that mutates deal/property data in a way users would expect to see reflected in Q&amp;A answers within seconds:</strong> add a Supabase Database Webhook → <code>/api/internal/cache-invalidate</code> → <code>redis.del(pattern)</code> flow.</p>
+<p><strong>Flush cache manually for testing:</strong></p>
+<pre><code class="lang-bash">redis-cli -u "$REDIS_URL" FLUSHDB</code></pre>
+<p><strong>Inspect cache state:</strong></p>
+<pre><code class="lang-bash">redis-cli -u "$REDIS_URL" DBSIZE         # count of keys
+redis-cli -u "$REDIS_URL" KEYS 'qa:v1:*' # list all Q&amp;A cache keys</code></pre>
+<h2>Q&amp;A Engine Conventions (BL-114 / BL-115 / BL-115b — 2026-04-19)</h2>
+<h3>Property is source of truth</h3>
+<p>When authoring KB rows or designing Q&amp;A behavior:</p>
+<ul><li><strong>Property attribute questions</strong> (price, bedrooms, address, floor, etc.) → <code>required_fields</code> MUST read from <code>properties.*</code></li><li><strong>Deal-specific questions</strong> (offer price, commission, closing date) → read from <code>deals.*</code></li><li>The deal table holds snapshots and deal-specific fields. The property table is the source of truth for property attributes.</li><li>Never model a property attribute as deal-only (e.g., "what's the price" should NOT require <code>deals.asking_price_snapshot</code>).</li></ul>
+<h3>Eval harness coverage rule</h3>
+<p>When adding new fixtures to <code>scripts/bl60/eval-fixtures.csv</code>:</p>
+<ul><li>Cover all input shape combinations: <code>(deal_id, property_id, both, neither)</code></li><li>A 50/50 pass rate means nothing if all fixtures use the same input shape.</li><li>New code paths require new fixtures with the relevant input shape.</li></ul>
+<h3>Schema fallback as a signal</h3>
+<p>The <code>match_source: 'schema_fallback'</code> count in <code>ai_qa_interactions</code> is a feedback signal:</p>
+<ul><li>High fallback usage on a column = priority candidate for a curated KB row</li><li>Repeated fallbacks for "none"-classified questions = corpus gap to flag</li></ul>
+<h3>Vercel restart required after corpus reseed</h3>
+<p><code>intent-matcher.service.ts</code> caches the corpus block at module load. After running <code>seed-qa-knowledge-base.mjs</code>, you MUST trigger a Vercel redeploy (e.g., empty commit + push) for the matcher to see new rows.</p>
+<h3>Multi-screen components with separate return trees (BL-112 lesson)</h3>
+<p>Components like <code>ViewingMode.tsx</code> that have separate <code>return (...)</code> blocks per screen state (select/rooms/chat) — modal/overlay render blocks must live INSIDE each screen's return, OR be hoisted to the component root. A state flip from Screen N's UI has nothing to render if the modal block lives in Screen M's return. Only catchable by clicking the actual UI, not by verifying state changes. (BG-46 logged.)</p>
+<h3>Diagnose surface allowlists at the API route, not just types</h3>
+<p>Client-side type unions in <code>useQaAsk</code> etc. are not authoritative — the server route validates against its own allowlist. When adding a new surface value, grep BOTH client types AND server route validation.</p>
+<h2>Data Integrity (BL-116 lesson — 2026-04-21)</h2>
+<h3>Prefer CHECK constraints over application-layer validation</h3>
+<p>Application-level validation is not sufficient for enforcing data quality rules. Seed scripts, third-party integrations, direct SQL edits in Supabase Studio, and future migrations can all insert rows that bypass application validation. CHECK constraints applied at the PostgreSQL level apply universally and are the durable fix. BL-116 Phase 2.2 added five CHECK constraints to the <code>properties</code> table: year<em>built range (1900–2030), square</em>footage (0–50000), bedrooms (0–20), bathrooms (0–20), and rent_frequency required on rental listings. When designing any field with a bounded range or a required-when-X relationship, prefer a CHECK constraint over application-layer validation.</p>
+<h2>Documentation Integrity (BL-116 lesson — 2026-04-21)</h2>
+<h3>DB-SCHEMA.md is a reference, not the source of truth</h3>
+<p>DB-SCHEMA.md is manually maintained and drifts over time as migrations ship without corresponding doc updates. BL-116 Phase 2.4 surfaced 28 undocumented tables and ~305 missing columns that accumulated over several months. The correct source of truth for schema questions is always the live database via <code>information_schema.columns</code>, not the markdown file. When in doubt, query the live schema directly. A future improvement is a CI check that regenerates a schema snapshot on every migration and diffs against DB-SCHEMA.md, failing the build if they disagree. Until that exists, treat DB-SCHEMA.md as a reference that may be stale, and verify critical assumptions against the live database.</p>
+<h2>Compliance liability posture (BL-129 / BL-134 — 2026-04-30)</h2>
+<p><strong>Canonical doc:</strong> <a href="docs/legal-compliance/ARCHITECTURE.html"><code>docs/legal-compliance/ARCHITECTURE.md</code></a>. Read it before designing any compliance UI, ingestion ticket, or rule-engine change.</p>
+<p>HouseZoom provides <strong>decision support, not legal authority.</strong> Every compliance message we surface to an agent must follow the three lines of defense documented in the canonical doc:</p>
+<ol><li><strong>Always cite, always disclaim.</strong> Every rule in <code>compliance_rules</code> carries <code>source_url</code> / <code>source_citation</code> / <code>source_authority</code> / <code>source_verified_at</code> (BL-129/D-289 schema). UI surfaces render the citation, the verification date, and a fixed locale-aware disclaimer. Disclaimer copy is non-dismissible — not a tooltip, not collapsible, not first-view-only.</li><li><strong>Affirmative admin acceptance.</strong> A rule ingested into <code>compliance_rules</code> is not yet active for an agency until the agency admin has reviewed and accepted it. Lifecycle: <code>ingested → pending_review → accepted → active</code> (or <code>rejected</code> / <code>overridden</code>). Acceptance is recorded in <code>compliance_rule_org_acceptance</code> (planned BL-134/admin-review-queue table; canonical doc has the schema).</li><li><strong>Editable ruleset.</strong> Admin has dedicated review/accept/reject/override surfaces. Bulk-accept requires explicit per-country acknowledgment. Material rule version changes flip acceptance back to <code>pending_review</code>.</li></ol>
+<p><strong>Anchor principle:</strong> standard public legal forms (Form F, compromis de vente, rogito, cantonal sale agreements) are the canonical reference — we point at the authority's URL, we never redefine the form's content. Replicating forms creates a maintenance burden and a liability surface.</p>
+<p><strong>Do not interpret edge cases beyond the scope of ingested rules. Do not synthesize cross-border guidance. Do not generate facsimile forms.</strong> See the canonical doc's "Out of scope" section for the full explicit list.</p>
+<p>When working a compliance ticket: open <code>docs/legal-compliance/ARCHITECTURE.md</code> first, locate the relevant phase in the "Phased rollout" section, and follow the contract. Disclaimer copy lives in the canonical doc (see "Disclaimer copy" section, locale-aware); copy from there, do not paraphrase.</p>
+<h2>Compliance Acceptance Flow (BL-136 — D-### TBD)</h2>
+<p>Five operational invariants when touching compliance acceptance code or data.</p>
+<h3>1. JS↔SQL fingerprint parity is mandatory</h3>
+<p><code>src/features/admin/services/ruleFingerprint.ts</code> (JS) and <code>compute_rule_fingerprint(compliance_rules)</code> (SQL, in the BL-136 migration) must produce <strong>byte-identical</strong> sha256 hex for the same rule. The 10-field canonical (<code>version</code>, <code>severity</code>, <code>blocking</code>, <code>description</code>, <code>source_authority</code>, <code>source_url</code>, <code>source_citation</code>, <code>source_verified_at</code>, <code>conditions::text</code>, <code>actions::text</code>) is the contract. NULL is coalesced to <code>''</code> before pipe-joining; JSONB columns are JSON-stringified (JS) / cast to text (SQL).</p>
+<p><code>tests/unit/ruleFingerprint.test.ts</code> enforces drift detection — the live-DB parity test is <code>describe.skip</code> in CI today (TD-COMPLIANCE-FINGERPRINT-CI-PARITY); the structural tests (stability + sensitivity) always run.</p>
+<h3>2. Append-only audit log</h3>
+<p><code>compliance_rule_org_acceptance</code> is an audit log. <strong>Never UPDATE or DELETE rows from app code.</strong> Re-decisions = INSERT a new row with <code>previous_acceptance_id</code> pointing at the prior latest. The migration's RLS denies UPDATE/DELETE to <code>authenticated</code> to enforce this at the DB layer; <code>service_role</code> can bypass for cache wipes only (<code>compliance_evaluations</code> deletes folded into <code>acceptanceService</code>).</p>
+<h3>3. Direct SQL UPDATEs to <code>compliance_rules</code> do not fire <code>law_update</code> notifications</h3>
+<p>Trigger #2 in <code>complianceNotificationService.notifyLawUpdate</code> is <strong>app-level only</strong> — fires from <code>/api/admin/compliance/...</code> UPDATE routes when those land. Direct SQL edits in Supabase SQL Editor or via service-role scripts will silently update the rule and the view will flip <code>accepted</code> → <code>stale_accepted</code> for orgs that had accepted it, but no email/intel-card lands. This is intentional for dev edits; for production rule updates, go through the API. Filed as TD-COMPLIANCE-DIRECT-SQL-EDIT-NOTIFICATIONS for a future Postgres trigger if the silent path becomes a real risk.</p>
+<h3>4. Snooze sweep idempotency</h3>
+<p><code>/api/cron/compliance-snooze-sweep</code> runs daily at 03:00 UTC. Same-day re-runs do NOT duplicate cards. The check in <code>notifySnoozeExpired</code> is: <code>card_type='compliance_acceptance_pending'</code> + <code>entity_refs.compliance_rule_id</code> matches + <code>created_at &amp;gt;= today_start_in_local_tz</code>. If the cron fires twice on the same calendar day for any reason (manual trigger + scheduled, or two regions firing the same UTC schedule), duplicate cards are still suppressed.</p>
+<h3>5. View cross-product caveat</h3>
+<p><code>v_compliance_rule_acceptance_state</code> joins <code>compliance_rules × organizations</code> (filtered to <code>created_via='ingestion'</code>). Per-call query MUST filter by <code>org_id</code> — the engine and the admin UI both do this. If admin scale brings perf pain (200 EU rules × 1k orgs = 200k rows), materialise the view with refresh-on-rule-change. Filed as TD-COMPLIANCE-ACCEPTANCE-VIEW-PERF for a measurement-driven follow-up.</p>
+<h2>Country code canonicalization (BL-137 — D-### TBD)</h2>
+<p>Two rules govern any code that touches a country:</p>
+<h3>1. Storage: ISO-3166-1 alpha-2, always</h3>
+<p>Every column that stores a country uses ISO codes (<code>'FR'</code>, <code>'CH'</code>, <code>'IT'</code>, <code>'AE'</code>). Canonical column name: <code>country_code</code>. Live tables: <code>compliance_rules.country_code</code>, <code>agent_profiles.country_code</code>, <code>agent_profiles.operating_country</code>, <code>market_profiles.country_code</code>, <code>qa_knowledge_base.country_code</code>, <code>workflow_templates.country_code</code>, and (BL-137) <code>organizations.country_code</code>. Joins between any two of these are now value-compatible with no transform. Never invent a new column with a different format (English name, full ISO-3166-1 alpha-3, free text).</p>
+<p><strong>BL-133 (2026-05-05) — schema-layer enforcement.</strong> ISO format is now enforced via CHECK constraints on <code>compliance_rules</code>, <code>workflow_templates</code>, <code>qa_knowledge_base</code>, <code>market_profiles</code>, and <code>agent_profiles.operating_country</code>. New tables with country columns MUST add the same CHECK pattern: <code>CHECK (country_code ~ '^[A-Z]{2}$')</code> (or <code>IS NULL OR …</code> for nullable columns). The constraint name convention is <code>&amp;lt;table&amp;gt;_&amp;lt;column&amp;gt;_iso_format</code>. Exception: <code>agent_profiles.country_code</code> stores phone country codes — deliberately not under this CHECK; tracked separately under TD-DATA-COUNTRY-CODE-COLLISION format-collision half.</p>
+<h3>2. Display: <code>getCountryLabel(code, locale)</code> — never raw <code>.country_code</code> in UI</h3>
+<p>Display labels live in the typed <code>COUNTRY_LABELS</code> map at <code>src/lib/country.ts</code>, keyed by <code>(CountryCode, SupportedLocale)</code>. To render a country anywhere user-facing, pull <code>useLocale()</code> from <code>next-intl</code> and call <code>getCountryLabel(code, locale)</code>. Falls back to English if the locale isn't supported, then to the raw code if the country isn't mapped (defensive — should never hit production with a correct DB CHECK). To add a country: extend <code>CountryCode</code>, <code>SUPPORTED_COUNTRIES</code>, <code>COUNTRY_LABELS</code>, and (if applicable) the migration's CASE.</p>
+<h3>3. Deprecation window — <code>organizations.country_default</code></h3>
+<p><code>organizations.country_default</code> is <strong>deprecated</strong> as of 2026-05-01 (BL-137). It is kept temporarily as a safety net during the migration window because some pre-BL-137 rows stored mixed-format names ('France', 'Switzerland') alongside ISO codes ('AE', 'IT'). All read sites have moved to <code>country_code</code> (with <code>country_default</code> fallback for any rows the backfill missed); all write sites dual-write both columns. <strong>A cleanup ticket</strong> lands ~end of May 2026 to drop the column, remove <code>legacyCountryNameToCode()</code>, and strip every <code>BL-137 dual-write</code> comment marker. Find them with <code>grep -rn "BL-137 dual-write" src/ scripts/</code>.</p>
+<h3>4. Direct SQL writes vs the dual-write convention</h3>
+<p>If you UPDATE <code>organizations.country_default</code> directly in Supabase SQL Editor without also updating <code>country_code</code>, the engine will see a stale ISO value (or NULL) and the country join may return zero rows. Either go through the API/UI (which dual-writes both), or update both columns by hand in the same UPDATE statement.</p>
+<h2>Fingerprint contracts (BL-136 hotfix #4 — 2026-05-01)</h2>
+<p>When an integrity hash is computed in two places (JS app side + SQL view side), one of them must be the spec, byte-for-byte. Drift between the two is a production correctness bug, not a stylistic difference.</p>
+<h3>1. JS canonicalization is the contract</h3>
+<p>The JS implementation at <code>src/features/admin/services/ruleFingerprint.ts</code> defines the canonical format. SQL functions mirror it byte-for-byte. PostgREST's natural serialization is the reference:</p>
+<ul><li><strong>Timestamps:</strong> ISO 8601 with explicit timezone offset (<code>2026-04-30T00:00:00+00:00</code>) — what PostgREST returns to JS.</li><li><strong>JSONB:</strong> no whitespace between structural tokens (<code>[{"k":"v"}]</code>, not <code>[{"k": "v"}]</code>) — what JSON.stringify produces.</li><li><strong>Object key order:</strong> alphabetical (jsonb's storage order) — what both PostgREST and <code>jsonb_each</code> traversal yield.</li></ul>
+<p><code>compute_rule_fingerprint(compliance_rules)</code> in the BL-136 hotfix #4 migration uses <code>to_jsonb(timestamptz)</code> for ISO format and a recursive <code>jsonb_compact()</code> plpgsql helper for whitespace-free serialization. If <code>ruleFingerprint.ts</code> ever changes, ship a new SQL migration that updates the function body in lockstep.</p>
+<h3>2. Hardcoded fixture test is mandatory</h3>
+<p>A unit test with a frozen canonical string + frozen sha256 hex must run unconditionally in CI. If either the JS function or the SQL function changes, the fixture diverges and the test fails until both sides are realigned. Live-DB parity is additional, never a substitute. See <code>tests/unit/ruleFingerprint.test.ts</code> § "hardcoded regression fixture (BL-136 hotfix #4)" for the pattern.</p>
+<h3>3. Skipped tests are debt that bites in production</h3>
+<p><code>TD-COMPLIANCE-FINGERPRINT-CI-PARITY</code> was filed at BL-136 Phase 1 with a <code>describe.skip</code> on the live-DB parity test (no local Supabase in CI). Hotfix #4 was the bill — every accept landed as <code>stale_accepted</code> in production because the JS hash and the SQL hash diverged on timestamp + JSONB whitespace. <strong>Wire local Supabase or a live RPC parity check to CI before any future hash-using feature lands.</strong></p>
+<h2>Session lessons — 2026-05-08 (BL-131 / ADR-0002)</h2>
+<h3>1. Schema-correct from day one</h3>
+<p>When porting seeds across countries, embed the schema invariants check INSIDE the spec (a § 15-style "live-schema invariants" table) so the CC prompt is correct by construction. Avoids the Phase 0 STOP iteration BL-131 hit — v1 of the BL-131 CC prompt assumed a schema model that diverged from production in 8 places (no <code>deal_type</code>/<code>metadata</code> columns, <code>name</code> NOT NULL not <code>title</code>, <code>'[]'::jsonb</code> defaults for conditions/actions, the live <code>workflow_stage_canonical</code> 9-value CHECK list, <code>workflow_templates.status</code> allowing <code>draft/active/deprecated</code> not <code>published</code>). v2 mirrored the FR seed shape verbatim; cost was paper-trail only because Phase 0 was structured to stop before any DB write. <strong>TD-SPEC-DB-SCHEMA-CROSS-CHECK</strong> escalated 🔴 (second occurrence after BL-136) — every future spec authored against an imagined schema needs the invariants table embedded before CC runs it.</p>
+<h3>2. Cross-validation before locking architectural decisions</h3>
+<p>When a non-trivial architectural option emerges late (e.g. Option D in ADR-0002 surfacing during user pushback against Option C JSONB), do not skip cross-val with ChatGPT and Gemini. Both reviewers added real value to v3:</p>
+<ul><li>ChatGPT: replace regex URL parsing with the URL API (safer); explicit framing that the stored URL is not legally authoritative; mandatory "Informational only" UI label for English Fedlex pages.</li><li>Gemini: hostname + ELI-prefix pass-through guard; Option E (ELI URN identifier) documented as future evolution if compliance certification ever requires it; selectively reserve Option C (JSONB) for the cantonal layer where parallel URLs are non-mechanical.</li></ul>
+<p>The two-AI cross-val is a real value-add for ADRs, not ceremony. Apply it any time an architectural pivot lands — not just on the first ADR draft.</p>
+<h3>3. Rollback scope flag bugs are easy to introduce</h3>
+<p><code>--rollback --scope=</code> flags need explicit code-prefix filters in the DELETE clause, not just header logging. Surfaced during BL-131 Phase 8 idempotency test: <code>seed-it-compliance.mjs --rollback --scope=sale</code> deleted all 55 rows instead of the 28 sale rows because the DELETE filtered only by the seed marker (<code>[seed:it-compliance-v1]</code>), ignoring the parsed <code>scope</code> variable. Header logged <code>scope: sale</code> correctly so the bug was invisible from output. Same class of bug as TD-BL136-BOOTSTRAP-COUNTRY-FLAG (silent default to FR when <code>--country=IT</code> was passed). <strong>Pre-empt in BL-132 (CH) seed; verify and patch FR seed if affected.</strong> TD-SEED-IT-ROLLBACK-SCOPE-FLAG 🟡 filed.</p>
+<h3>4. MCP verification is worth the full plan even if it crashes mid-flight</h3>
+<p>BL-131 Phase 7 surfaced 2 pre-existing UI TDs that wouldn't have been visible from a happy-path-only walk:</p>
+<ul><li>TD-ADMIN-COMPLIANCE-SIDEPANEL-METADATA-FETCH 🟢 — admin compliance side panel renders literal "Failed to fetch" text in <code>Modificable</code> / <code>Blocco normativo</code> / <code>Blocking</code> field rows. Reproduced on multiple IT and FR rules; pre-existing, not introduced by BL-131.</li><li>TD-ADMIN-COMPLIANCE-SIDEPANEL-STALE-STATE 🟢 — side panel badge row doesn't refresh after Accetta/Rifiuta/Posticipa click. Network shows POST 200, list filter recomputes correctly, but the panel header still shows stale state until close/reopen.</li></ul>
+<p>The deliberate "click everything" discipline on each MCP step pays back. Don't shortcut to the happy path even if the verification objective is narrow.</p>
+<h3>5. Patch prompts can include parallel-fix-elsewhere instructions</h3>
+<p>When a bug is filed for one file, write the TD to flag any sibling files with the same risk. Example: TD-SEED-IT-ROLLBACK-SCOPE-FLAG explicitly notes <code>scripts/seed-fr-compliance.mjs</code> likely has the same rollback-scope bug and <code>scripts/seed-ch-compliance.mjs</code> (BL-132, future) must be pre-emptively fixed. Saves rediscovery in a future session and turns one fix into N when the time comes to land it.</p>
+<h2>Session lessons — 2026-05-08 — afternoon (BL-132 / ADR-0002 v3 implementation)</h2>
+<h3>1. Spec Phase 0 schema reality check before drafting CC prompt — saves Phase 0 STOP iteration</h3>
+<p>Reinforced the BL-131 lesson by being more rigorous: the BL-132 spec v2 included an <code>ALTER TABLE compliance_rules ADD COLUMN region_code</code> until live inspection (DB-SCHEMA.md:1696, then <code>information_schema.columns</code> query) revealed the column already existed from BL-129 era. Spec → v2.1 dropped the ADD and kept just the CHECK constraint. Cost: 5 minutes of inspection. Savings: a Phase 0 STOP roundtrip + spec amendment + paper-trail confusion. <strong>Rule: every spec that touches schema must include a <code>§ N. Live-schema invariants</code> section with an actual <code>information_schema</code> query result inline, not a description of expected schema.</strong> The CC prompt then embeds the same predicates as a DO-block in the migration so the runtime check matches the spec assumption byte-for-byte.</p>
+<h3>2. Cross-validation before locking architectural decisions — applies to implementations too, not just ADRs</h3>
+<p>The pattern from D-311 (cross-val the ADR) extended cleanly to D-312 (cross-val the spec). Spec v1 → v2 reclassified 5 sale + 1 rental rule as <code>federal_base_canton_dependent</code> after both ChatGPT and Gemini independently flagged "federal pretenders" — rules with cantonal rate/form/applicability that v1 had marked as plain <code>federal</code>. Both reviewers also caught: Lex Koller "Authorization Check" should be "Status Declaration" (Form 3 — mandatory filing, not just a check); SVIT brokerage was law-shaped framing for what is a <code>market_practice</code>; English Fedlex needed an explicit <code>informational_only</code> flag per PublA art. 14. Without cross-val, every one of these would have shipped wrong. <strong>The two-AI cross-val is a real value-add for non-trivial implementations, not just ceremony for ADRs.</strong></p>
+<h3>3. Applicability tiers belong in a column, not a metadata bag</h3>
+<p>Both reviewers also hit on this independently: federal-vs-canton-vs-market-practice is a load-bearing distinction that needs to be a typed, CHECK-constrained column — not a flag in <code>metadata</code> JSONB or a substring match on <code>description</code>. The engine reads it directly to keep framing-tier rules forced info+non-blocking even after BL-136 acceptance. Ad-hoc tagging via metadata would have allowed silent drift; the column makes the contract enforceable.</p>
+<h3>4. The rollback scope-prefix bug is now structural — every new seed must pre-empt it</h3>
+<p>TD-SEED-IT-ROLLBACK-SCOPE-FLAG was filed at the end of BL-131. By the time BL-132 was scoped, the prompt explicitly required <code>--rollback --scope=sale|rental</code> to filter by code prefix — and the CH seed's rollback function does so from day one with <code>CH-SALE-%</code> / <code>CH-RENTAL-%</code> filters. AML CH-BOTH-* rules are only deleted when <code>--scope=all</code> (or no scope) — semantically correct because they belong to neither sale nor rental scope alone. <strong>Every future country seed must include this.</strong> FR + IT seeds still carry the bug; carry-forward TD applies.</p>
+<h3>5. Don't ship a brand-new architectural pattern without unit tests</h3>
+<p>The Fedlex URL adapter is the first piece of code derived from an ADR rather than from a feature spec. It got 14 unit tests covering every branch of the adapter's contract: the 4-locale matrix, malformed URL fallback, non-Fedlex host pass-through, missing language segment, query/fragment/trailing-slash preservation, bare-host variant. Without those tests, we'd be relying on MCP verification to catch URL handling regressions — too late and too coarse. <strong>Architectural-pattern code (adapters, framing helpers, sentinel values) gets unit tests as a matter of policy.</strong> ADR-0001 (fingerprint parity) already established this norm; ADR-0002 implementations follow.</p>
+<h3>6. Sibling-table CHECK constraints — audit before locking the migration</h3>
+<p>When adding a CHECK constraint to a column on one table, audit sibling tables for the same column name. <code>compliance_rules.region_code</code> and <code>workflow_templates.region_code</code> exist on both tables (both from the BL-129 era) and were both unconstrained before BL-132. The migration locked CHECKs on both in one pass — free win, prevents the next BL-138 ticket from doing it. Generalisation: any time you add a regex/enum CHECK to column <code>X.foo</code>, grep the schema for other tables that have a <code>foo</code> column with the same semantics, and add the matching CHECK in the same migration.</p>
+<h3>7. Inline incident paper-trail discipline — incidents that resolve same-session live under the closing D-number</h3>
+<p>When Phase 6 ops surface incidents that resolve same-session, paper-trail them inline in the closing D-number's CHANGELOG entry under an explicit "<strong>Inline incidents</strong>" heading rather than spawning new D-numbers. D-312 captured two such incidents: (a) UAE <code>region_code</code> legacy values (<code>Dubai</code>/<code>DXB</code> → <code>AE-DU</code>) — closes BL-133 region-code half via paper-trail TD <code>TD-DATA-AE-REGION-CODE-CANONICALIZATION-COMPLETE</code>; (b) <code>workflow_templates.locked_steps</code> is jsonb not text[] — committed as <code>18fe44f</code> mid-session. Keeps the headline ticket coherent. Don't lose lineage: name them explicitly so future-Will can reconstruct the arc. <strong>New D-numbers should only spawn when the incident is independent of the headline ticket</strong> (different feature surface, different cause, different ship target).</p>
+<h3>CI green is a precondition for tag cuts (BL-132 D-312 hotfix lesson)</h3>
+<p>Tag <code>v2.1.0</code> was cut at commit <code>ed11d6b</code> while CI was actually red on three consecutive runs (#649 / #650 / #651). Root cause not noticed during EOS because the EOS prompt accepted "tsc clean locally" as a proxy for CI status. CI runs real-DB migrations against a fresh schema baseline; local tsc does not exercise the migration cascade.</p>
+<p><strong>Codified rule:</strong></p>
+<ul><li>Every EOS prompt that cuts a tag MUST include a step "verify last CI run on <code>main</code> is green" BEFORE <code>git tag</code>. The tag command must be the very last operation, after CI confirmation.</li><li>Local tsc / lint / Jest results are necessary but not sufficient. They do not exercise migration replay, schema baseline drift, or anything that requires Postgres.</li><li>If CI is red at EOS time, STOP and ask Will — never cut a tag onto red main.</li></ul>
+<p><strong>Reinforces D-307 lesson</strong> ("Open every red CI within the same session — Vercel deploys independently and is not a substitute") — same pattern: an external-to-the-rig green signal is not the same as CI green.</p>
+<h3>Migration idempotency contract (BL-132 D-312 hotfix lesson)</h3>
+<p>Every schema migration that touches existing data must satisfy a strict idempotency contract so the file can be re-run on any environment (production, CI replay, fresh dev DB, staging snapshot restore) without error. Three concrete patterns now mandatory:</p>
+<ol><li><strong>Phase 0 verification logs state, does not RAISE EXCEPTION on <code>column already exists</code>.</strong> Use <code>RAISE NOTICE</code> for soft expectations (column may or may not exist — first run vs re-run). Reserve <code>RAISE EXCEPTION</code> only for hard expectations that must be true on every run (e.g. pre-existing column from prior migration).</li></ol>
+<ol><li><strong>All <code>ALTER TABLE ADD COLUMN</code>/<code>ADD CONSTRAINT</code> guarded.</strong> Use <code>ADD COLUMN IF NOT EXISTS</code> for columns; wrap <code>ADD CONSTRAINT</code> in <code>DO $$ ... IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = '&amp;lt;name&amp;gt;') ... END $$</code> for constraints. Postgres has no native <code>ADD CONSTRAINT IF NOT EXISTS</code> — the DO block is the canonical pattern.</li></ol>
+<ol><li><strong>Data UPDATEs include a <code>WHERE</code> clause that becomes a no-op when already applied.</strong> E.g. <code>UPDATE organizations SET canton = 'CH-ZH' WHERE id = '...' AND (canton IS NULL OR canton &amp;lt;&amp;gt; 'CH-ZH')</code> rather than unconditional UPDATE. Same applies to data-cleanup UPDATEs that fix legacy values: <code>UPDATE ... WHERE value IN ('legacy-1', 'legacy-2')</code> is naturally idempotent (matches 0 rows post-cleanup).</li></ol>
+<p><strong>Reinforces BL-131 Phase 0 STOP lesson:</strong> spec-vs-schema divergence caught at execution time costs an iteration. v2.1 of BL-132 spec caught it at draft time. <strong>This BL-132 D-312 hotfix lesson extends the same principle to migration replay</strong> — the migration must work not just on the snapshot Will is targeting today, but on every snapshot the file might encounter.</p>
+<h2>Session lessons — 2026-05-09 — morning (BL-138 prep / paper-trail recovery)</h2>
+<p><strong>1. Research artifacts referenced by committed docs MUST themselves be committed.</strong></p>
+<p>When BL-132 session 2026-05-08-1 produced <code>BL-132-ch-source-registry-research.md</code>, the SOS noted "saved in <code>~/Downloads/claude/</code>, not committed to repo this session". This was a self-acknowledged WOW violation that wasn't caught at EOS. Worse, the file then disappeared from <code>~/Downloads/claude/</code> between sessions, and was only recoverable because a separate Claude session retained a copy.</p>
+<p><strong>Rule going forward:</strong> If a session produces an artifact that gets referenced by a committed file (spec, ADR, SOS), that artifact MUST itself be committed before EOS. The EOS protocol Definition of Done should fail otherwise. See TD-EOS-UNCOMMITTED-ARTIFACT-CHECK.</p>
+<p><strong>Detection at EOS time</strong> (manual until TD lands): grep all docs touched in the session for paths starting with <code>~/</code>, <code>/Users/</code>, <code>/Downloads/</code>. Any hit that isn't a code-execution example flags an uncommitted artifact.</p>
+<h2>Session lessons — 2026-05-09 — afternoon (BL-138 D-314 wave 1)</h2>
+<h3>1. Spec arithmetic errors hide inside "documented drift" claims</h3>
+<p>BL-138 spec v2.1 § "Phase 0 corrections" claimed federal CH rule count was <code>40+6+1=47</code> and filed <code>TD-COMPLIANCE-CH-FEDERAL-COUNT-DRIFT</code> to investigate the +1 vs BL-132 D-312's stated 46. Phase 0 reality check (commit <code>0ebb1ec</code>) confirmed production = 46, BL-132 paper trail = 46, no drift. The "47" in the spec was a <code>40</code> typo — should have been <code>39+6+1=46</code>. <strong>The "documented drift" framing is dangerous</strong> — it converts an arithmetic error into a planned investigation, which then ships as a real TD that pollutes the backlog. Phase 0 caught it; without Phase 0 the TD would have been filed and Will would have spent 30 minutes in a future session re-reading BL-132's CHANGELOG to discover there was nothing to investigate. <strong>Rule: any spec section claiming "documented drift" against a previously-shipped paper trail must verify the drift is real (not arithmetic) before locking. Cross-check the breakdown that produces the new number.</strong></p>
+<h3>2. Three-gate execution for large CC tickets is structurally cheaper than one big commit</h3>
+<p>BL-132 was a single 4-hour CC commit; BL-138 was three commits (Gate 1 schema, Gate 2 adapter+engine+listener, Gate 3 rules+UI+paper-trail) gated on Will's explicit go-ahead between gates. The gating cost: ~2 minutes per gate (Will reads CC's report, types "proceed"). The benefit: at Gate 1, a deviation surfaced (the prompt's filename <code>2026-05-09-bl138-...sql</code> would have sorted before BL-132 migrations and broken apply order — caught and renamed). At Gate 2, a wire-in deviation surfaced (the canton-change listener has no caller because BL-119 hasn't shipped yet — TD filed; listener still ships, idempotent and tested). At Gate 3, a schema mismatch surfaced (no <code>metadata</code> column despite spec assumption — TD filed, seed amended in flight, 60 rows still ingested). <strong>Gating works because each gate's blast radius is contained</strong>: schema lands cleanly before Gate 2 touches any TS; adapter/listener types stabilise before Gate 3 generates 60 rules. For tickets above ~3-hour scope, prefer 3-gate execution.</p>
+<h3>3. The <code>.cjs</code> ↔ <code>.mjs</code> shim pattern is now standard for seed-data tests</h3>
+<p>BL-131 introduced this for <code>stripMarkdownLinks</code>: the canonical lives in a <code>.cjs</code> so ts-jest can <code>require()</code> it; a <code>.mjs</code> shim re-exports via <code>createRequire</code> for the seed scripts (which are <code>.mjs</code>). BL-138 needed it again for the 60-rule cantonal data: <code>cantonal-rules-data.cjs</code> holds the rules + <code>selectRules</code> helper; <code>seed-ch-cantonal-compliance.mjs</code> imports via <code>createRequire</code>; <code>tests/unit/bl138-seed.integration.test.ts</code> does plain <code>require()</code>. <strong>This is now the canonical pattern for seed-data integration tests.</strong> Any future <code>seed-XX-*.mjs</code> that needs unit-test coverage of its rule data should split the static data into a sibling <code>.cjs</code> from the start. The <code>.mjs</code> keeps the Supabase logic.</p>
+<h3>4. Live-schema introspection beats spec assumptions</h3>
+<p>Spec § 6.2 confidently said "extend <code>compliance_rules.metadata</code> JSONB (existing)". A 30-second PostgREST probe via <code>select('*').limit(1)</code> revealed there's no <code>metadata</code> column at all. The seed had to be amended in flight (drop the <code>metadata</code> field from <code>buildRow</code>, file <code>TD-COMPLIANCE-METADATA-COLUMN</code>). <strong>Run a column-existence probe at Phase 0 for every column the spec touches</strong> (whether claimed-existing or newly-added). For BL-138, the post-schema check would have caught this if it had explicitly listed <code>metadata</code> as an expected column — but the spec said <code>metadata</code> was already there, so we didn't include it. Going forward: Phase 0 reality checks should enumerate <strong>every column the buildRow function will write</strong>, not just the ones the migration adds.</p>
+<h3>5. Web verification of policy claims belongs in the seed, not the spec</h3>
+<p>Spec v2.2 § 5.5 Rule 1 said "TI transfer tax: NO transfer tax (verify before seed)" with the verification owner unspecified. The CC prompt then said "before writing the TI section's Rule 1, web-fetch ... to confirm". CC fetched the DC TI site at Gate 3 start; the verification ran 6 minutes before the seed file was written, and the finding (no transfer tax exists; Comparis-confirmed) shipped in the seed file's source-type comment + the rule's description. <strong>Rule: any spec rule that says "verify before seed" must trigger an actual web-fetch at the start of the seed-writing turn, with the finding pasted into the rule's description (not just into the CHANGELOG).</strong> This makes the web verification visible at the row level so future-Will can audit each rule's primary-source confirmation date.</p>
+<h2>MCP Verification Patterns (D-315 — BL-138 wave 1 lessons)</h2>
+<h3>Direct API auth + localStorage injection (~10× faster than UI login)</h3>
+<p>For MCP read-only verification work, log in via direct Supabase auth API and inject the result into the app's localStorage. The supabase-js client on next page navigation picks up the session as if a real login happened.</p>
+<pre><code class="lang-javascript">// In the browser console of the target tab:
+const ANON = '&lt;NEXT_PUBLIC_SUPABASE_ANON_KEY&gt;';
+const r = await fetch('https://&lt;project&gt;.supabase.co/auth/v1/token?grant_type=password', {
+  method: 'POST',
+  headers: { 'apikey': ANON, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email: '&lt;EMAIL&gt;', password: '&lt;PASSWORD&gt;' })
+});
+const data = await r.json();
+const authPayload = {
+  access_token: data.access_token,
+  refresh_token: data.refresh_token,
+  expires_at: Math.floor(Date.now()/1000) + data.expires_in,
+  expires_in: data.expires_in,
+  token_type: 'bearer',
+  user: data.user
+};
+localStorage.setItem('housezoom-auth', JSON.stringify(authPayload));
+localStorage.setItem('sb-&lt;project&gt;-auth-token', JSON.stringify(authPayload));
+// Then navigate to /admin/&lt;whatever&gt; — app picks up the session.</code></pre>
+<p>Caveat: <code>window.__anonKey</code> is cleared on navigation. Re-set it on every page load if you're chaining queries across navigations.</p>
+<h3>Read-only verification via direct REST query</h3>
+<p>Once authenticated in-page, you can hit any RLS-protected endpoint with the user's JWT:</p>
+<pre><code class="lang-javascript">const sb = async (path) =&gt; {
+  const r = await fetch('https://&lt;project&gt;.supabase.co/rest/v1/' + path, {
+    headers: { 'apikey': window.__anonKey, 'Authorization': 'Bearer ' + window.__token }
+  });
+  return { status: r.status, data: await r.json() };
+};</code></pre>
+<p>This is significantly faster than scraping rendered DOM for read-only checks (rule counts, applicability tier breakdowns, FK joins). DOM inspection still required for UI-rendering checks (badge placement, locale toggle URL output, side panel layout).</p>
+<h3>When to use each</h3>
+<table><thead><tr><th>Verification type</th><th>Tool</th><th>Example</th></tr></thead><tbody><tr><td>Rule counts, FK relationships, schema state</td><td>direct REST</td><td>"How many cantonal rules per canton?"</td></tr><tr><td>Badge rendering, label text, color/severity</td><td>DOM inspection</td><td>"Does the LDTR row show a 'Kritisch' badge?"</td></tr><tr><td>URL output from locale-aware adapters</td><td>DOM (read href) + state mutation (DB PATCH)</td><td>"Does BE rule's source URL flip from <code>/de/</code> to <code>/fr/</code> when agent locale changes?"</td></tr><tr><td>Form submissions, e-signatures, file uploads</td><td>UI form-driving</td><td>(BL-81/81i/etc)</td></tr></tbody></table>
+<h3>Recipe: capture the anon key from the env file</h3>
+<p>The anon key is publicly bundled in the frontend (it's designed to be), so it's safe to extract from <code>.env.local</code>:</p>
+<pre><code class="lang-bash">grep NEXT_PUBLIC_SUPABASE_ANON_KEY ~/Apps/housezum-app/.env.local | cut -d= -f2</code></pre>
+<p>The service-role key is NOT safe to use in browser-side verification — it bypasses RLS, exposes cross-tenant data, and never touches client code in a healthy app.</p>
+<h3>Schema-first discipline (D-341 — 2026-05-19)</h3>
+<p>Before filing a 🔴 architectural-gap ticket claiming "no infrastructure exists for X", search the <strong>schema source of truth</strong> first — in order: <code>docs/architecture/DB-SCHEMA.md</code>, <code>supabase/migrations/*.sql</code>, <code>src/types/index.ts</code>. Reach for MCP probes only after schema review, to verify <em>runtime state</em> of structures the schema confirms exist, not to discover whether they exist at all.</p>
+<p>An earlier draft this session filed BG-103 v1 (originally proposed as BG-78, but BG-78 was already shipped per BG collision precheck in the same session) claiming "no task/appointment/reminder infrastructure exists" after 6 negative MCP probes of recently-encountered tables (<code>activity_log</code>, <code>intel_cards</code> partial scan, etc.). The ticket was retracted within minutes after reading DB-SCHEMA.md, which showed <code>intel_cards</code> actually has 30+ card<em>types (including signal/reminder/recommendation/escalation card</em>types directly applicable to friction surfacing), plus <code>ai_action_cards</code>, <code>external_events</code>, <code>inbound_signals</code>, <code>viewings</code>, <code>disclosure_requests</code>, <code>compliance_evaluations</code> — all with active rows in the live DB. The real bug was much narrower: BL-144 seed bypassed those existing surfaces. Re-filed as v2 "seed-completeness gap" 🟡.</p>
+<p><strong>Why this matters:</strong> filing a 🔴 architectural-gap ticket sets the wrong Phase 4 priority order and primes implementation work toward building things that already exist. Schema review costs ~5 minutes; the cost of a wrong-class 🔴 ticket compounds across every downstream planning decision.</p>
+<p><strong>How to apply:</strong> the order is <code>DB-SCHEMA.md → migrations → types → MCP</code>. MCP-probe-first is acceptable when you're testing a known-existing table for runtime data state; it is NOT acceptable when generalizing from a sparse probe set to "this infrastructure doesn't exist". If a probe returns 0 rows or 6 negative responses, that's evidence about DATA, not about SCHEMA.</p>
+<h2>SECURITY DEFINER Function Discipline (D-315)</h2>
+<p>Every SECURITY DEFINER function in the schema MUST:</p>
+<ol><li><strong>Set explicit search<em>path:</strong> <code>SET search_path = public, pg_temp</code> or whatever subset the function actually needs. Without this, the function executes with the caller's search</em>path — which for service callers (GoTrue, pg_cron, postgrest) often does not include <code>public</code>, causing unqualified table references to fail at name resolution.</li><li><strong>Schema-qualify all table references:</strong> <code>UPDATE public.agent_profiles ...</code> not <code>UPDATE agent_profiles ...</code>. Belt-and-suspenders with #1.</li><li><strong>Document the security boundary:</strong> function header comment explaining why SECURITY DEFINER is needed and what privilege escalation it enables.</li><li><strong>PostGIS extension functions are out of scope.</strong> <code>public.st_estimatedextent</code> (3 overloads) and any other functions installed by <code>CREATE EXTENSION postgis</code> will continue to flag as <code>NEEDS_HARDENING</code> in the audit query forever — <code>proconfig</code> is NULL on extension-installed functions and we cannot reissue <code>CREATE OR REPLACE FUNCTION</code> on them without forking them from the extension (next <code>ALTER EXTENSION postgis UPDATE</code> would then either fail or silently revert our changes). When the audit re-runs, expect these 3 rows to remain <code>NEEDS_HARDENING</code>; do NOT include them in hardening migrations. This rule generalizes: any SECURITY DEFINER function in <code>public</code> that is owned by an extension (check <code>pg_depend</code> for <code>deptype='e'</code>) is excluded for the same reason.</li></ol>
+<p>D-315's <code>sync_agent_profile_email()</code> had been latent-broken since creation because rule #1 wasn't followed. The bug only manifested when GoTrue's session was the caller (admin createUser → trigger → unqualified UPDATE → name resolution failure → "relation 'agent_profiles' does not exist"). <strong>Last audited: 2026-05-16 (D-331).</strong> 11 SECURITY DEFINER functions in non-system schemas; 8 compliant (5 <code>public.*</code> ours + 3 Supabase/extension-managed in <code>pgbouncer</code>/<code>vault</code>). Re-run the audit query at the start of any session that touches function definitions, RLS, or auth; re-run unconditionally every ~3 months.</p>
+<pre><code class="lang-sql">-- Audit query: list all SECURITY DEFINER functions and whether they SET search_path
+SELECT
+  n.nspname || '.' || p.proname AS function,
+  p.prosecdef AS is_security_definer,
+  p.proconfig AS config_settings  -- search_path appears here if set
+FROM pg_proc p
+JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE p.prosecdef = true
+  AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+ORDER BY n.nspname, p.proname;</code></pre>
+<p>Functions where <code>config_settings</code> is NULL or doesn't contain <code>search_path=...</code> need hardening.</p>
+<h2>Hook signature discipline (D-316 footnote)</h2>
+<p>When CC prompts include pseudocode that crosses a file boundary (e.g. invoking a service function defined elsewhere), either (a) copy the exact function signature into the prompt verbatim, or (b) require Phase 0 to verify the signature in source. BL-119's prompt used destructured-object pseudocode for <code>hooks.onChange</code> (e.g. <code>onChange: async ({ orgId, oldCanton, newCanton }) =&amp;gt; { … }</code>); the actual <code>canton-change-listener.ts</code> invokes hooks positionally (<code>hooks.onChange(orgId, oldCanton, newCanton)</code>). CC followed the actual source and documented the mismatch in spec implementation-notes. Non-issue this time, but worth recording: when authoring future CC prompts, paste real signatures or require Phase 0 verification.</p></div>
+</main>
+<footer>
+  HouseZoom.ai Ways of working · Auto-generated from <code>WAYS-OF-WORKING.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

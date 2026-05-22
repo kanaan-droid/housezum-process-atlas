@@ -27,7 +27,7 @@ a:hover{text-decoration:underline}
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
 .nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
 .nav-brand span{color:var(--purple)}
-.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
 .nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
 .nav-links a.active{color:var(--purple);background:var(--purple3)}
@@ -75,6 +75,9 @@ footer a{color:var(--text2)}
   <div class="nav-links">
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
   </div>
 </nav>
@@ -111,8 +114,7 @@ footer a{color:var(--text2)}
 <ul><li><a href="strategy.html"><code>STRATEGY.md</code></a> — multi-model architecture (Claude Vision today → planned CLIP/ViT). Photo intelligence is the canonical example of "swappable model boundary".</li><li><a href="qa-engine.html"><code>qa-engine.md</code></a> — photo-related Q&amp;A surfaces (e.g. "what rooms does this property have?") read photo + annotation tables but the pipeline is QA-engine territory.</li><li><a href="portal.html"><code>portal.md</code></a> — portal feed adapters consume optimized photos + walkthrough share URLs. Cross-link with § Walkthrough subsystem (BL-89 portal distribution wiring).</li><li><code>multi-tenancy.md § Security</code> — Data Safety Guardrails (BL-103 RESTRICT FK + <code>--dry-run</code> discipline) covers corpus-protection patterns.</li><li>Spec: <code>docs/specs/BL-88-PHOTO-OPTIMIZATION-SPEC.md</code>, plus <code>BL-87-MEDIA-INTELLIGENCE-SPEC.md</code> and <code>BL-87-WALKTHROUGH-REORDER-SPEC.md</code>.</li></ul></div>
 </main>
 <footer>
-  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/photo-intelligence.md</code>
-  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/photo-intelligence.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
 </footer>
 </body>
 </html>

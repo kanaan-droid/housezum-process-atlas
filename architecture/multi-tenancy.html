@@ -27,7 +27,7 @@ a:hover{text-decoration:underline}
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
 .nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
 .nav-brand span{color:var(--purple)}
-.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
 .nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
 .nav-links a.active{color:var(--purple);background:var(--purple3)}
@@ -75,6 +75,9 @@ footer a{color:var(--text2)}
   <div class="nav-links">
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/" class="active">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
   </div>
 </nav>
@@ -141,8 +144,7 @@ footer a{color:var(--text2)}
 <ul><li><strong>BL-126 (D-280)</strong> — Seed EU locales (FR/DE-CH/IT) with realistic CRM data: 75 contacts (12 buyers + 5 sellers + 3 owners + 5 service providers per org × 3 orgs) + 30 deals + 30 viewings + 18 viewing_feedback + 30 leads + 15 property↔seller links + 3 org <code>default_locale</code> fixes (en→fr/de/it) across Saint Germain Immobilier (FR), Zürich Premium Realty (DE-CH), Milano Prestige (IT). Locale-authentic names + phone formats (+33/+41/+39) + email TLDs + commission rates. Idempotent via <code>[seed:eu-v1]</code> marker; <code>--dry-run</code> / <code>--force</code> / <code>--rollback</code> / <code>--locale=</code> flags. Established the marker-based-idempotency pattern for new multi-tenant seeds.</li><li><strong>BL-127</strong> (open 🟢 TD) — Retrofit Gulf Horizon (UAE) seed to use <code>[seed:uae-v1]</code> marker pattern. The original <code>scripts/seed-dubai.mjs</code> predates the marker convention introduced in BL-126; today it relies on deterministic UUIDs + manual FK-ordered wipe. Retrofit to append <code>[seed:uae-v1]</code> to all <code>metadata</code> JSONB fields, then standardize the rollback path. Low priority — the existing script works, just doesn't follow the new convention.</li></ul></div>
 </main>
 <footer>
-  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/multi-tenancy.md</code>
-  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+  HouseZoom.ai Architecture · Auto-generated from <code>docs/architecture/multi-tenancy.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
 </footer>
 </body>
 </html>

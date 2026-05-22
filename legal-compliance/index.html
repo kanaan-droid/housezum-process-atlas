@@ -27,7 +27,7 @@ a:hover{text-decoration:underline}
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
 .nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
 .nav-brand span{color:var(--purple)}
-.nav-links{display:flex;gap:4px;margin-left:auto}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
 .nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
 .nav-links a.active{color:var(--purple);background:var(--purple3)}
@@ -77,6 +77,7 @@ footer a{color:var(--text2)}
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/" class="active">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
   </div>
 </nav>
@@ -239,8 +240,7 @@ workflow_stage_canonical TEXT  -- CHECK: listing/pre_offer/offer/pre_contract/
 <ol><li><strong>Default state of newly-ingested rules</strong> — info-only until accepted, or invisible until accepted? (Will to confirm before BL-136 design.)</li><li><strong>Final disclaimer language</strong> — pending legal counsel review. Current text is development-grade.</li><li><strong>Material vs. non-material version changes</strong> — what triggers re-prompt vs. silent update? Heuristic: any change to <code>severity</code>, <code>blocking</code>, <code>conditions.required_*</code>, <code>actions[*].type</code>, or <code>valid_to</code> triggers re-prompt; pure citation/wording updates do not. (To formalize in BL-136.)</li><li><strong>Per-authority freshness SLAs</strong> — fee tables (90 days), civil code articles (365 days), regulatory circulars (30 days)? (To formalize in BL-139.)</li></ol></div>
 </main>
 <footer>
-  HouseZoom.ai Legal &amp; Compliance · Auto-generated from <code>docs/legal-compliance/INDEX.md</code>
-  · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+  HouseZoom.ai Legal &amp; Compliance · Auto-generated from <code>docs/legal-compliance/ARCHITECTURE.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
 </footer>
 </body>
 </html>

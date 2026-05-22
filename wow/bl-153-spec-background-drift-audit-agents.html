@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — BL-153 — Background Drift Audit Agents (Phases A/B/C)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/" class="active">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Ways of working</a> / BL-153-Spec-Background-Drift-Audit-Agents.md</div>
+  
+  <div class="content"><h1>BL-153 — Background Drift Audit Agents (Phases A/B/C)</h1>
+<p><strong>Spec version:</strong> v0.1 (draft, awaiting Will review) <strong>Filed:</strong> 2026-05-22 <strong>Author:</strong> Claude.ai web (this session) <strong>Status:</strong> SPEC — not yet locked, not yet implemented</p>
+<blockquote><p><strong>Provenance:</strong> This spec is the corrective action filed in response to two governance drift events surfaced 2026-05-22:</p>
+<ol><li>D-340 drafted Phase 3 axis prompts using axis numbers (6/2/5) that did NOT match the canonical 10-axis DD checklist in <code>dd-hardening-tracker.xlsx</code> § Pillar 1 Detail § Section 3. The drift went undetected through D-341, D-342, D-343 — three downstream sessions — and would have continued indefinitely without manual audit.</li><li><code>housezoom-dd-hardening-plan-v0.2.docx</code>, referenced by the tracker as the source of the hardening plan, does not exist anywhere in the repo or on Will's Mac. Reference was treated as canonical for weeks.</li></ol>
+<p><strong>Root cause of both:</strong> no automated cross-validation between paper-trail artifacts. Drift accumulates silently between sessions; only manual audit surfaces it, and only after damage.</p>
+<p><strong>Cost of drift:</strong> ~1h of Will's time + a chunk of confidence per event. At observed cadence (2 events in 2 weeks), ~50h/year.</p></blockquote>
+<hr/>
+<h2>TL;DR</h2>
+<p>Three nightly Claude-agent jobs running in GitHub Actions, layered:</p>
+<table><thead><tr><th>Phase</th><th>Job</th><th>What it validates</th><th>Setup cost</th><th>Recurring cost</th><th>Catches</th></tr></thead><tbody><tr><td>A</td><td><strong>paper-trail drift audit</strong></td><td>Internal consistency across ROADMAP / CHANGELOG / SOS / tracker / STANDING-OBLIGATIONS / findings docs</td><td>~3h</td><td>~$30/mo</td><td>The D-340 axis label class. Severity/status mismatches. Stale "Last touched" dates.</td></tr><tr><td>B</td><td><strong>doc-reference validator</strong> (extends A)</td><td>Every doc referenced in paper trail exists in <code>git ls-files</code></td><td>~1h</td><td>+$10/mo</td><td>The missing-docx class. Broken cross-refs. Phantom artifact references.</td></tr><tr><td>C</td><td><strong>schema-vs-docs sync</strong></td><td>Live Supabase schema diffed against <code>DB-SCHEMA.md</code></td><td>~4h</td><td>+$20/mo</td><td>The dual-column class (D-342 disaster). Stale schema documentation.</td></tr></tbody></table>
+<p><strong>Total recurring cost: ~$60/mo. Recovers ~50h/year of Will's time at current drift cadence.</strong></p>
+<p>All three phases run nightly at 04:00 UTC (after EU-late EOS commits land). Each writes a drift report to <code>docs/audits/</code>. Each opens a GitHub issue when 🔴 drift is detected. None auto-commits fixes — review remains human-gated.</p>
+<hr/>
+<h2>Why three phases, not one</h2>
+<p>Phase A is the must-have. It's self-contained, ships in one PR, and would have caught the D-340 drift the night it happened.</p>
+<p>Phase B is a 1-hour incremental extension of A — same workflow, additional checks. Defer if Phase A reveals A-class drift is enough surface area to monitor.</p>
+<p>Phase C is structurally different — needs a read-only Supabase service role secret, needs its own dump+diff infra, has its own failure modes. Worth its own PR + ramp-up. Solves a different class of bug (the D-342 dual-column disaster) that Phases A/B cannot see.</p>
+<p>The spec covers all three so that the <strong>infrastructure investment is amortized</strong> — same GH Actions account, same artifact-storage pattern, same issue-templating, same agent-prompt structure. Phase A pays for Phase B's hosting; Phase B pays for Phase C's scaffolding.</p>
+<hr/>
+<h2>Phase A — Paper-trail drift audit</h2>
+<h3>Goal</h3>
+<p>Detect inconsistency between human-authored governance docs <strong>before it compounds into downstream sessions</strong>.</p>
+<h3>Sources of truth read by the agent</h3>
+<table><thead><tr><th>Source</th><th>Role</th></tr></thead><tbody><tr><td><code>ROADMAP.md</code></td><td>Canonical ledger of BL/BG/TD/D tickets</td></tr><tr><td><code>CHANGELOG.md</code></td><td>Canonical record of D-NNN ships, dates, scopes</td></tr><tr><td><code>docs/sessions/SOS-*.md</code></td><td>Per-session deliverables + commit ledger</td></tr><tr><td><code>docs/sessions/STANDING-OBLIGATIONS.md</code></td><td>Recurring obligations + "Last touched" dates</td></tr><tr><td><code>docs/dd-hardening/dd-hardening-tracker.xlsx</code></td><td>DD-readiness status + canonical 10-axis checklist</td></tr><tr><td><code>docs/dd-hardening/phase-3-axis-*-findings.md</code></td><td>Per-axis walkthrough findings</td></tr><tr><td><a href="ways-of-working.html"><code>WAYS-OF-WORKING.md</code></a></td><td>Process rules (incl. Commandments)</td></tr><tr><td><code>package.json</code></td><td>Version tag</td></tr><tr><td><code>docs/ClaudeAccess.md</code></td><td>Capability matrix</td></tr></tbody></table>
+<h3>Cross-validation checks (initial set — must be augmentable)</h3>
+<p>The agent runs each check and emits a structured finding per drift detected. Initial check set:</p>
+<table><thead><tr><th>#</th><th>Check</th><th>Drift class</th><th>Severity if drifts</th></tr></thead><tbody><tr><td>1</td><td>Every <code>BG-NNN</code> in ROADMAP appears in ≥1 SOS or findings doc (or pre-dates Phase 3 protocol)</td><td>Orphaned ticket</td><td>🟡</td></tr><tr><td>2</td><td>Every <code>BG-NNN</code> referenced in a findings doc has a ROADMAP row</td><td>Phantom ticket</td><td>🔴</td></tr><tr><td>3</td><td>Every <code>BG-NNN</code> severity matches across ROADMAP / SOS / findings</td><td>Severity drift</td><td>🟡</td></tr><tr><td>4</td><td>Every <code>BG-NNN</code> status (open / fixed / withdrawn / retracted) matches across sources</td><td>Status drift</td><td>🔴</td></tr><tr><td>5</td><td>Every <code>D-NNN</code> in CHANGELOG has a matching SOS (or single-line "no SOS — paper-trail only" exception)</td><td>Missing SOS</td><td>🟡</td></tr><tr><td>6</td><td>Every "Axis N" reference in any findings doc matches the canonical axis-name from the tracker's § Pillar 1 Detail § Section 3</td><td><strong>Axis label drift</strong></td><td>🔴</td></tr><tr><td>7</td><td>Every doc filename referenced in any other doc resolves to a file in <code>git ls-files</code> (Phase B expands this)</td><td>Phantom reference</td><td>🟡 in Phase A, 🔴 in Phase B</td></tr><tr><td>8</td><td>Every STANDING-OBLIGATIONS row's "Last touched" is parseable as a date and ≤ today</td><td>Stale / malformed</td><td>🟡</td></tr><tr><td>9</td><td>Every "Pillar N Phase N" reference resolves to a known phase in the tracker</td><td>Pillar phase drift</td><td>🟡</td></tr><tr><td>10</td><td>Every <code>TD-*</code> code referenced anywhere has a ROADMAP entry (open or closed)</td><td>Phantom TD</td><td>🟡</td></tr><tr><td>11</td><td><code>package.json</code> version matches the most recent <code>v*</code> tag mentioned in latest CHANGELOG entry</td><td>Version drift</td><td>🟢</td></tr><tr><td>12</td><td>Every <code>[seed:*]</code> marker in tracker matches a seed script in <code>scripts/</code></td><td>Phantom seed</td><td>🟡</td></tr><tr><td>13</td><td>WOW Commandment count (currently 11) matches between WOW doc and any reference in other docs</td><td>Commandment count drift</td><td>🟢</td></tr><tr><td>14</td><td>Every <code>org_id</code> UUID referenced in any doc resolves to a known seeded org (from memory of seeded UUIDs or a registry file)</td><td>Phantom UUID</td><td>🟡</td></tr><tr><td>15</td><td>docs-check.mjs Check 4 soft-warn output matches the agent's own STANDING-OBLIGATIONS analysis</td><td>Check 4 mismatch</td><td>🟢</td></tr></tbody></table>
+<p>This list is the v0.1 spec. New checks file as <code>BG-*</code> against this spec, or as TDs that extend the prompt.</p>
+<h3>What the agent CANNOT check (out of scope for Phase A)</h3>
+<ul><li>Anything live (Supabase, deployed app, MCP) — Phase C territory</li><li>Anything requiring browser drive — never; that's Will + Claude Desktop + Chrome MCP</li><li>Anything that requires interpretation of intent (e.g., "should this BG be 🔴 or 🟡?") — only mechanical consistency</li><li>Anything outside the repo (Vercel logs, Anthropic API console, etc.)</li></ul>
+<h3>Output</h3>
+<p>Two artifacts per run:</p>
+<ol><li><strong><code>docs/audits/drift-report-YYYY-MM-DD.md</code></strong> — full structured report:</li></ol>
+<pre><code class="lang-markdown"># Drift Audit Report — 2026-05-22
+
+**Run:** 2026-05-22 04:00 UTC
+**Commit audited:** &lt;SHA&gt;
+**Phase:** A
+**Total checks run:** 15
+**Total drift findings:** N
+**🔴 count:** N / **🟡 count:** N / **🟢 count:** N
+
+## 🔴 Critical drift
+
+### Finding 1 — [Check 6] Axis label drift
+**Affected files:** docs/dd-hardening/phase-3-axis-6-findings.md, docs/dd-hardening/phase3-prompt-axis-6-friction-states.md
+**Canonical source:** dd-hardening-tracker.xlsx § Pillar 1 Detail § Section 3 row 6
+**Canonical value:** "Transaction checklist"
+**Observed value (3 files):** "Friction States"
+**Recommendation:** rename OR add cross-reference table OR file TD
+
+## 🟡 Significant drift
+...
+
+## 🟢 Polish
+...
+
+## What the agent did NOT check
+...
+
+## Suggested next actions
+...</code></pre>
+<ol><li><strong>GitHub issue</strong> — opened iff <code>🔴 count &amp;gt; 0</code>, tagged <code>drift-audit, automated</code>:  - Title: <code>[Drift Audit] N 🔴 findings on YYYY-MM-DD</code>  - Body: summary of 🔴 findings + link to the full report  - Assignee: Will (configurable)  - Idempotent: re-opens existing issue if same drift persists, doesn't spam</li></ol>
+<h3>Workflow</h3>
+<p><code>.github/workflows/drift-audit.yml</code> triggered by:</p>
+<ul><li><strong>Nightly cron:</strong> <code>0 4 * * *</code> (04:00 UTC)</li><li><strong>On push to main</strong> touching <code>docs/</code>, <code>ROADMAP.md</code>, <code>CHANGELOG.md</code>, <a href="ways-of-working.html"><code>WAYS-OF-WORKING.md</code></a>, <code>package.json</code>, <code>docs/dd-hardening/dd-hardening-tracker.xlsx</code></li><li><strong>On PR</strong> with same path filter (posts findings as PR comment instead of issue)</li><li><strong>Manual:</strong> <code>workflow_dispatch</code> for ad-hoc runs</li></ul>
+<h3>Agent runtime</h3>
+<p>Uses <a href="https://github.com/anthropics/claude-code-action">Anthropic's official <code>claude-code-action</code></a> (or equivalent) running <code>claude-sonnet-4-6</code>. Falls back to a retry on <code>claude-opus-4-7</code> for any single run that returns a malformed JSON output.</p>
+<p><strong>Why Sonnet 4.6:</strong> drift audit is text reasoning over markdown files. Doesn't need Opus 4.7's deeper reasoning. Cost per run with Sonnet ≈ $0.50-$1.50; with Opus ≈ $2-$5.</p>
+<h3>Prompt</h3>
+<p>Lives at <code>scripts/audit/drift-audit/PROMPT.md</code>. Versioned (e.g., <code>PROMPT-v0.1.md</code>). Strict structure:</p>
+<ul><li><strong>Role:</strong> "You are a paper-trail drift auditor for the HouseZoom repo. Your job is mechanical cross-validation of governance docs."</li><li><strong>Allowed tools:</strong> read-only (<code>view</code>, <code>grep</code>, <code>extract-text</code> for xlsx). NO write tools. NO bash that mutates.</li><li><strong>Output:</strong> ONE markdown file matching <code>scripts/audit/drift-audit/REPORT-SCHEMA.md</code> (template).</li><li><strong>Hard constraints:</strong> no fabrication; if a check cannot run, emit a "check skipped" finding with reason. No recommendations beyond what's listed in the spec's check table.</li><li><strong>Self-check:</strong> before emitting, re-read own output against the template. If schema invalid, retry once.</li></ul>
+<h3>Schema</h3>
+<p><code>scripts/audit/drift-audit/REPORT-SCHEMA.md</code> — frozen template the agent must match. Validated by a small CI step (<code>scripts/audit/drift-audit/validate-report.mjs</code>) that checks every finding has: severity, check ID, affected files, canonical value, observed value, recommendation. Run as part of the workflow; failure → workflow fails → re-run.</p>
+<h3>Cost model</h3>
+<p>Per nightly run:</p>
+<ul><li>Avg context: ~80KB markdown + ~30KB xlsx text dump = ~25k tokens input</li><li>Avg output: ~3-5k tokens</li><li>Sonnet 4.6 input ≈ $3/1M tokens, output ≈ $15/1M</li><li><strong>Per run: $0.075 input + $0.075 output = ~$0.15</strong></li><li><strong>Nightly = ~$4.50/mo</strong></li><li>Plus on-push runs: assume ~30/mo × $0.15 = ~$4.50</li><li>Plus retry overhead, opus fallback: ~30%</li><li><strong>Phase A total ≈ $12/mo</strong> (earlier $30/mo estimate was conservative; revising down)</li></ul>
+<h3>Setup work breakdown</h3>
+<table><thead><tr><th>Task</th><th>Time</th><th>Owner</th></tr></thead><tbody><tr><td>Write <code>PROMPT-v0.1.md</code></td><td>60 min</td><td>Claude.ai web (drafting session)</td></tr><tr><td>Write <code>REPORT-SCHEMA.md</code></td><td>30 min</td><td>Same</td></tr><tr><td>Write <code>validate-report.mjs</code></td><td>45 min</td><td>CC</td></tr><tr><td>Write <code>.github/workflows/drift-audit.yml</code></td><td>30 min</td><td>CC</td></tr><tr><td>Create <code>ANTHROPIC_API_KEY</code> GH Secret</td><td>5 min</td><td>Will</td></tr><tr><td>Smoke test: run workflow manually, verify report shape</td><td>30 min</td><td>Will + CC</td></tr><tr><td>First nightly run validates against itself</td><td>0 (auto)</td><td>—</td></tr><tr><td><strong>Total</strong></td><td><strong>~3h</strong></td><td>mixed</td></tr></tbody></table>
+<h3>Success criteria (Phase A is "done")</h3>
+<ol><li>Workflow runs nightly without manual intervention for 7 consecutive days</li><li>Report schema validates without retries on ≥5 of 7 runs</li><li>Workflow correctly detects ≥1 known drift (we seed a deliberate test drift, confirm it's caught, remove it)</li><li>First 🔴 finding detected in real audit gets an issue opened, assigned to Will, and resolved</li><li>Will's first impression after 1 week: "this is signal, not noise"</li></ol>
+<p>If criterion 5 fails — i.e., output is mostly noise — Phase A goes back to spec for prompt tuning. Don't proceed to B until A is signal.</p>
+<h3>Rollback</h3>
+<p>Disable workflow via GitHub UI (one click). Workflow file stays in repo. No data loss; reports are append-only.</p>
+<hr/>
+<h2>Phase B — Doc-reference validator (extends A)</h2>
+<h3>Goal</h3>
+<p>Detect references to files that don't exist in the repo. Catches the missing-<code>housezoom-dd-hardening-plan-v0.2.docx</code> class.</p>
+<h3>Delta over Phase A</h3>
+<p>Same workflow, same agent, same schedule. Adds <strong>one new check class</strong> (#7 in Phase A's check table is the seed):</p>
+<p><strong>Check 7-expanded:</strong> for every markdown link, bare file reference, or path mention in any of the Phase A source files:</p>
+<ol><li>Extract the path (regex against <code>.md</code>, <code>.docx</code>, <code>.xlsx</code>, <code>.pdf</code>, <code>.sql</code>, <code>.mjs</code>, <code>.ts</code>, <code>.tsx</code>, <code>.cjs</code>, <code>.py</code>, <code>.json</code> extensions)</li><li>Resolve relative to repo root</li><li>Check if it exists in <code>git ls-files</code></li><li>If not: emit drift finding 🔴 (phantom reference)</li></ol>
+<p>Two exception categories that don't count as drift:</p>
+<ul><li>Paths under <code>node_modules/</code>, <code>.next/</code>, <code>dist/</code> (ignored)</li><li>Paths explicitly marked <code>[deleted in D-NNN]</code> or <code>[deprecated]</code> in surrounding text (the agent reads context)</li></ul>
+<h3>Output</h3>
+<p>Same artifact as Phase A. Adds a new section: "<strong>Phantom file references</strong>" listing every (referencing file, referenced path, exists?) tuple where exists=false.</p>
+<h3>Setup work breakdown</h3>
+<table><thead><tr><th>Task</th><th>Time</th><th>Owner</th></tr></thead><tbody><tr><td>Extend <code>PROMPT-v0.1.md</code> → <code>v0.2.md</code> to include Check 7-expanded</td><td>20 min</td><td>Claude.ai web</td></tr><tr><td>Extend <code>REPORT-SCHEMA.md</code> for phantom-reference section</td><td>10 min</td><td>Same</td></tr><tr><td>Update <code>validate-report.mjs</code> for new section</td><td>20 min</td><td>CC</td></tr><tr><td>Smoke test against known phantom (the housezoom-dd-hardening-plan-v0.2.docx case)</td><td>10 min</td><td>Will</td></tr><tr><td><strong>Total</strong></td><td><strong>~1h</strong></td><td>mixed</td></tr></tbody></table>
+<h3>Success criteria</h3>
+<ol><li>Detects <code>housezoom-dd-hardening-plan-v0.2.docx</code> as phantom (regression test)</li><li>No false positives on legitimate <code>[deleted in D-NNN]</code> references</li><li>No false positives on relative paths in code comments</li></ol>
+<h3>Rollback</h3>
+<p>Revert prompt to v0.1. Same workflow keeps running with smaller check set.</p>
+<hr/>
+<h2>Phase C — Schema-vs-docs sync</h2>
+<h3>Goal</h3>
+<p>Detect drift between live Supabase schema and <code>DB-SCHEMA.md</code>. Catches the <strong>D-342 dual-column class</strong> — schema acquires structures that documentation doesn't know about, or documentation describes structures that no longer exist.</p>
+<h3>Why this is structurally separate from A/B</h3>
+<ul><li>Needs a read-only Supabase service role secret in GH Actions Secrets (security boundary)</li><li>Needs Postgres client in the runner (<code>psql</code> or <code>pg</code>)</li><li>Needs schema dump + diff, not just markdown reasoning</li><li>Failure modes are different (network failure, auth failure, schema-dump format change)</li></ul>
+<h3>What it does</h3>
+<p>Nightly:</p>
+<ol><li>Connect to Supabase via a <strong>read-only role</strong> (newly created — <code>drift_audit_readonly</code>) using <code>pg_dump --schema-only --no-owner --no-privileges</code></li><li>Normalize the dump (sort statements, strip timestamps, strip extension version numbers)</li><li>Compare to a checked-in snapshot at <code>docs/db-schema-snapshot.sql</code></li><li>If diff detected:  - Parse the diff into structured findings (column added/dropped/renamed, RLS policy changed, trigger added, etc.)  - For each finding, check whether <code>DB-SCHEMA.md</code> reflects it  - Emit drift report tagged 🔴 if structure changed but DB-SCHEMA.md didn't update; 🟡 if DB-SCHEMA.md mentions structures not in live schema; 🟢 if both align (no drift)</li><li>Also re-runs the audit query from <code>WAYS-OF-WORKING.md § SECURITY DEFINER Function Discipline</code> and reports any <code>NEEDS_HARDENING</code> rows that aren't on the known-exempted list (PostGIS extension functions)</li><li>Updates the snapshot file IFF Will reviews and approves via a follow-up PR (NOT auto-committed)</li></ol>
+<h3>Sources of truth</h3>
+<table><thead><tr><th>Source</th><th>Role</th></tr></thead><tbody><tr><td>Live Supabase via <code>drift_audit_readonly</code></td><td>Authoritative schema</td></tr><tr><td><code>docs/db-schema-snapshot.sql</code></td><td>Last-approved schema baseline</td></tr><tr><td><code>DB-SCHEMA.md</code></td><td>Human-readable canonical reference</td></tr><tr><td><code>supabase/migrations/*.sql</code></td><td>Migration history (informational only)</td></tr></tbody></table>
+<h3>What it CANNOT do</h3>
+<ul><li>Run any DDL</li><li>Run any DML</li><li>Read user data (read-only role gets <code>USAGE</code> + <code>SELECT</code> on <code>information_schema</code> + <code>pg_catalog</code> only; no row access)</li><li>Auto-commit a snapshot update — that's always a Will-reviewed PR</li></ul>
+<h3>Setup work breakdown</h3>
+<table><thead><tr><th>Task</th><th>Time</th><th>Owner</th></tr></thead><tbody><tr><td>Create <code>drift_audit_readonly</code> role in Supabase, grant <code>USAGE ON SCHEMA public</code> + <code>SELECT ON information_schema.*</code> + <code>SELECT ON pg_catalog.*</code> (no row access)</td><td>15 min</td><td>Will</td></tr><tr><td>Add secret <code>DRIFT_AUDIT_DB_URL</code> to GH Actions</td><td>5 min</td><td>Will</td></tr><tr><td>Write <code>scripts/audit/drift-audit/schema-snapshot.mjs</code> (dump + normalize)</td><td>60 min</td><td>CC</td></tr><tr><td>Write <code>scripts/audit/drift-audit/schema-diff-to-findings.mjs</code> (parse diff into findings)</td><td>90 min</td><td>CC</td></tr><tr><td>Extend prompt + report schema for Phase C section</td><td>30 min</td><td>Claude.ai web</td></tr><tr><td>Generate initial <code>docs/db-schema-snapshot.sql</code> (one-time)</td><td>10 min</td><td>Will + CC</td></tr><tr><td>Smoke test: introduce a known schema drift, verify it's caught</td><td>30 min</td><td>Will</td></tr><tr><td><strong>Total</strong></td><td><strong>~4h</strong></td><td>mixed</td></tr></tbody></table>
+<h3>Cost model</h3>
+<ul><li>Each run: <code>pg_dump</code> (free, runner-local) + agent call (~$0.30 with smaller context since diff is short)</li><li><strong>Phase C total ≈ $9/mo</strong> (revising down from $20/mo estimate)</li></ul>
+<h3>Success criteria</h3>
+<ol><li>Snapshot-vs-live drift report runs nightly without auth/network issues for 7 days</li><li>Detects a known-introduced drift in smoke test</li><li>Generates a clean baseline snapshot on first run</li><li>Zero security incidents (no service role token leaked, no DDL/DML attempted)</li></ol>
+<h3>Rollback</h3>
+<p>Disable workflow. Revoke <code>drift_audit_readonly</code> role. Delete <code>DRIFT_AUDIT_DB_URL</code> secret. Total rollback: &lt;5 min.</p>
+<hr/>
+<h2>Cross-phase architecture</h2>
+<h3>Directory layout</h3>
+<pre><code>scripts/audit/drift-audit/
+├── README.md                   # Quick-start for next-session-Claude
+├── PROMPT-v0.1.md              # Phase A prompt
+├── PROMPT-v0.2.md              # Phase B prompt (delta over v0.1)
+├── PROMPT-v0.3.md              # Phase C prompt (delta over v0.2)
+├── REPORT-SCHEMA.md            # Frozen output template
+├── validate-report.mjs         # CI validator for report shape
+├── schema-snapshot.mjs         # Phase C only
+├── schema-diff-to-findings.mjs # Phase C only
+└── known-exemptions.json       # Known-OK drifts (e.g., PostGIS SECDEF functions)
+
+.github/workflows/
+└── drift-audit.yml             # All 3 phases
+
+docs/audits/
+├── drift-report-2026-05-23.md  # Generated nightly
+├── drift-report-2026-05-24.md
+└── ...</code></pre>
+<h3>Secrets required</h3>
+<table><thead><tr><th>Secret</th><th>Scope</th><th>Phase</th></tr></thead><tbody><tr><td><code>ANTHROPIC_API_KEY</code></td><td>repo</td><td>A, B, C</td></tr><tr><td><code>DRIFT_AUDIT_DB_URL</code></td><td>repo</td><td>C only</td></tr><tr><td><code>GITHUB_TOKEN</code></td><td>auto-provided</td><td>A, B, C (for issue creation)</td></tr></tbody></table>
+<h3>Failure handling</h3>
+<table><thead><tr><th>Failure</th><th>Behavior</th></tr></thead><tbody><tr><td>Anthropic API down</td><td>Workflow retries 3× with exponential backoff. If still fails: workflow fails (visible in GH UI), no issue opened.</td></tr><tr><td>Agent returns invalid JSON</td><td>Re-run on Opus 4.7. If still invalid: workflow fails.</td></tr><tr><td>Issue creation fails</td><td>Report still written to <code>docs/audits/</code>. Workflow logs warning. Manual cleanup.</td></tr><tr><td>Supabase down (Phase C only)</td><td>Phase A+B still run. Phase C section of report marked "skipped: DB unreachable".</td></tr><tr><td>Token budget exceeded</td><td>Workflow fails before incurring further cost. Sets <code>Budget exceeded</code> label.</td></tr></tbody></table>
+<h3>Cost guardrails</h3>
+<ul><li><strong>Per-run hard limit:</strong> $5. Enforced via Anthropic API budget at the workflow level.</li><li><strong>Per-month hard limit:</strong> $100 across all 3 phases. Enforced via repo-level Anthropic budget.</li><li>If either trips: workflow disables itself + opens an issue.</li></ul>
+<h3>Versioning</h3>
+<p>Each phase ships in its own PR, tagged its own minor version:</p>
+<ul><li>Phase A: v0.1.0 of this spec</li><li>Phase B: v0.2.0</li><li>Phase C: v0.3.0</li></ul>
+<p>Spec lives at <code>docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md</code> and is amended (not replaced) per phase.</p>
+<hr/>
+<h2>Atlas integration (BL-153d, separate spec — referenced for completeness)</h2>
+<p>This spec lives in the new Atlas "Ways of Working" section at:</p>
+<p><code>kanaan-droid.github.io/housezum-process-atlas/wow/</code></p>
+<p>That section is its own ticket: <strong>BL-153d — Atlas "Ways of Working" tab (generator change)</strong>. Out of scope for this spec, but BL-153d is a blocker for "drift audit findings + WOW docs are visible without opening the repo." Once BL-153d ships, the Atlas tab renders:</p>
+<ul><li><a href="ways-of-working.html"><code>WAYS-OF-WORKING.md</code></a></li><li><code>docs/sessions/STANDING-OBLIGATIONS.md</code></li><li><code>docs/ClaudeAccess.md</code></li><li><code>docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md</code> (this doc)</li><li>Any future doc under <code>docs/governance/</code> (new convention; not creating that dir in this spec)</li><li>Latest 7 drift reports from <code>docs/audits/drift-report-*.md</code></li></ul>
+<p>BL-153d work is generator-side change to <code>scripts/generate-roadmap-html.mjs</code> (or sibling); ~2h.</p>
+<hr/>
+<h2>Decisions (all locked 2026-05-22)</h2>
+<table><thead><tr><th>#</th><th>Decision</th><th>Lock</th></tr></thead><tbody><tr><td>1</td><td>BL-153 — no collision confirmed</td><td>LOCKED ✅</td></tr><tr><td>2</td><td>Sub-tickets BL-153a/b/c/d (BL-81 series precedent)</td><td>LOCKED ✅</td></tr><tr><td>3</td><td><strong>Gate-driven rollout, not calendar-driven.</strong> Phase A ships → observe until "signal not noise" → then B+C combined. No fixed timeline.</td><td>LOCKED ✅</td></tr><tr><td>4</td><td>Issue assignee on 🔴 drift: Will only</td><td>LOCKED ✅</td></tr><tr><td>5</td><td>Drift reports stay in repo forever (~5KB/report negligible)</td><td>LOCKED ✅</td></tr><tr><td>6</td><td>Post-commit only (no pre-commit hook). Audit runs in cloud after push.</td><td>LOCKED ✅</td></tr><tr><td>7</td><td>Backfill the 2 known drift events into <code>docs/audits/drift-report-2026-05-22-manual.md</code> this session as the Phase 0 precedent.</td><td>LOCKED ✅</td></tr><tr><td>8</td><td>Agent gets <code>issues: write, pull-requests: write</code> only — no <code>contents: write</code></td><td>LOCKED ✅</td></tr><tr><td>9</td><td>Workflow runs on PRs as well as nightly+push (catches drift at PR time before merge)</td><td>LOCKED ✅</td></tr><tr><td>10</td><td>Phase C: snapshot updates auto-PR'd by agent, Will reviews + merges</td><td>LOCKED ✅</td></tr></tbody></table>
+<hr/>
+<h2>Risks</h2>
+<table><thead><tr><th>Risk</th><th>Likelihood</th><th>Mitigation</th></tr></thead><tbody><tr><td>Agent hallucinates drift that doesn't exist</td><td>Medium</td><td>Strict report schema + validate-report.mjs. Will reviews first week of output before treating as signal.</td></tr><tr><td>Agent misses drift that does exist</td><td>Medium</td><td>Augmentable check set; Will can file BG against the prompt to add a new check.</td></tr><tr><td>Cost overrun</td><td>Low</td><td>$5/run + $100/mo hard caps. Workflow self-disables.</td></tr><tr><td>Secret leakage</td><td>Low</td><td>All secrets via GH Actions Secrets, never logged. Phase C uses read-only role.</td></tr><tr><td>GH Actions free tier exhaustion</td><td>Low</td><td>2000 min/mo free for private repos. Audit run ≈ 3 min. ~10 runs/day = 900 min/mo. Headroom.</td></tr><tr><td>Drift audit itself drifts</td><td>Medium-low</td><td>Spec lives in repo; spec changes go through PR; prompt is versioned.</td></tr><tr><td>False sense of security ("Claude has my back, I don't need to think")</td><td>Medium-high</td><td>This spec explicitly lists what the agent CANNOT check. Will reads that list at sign-off. Drift audit is a safety net, not a substitute for canonical-source-first discipline.</td></tr></tbody></table>
+<hr/>
+<h2>Why this is filed as BL, not TD</h2>
+<p>This is new capability, not debt repayment. BL is correct.</p>
+<p>The drift events it addresses (D-340 axis mismatch, missing docx) are themselves filed as separate TDs:</p>
+<ul><li><code>TD-CLAUDE-CANONICAL-SOURCE-FIRST-DISCIPLINE</code> 🟡 — already exists (D-341)</li><li><code>TD-DOCS-PHANTOM-REFERENCE-housezoom-dd-hardening-plan</code> 🟡 — to be filed after this spec lands</li><li><code>TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-FIVE-DOCS</code> 🔴 — to be filed after this spec lands, blocks Phase 3 completion until reconciled</li></ul>
+<p>BL-153 doesn't close any of these TDs. It prevents the NEXT instance of the same class.</p>
+<hr/>
+<h2>Implementation order (gate-driven)</h2>
+<ol><li><strong>THIS SESSION:</strong> Will reviews v0.1. ✅ All 10 decisions locked.</li><li><strong>THIS SESSION:</strong> Claude.ai web writes <code>docs/audits/drift-report-2026-05-22-manual.md</code> as the Phase 0 backfill — captures the 2 known drift events (axis label drift + missing docx) using the report schema. This becomes the agent's calibration anchor.</li><li><strong>THIS SESSION:</strong> Will commits this spec + the manual drift report to repo.</li><li><strong>NEXT SESSION:</strong> Claude.ai web drafts <code>PROMPT-v0.1.md</code> + <code>REPORT-SCHEMA.md</code>.</li><li><strong>NEXT+1 SESSION:</strong> CC implements <code>validate-report.mjs</code> + <code>.github/workflows/drift-audit.yml</code>. Smoke test manually.</li><li><strong>GATE 1:</strong> Phase A goes live. <strong>Observation period: until signal not noise</strong> (could be 1 day, could be 2 weeks).</li><li><strong>AFTER GATE 1:</strong> Phase B + Phase C combined PR. Phase B is 1h delta on top of A; Phase C is structurally independent but ships in the same PR for reviewer efficiency.</li><li><strong>GATE 2:</strong> Phase B + C live. Observation period: until both produce signal.</li><li><strong>DONE:</strong> All 3 phases operational.</li></ol>
+<p>No calendar commitments. Each gate opens when quality is met, not when time passes.</p>
+<hr/>
+<h2>Sign-off</h2>
+<p><strong>Spec status:</strong> v0.1 LOCKED (2026-05-22, Will) <strong>Next document:</strong> <code>docs/audits/drift-report-2026-05-22-manual.md</code> — backfill drift audit for the 2 known events, written by Claude.ai web this session as the "Phase 0" precedent.</p>
+<hr/>
+<h2>History</h2>
+<table><thead><tr><th>Date</th><th>Version</th><th>Change</th><th>Author</th></tr></thead><tbody><tr><td>2026-05-22</td><td>v0.1 (draft)</td><td>Initial draft</td><td>Claude.ai web (in response to D-340 axis drift + missing-docx events surfaced 2026-05-22)</td></tr><tr><td>2026-05-22</td><td>v0.1 (locked)</td><td>All 10 decisions locked; rollout reframed gate-driven (not calendar-driven)</td><td>Will</td></tr></tbody></table></div>
+</main>
+<footer>
+  HouseZoom.ai Ways of working · Auto-generated from <code>docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

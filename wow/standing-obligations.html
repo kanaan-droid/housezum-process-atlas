@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Standing Obligations</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/" class="active">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Ways of working</a> / STANDING-OBLIGATIONS.md</div>
+  
+  <div class="content"><h1>Standing Obligations</h1>
+<blockquote><p>Cross-session recurring obligations. Read at session start. Update "Last touched" at EOS. File location: <code>docs/sessions/STANDING-OBLIGATIONS.md</code> (general-purpose, permanent home for cross-session obligations).</p>
+<p>Provenance: D-338 (filed 2026-05-19 in Pillar 1 Phase 3 warm-up after second consecutive miss on <code>dd-hardening-tracker.xlsx</code> updates).</p></blockquote>
+<h2>How to use</h2>
+<p><strong>At session start:</strong> read the Open Obligations table. For each row, check whether its trigger applies to the work planned this session.</p>
+<p><strong>At EOS:</strong> for each open obligation, EITHER:</p>
+<ul><li>Update its "Last touched" column to today's date (if it was actioned), OR</li><li>Add a one-line note to the SOS explaining why it wasn't actioned (e.g. "no Pillar 1-5 work this session")</li></ul>
+<p><strong>Soft enforcement:</strong> <code>scripts/docs-check.mjs</code> Check 4 parses this file and surfaces a soft warn if a commit appears to match a trigger but the corresponding row's "Last touched" wasn't bumped in the same commit. Check 4 NEVER fails — it only reminds.</p>
+<h2>Open Obligations</h2>
+<table><thead><tr><th>#</th><th>Obligation</th><th>Trigger</th><th>Closes when</th><th>Last touched</th></tr></thead><tbody><tr><td>1</td><td>Update <code>docs/dd-hardening/dd-hardening-tracker.xlsx</code></td><td>Session ships any Pillar 1-5 work (BL-/TD-/D- entry tagged to a pillar)</td><td>Pillar 5 sign-off</td><td>2026-05-21</td></tr><tr><td>2</td><td>Regenerate Process Atlas (<code>node scripts/generate-roadmap-html.mjs</code> in <code>~/Apps/housezum-app</code>, push from <code>~/Apps/housezum-process-atlas</code>)</td><td>Every session that touches ROADMAP / CHANGELOG / FEATURE-MAP</td><td>Never (permanent)</td><td>2026-05-22</td></tr><tr><td>3</td><td>Bump <code>package.json</code> version</td><td>Every functional ship (code change, not pure paper trail)</td><td>Never (permanent)</td><td>2026-05-22</td></tr><tr><td>4</td><td>Update ROADMAP / CHANGELOG / FEATURE-MAP / PROJECT-STRUCTURE</td><td>Every functional ship</td><td>Never (permanent)</td><td>2026-05-22</td></tr><tr><td>5</td><td>Run <code>node scripts/docs-check.mjs</code> before commit</td><td>Every commit</td><td>Never (permanent)</td><td>2026-05-22</td></tr><tr><td>6</td><td>Write SOS at EOS (<code>docs/sessions/SOS-YYYY-MM-DD.md</code>)</td><td>Every session that ships work</td><td>Never (permanent)</td><td>2026-05-21</td></tr><tr><td>7</td><td>Draft Phase 3 axis prompts for axes 1/3/4/7/8/9/10</td><td>Any Pillar 1 Phase 3 session ending without all 10 axis prompts present in <code>docs/dd-hardening/phase3-prompt-axis-*.md</code></td><td>Pillar 1 Phase 3 sign-off (or all 10 prompts landed)</td><td>2026-05-19</td></tr></tbody></table>
+<h2>Closed Obligations (archive)</h2>
+<p><em>None yet. When an obligation's "Closes when" condition is met, move its row from Open Obligations to this section with a closure date.</em></p>
+<h2>History / amendments</h2>
+<table><thead><tr><th>Date</th><th>Change</th><th>By</th></tr></thead><tbody><tr><td>2026-05-19</td><td>Initial creation (D-338). 6 obligations seeded.</td><td>Will + Claude Desktop</td></tr><tr><td>2026-05-19</td><td>D-340 — added row 7 (Phase 3 axis prompts for axes 1/3/4/7/8/9/10). Priority axes 6/2/5 drafted today; remaining 7 deferred per the agreed scope (A + ii: one prompt per axis, draft priorities first, defer rest informed by Phase 3 session 1 findings).</td><td>Will + Claude Desktop</td></tr><tr><td>2026-05-19</td><td>EOS session 2 — Process Atlas regenerated (575KB → <code>~/Apps/housezum-process-atlas/roadmap/index.html</code>). Rows #1, #2, #3, #4, #5, #6 already at today's date from prior commits this session — no cell edits needed. Row #7 (Phase 3 axis prompts) stays at 2026-05-19 (creation date), unchanged. Atlas push pending Will.</td><td>Will + Claude Desktop</td></tr><tr><td>2026-05-19</td><td>D-341 — Pillar 1 Phase 3 Axis 6 walkthrough EOS. Rows #1, #2, #4, #5, #6 bumped to 2026-05-19. Row #3 NOT bumped (paper trail only, no code change — see SOS exception note). Row #7 NOT bumped (trigger doesn't apply — session walked existing 6/2/5 prompts, didn't draft missing 1/3/4/7/8/9/10; deferred per Open Decisions r13 / #9 — informed by Phase 3 session 1 findings to be done in future session). New WOW subsection "Schema-first discipline" added in same EOS commit.</td><td>Will + Claude (Claude.ai web + Chrome MCP)</td></tr><tr><td>2026-05-21</td><td>D-342 + D-343 EOS. Rows #1, #2, #3, #4, #5, #6 bumped to 2026-05-21. Row #3 IS bumped this time (functional ships: D-342 dropped <code>deals.owner_user_id</code>, D-343 added 12 RLS policies + 2 indexes; package.json 2.6.9 → 2.6.10 → 2.6.11). Row #7 NOT bumped — Phase 3 axis prompts for axes 1/3/4/7/8/9/10 still undrafted; session focused on closing 5 🔴 BGs from Axis 5 instead. New WOW Commandment #11 added (full DB schema scan before any schema change). New permanent doc <code>docs/ClaudeAccess.md</code> added (Claude capability matrix per surface).</td><td>Will + Claude (Claude.ai web + Chrome MCP)</td></tr><tr><td>2026-05-22</td><td>D-345 functional ship (Atlas generator refactor + WOW section, closes TD-26 + TD-26b). Rows #3, #4, #5 bumped to 2026-05-22 (package.json 2.6.11 → 2.6.12; ROADMAP/CHANGELOG/PROJECT-STRUCTURE updated; docs:check before commit). Row #1 NOT bumped — no Pillar 1-5 work (D-345 is governance-infrastructure, not Pillar). Row #2 NOT bumped on the housezum-app side this commit — Atlas regen is Will's per dispatch (he runs <code>npm run docs:html</code> + pushes himself); CC did regen-and-diff as a validation step but those changes are sitting in atlas working tree, not pushed. Will bumps row #2 when he pushes the atlas regen. Row #6 NOT bumped — no SOS this session. Row #7 NOT bumped — axes still undrafted; the axis-label drift (TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS) means canonical numbering must reconcile first. <strong>D-345 deliverables:</strong> <code>scripts/generate-atlas-section.mjs</code> (NEW, ~870 LoC, 3 layouts) + <code>scripts/lib/atlas-section-config.mjs</code> (NEW, shared config) + 4 old generators moved to <code>scripts/_DEPRECATED/</code> with README + <code>scripts/generate-atlas-index.mjs</code> consumes shared config + package.json scripts retain names (now invoke new generator) + new WOW Atlas section <code>/wow/</code> with 5 governance docs + rolling drift-reports sub-section.</td><td>Will + Claude (Claude.ai web spec + CC implementation)</td></tr><tr><td>2026-05-22</td><td>D-344 paper-trail commit (earlier this session). Rows #2, #4, #5 bumped to 2026-05-22 (session touched ROADMAP/CHANGELOG/PROJECT-STRUCTURE + ran docs:check before commit + Atlas regen pending Will per Step 6 reminder). Row #1 NOT bumped — no Pillar 1-5 functional work this session (BL-153 spec filing is corrective-infra paper trail, not Pillar 1-5 ship per tracker row tagging). Row #3 NOT bumped — paper trail only, no code change. Row #6 NOT bumped — no SOS this session (Will closes the broader session arc separately). Row #7 NOT bumped — axes still undrafted; the axis-label drift surfaced this session (TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS 🔴) means the canonical axis numbering must be reconciled before drafting any further axis prompts; row 7's referenced axis set (1/3/4/7/8/9/10) is itself drifted and may need rewriting after recovery strategy decision. <strong>Two new artifacts:</strong> <code>docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md</code> (3-phase drift audit agent spec v0.1 LOCKED) + <code>docs/audits/drift-report-2026-05-22-manual.md</code> (Phase 0 backfill drift audit). <strong>2 TDs filed:</strong> TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS 🔴 + TD-DOCS-PHANTOM-REFERENCE-housezoom-dd-hardening-plan 🟡.</td><td>Will + Claude (Claude.ai web + CC)</td></tr></tbody></table></div>
+</main>
+<footer>
+  HouseZoom.ai Ways of working · Auto-generated from <code>docs/sessions/STANDING-OBLIGATIONS.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

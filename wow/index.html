@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Ways of working</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/" class="active">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  
+  
+  <div class="content"><h1>Ways of working</h1>
+<p>Governance docs — Commandments, standing obligations, Claude capability matrix, drift-audit specs. Read first at session start. Latest 7 drift reports surfaced as a rolling subsection.</p>
+<h2>Read these in order at session start</h2>
+<ul><li><a href="ways-of-working.html">WAYS-OF-WORKING.md</a> — The 11 Commandments + governance protocols</li><li><a href="standing-obligations.html">STANDING-OBLIGATIONS.md</a> — Recurring obligations + Last touched dates</li></ul>
+<h2>Active governance specs</h2>
+<ul><li><a href="bl-153-spec-background-drift-audit-agents.html">BL-153-Spec-Background-Drift-Audit-Agents.md</a></li><li><a href="bl-153d-spec-atlas-ways-of-working-tab.html">BL-153d-Spec-Atlas-Ways-of-Working-Tab.md</a></li></ul>
+<h2>Drift reports</h2>
+<p>Latest 1 drift report (<a href="audits/index.html">all reports →</a>):</p>
+<ul><li><a href="audits/drift-report-2026-05-22-manual.html">2026-05-22 — Drift Audit Report — 2026-05-22 (Manual / Phase 0 Backfill)</a></li></ul>
+<hr/>
+<p>Last regenerated: 2026-05-22</p></div>
+</main>
+<footer>
+  HouseZoom.ai Ways of working · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>
