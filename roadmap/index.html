@@ -335,20 +335,20 @@ const DATA = {
       "added": "2026-05-02"
     },
     {
-      "id": "TD-26",
-      "title": "Refactor Atlas HTML generators into a single config-driven script",
-      "desc": "Currently 4 near-identical generators after BL-134/D-291: generate-roadmap-html.mjs, generate-architecture-html.mjs, generate-data-environments-html.mjs, generate-legal-compliance-html.mjs. Each has its own copy of the template HTML, CSS variables, cross-link rewriter, etc. Refactor to a single generate-atlas-html.mjs that takes a config block (source dir, output dir, theme, page title, known-docs set) and emits HTML for any docs tree. Now urgent — see TD-26b.",
-      "files": "scripts/generate-atlas-*.mjs, scripts/atlas/ (NEW dir)",
-      "tag": "compliance",
-      "added": "2026-04-29"
+      "id": "~~TD-26~~",
+      "title": "~~Refactor Atlas HTML generators into a single config-driven script~~ — CLOSED 2026-05-22 → D-345 (BL-153d). 4 generators collapsed into scripts/generate-atlas-section.mjs (single dispatcher) + scripts/lib/atlas-section-config.mjs (shared config array). Layouts: single-page (roadmap) / multi-page (arch/data-env/legal/wow) / rolling (augment for drift reports). Old generators moved to scripts/_DEPRECATED/ with README. ~50% LoC reduction.",
+      "desc": "scripts/generate-atlas-section.mjs, scripts/lib/atlas-section-config.mjs, scripts/_DEPRECATED/",
+      "files": "2026-04-29",
+      "tag": "infra",
+      "added": ""
     },
     {
-      "id": "TD-26b",
-      "title": "Generator-consolidation escalation — three (now four) near-identical clones",
-      "desc": "Filed 2026-04-30 with BL-134/D-291. The fourth clone (generate-legal-compliance-html.mjs) intensifies TD-26: every new section duplicates ~500 LoC of template + converter + rewriter + lonely-landing logic. Inconsistent nav across generators is already showing (each generator hardcodes the section list in its \u003cnav\u003e block — Legal & Compliance is in its own nav but missing from data-environments/architecture/roadmap navs until they regenerate against a config-driven base). Promote TD-26 to active before the fifth clone lands. Scope: extract the template + converter + KNOWN_DOCS + lonely-landing into scripts/atlas/render.mjs; thin per-section wrappers reduce to ~30 LoC each (slug, source dir, atlas dir, nav-active flag); \u003cnav\u003e block builds from ATLAS_SECTIONS so adding a section auto-updates every page's nav.",
-      "files": "scripts/generate-atlas-*.mjs, scripts/atlas/ (NEW dir)",
+      "id": "~~TD-26b~~",
+      "title": "~~Generator-consolidation escalation — three (now four) near-identical clones~~ — CLOSED 2026-05-22 → D-345 (BL-153d). Resolved alongside parent TD-26. Inconsistent-nav drift fixed — nav now built from shared ATLAS_SECTIONS config, every page lists every section, current section auto-marked active. Adding a new section is one config entry (~30 lines). Legal-compliance footer source-path bug surfaced + fixed during refactor (old generator hardcoded INDEX.md even when lonely-landing promoted a different .md).",
+      "desc": "scripts/generate-atlas-section.mjs, scripts/lib/atlas-section-config.mjs, scripts/_DEPRECATED/",
+      "files": "2026-04-30",
       "tag": "compliance",
-      "added": "2026-04-30"
+      "added": ""
     },
     {
       "id": "BG-85",
@@ -3044,6 +3044,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-345",
+      "title": "Atlas generator refactor + WOW section (BL-153d, closes TD-26 + TD-26b)",
+      "desc": "Collapsed 4 near-identical Atlas section generators (~1916 LoC across generate-{roadmap,architecture,data-environments,legal-compliance}-html.mjs) into one config-driven generator (scripts/generate-atlas-section.mjs) + shared config (scripts/lib/atlas-section-config.mjs). 3 layout types: single-page (roadmap) preserves the prior generator's HTML template + parser verbatim → roadmap output byte-identical except for the shared nav; multi-page (architecture / data-environments / legal-compliance / wow) shares one MD converter + pageShell + KNOWN_DOCS cross-link rewriter + lonely-landing logic; rolling (used as augment) handles time-series content like drift reports — picks newest-N by date glob + sub-index page. Old generators moved to scripts/_DEPRECATED/\u003cname\u003e.mjs.deprecated per Commandment #6 (no deletions without approval; rollback via git mv). package.json scripts unchanged in name (docs:html:roadmap etc.) — they now invoke the new generator with section-id arg; docs:html:wow added; docs:html chains generate-atlas-section.mjs all && docs:html:atlas-index. generate-atlas-index.mjs updated to consume the shared config (1-line import + 5-line shape translation; card HTML untouched so existing 5 cards stay byte-identical). New WOW section (BL-153d): governance docs surfaced at /wow/ with 5 sources (WAYS-OF-WORKING.md / STANDING-OBLIGATIONS.md / ClaudeAccess.md [skipped — file doesn't exist yet] / BL-153 spec / BL-153d spec) + rolling drift-report augment at /wow/audits/ (latest 7 from docs/audits/drift-report-*.md glob; currently 1 — the 2026-05-22 manual Phase 0 backfill). Synthetic landing page generated by tool (no INDEX.md source) lists \"Read first\" docs + active governance specs + drift-report sub-index link. Nav consistency fix (TD-26b's other call-out): nav was previously hardcoded per-generator (3 links each, drifting); now built from shared ATLAS_SECTIONS so every page shows every section + current marked active. Latent bug surfaced + fixed during refactor: legal-compliance footer source-path hardcoded INDEX.md even when lonely-landing promoted ARCHITECTURE.md to index.html — refactored generator computes from actual source filename. Diff against atlas baseline (post-regen verification): 4 existing sections render byte-identical bodies; nav + 1 footer fix are the only changes. Boundary: This commit ships the housezum-app side (generators + config + paper trail). Will runs node scripts/generate-roadmap-html.mjs-equivalent (npm run docs:html) himself + pushes Atlas repo regen per dispatch — CC does not push Atlas. Note: docs/ClaudeAccess.md is referenced in BL-153d spec sources but does not exist in repo yet; generator skips missing sources gracefully with a warning. Filing as future addition under WOW once authored. package.json 2.6.11 → 2.6.12 (functional ship — new code, refactored generator).",
+      "completed": "NEW scripts/generate-atlas-section.mjs, NEW scripts/lib/atlas-section-config.mjs, NEW scripts/_DEPRECATED/README.md, MOVED 4 old generators to scripts/_DEPRECATED/*.deprecated, MODIFIED scripts/generate-atlas-index.mjs (read shared config), MODIFIED package.json (script invocation + version bump), MODIFIED ROADMAP.md (TD-26 + TD-26b closures + D-345 row), CHANGELOG.md, PROJECT-STRUCTURE.md, docs/sessions/STANDING-OBLIGATIONS.md",
+      "tag": "compliance"
+    },
     {
       "id": "D-344",
       "title": "BL-153 spec v0.1 LOCKED + Phase 0 manual drift report filed + 2 TDs filed (paper trail only)",
