@@ -135,7 +135,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-21';
+const LAST_UPDATED = '2026-05-22';
 const DATA = {
   "inProgress": [
     {
@@ -276,6 +276,14 @@ const DATA = {
     }
   ],
   "nextUp": [
+    {
+      "id": "BL-153",
+      "title": "Background drift audit agents (3-phase nightly GH Actions)",
+      "desc": "Filed as corrective action for two drift events surfaced 2026-05-22: (1) D-340 axis labels (6/2/5) did not match the canonical 10-axis DD checklist in dd-hardening-tracker.xlsx § Pillar 1 Detail § Section 3 (canonical names for those numbers are Transaction checklist / Deal stages / Signing — recipient). Drift compounded through D-341/D-342/D-343 — 23 BG tickets (BG-90..104, BG-105..114) filed under wrong axis labels. (2) housezoom-dd-hardening-plan-v0.2.docx referenced by tracker as canonical hardening-plan source but does not exist anywhere in repo, GitHub, or on Will's Mac. Both share root cause: no automated cross-validation between paper-trail artifacts. Spec defines 3 layered phases — A paper-trail drift audit (~$12/mo, 15 checks across ROADMAP/CHANGELOG/SOS/tracker/STANDING-OBLIGATIONS/findings/WOW/package.json/ClaudeAccess; ships in ~3h), B doc-reference validator extending A (+$10/mo, +1h, catches phantom-docx class), C schema-vs-docs sync (+$9/mo, +4h, catches D-342 dual-column class via Supabase read-only role + pg_dump diff vs DB-SCHEMA.md). All run nightly 04:00 UTC + on push + on PR; write reports to docs/audits/; open GitHub issues only on 🔴 findings; no auto-commits. 10 decisions locked 2026-05-22 — gate-driven rollout (Phase A → observe until \"signal not noise\" → Phase B+C combined PR); issue assignee Will only; reports stay in repo forever; post-commit only (no pre-commit hooks). Sub-tickets: BL-153a (Phase A workflow + PROMPT-v0.1.md + REPORT-SCHEMA.md + validate-report.mjs), BL-153b (Phase B extension), BL-153c (Phase C schema sync), BL-153d (Atlas \"Ways of Working\" tab — separate spec, ~2h generator-side change). Spec v0.1 LOCKED. Total recurring cost ~$60/mo. Recovers ~50h/year of Will's time at observed drift cadence (2 events in 2 weeks).",
+      "files": "docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md (LOCKED v0.1), future: scripts/audit/drift-audit/*, .github/workflows/drift-audit.yml, docs/audits/drift-report-*.md",
+      "tag": "admin",
+      "added": "2026-05-22"
+    },
     {
       "id": "~~BL-107~~",
       "title": "~~Seed property cleanup~~",
@@ -1783,6 +1791,30 @@ const DATA = {
   ],
   "techDebt": [
     {
+      "id": "🔴 TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS",
+      "title": "D-340 axis prompts used numbers 6/2/5 with labels that don't match the canonical tracker § Pillar 1 Detail § Section 3",
+      "desc": "Surfaced 2026-05-22 during session-start audit. D-340 drafted Phase 3 axis prompts for axes 6/2/5 using labels \"Friction States\" / \"Compliance Gating\" / \"Multi-Agent Ownership\" — but the canonical 10-axis DD checklist in dd-hardening-tracker.xlsx § Pillar 1 Detail § Section 3 has different names for those numbers: Axis 6 = Transaction checklist, Axis 2 = Deal stages, Axis 5 = Signing — recipient. The labels D-340 used were derived from BL-144 spec § 5.4 friction taxonomy / compliance distribution / 8-agent distribution (likely sourced from the missing housezoom-dd-hardening-plan-v0.2.docx — see sibling TD), NOT from the tracker. Drift compounded through D-341 + D-342 + D-343 — 23 BG tickets (BG-90..104 + BG-105..114) filed under wrong axis labels in ROADMAP, findings doc, CHANGELOG, SOS, tracker. 9 files affected: docs/dd-hardening/phase3-prompt-axis-{6,2,5}-*.md (3); docs/dd-hardening/phase-3-axis-6-findings.md (1); docs/sessions/SOS-2026-05-19.md (1); docs/sessions/SOS-2026-05-21.md (1); ROADMAP.md D-341/342/343 Done rows (1); CHANGELOG.md D-340/341/342/343 entries (1); docs/dd-hardening/dd-hardening-tracker.xlsx Master Tracker Phase 3 row (1). Substantive impact: bugs filed remain VALID (only the axis labels are wrong); under canonical numbering, actual Phase 3 coverage is partial Axis 2 (D-341) + Axis 7 (D-342/D-343) — axes 1/3/4/5/6/8/9/10 have no coverage (STANDING-OBLIGATIONS row 7 lists the wrong-scheme axes 1/3/4/7/8/9/10). Blocks Phase 3 completion until reconciled. Recovery options under consideration: (a) rename prompts/findings/ROADMAP entries to match canonical numbers — preserves history with corrected labels; (b) add cross-reference table to tracker mapping D-340 labels → canonical labels — lowest cost; (c) treat D-340..D-343 as \"Phase 3 pre-work\" and the formal 10-axis sweep starts fresh — cleanest semantically. Decision deferred to next session (after Phase 3 coverage audit completes). See docs/audits/drift-report-2026-05-22-manual.md § Finding 1 for full diagnosis.",
+      "files": "docs/dd-hardening/phase3-prompt-axis-{6,2,5}-*.md, docs/dd-hardening/phase-3-axis-6-findings.md, docs/sessions/SOS-2026-05-19.md, docs/sessions/SOS-2026-05-21.md, ROADMAP.md, CHANGELOG.md, docs/dd-hardening/dd-hardening-tracker.xlsx",
+      "tag": "compliance",
+      "added": "2026-05-22"
+    },
+    {
+      "id": "🟢 TD-DOCS-CHECK-WINDOW-AWARENESS",
+      "title": "docs:check v2.6.11..HEAD window flags prior commits' trigger compliance even when subsequent commits cured the drift",
+      "desc": "Filed 2026-05-22 with D-344. Same class as TD-DOCS-CHECK-FOLLOWUP-COMMIT-AWARENESS (D-332). Recurring observation: when commit N adds a docs/sessions/ or scripts/ file without bumping PROJECT-STRUCTURE.md, the next commit N+1 can land the PROJECT-STRUCTURE update — but docs:check is per-commit-strict and still flags commit N as a trigger violation until the next tag advances the baseline past it. Hit at v2.6.2 (resolved via tag advance), at D-342 commit (resolved via tag advance), and again at D-344 commit (this filing) where commit 11c0707 EOS commit was followed by D-344 PROJECT-STRUCTURE bundle. Fix options: (a) narrow window to HEAD only — only check the working-tree commit, not the window. Loses the \"warn early\" property but eliminates false-positives. (b) special-case post-tag EOS commits — exempt commits whose subject starts with EOS or docs(SOS) from per-commit strict trigger check. (c) make trigger compliance cumulative — accept any PROJECT-STRUCTURE update within the window as curing any prior trigger miss within the same window. Recommended: (c) — cumulative semantics match how the paper-trail discipline is actually practiced. ~30 min to implement in scripts/docs-check.mjs Check 1. Cost-of-not-fixing: every session where an EOS commit lands a new SOS/tracker-update file forces a follow-up false-positive in docs:check, eroding \"must exit 0\" gate confidence and requiring repeated stop-and-surface dispatches.",
+      "files": "scripts/docs-check.mjs (Check 1 trigger compliance logic)",
+      "tag": "compliance",
+      "added": "2026-05-22"
+    },
+    {
+      "id": "🟡 TD-DOCS-PHANTOM-REFERENCE-housezoom-dd-hardening-plan",
+      "title": "housezoom-dd-hardening-plan-v0.2.docx referenced by tracker but does not exist anywhere",
+      "desc": "Surfaced 2026-05-22 during Axis Label Drift investigation. Tracker dd-hardening-tracker.xlsx Master Tracker sheet references \"Hardening Plan doc\" / housezoom-dd-hardening-plan-v0.2.docx as the linked detail for \"Setup / DD-hardening plan v0.2\" and \"Investor-ready / Pillar 1+2 DD-ready\" rows; Changelog v0.1 entry references \"hardening plan v0.2 delivered.\" File does NOT exist in git ls-files, on GitHub, or on Will's Mac (confirmed 2026-05-22). Likely drafted in ChatGPT or Claude during a 2026-05-17 session and treated as canonical source for tracker structure (5 pillars × 5 phases / 10-axis DD checklist / 12 critical paths / 7 weak spots) but never committed. Probably contributed to the axis label drift (sibling TD) — D-340 axis-numbering scheme may have come from this docx; cannot verify. Recommendation: (a) declare tracker self-sufficient — remove \"Hardening Plan doc\" phantom references from tracker (Master Tracker + Changelog sheets) and add a History note explaining v0.2 docx was an early-stage draft that did not survive into canonical paper trail. Alternative (b) reconstruct missing plan from tracker + ROADMAP + CHANGELOG and commit — rejected as the tracker IS the canonical source now. ~30 min cleanup. See docs/audits/drift-report-2026-05-22-manual.md § Finding 2 for full diagnosis.",
+      "files": "docs/dd-hardening/dd-hardening-tracker.xlsx (Master Tracker + Changelog sheets)",
+      "tag": "ai",
+      "added": "2026-05-22"
+    },
+    {
       "id": "🟡 TD-DOCS-DBSCHEMA-SEED-SUMMARY-LINES",
       "title": "EOS protocol should enforce updates to DB-SCHEMA.md summary-style cells, not just column-level notes",
       "desc": "Filed 2026-05-17 (corrected at commit e6c0aa0). BL-132 (D-312, 2026-05-08) and BL-138 wave 1+2A (D-314 + D-318) shipped major changes to workflow_templates data but did not update the \"Seeded templates:\" summary line at DB-SCHEMA.md L1052 or the matching prose in the stages column Notes at L1039. Both lines continued to state Switzerland was \"pre-canonical, awaits BL-132\" for 9 days after BL-132 shipped, and across two further BL-138 waves. The drift caused a real planning-session confusion on 2026-05-17 (~30 min lost re-deriving facts already in CHANGELOG.md). Root cause: EOS protocol enforces updates to DB-SCHEMA.md column-level rows but not to free-prose \"Seeded:\" / \"Examples:\" / summary-style cells inside the same table — physically adjacent in the file but treated differently by the existing docs:check rules. Fix: Extend EOS protocol (and/or docs:check) to flag commits that modify workflow_templates, compliance_rules, or other tables with a \"Seeded:\" summary line if those summary lines have not been touched in the same commit. Implementation could be a simple grep-based check: \"if a migration touches table X, has the 'Seeded templates' or 'Examples' line for table X in DB-SCHEMA.md been edited in this commit window?\" Cost-of-fix: ~1-2h to add the check to scripts/docs-check.mjs or wherever the trigger-compliance check lives, plus codify in WAYS-OF-WORKING.md § Documentation Governance. Cost-of-not-fixing: Recurring drift on summary lines every time a BL retrofits seeded data. Already cost ~30 min this week; will recur each time a new country/region template ships.",
@@ -3002,6 +3034,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-344",
+      "title": "BL-153 spec v0.1 LOCKED + Phase 0 manual drift report filed + 2 TDs filed (paper trail only)",
+      "desc": "Two governance drift events surfaced during 2026-05-22 session-start audit: (1) D-340 axis label drift — Phase 3 axis prompts used numbers 6/2/5 with labels \"Friction States\" / \"Compliance Gating\" / \"Multi-Agent Ownership\" that do not match the canonical 10-axis DD checklist in dd-hardening-tracker.xlsx § Pillar 1 Detail § Section 3 (canonical names: Transaction checklist / Deal stages / Signing — recipient). Drift compounded through D-341/D-342/D-343; 23 BGs filed under wrong axis labels across 9 docs. Bugs remain VALID; only labels are wrong. (2) Phantom docx reference — housezoom-dd-hardening-plan-v0.2.docx referenced by tracker as canonical hardening-plan source but does not exist anywhere (repo, GitHub, Will's Mac). Likely drafted in ChatGPT/Claude during a prior session and treated as canonical without commit. Root cause for both: no automated cross-validation between paper-trail artifacts. 4 new artifacts filed this session: (a) NEW docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md (~25KB, v0.1 LOCKED) — 3-phase nightly GH Actions drift audit (Phase A paper-trail $12/mo / Phase B doc-reference validator +$10/mo / Phase C schema-vs-docs sync +$9/mo via Supabase read-only role); 10 decisions locked; gate-driven rollout; sub-tickets BL-153a/b/c/d. (b) NEW docs/audits/drift-report-2026-05-22-manual.md — Phase 0 manual backfill drift audit; structured per spec schema; serves as agent calibration anchor when BL-153a goes live. (c) NEW Tech Debt row TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS 🔴 — blocks Phase 3 completion; recovery strategy decision deferred to next session after Phase 3 coverage audit. (d) NEW Tech Debt row TD-DOCS-PHANTOM-REFERENCE-housezoom-dd-hardening-plan 🟡 — ~30 min cleanup (remove phantom refs from tracker + History note). No code change. No package.json bump. No tag. Next session: Phase 3 coverage audit + axis recovery strategy decision (a/b/c per drift report Finding 1).",
+      "completed": "NEW docs/specs/BL-153-Spec-Background-Drift-Audit-Agents.md, NEW docs/audits/drift-report-2026-05-22-manual.md, MODIFIED ROADMAP.md (BL-153 + 2 TDs + D-344 row), CHANGELOG.md, PROJECT-STRUCTURE.md, docs/sessions/STANDING-OBLIGATIONS.md",
+      "tag": "compliance"
+    },
     {
       "id": "D-343",
       "title": "RLS read-scope fix on deals / leads / requirements (closes BG-105 / BG-113 / BG-114)",
