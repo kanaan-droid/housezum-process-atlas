@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Phase 3 Coverage Audit — per canonical DD axis</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/" class="active">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Ways of working</a> / phase-3-coverage-audit.md</div>
+  
+  <div class="content"><h1>Phase 3 Coverage Audit — per canonical DD axis</h1>
+<blockquote><p><strong>Filed:</strong> 2026-05-22 (session 6, paper-trail) — Will + Claude (Claude.ai web) <strong>Purpose:</strong> Establish, per the canonical 10-axis DD checklist in <code>dd-hardening-tracker.xlsx</code> § Pillar 1 Detail § Section 3, what prior MCP-verified ships and BG fixes substantively cover each axis. Output drives the axis-label drift recovery decision (TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS 🔴) and the unblock of Standing Obligation #7. <strong>Evidence sources:</strong> <code>/mnt/project/ROADMAP.md</code> (3 568 lines), <code>/mnt/project/CHANGELOG.md</code>, <code>/mnt/project/FEATURE-MAP.md</code>, dd-hardening tracker xlsx Pillar 1 sheets. No live MCP or DB inspection. <strong>Note on "MCP-verified":</strong> "Yes" = a D-### explicitly stated MCP/browser verification was run; "Partial" = verification was scoped (one role / one fixture / one path); "No" = code shipped but no MCP verification on record.</p></blockquote>
+<hr/>
+<h2>Drift reconciliation (canonical ↔ D-340 drifted labels)</h2>
+<blockquote><p><strong>This section is the canonical reconciliation point</strong> for the axis-label drift surfaced 2026-05-22 (TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS 🔴, closed via D-347). D-340 (2026-05-19) drafted Phase 3 axis prompts using axis numbers 6/2/5 with labels that do not match the canonical 10-axis DD checklist in <code>dd-hardening-tracker.xlsx</code> § Pillar 1 — Detail § Section 3. The substantive work done at D-340/D-341/D-342/D-343 remains VALID (15+ BGs filed, real findings); only the axis LABELS are wrong. Historical docs (D-340 prompts, D-341 findings, SOSes, ROADMAP/CHANGELOG D-341/342/343 rows) are FROZEN per Will's 2026-05-22 (b)+(c) decision — they retain drifted labels as immutable paper trail. This table is the single durable mapping.</p></blockquote>
+<table><thead><tr><th>Number</th><th>D-340 drifted label</th><th>Canonical label (Pillar 1 § 3)</th><th>Drift filed</th><th>Status</th></tr></thead><tbody><tr><td>2</td><td>Compliance Gating</td><td><strong>Deal stages</strong></td><td>2026-05-22 (TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS)</td><td>Frozen — historical docs not retroactively edited per (b)</td></tr><tr><td>5</td><td>Multi-Agent Ownership</td><td><strong>Signing — recipient</strong></td><td>2026-05-22</td><td>Frozen</td></tr><tr><td>6</td><td>Friction States</td><td><strong>Transaction checklist</strong></td><td>2026-05-22</td><td>Frozen</td></tr></tbody></table>
+<p><strong>Drift origin:</strong> D-340 labels likely sourced from BL-144 spec § 5.4 friction taxonomy / compliance distribution / 8-agent distribution — and the missing <code>housezoom-dd-hardening-plan-v0.2.docx</code> (referenced by tracker but does not exist; see TD-DOCS-PHANTOM-REFERENCE-housezoom-dd-hardening-plan 🟡).</p>
+<p><strong>Cross-references:</strong></p>
+<ul><li>Drift report (Phase 0 manual backfill): <code>docs/audits/drift-report-2026-05-22-manual.md</code></li><li>TD closure: ROADMAP § Tech Debt — TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS (closed D-347, 2026-05-22)</li><li>Tracker pointer: <code>dd-hardening-tracker.xlsx</code> § Master Tracker r19 Notes</li><li>Forward direction: D-340..D-343 reclassified as <strong>Phase 3 pre-work</strong> per (c); formal Phase 3 sweep begins next session with 10 canonical axis prompts authored using this audit as baseline.</li></ul>
+<p><strong>Disposition of the 23 BGs filed under drifted labels (BG-90..104 + BG-105..114):</strong> Substantive bug content VALID. Per-BG axis remapping NOT scoped to D-347 — surfaces in next session's per-canonical-axis Phase 3 walkthroughs (each walkthrough sweeps existing BGs under that canonical axis and remaps as needed).</p>
+<hr/>
+<h2>TL;DR — Coverage matrix</h2>
+<table><thead><tr><th>#</th><th>Canonical axis</th><th>Coverage</th><th>Verdict</th><th>Phase 3 prompt ready?</th></tr></thead><tbody><tr><td>1</td><td>Daily Plan</td><td>Substantive (BL-38, BL-38b, BL-97 wiring)</td><td><strong>READY</strong></td><td>YES — prompt can be drafted now</td></tr><tr><td>2</td><td>Deal stages</td><td>Substantive (BL-68/69/70, BL-71, D-341 friction walkthrough)</td><td><strong>READY (with caveat)</strong></td><td>YES — but D-341 findings (15 BGs filed) should be incorporated</td></tr><tr><td>3</td><td>Documents</td><td>Substantive (BL-70 polymorphic, BL-89, doc scan)</td><td><strong>READY</strong></td><td>YES</td></tr><tr><td>4</td><td>Signing — agent</td><td>Substantive (BL-81 series a-i, 22+ ships)</td><td><strong>READY</strong></td><td>YES</td></tr><tr><td>5</td><td>Signing — recipient</td><td>Substantive (NU-8/10/11, BL-81i, D-342+D-343 RLS)</td><td><strong>READY</strong></td><td>YES — D-342/D-343 already touched this axis</td></tr><tr><td>6</td><td>Transaction checklist</td><td>Substantive (BL-73, BL-73b shipped; BL-73c deferred)</td><td><strong>READY (with caveat)</strong></td><td>YES — but BL-73c (co-broke + conflict detection) still open</td></tr><tr><td>7</td><td>Permissions</td><td>Substantive (BG-84 P0 RLS, BG-85, D-342, D-343, agent<em>can</em>* flags)</td><td><strong>READY</strong></td><td>YES — D-343 already touched this axis (Nina 26→3 deals fix)</td></tr><tr><td>8</td><td>i18n / locale</td><td><strong>Heavy</strong> (BL-138 CH cantonal, BL-132, BL-120, BG-50 wired, BG-60 errors)</td><td><strong>READY</strong></td><td>YES — but coverage is so deep this axis may not need a prompt; spot-checks instead</td></tr><tr><td>9</td><td>Mobile (iOS)</td><td>Substantive (BL-1 Capacitor, BL-81h Part A, walkthrough safe-area, voice fixes)</td><td><strong>READY</strong></td><td>YES</td></tr><tr><td>10</td><td>Console + network</td><td>Partial (BG-83/84/85 audit scripts; BL-105 LLM 4xx; widespread console-error noise still on record)</td><td><strong>WEAK</strong></td><td>PARTIAL — prompt can be drafted, expect this to surface as the highest-finding axis</td></tr></tbody></table>
+<p><strong>Headline:</strong> All 10 axes have substantive code coverage. None are in the "ZERO coverage" bucket that the earlier session-5 claim suggested. The work for Phase 3 is <strong>walkthrough verification</strong>, not new feature builds. Axis 10 is the weakest; axis 8 the strongest.</p>
+<hr/>
+<h2>Axis 1 — Daily Plan</h2>
+<p><strong>Canonical scope (tracker):</strong> Cron ran in last 24h; plan exists per agent; correct first name; tasks point to real deals.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>D-106 / BL-38</strong></td><td>2026-03-15</td><td><code>agent_daily_plans</code> table, deterministic scoring engine (9 task types), 1 AM UTC cron, dashboard summary card, <code>/daily-plan</code> page, Claude Haiku narrative, market-aware scoring (UAE 7-day, EU weekday-only)</td><td>Yes (1 AM UTC cron run verified)</td></tr><tr><td><strong>D-109 / BL-38b</strong></td><td>2026-03-16</td><td><code>/daily-plan</code> full page with Mark Done + Snooze (1h/4h/tomorrow), 5-min polling, auto-refresh triggers (gmail/sync, deals/confirm-stage), time-aware greeting, completed/snoozed footer</td><td>Yes (mid-session iteration)</td></tr><tr><td><strong>D-182 / BL-97 Phase B</strong></td><td>2026-04-13</td><td>actionCardGeneratorService wired to Deal Orchestrator (Layer 3 Planning Agent), dedup + ceiling check</td><td>Yes (Twilio SID returned end-to-end)</td></tr><tr><td><strong>D-283 / BG-84</strong></td><td>2026-04-29</td><td>P0 RLS fix: <code>agent_daily_plans</code> had <code>roles={public}</code> + <code>qual=true</code> — every authenticated user saw every plan. Migration scoped to <code>TO service_role</code></td><td>Yes (MCP: Jean@SaintGermain reading UAE plans)</td></tr></tbody></table>
+<p><strong>BGs touched:</strong> BG-84 (P0 RLS leak, CLOSED), BG-50/W5 i18n (daily-plan surface wired)</p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li>WhatsApp auto-refresh trigger skipped (BL-38b deferred) — no <code>agent_id</code> in webhook context. Tracker says not a DD blocker.</li><li>BL-105 (Anthropic API failure mode handling) — if Claude Haiku is down at 1 AM UTC, plan generation silently surfaces a generic 500. Open.</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3.</strong> Substantive coverage on cron, scoring, UI, RLS. Walkthrough should confirm cron actually ran in last 24h per seeded agent, first names match <code>agent_profiles.full_name</code>, tasks point to real deal IDs (not orphan UUIDs).</p>
+<hr/>
+<h2>Axis 2 — Deal stages</h2>
+<p><strong>Canonical scope (tracker):</strong> Every Swiss demo deal has valid stage; workflow_instance present; stage history populated.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>BL-68/69/70 series</strong></td><td>2026-Q1</td><td>Admin Deal Kanban (drag/drop), DealDetailPanel (Overview + Documents tabs), Stage suggestions (event-driven Intel Cards), Admin Confirmations page, Role-based deal permissions (<code>agent_can_edit_stage/value/upload_docs/confirm_stages</code>)</td><td>Yes (tracker § 1 marks all READY)</td></tr><tr><td><strong>BL-71</strong></td><td>2026-03-18</td><td><code>computeDealHealth</code> pure function + <code>DealHealthBadge</code> (green/amber/red), wired into admin kanban + agent dashboard</td><td>Yes</td></tr><tr><td><strong>D-341 / Axis 6 walkthrough</strong></td><td>2026-05-19</td><td>Friction state probe: F3 Lex Koller red, F10 GEAK missing, F7 seller traveling. Confirmed 🔴 hard-stop bypass — direct PATCH <code>deals.current_stage_key</code> from <code>due_diligence</code> to <code>closing</code> succeeds with no server gate.</td><td>Yes (browser walkthrough)</td></tr><tr><td><strong>BL-132 / D-312</strong></td><td>2026-05-08</td><td>CH Sale workflow template (8 stages, 4 locked: lex<em>koller</em>check / authorization / oeffentliche_beurkundung / grundbucheintrag); CH Rental (5 stages, 3 locked)</td><td>Yes (Hans Müller end-to-end)</td></tr></tbody></table>
+<p><strong>BGs touched:</strong> BG-90..104 (15 BGs from D-341 friction walkthrough, mislabeled as "Axis 6 Friction States" but substantively about deal stages), BG-104 🔴 (top priority per D-341 fix order)</p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li>🔴 BG-104 (top of D-341 fix order — content TBD from findings doc, not in <code>/mnt/project/</code> mount)</li><li>🔴 BG-90 / BG-98 / BG-97 / BG-103 priority chain from D-341</li><li>Workflow_instance presence per Swiss demo deal not yet verified per-deal at MCP time</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3 (with caveat).</strong> D-341 already walked this under a drifted label. Phase 3 prompt for Axis 2 = Phase 4 fix execution on the 15 BGs filed at D-341, NOT a fresh walkthrough.</p>
+<hr/>
+<h2>Axis 3 — Documents</h2>
+<p><strong>Canonical scope (tracker):</strong> Upload deal doc works; categorization persists; ContactDocsTab cross-refs work.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>BL-70</strong></td><td>2026-Q1</td><td>Polymorphic documents table (<code>entity_type</code>/<code>entity_id</code>), DealDocumentsTab, ContactDocsTab (5 category groups, KYC cross-ref), DocumentUploadModal (shared portal-based)</td><td>Yes (tracker § 1)</td></tr><tr><td><strong>Document Scan modal</strong></td><td>Predates BL-70</td><td>Camera capture + upload</td><td>Yes</td></tr><tr><td><strong>D-277 / Documentation Governance Pass 3</strong></td><td>2026-04-28</td><td>crm.md absorbs BL-70 + 15 sibling tickets (V2 polymorphic foundation)</td><td>Doc-only</td></tr></tbody></table>
+<p><strong>BGs touched:</strong> None directly tagged "documents" axis in <code>/mnt/project/</code> (BG-50 i18n wired some doc surfaces)</p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li>No explicit per-axis BG list — this means walkthrough is genuinely needed</li><li>Cross-ref behavior (KYC docs appearing on contact AND deal) needs end-to-end check across roles</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3.</strong> Code is shipped and stable; walkthrough should produce the first real BG list for this axis.</p>
+<hr/>
+<h2>Axis 4 — Signing — agent</h2>
+<p><strong>Canonical scope (tracker):</strong> DocumentPrepareModal opens; templates load; AcroForm no keystroke loss; field placement persists.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>BL-81 / BL-81b/d</strong></td><td>2026-Q1</td><td>Field placement canvas (sig/initial/date/text), 3-step context menu, AGENT/RECIPIENT badges</td><td>Yes</td></tr><tr><td><strong>BL-81c</strong></td><td>Multi-party signing + execution status, FULLY EXECUTED badge</td><td>Yes</td><td></td></tr><tr><td><strong>BL-81e</strong></td><td>Universal Fill &amp; Sign (text fields, CRM auto-fill, <code>document_field_values</code> table)</td><td>Yes</td><td></td></tr><tr><td><strong>BL-81f</strong></td><td>Signing Templates (55 field presets, 6 roles), Template CRUD service</td><td>Yes</td><td></td></tr><tr><td><strong>BL-81g</strong></td><td>Document Prepare flow (4-step modal: Template → Prepare → Assign → Send)</td><td>Yes</td><td></td></tr><tr><td><strong>BL-81h</strong></td><td>AcroForm PDF Editor + Finalization API — multi-page, hydration guards, no keystroke loss</td><td>Yes (regression check on mobile)</td><td></td></tr><tr><td><strong>NU-8/10</strong></td><td>PDF Proxy route — server-side baking, widget stripping, recipient-owned exclusion</td><td>Yes</td><td></td></tr><tr><td><strong>D-277 / Pass 2</strong></td><td>2026-04-28</td><td>signing.md absorbs 24 signing tickets — architectural primitives captured</td><td>Doc-only</td></tr></tbody></table>
+<p><strong>BGs touched:</strong> BG-21/22/23/24/26/35 (signing PDF pipeline class) — all absorbed into signing.md</p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li>NU-12/13/14/15 open items (seller sig grey-out, copy-link, agent view lock, recipient<em>can</em>override toggle) — tracker says "Decide ship vs defer for P1 sign-off"</li><li>AcroForm keystroke-loss class is fix-after-fix history; walkthrough should confirm no regression on iOS</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3.</strong> Heaviest pillar by ship count (~22 sub-tickets shipped). Walkthrough is the audit, not a build.</p>
+<hr/>
+<h2>Axis 5 — Signing — recipient</h2>
+<p><strong>Canonical scope (tracker):</strong> <code>/sign/[token]</code> loads; clean PDF render; greyed other-party fields; submit works.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>NU-8 / NU-10 / NU-11</strong></td><td>Recipient signing page, other-party fields greyed out</td><td>Yes</td><td></td></tr><tr><td><strong>BL-81i</strong></td><td>Recipient CRM pre-fill (name/phone/email from participants)</td><td>Yes</td><td></td></tr><tr><td><strong>D-342</strong></td><td>2026-05-21</td><td>Dropped vestigial <code>deals.owner_user_id</code>; 8 BGs filed under "Axis 5" label (drifted) — actually mostly deal-ownership and RLS. <strong>BG-106 dual columns 🔴 / BG-107 kanban 🟡 / BG-112 RLS write blocks 🔴 → CLOSED</strong></td><td>Yes</td></tr><tr><td><strong>D-343</strong></td><td>2026-05-21</td><td>RLS read-scope fix on deals/leads/requirements — 11 new policies, viewer/assistant+ hierarchy enforced. Closes <strong>BG-105 🔴 / BG-113 🔴 / BG-114 🔴</strong></td><td>Yes (Nina 26 → 3 deals empirical)</td></tr></tbody></table>
+<p><strong>BGs touched (under drifted Axis 5 label = actually permissions + ownership):</strong> BG-105 / BG-106 / BG-107 / BG-108 / BG-109 / BG-110 / BG-111 / BG-112 / BG-113 / BG-114</p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li>🔴 BG-108 — empty audit tables across mutation paths (audit<em>log / activity</em>log / activity_events all 0 rows) — <strong>architectural decision needed</strong>, carried forward in SOS-2026-05-22 candidate list</li><li>🟢 BG-109 — PostgREST DELETE 204 misleading</li><li>🟢 BG-111 — Lukas Frei owns 0 deals (possibly intentional admin)</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3.</strong> D-342 and D-343 substantively delivered the permissions story that was labeled "Axis 5" but is actually canonical Axis 7. A canonical Axis 5 (signing — recipient) walkthrough is still needed for the <code>/sign/[token]</code> page itself.</p>
+<hr/>
+<h2>Axis 6 — Transaction checklist</h2>
+<p><strong>Canonical scope (tracker):</strong> Per-stage steps render; auto-derived statuses correct (incl. CH); manual override + conflict detection.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>D-107 / BL-73</strong></td><td>2026-03-15</td><td>Phase 1 end-to-end transaction checklist on deal detail; check/uncheck; progress indicator</td><td>Yes</td></tr><tr><td><strong>D-123 / BL-73b</strong></td><td>2026-03-18</td><td>Client-Shareable Checklist — public <code>/c/[token]</code>, <code>checklist_share_tokens</code> table, ContactCTA (WhatsApp + Email copy-to-clipboard), agent email fallback</td><td>Yes</td></tr><tr><td><strong>D-107 detail</strong></td><td>2026-03-16</td><td><code>checklist_step_overrides</code> + <code>checklist_share_tokens</code> tables, 4 new compliance rules (UAE trustee, FR preemption, CH cantonal tax, IT codice fiscale), checklistService.ts (auto-derives from deals/docs/viewings/portals/photos), manual override modal with conflict detection</td><td>Yes</td></tr></tbody></table>
+<p><strong>BGs touched:</strong> None directly under "checklist" label that I can find in <code>/mnt/project/</code></p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li><strong>BL-73c open</strong> — Phase 3 Co-broke + Conflict Detection: read-only view for non-owning agents (buyer agent sees listing agent steps); override data flagged for AI training</li><li>CH cantonal tax compliance rule was federal-only initially; BL-138 has since seeded 97 cantonal rows — checklist may need wiring to new rule set</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3.</strong> Walkthrough should pay particular attention to whether <code>checklistService</code> reads the BL-132 + BL-138 federal/cantonal rule set or still uses the original 4 hand-coded rules.</p>
+<hr/>
+<h2>Axis 7 — Permissions</h2>
+<p><strong>Canonical scope (tracker):</strong> Lena (agent) sees only assigned; Hans (admin) sees all; toggles respected; RLS holds.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>BL-68</strong></td><td>2026-Q1</td><td>Role-based deal permissions (<code>agent_can_edit_stage/value/upload_docs/confirm_stages</code> toggles)</td><td>Yes</td></tr><tr><td><strong>D-283 / BG-84</strong></td><td>2026-04-29</td><td>P0 RLS cross-tenant leak on <code>ai_action_cards</code> + <code>agent_daily_plans</code> — fixed; new WOW § RLS Policy Discipline</td><td>Yes (Jean@SaintGermain)</td></tr><tr><td><strong>BG-85</strong></td><td>2026-04-29</td><td>Filed — recurring RLS policy audit script (sibling to BG-83)</td><td>Open</td></tr><tr><td><strong>BG-83</strong></td><td>2026-04-29</td><td>Filed — recurring constraint-drift audit</td><td>Open</td></tr><tr><td><strong>D-282 / BL-126</strong></td><td>2026-04-29</td><td>DB-SCHEMA + WAYS-OF-WORKING governance updates — 4 stale constraint corrections; new Seed Script Discipline section</td><td>Doc + DB</td></tr><tr><td><strong>D-331 / TD-AUTH-SECDEF-SEARCHPATH</strong></td><td>2026-05-16</td><td>Audited 11 SECURITY DEFINER functions; 4 hardened with <code>SET search_path</code> + schema-qualification</td><td>Yes (Fatima RPCs end-to-end)</td></tr><tr><td><strong>D-342</strong></td><td>2026-05-21</td><td>Dropped <code>deals.owner_user_id</code> dual column — eliminates RLS-uses-one / UI-uses-one / seed-uses-other shadow-write</td><td>Yes</td></tr><tr><td><strong>D-343</strong></td><td>2026-05-21</td><td>RLS read-scope fix on <code>deals</code>/<code>leads</code>/<code>requirements</code> — viewer (SELECT own + participating), assistant+ (UPDATE own + participating), manager+ (all-org). 11 new policies, 5 dropped.</td><td>Yes (Nina 26→3 deals)</td></tr><tr><td><strong>BG-50 W5</strong></td><td>2026-04-26</td><td>i18n leak hunt wired admin/agent surfaces — 92.3% → 94.1% coverage</td><td>Yes</td></tr></tbody></table>
+<p><strong>BGs touched (under drifted "Multi-Agent Ownership" Axis 5 label = actually Axis 7):</strong> All of BG-105 / BG-106 / BG-107 / BG-108 / BG-110 / BG-111 / BG-112 / BG-113 / BG-114</p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li>🔴 BG-108 — empty audit tables — <strong>carried forward, blocks Phase 3 sign-off until architectural decision</strong></li><li>🟡 BG-85 — recurring RLS audit script (filed, not implemented)</li><li>TD-AUTH-SECDEF-SEARCHPATH had a regression class — <code>sync_agent_profile_email()</code> listed as still missing in earlier notes (D-331 audit pass closed this — verify against current DB before walkthrough)</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3.</strong> Heavy investment over the last 4 weeks. Walkthrough should add Lena/Hans/Nina probe matrix (per-role, per-table SELECT/INSERT/UPDATE/DELETE expected vs actual).</p>
+<hr/>
+<h2>Axis 8 — i18n / locale</h2>
+<p><strong>Canonical scope (tracker):</strong> No <code>i18n:</code> leaks; EN→DE→FR→IT switch works; CHF + DD.MM.YYYY for CH.</p>
+<p><strong>This axis has the most coverage by far.</strong> Mention count: BL-138 (42 / 29 / 18 across CHANGELOG / ROADMAP / FEATURE-MAP), BG-50 (38 / 53 / 38), BG-60 (19 in ROADMAP). Compressed table only.</p>
+<table><thead><tr><th>Ship cluster</th><th>Coverage</th></tr></thead><tbody><tr><td><strong>BL-120</strong></td><td>Locale resolution chain + Capacitor branch + <code>&amp;lt;html translate="no"&amp;gt;</code> Google Translate opt-out</td></tr><tr><td><strong>BL-138 wave 1</strong></td><td>CH cantonal compliance ingestion — 60 rules across ZH/BE/GE/VD/TI; canton-change listener (with BL-119 wire-in)</td></tr><tr><td><strong>BL-132 / D-312</strong></td><td>CH federal compliance (46 rules) — Sale + Rental templates with locked stages in DE/FR/IT</td></tr><tr><td><strong>BL-119 / D-316</strong></td><td>Canton-based default language — Anna Schneider CH-BE→CH-GE flip verified DE→FR end-to-end</td></tr><tr><td><strong>BG-50</strong></td><td>i18n leak hunt — multi-wave wire-in across 21 buckets, 94.1% coverage achieved at W5</td></tr><tr><td><strong>BG-60</strong></td><td>Error i18n — Shape A/B/C error payloads migrated to keyed i18n; multi-batch wire-in (W1-W3 + Phase 2)</td></tr><tr><td><strong>BG-54 / D-248</strong></td><td><code>admin.nav.autonomy</code> MISSING_MESSAGE noise (70+ errors per nav re-render) — closed</td></tr><tr><td><strong>BG-65</strong></td><td>i18n key collision handling (intel + portalSimulator namespaces)</td></tr><tr><td><strong>BL-126</strong></td><td>Federal Lex Koller 2026 consultation (external timeline Q4 2026)</td></tr><tr><td><strong>D-330 / TD-COMPLIANCE-METADATA-COLUMN</strong></td><td>Added <code>metadata</code> + <code>description_i18n</code> JSONB columns to <code>compliance_rules</code> — multilingual descriptions persist</td></tr></tbody></table>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li>BL-138 wave 2 (FR-canton/VS/GR + additional FR-canton coverage) — open</li><li>TD-COMPLIANCE-METADATA-COLUMN 🟡 backports — 8 Lex Koller rules in seed source only (per userMemories)</li><li>BL-119 wire-in for canton-change listener — closed per D-316; verify in walkthrough that org settings UI exists</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3 (over-covered).</strong> This axis arguably doesn't need a fresh walkthrough — spot-checks on remaining gaps (BL-138 wave 2 missing cantons + remaining <code>i18n:</code> leaks per BG-50 audit) would suffice.</p>
+<hr/>
+<h2>Axis 9 — Mobile (iOS)</h2>
+<p><strong>Canonical scope (tracker):</strong> Daily plan, deal detail, signing all usable on Capacitor iOS; no widget leak; safe-area respected.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>D-28 / BL-1</strong></td><td>Predates D-100</td><td>Capacitor local build migration — iOS from remote URL to local static; API URL abstraction (11 routes); WKWebView crash fix (runtime i18n); CapacitorIntlProvider; auth/navigation fixes</td><td>Yes (TestFlight)</td></tr><tr><td><strong>BL-89 walkthrough</strong></td><td>2026-04-02</td><td>Safe-area fixes — Walkthrough Player X + grid + share + slide counter clear iOS status bar via <code>calc(env(safe-area-inset-top, 0px) + 16px)</code>; WalkthroughReorderGrid same</td><td>Yes</td></tr><tr><td><strong>Contact Import from Phone</strong></td><td><code>@capacitor-community/contacts</code> picker — search, select-all, dedup, classify; SPM plugin registration fix for Capacitor 8</td><td>Yes</td><td></td></tr><tr><td><strong>iOS Viewing Mode voice fixes</strong></td><td>Mic auto-stop fallback (10s hard timeout for WKWebView zero-volume), Screen 2 text submit (<code>&amp;lt;form&amp;gt;</code> for "Go" key), removed <code>speechSynthesis</code> prompt blocking mic start</td><td>Yes</td><td></td></tr><tr><td><strong>BL-81h Part A</strong></td><td>AcroForm no keystroke loss on iOS — multi-page, hydration guards, no scroll bleed, no widget leak</td><td>Yes</td><td></td></tr><tr><td><strong>D-251 / native share</strong></td><td><code>navigator.share</code> on mobile, clipboard fallback on desktop with "Link copied" toast</td><td>Yes</td><td></td></tr></tbody></table>
+<p><strong>BGs touched:</strong> BG-46 (ViewingMode multi-return on Capacitor — verified at BG-50 W5)</p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li>iOS-specific walkthrough has been opportunistic, not systematic — no per-screen iOS check matrix on record</li><li>Capacitor 8 SPM plugin registration was a known foot-gun; verify other plugins still work post-Capacitor upgrade</li><li><code>agent.mobile.bottomNav</code> overlap with <code>bottom: env(safe-area-inset-bottom, 0px)</code> — verify on iPhone with home indicator</li></ul>
+<p><strong>Verdict:</strong> <strong>READY for Phase 3.</strong> Phase 3 prompt for this axis is a systematic per-screen iOS walkthrough on physical device (or TestFlight on simulator), not a code review.</p>
+<hr/>
+<h2>Axis 10 — Console + network</h2>
+<p><strong>Canonical scope (tracker):</strong> Zero unhandled errors in 30-min walkthrough; no 5xx; 4xx only on expected conditions.</p>
+<table><thead><tr><th>Ship</th><th>Date</th><th>What it covered</th><th>MCP-verified</th></tr></thead><tbody><tr><td><strong>BG-83 (filed)</strong></td><td>2026-04-29</td><td>Recurring constraint-drift audit script — runs canonical <code>pg_get_constraintdef</code> query, diffs against snapshot</td><td><strong>Open</strong></td></tr><tr><td><strong>BG-85 (filed)</strong></td><td>2026-04-29</td><td>Recurring RLS policy audit script</td><td><strong>Open</strong></td></tr><tr><td><strong>BG-54 / D-248</strong></td><td>2026-04-25</td><td><code>admin.nav.autonomy</code> MISSING_MESSAGE was firing 70+ console errors per nav re-render — fixed</td><td>Yes</td></tr><tr><td><strong>BL-105 (open)</strong></td><td>2026-04-18</td><td>Anthropic API failure mode handling — when API returns 4xx (credit depleted, rate limit), engine surfaces generic 500. Improve: distinct 503 + UI fallback + log code</td><td><strong>Open</strong></td></tr><tr><td><strong>BG-50 W5 → console-error hygiene</strong></td><td>2026-04-26</td><td>i18n wire-in eliminated dozens of console-error sources from missing-key noise</td><td>Partial</td></tr><tr><td><strong>D-305 / docs:check debt-ceiling</strong></td><td>2026-05-05</td><td>CI's Documentation Governance Check step had been red since 2026-04-30 — found because trigger-compliance is per-commit-strict</td><td>Yes</td></tr><tr><td><strong>CHANGELOG console errors note</strong></td><td>2026-04</td><td>BL-133 verification: 272 errors observed, all pre-existing <code>AuthRetryableFetchError</code> from expired Raj session — documented as background noise</td><td>Yes (verified)</td></tr></tbody></table>
+<p><strong>BGs touched:</strong> BG-83 + BG-85 + BG-54 (closed). Console error class itself has no dedicated BG list yet.</p>
+<p><strong>Gaps / weak spots:</strong></p>
+<ul><li><strong>Walkthrough on this axis has never been run end-to-end.</strong> The 30-min zero-error spec is unverified.</li><li>BL-105 (LLM 4xx) — open since 2026-04-18, surfaces on every credit-depleted period</li><li>BG-83 + BG-85 audit scripts filed but not implemented — drift is not auto-detected today</li><li><code>AuthRetryableFetchError</code> from expired sessions is dismissed as "background noise" — may mask real auth issues during walkthrough</li></ul>
+<p><strong>Verdict:</strong> <strong>WEAK — but PHASE 3 PROMPT READY.</strong> This axis has the lightest substantive coverage. Phase 3 walkthrough is the right move — expect this to be the highest-finding axis. Prompt should specify: 30-min walkthrough per role (Fatima admin, Lena agent, Nina junior agent), browser devtools console + Network tab open, log every unhandled error / 5xx / unexpected 4xx with stack + repro step.</p>
+<hr/>
+<h2>Drift-recovery options — informed view</h2>
+<p>Given the coverage above, the three recovery options from SOS-2026-05-22 carry different costs:</p>
+<table><thead><tr><th>Option</th><th>What it does</th><th>Cost</th><th>Risk</th></tr></thead><tbody><tr><td><strong>(a) Rename</strong></td><td>Rewrite prompts/findings/ROADMAP D-341/342/343 entries to use canonical axis numbers</td><td>High — touches 9 docs, all of which carry the drifted label as part of historical record</td><td>Audit-trail corruption — future readers can't tell which version is canonical</td></tr><tr><td><strong>(b) Cross-ref table</strong></td><td>Add mapping table to tracker: D-340 label → canonical label → drift filing date</td><td>Low — single tracker xlsx edit, ~30 min</td><td>Drift remains in historical docs (acceptable — they're frozen)</td></tr><tr><td><strong>(c) Pre-work label</strong></td><td>Treat D-340..D-343 as "Phase 3 pre-work"; formal 10-axis sweep starts fresh</td><td>Medium — historical docs stay; new prompts start from canonical labels; coverage credit retained per this audit</td><td>Highest semantic cleanliness; some confusion at the boundary (is D-341 "Phase 3" or "pre-work"?)</td></tr></tbody></table>
+<p><strong>My recommendation: (b) + (c) combined.</strong></p>
+<ul><li>(b) for the historical record — the drift happened, we acknowledge it in one place, audit trail stays honest.</li><li>(c) for forward motion — Phase 3 formal axis prompts (10 of them, one per canonical axis) start fresh using this coverage audit as their baseline. They reference D-341/D-342/D-343 findings as "pre-work covered the same ground; X residual BGs carry forward."</li></ul>
+<p>Why not (a): rewriting 9 docs to correct labels in-place destroys audit trail. The whole point of paper trail is that it's immutable.</p>
+<p>Why not (c) alone: without (b), the tracker xlsx still claims axes 6/2/5 are "NOT STARTED" — and they aren't.</p>
+<p><strong>Cost estimate for (b)+(c):</strong> ~30 min for the tracker edit + history note; Phase 3 axis prompts then unblock for next session at standard authoring cost.</p>
+<hr/>
+<h2>What this audit does NOT cover</h2>
+<ul><li>No live DB inspection — every "Yes (MCP-verified)" is reported, not re-verified today</li><li>No <code>docs/dd-hardening/findings-*.md</code> content (not in <code>/mnt/project/</code> mount) — D-341 findings doc would refine Axis 2 BG list</li><li>No <code>docs/sessions/SOS-*.md</code> content beyond 2026-05-22 (uploaded) — prior session SOSes may carry context not surfaced here</li><li>No grep over CHANGELOG.md for <code>D-3xx</code> entries below 312 — sampled but not exhaustive</li><li>23 BGs filed at D-341/342/343 under drifted Axis 6/5 labels remain valid; their substantive axis assignment (per this audit) is mostly Axis 2 (deal stages) + Axis 7 (permissions). Per-BG remapping is NOT in scope of this audit.</li></ul>
+<hr/>
+<h2>Decision point for Will</h2>
+<p>The audit shows: <strong>no axis is missing coverage; all 10 are ready for Phase 3 walkthrough prompts.</strong> Standing Obligation #7 can be discharged in one session once a recovery option lands.</p>
+<p>Next step → drift-recovery option choice (a)/(b)/(c)/(b+c).</p></div>
+</main>
+<footer>
+  HouseZoom.ai Ways of working · Auto-generated from <code>docs/dd-hardening/phase-3-coverage-audit.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>
