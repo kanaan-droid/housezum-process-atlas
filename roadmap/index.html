@@ -1809,6 +1809,14 @@ const DATA = {
       "added": "2026-05-22"
     },
     {
+      "id": "🟢 TD-ORCHESTRATOR-TASK-SIGNAL-FIELD-DROPPED",
+      "title": "signal field set in orchestratorScoringEngine.ts doesn't appear on tasks returned to callers",
+      "desc": "Surfaced 2026-05-23 during BL-154 verification harness. The scoring engine sets signal: '${daysInStage}d in ${stage}, ${daysSinceActivity}d since last activity' on stale_deal candidates (line ~218) and similar strings on other task types, but the field is undefined in the JSON returned to consumers (verified via direct generateDailyPlan() call). Either (a) a downstream transformer drops/renames it, (b) the consumer expects a different key (e.g., rationale / description), or (c) the field never makes it through type coercion at the API boundary. Cosmetic — tasks render fine via title; signal text would add useful context (days in stage + activity recency) to the agent's UI. Cost-of-fix: ~30 min trace through src/features/orchestrator/services/orchestratorScoringEngine.ts → src/app/api/orchestrator/* → useOrchestratorPlan.ts (or wherever the consumer is). Cost-of-not-fixing: signal context not visible to agents; harmless.",
+      "files": "src/features/orchestrator/services/orchestratorScoringEngine.ts (source emit), plus downstream transformer/consumer path",
+      "tag": "admin",
+      "added": "2026-05-23"
+    },
+    {
       "id": "🟢 TD-DOCS-CHECK-WINDOW-AWARENESS",
       "title": "docs:check v2.6.11..HEAD window flags prior commits' trigger compliance even when subsequent commits cured the drift",
       "desc": "Filed 2026-05-22 with D-344. Same class as TD-DOCS-CHECK-FOLLOWUP-COMMIT-AWARENESS (D-332). Recurring observation: when commit N adds a docs/sessions/ or scripts/ file without bumping PROJECT-STRUCTURE.md, the next commit N+1 can land the PROJECT-STRUCTURE update — but docs:check is per-commit-strict and still flags commit N as a trigger violation until the next tag advances the baseline past it. Hit at v2.6.2 (resolved via tag advance), at D-342 commit (resolved via tag advance), and again at D-344 commit (this filing) where commit 11c0707 EOS commit was followed by D-344 PROJECT-STRUCTURE bundle. Fix options: (a) narrow window to HEAD only — only check the working-tree commit, not the window. Loses the \"warn early\" property but eliminates false-positives. (b) special-case post-tag EOS commits — exempt commits whose subject starts with EOS or docs(SOS) from per-commit strict trigger check. (c) make trigger compliance cumulative — accept any PROJECT-STRUCTURE update within the window as curing any prior trigger miss within the same window. Recommended: (c) — cumulative semantics match how the paper-trail discipline is actually practiced. ~30 min to implement in scripts/docs-check.mjs Check 1. Cost-of-not-fixing: every session where an EOS commit lands a new SOS/tracker-update file forces a follow-up false-positive in docs:check, eroding \"must exit 0\" gate confidence and requiring repeated stop-and-surface dispatches.",
@@ -3044,6 +3052,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-350",
+      "title": "BL-154 — Fix Deal Orchestrator scoring engine: 4 compounding bugs neutered CH market",
+      "desc": "Phase 3 Axis 1 walkthrough 2026-05-23 diagnosed 4 distinct bugs in src/features/orchestrator/services/orchestratorScoringEngine.ts that compounded to produce 0 tasks for every CH agent while UAE worked. Layer 1 SQL fix on 2026-05-23 verified root cause (insert deal_participants → Sutherland surfaces); Layer 1 rolled back, Layer 2 = this durable code fix. Fix 1 — agent attribution union (assignment + participation): the deals query read only deal_participants.user_id, missing all BL-144 CH deals where the seed populates deals.assigned_user_id but not deal_participants (D-342 made assigned_user_id canonical; the engine was still on the old read path). Refactored to union deals.assigned_user_id (Source A) ∪ deal_participants.user_id (Source B); dedup via Set; parallel via Promise.all. Added current_stage_entered_at to SELECT for Fix 4. Fix 2 — compliance dual-source: the compliance query read only compliance_evaluations (UAE/legacy table), missing every CH cantonal block that writes to workflow_instances.compliance_status (per BL-132/BL-138). Refactored to union both. UAE path unchanged (org-wide, capped 10). CH path agent-scoped per Will's Gate 2 decision (filter workflow_instances to deals where agent assigned OR participating; avoids cross-deal noise). Normalized output shape (entity_type/entity_id/overall_status/blocked_by/created_at) preserves downstream scoring loop. Fix 3 — intel_cards.user_id (not agent_user_id): engine queried .eq('agent_user_id', agentId) against intel_cards, but per DB-SCHEMA.md L1107 the column is user_id. Pre-BL-154 query matched 0 rows for every agent. Codebase grep confirmed single-site fix (cardGeneratorService.ts:618 uses agent_user_id against viewings, not intel_cards — schema drift between two tables, not a typo to fix everywhere). Fix 4 — stage age computation: stale_deal scoring used deal.updated_at for time-in-stage, but updated_at bumps on any column edit (photo upload, value change, etc.) and under-reports stage age. Refactored to `deal.current_stage_entered_at",
+      "completed": "deal.created_at",
+      "tag": "compliance"
+    },
     {
       "id": "D-349",
       "title": "WOW landing page gains \"Audits\" section — syntheticIndex refactored from boolean to config-driven section list",
