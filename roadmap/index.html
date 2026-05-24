@@ -145,7 +145,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-23';
+const LAST_UPDATED = '2026-05-24';
 const DATA = {
   "inProgress": [
     {
@@ -3049,9 +3049,51 @@ const DATA = {
       "desc": "🔴 Critical. Filed + closed in Phase 3 Axis 5 (D-343 retroactive).",
       "tag": "admin",
       "added": "2026-05-21"
+    },
+    {
+      "id": "~~BG-A7-001~~",
+      "title": "~~checklist_share_tokens had anon-public SELECT policy \"Public read checklist share tokens by token\" (qual (token IS NOT NULL)) — anyone with the publicly-bundled Supabase anon key could read every share token row.~~ RESOLVED 2026-05-24 — dead-weight policy: all reads server-rendered via the /c/[token] page using service role. Migration 20260524134611_bg_a7_001_002_003_drop_anon_policies.sql drops the anon policy; no client impact.",
+      "desc": "🔴 Critical (anon-exploitable). Filed + closed in Phase 3 Axis 7 walkthrough (Section A RLS inventory) 2026-05-24.",
+      "tag": "infra",
+      "added": "2026-05-24"
+    },
+    {
+      "id": "~~BG-A7-002~~",
+      "title": "~~disclosure_requests had two anon-public policies: \"Public read by token\" (SELECT) and \"Public can update disclosure by token\" (UPDATE), both qual (token IS NOT NULL). Browser-side EnrichmentPage.tsx UPDATEd via the anon key, making the policy load-bearing AND exploitable (anon could mark any disclosure submitted by token).~~ RESOLVED 2026-05-24 — owner-submit migrated to new service-role API route POST /api/enrichment/[token]/submit (idempotency guard returns 409 on re-submit). Migration drops both anon policies. EnrichmentPage.tsx refactored to call the API. Existing GET route at /api/enrichment/[token] already used service role.",
+      "desc": "🔴 Critical (anon-exploitable). Filed + closed in Phase 3 Axis 7 (Section A) 2026-05-24.",
+      "tag": "infra",
+      "added": "2026-05-24"
+    },
+    {
+      "id": "~~BG-A7-003~~",
+      "title": "~~document_field_values had anon-public \"Anyone can insert field values\" (INSERT) and \"Anyone can update field values\" (UPDATE) policies. Anyone with the anon key could create or overwrite any field value on any document.~~ RESOLVED 2026-05-24 — dead-weight policies: all writes go via service-role services in the signing pipeline. Migration drops both anon policies. The unrelated (org_id = get_user_org_id()) SELECT for authenticated agent verify-page reads is preserved untouched.",
+      "desc": "🔴 Critical (anon-exploitable). Filed + closed in Phase 3 Axis 7 (Section A) 2026-05-24.",
+      "tag": "admin",
+      "added": "2026-05-24"
+    },
+    {
+      "id": "~~BG-A7-012~~",
+      "title": "~~public.purge_expired_external_events() SECURITY DEFINER function performs unscoped DELETE FROM public.external_events WHERE expires_at \u003c NOW() with no role check. Any authenticated user can invoke via REST POST /rest/v1/rpc/purge_expired_external_events and trigger cross-org cleanup of expired events with no audit trail. Live exploit verified: Nina (agent, ZH org) called the RPC with her bearer token during Section F walkthrough — function executed and returned 0 (only because no rows currently match the expiry filter); if expired rows existed in any org, all would have been deleted cross-org.~~ RESOLVED 2026-05-24 — two-layer fix in migration 20260524145041_bg_a7_012_lock_purge_expired_external_events.sql: (1) REVOKE EXECUTE ... FROM PUBLIC, anon, authenticated + GRANT EXECUTE ... TO service_role (PostgREST denies the RPC at privilege-check before body runs); (2) body-level role guard raising 42501 for non-service callers (defense-in-depth — fires if REVOKE is bypassed or a future role is granted EXECUTE by mistake). Same class as BG-A7-001/002/003 (D-351 earlier today) but attack vector is RPC instead of direct table policy. App-tier audit: only caller is src/app/api/cron/purge-events/route.ts which uses SUPABASE_SERVICE_ROLE_KEY — retains EXECUTE under fix.",
+      "desc": "🔴 Critical (auth-exploitable). Filed + closed in Phase 3 Axis 7 (Section F SECDEF function exercise) 2026-05-24.",
+      "tag": "admin",
+      "added": "2026-05-24"
     }
   ],
   "done": [
+    {
+      "id": "D-352",
+      "title": "Lock purge_expired_external_events() SECDEF function to service_role (BG-A7-012)",
+      "desc": "Phase 3 Axis 7 walkthrough Section F (SECDEF function exercise) on 2026-05-24 surfaced a SECURITY DEFINER RPC callable by any authenticated user that performs unscoped DELETE FROM external_events WHERE expires_at \u003c NOW() with no role check. Live exploit verified: Nina invoked the RPC via REST and the function executed (returned 0 only because no rows currently match the expiry filter; if expired rows existed, all would have been deleted cross-org). Same bug class as BG-A7-001/002/003 closed in D-351 earlier today — under-authenticated mutation surface — but the attack vector is RPC instead of direct table policy. Two-layer fix in supabase/migrations/20260524145041_bg_a7_012_lock_purge_expired_external_events.sql: (1) REVOKE EXECUTE ... FROM PUBLIC, anon, authenticated + GRANT EXECUTE ... TO service_role (PostgREST denies the RPC at privilege-check before body runs); (2) CREATE OR REPLACE FUNCTION adds body-level role guard raising 42501 for non-service callers (checks both request.jwt.claim.role JWT claim and current_user for direct DB calls — defense-in-depth fires if REVOKE is bypassed). Migration NOT applied to DB — Will runs in Supabase SQL Editor per WAYS-OF-WORKING. Walk paused at this finding — Section F SECDEF audit complete (this is the only mutating SECDEF function with this exposure; sync_agent_profile_email is a trigger function excluded from PostgREST schema cache per Section F findings); Section E walk resumes after this fix lands. App-tier audit: only caller is src/app/api/cron/purge-events/route.ts which uses SUPABASE_SERVICE_ROLE_KEY (Vercel cron path). Retains EXECUTE under fix; no app-tier breakage. Verification post-fix (Will-side): re-run F.4 attack curl with Nina's bearer token; expected response now 42501 permission denied. Verification CC-side: npx tsc --noEmit clean; npm run build succeeded; grep audit confirmed single cron caller using service-role. package.json 2.6.14 → 2.6.15.",
+      "completed": "NEW supabase/migrations/20260524145041_bg_a7_012_lock_purge_expired_external_events.sql, ROADMAP.md (BG-A7-012 closure + D-352 row), CHANGELOG.md, package.json (2.6.14 → 2.6.15)",
+      "tag": "comms"
+    },
+    {
+      "id": "D-351",
+      "title": "Drop 3 anon-exploitable RLS back doors + migrate enrichment submit to API route (BG-A7-001+002+003)",
+      "desc": "Phase 3 Axis 7 walkthrough Section A (RLS inventory) on 2026-05-24 surfaced 3 anon/public-exploitable RLS policies — same class: qual='(token IS NOT NULL)' or qual='true' open to the anon role with no per-row guard, exploitable via the publicly-bundled Supabase anon key. Grep audit confirmed actual code paths: checklist_share_tokens (server-rendered via service role — dead weight), disclosure_requests (owner-submit was browser-anon, load-bearing AND exploitable), document_field_values (all writes via service-role services — dead weight). 3 things in single commit: (1) NEW src/app/api/enrichment/[token]/submit/route.ts — service-role POST with token validation + 404/409/500 error codes + 409 idempotency guard on re-submit + defense-in-depth id+token filter. Mirrors existing GET route pattern (corsResponse + OPTIONS re-export + service-role client at file top). (2) MODIFIED src/features/properties/pages/EnrichmentPage.tsx:314 — direct from('disclosure_requests').update(...) replaced with fetch(apiUrl(/api/enrichment/${token}/submit), {method:'POST'}) + error propagation matching page's existing throw pattern. (3) NEW supabase/migrations/20260524134611_bg_a7_001_002_003_drop_anon_policies.sql — purely subtractive, drops exactly 5 policies (2 disclosure_requests + 1 checklist_share_tokens + 2 document_field_values), idempotent via IF EXISTS, NO new policies added. Migration NOT applied to DB — Will runs in Supabase SQL Editor per WAYS-OF-WORKING. Walk paused at this finding — Section A inventory complete; Section B walk resumes after this fix lands. Other Axis 7 findings (BG-A7-004..008) deferred to separate Phase 4 work. Out of scope: SendEnrichmentModal.tsx:162 INSERT + tools/list-property/page.tsx:851 INSERT are authenticated agent writes properly gated by Agents can create disclosure requests policy — preserved untouched. Verification: npx tsc --noEmit clean; npm run build succeeded (new route appears in route table as /api/enrichment/[token]/submit); grep audit confirmed no remaining browser-side direct writes to affected tables outside documented exceptions. package.json 2.6.13 → 2.6.14.",
+      "completed": "NEW src/app/api/enrichment/[token]/submit/route.ts, MODIFIED src/features/properties/pages/EnrichmentPage.tsx, NEW supabase/migrations/20260524134611_bg_a7_001_002_003_drop_anon_policies.sql, ROADMAP.md (3 BG closures + D-351 row), CHANGELOG.md, FEATURE-MAP.md, package.json (2.6.13 → 2.6.14)",
+      "tag": "ai"
+    },
     {
       "id": "D-350",
       "title": "BL-154 — Fix Deal Orchestrator scoring engine: 4 compounding bugs neutered CH market",
