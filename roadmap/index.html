@@ -1801,6 +1801,14 @@ const DATA = {
   ],
   "techDebt": [
     {
+      "id": "🟡 TD-WORKFLOWSTAGE-TYPE-DRIFT",
+      "title": "WorkflowStage interface (types/index.ts:740) is stale vs the live workflow_templates.stages JSONB",
+      "desc": "Surfaced 2026-05-26 during BL-155 (D-358). The WorkflowStage interface has { id, name, order, required_documents, is_locked, canonical? }, but BL-130/131/132/138 shipped the JSONB as { key, locked, canonical, label_{en,fr,de,it} } (verified live). WorkflowTemplate.stages is typed WorkflowStage[] — so the type lies about the real shape. BL-155 worked around it by adding a NEW WorkflowTemplateStage type and casting at the hook's query boundary (did NOT touch WorkflowStage, to avoid breaking other consumers). Affects src/app/admin/workflows/page.tsx if it reads .name/.order/.is_locked off template stages. Fix: reconcile WorkflowStage → actual JSONB shape (or fold into WorkflowTemplateStage) + audit the admin workflows page. Cost-of-fix: ~1–2h. Not blocking BL-155.",
+      "files": "src/types/index.ts:740 (WorkflowStage), src/app/admin/workflows/page.tsx (audit)",
+      "tag": "admin",
+      "added": "2026-05-26"
+    },
+    {
       "id": "🟡 TD-ORG-SETTINGS-INCOMPLETE-GULF-HORIZON",
       "title": "Gulf Horizon Realty org settings jsonb lacks measurement_unit + default_language keys (legacy pre-BL-EU-SEED state)",
       "desc": "Session-5 audit (2026-05-25): the org's settings has currency='AED' but measurement_unit + default_language are NULL/absent (created pre-BL-EU-SEED settings discipline). Affects D-357's fallback chain on src/app/settings/profile/page.tsx — orgMeasurementUnit ?? 'sqft' lands on the hardcoded 'sqft' floor (accidentally correct for UAE but for the wrong reason; should resolve via org settings). Fix: backfill via SQL — `UPDATE organizations SET settings = settings",
@@ -2962,9 +2970,9 @@ const DATA = {
       "added": "2026-05-19"
     },
     {
-      "id": "BG-92",
-      "title": "UI stage stepper renders 5 hardcoded English-style stages instead of the workflow_template's actual stages (8 stages for CH Federal Sale). lex_koller_authorization stage never appears in UI.",
-      "desc": "🔴 Critical. Filed in Phase 3 Axis 6 (D-341).",
+      "id": "~~BG-92~~",
+      "title": "~~UI stage stepper renders 5 hardcoded English-style stages instead of the workflow_template's actual stages (8 stages for CH Federal Sale). lex_koller_authorization stage never appears in UI.~~ CLOSED 2026-05-26 → D-358 (BL-155). DealDetailPanel stepper now sources stages from the deal's workflow_template via the new useWorkflowTemplate hook (8 CH stages, locale labels, locked LK gates incl. lex_koller_authorization); UAE deals without a workflow_instance_id keep the legacy 5-stage rendering. (NB: BG-92 also still listed in scripts/docs-check.mjs ABSORBED_NON_ARCH as BL-151-deferred — harmless; remove when BL-151 ships.)",
+      "desc": "🔴 Critical. Filed in Phase 3 Axis 6 (D-341); closed in BL-155 (D-358).",
       "tag": "admin",
       "added": "2026-05-19"
     },
@@ -3285,6 +3293,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-358",
+      "title": "BL-155 — Deal stepper sources from workflow_template (closes BG-92)",
+      "desc": "DealDetailPanel's stage progress bar was a hardcoded 5-entry STAGE_KEYS list (UAE-style), so CH Federal Sale's 8 stages — incl. the lex_koller_authorization LK gate — never rendered, and labels were English-only. NEW hook src/features/deals/hooks/useWorkflowTemplate.ts joins workflow_instances → workflow_templates (via the template_id FK embed; robust to object-or-array embed shape) and returns the template's stages (cast to NEW type WorkflowTemplateStage) + current_stage_id. The stepper now renders template-driven for deals with a workflow_instance_id (per-stage locale labels via label_{locale}, inline-SVG lock icon on locked LK gates — lucide-react is not a dependency, so inline SVG per codebase convention), and falls back unchanged to the legacy STAGE_KEYS rendering for UAE deals. Per Will's Option 1 scope decision: onStageAdvance signature left UNCHANGED (DealStageKey) — for template-driven deals the advance button is hidden (replaced by a muted stageManagedByWorkflow note) because the downstream PATCH path can't accept template stage keys (that's BG-90, out of scope). Header stage-dot badge (deal.current_stage_key) and deal_stage_history rendering left untouched per spec §3.3/§3.5. NEW type WorkflowTemplateStage added; the stale WorkflowStage interface left untouched → TD-WORKFLOWSTAGE-TYPE-DRIFT 🟡 filed. 2 i18n keys (lockedStage, stageManagedByWorkflow) ×4 locales. No DB/migration/seed change. Verification: npx tsc --noEmit clean; npm run build succeeded (/admin/deals + /admin/deals/[id] compiled); ESLint 0 errors (3 warnings — 2 pre-existing in DealDetailPanel, 1 new hook @/lib/supabase import matching existing hook convention); docs:check clean. Pending Will MCP (spec §5.5–5.6): CH deal as Hans (8 stages, German labels, LK gate visible, lock icons, advance button hidden + note) + UAE deal as Fatima (legacy 5-stage fallback). Runtime note: the PostgREST workflow_templates(stages) embed is FK-backed but not used elsewhere in code — verify it returns stages live. package.json 2.6.19 → 2.6.20.",
+      "completed": "NEW src/features/deals/hooks/useWorkflowTemplate.ts, MODIFIED src/features/deals/components/DealDetailPanel.tsx, src/types/index.ts, messages/{en,fr,de,it}.json, ROADMAP.md, CHANGELOG.md, FEATURE-MAP.md, PROJECT-STRUCTURE.md, package.json (2.6.19 → 2.6.20)",
+      "tag": "admin"
+    },
     {
       "id": "D-357",
       "title": "BG-A5-004 — Profile page fallback chain rewired to org settings",
