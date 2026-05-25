@@ -3225,14 +3225,28 @@ const DATA = {
       "added": "2026-05-25"
     },
     {
+      "id": "~~BG-A5-002~~",
+      "title": "~~Silent HTTP 400 on agent profile save — empty-string preferences violate DB CHECK constraint. Captured live via Chrome MCP (Hans @ ZH Premium Realty, session 5): PATCH body sent currency:\"\", voice_language:\"\" (empty strings) which the DB rejected (HTTP 400); the if (!error) branch in updatePreferences() swallowed the failure so the UI showed \"saved\" while the DB row was unchanged — silent data-loss. Discovered while investigating BG-A5-001 (cookie staleness).~~ RESOLVED 2026-05-25 → D-355. Empty-string→null normalization added to the PATCH payload of both updateProfile() + updatePreferences(); console.error now surfaces save failures instead of swallowing them.",
+      "desc": "🔴 Critical (silent data-loss class). Filed + closed in D-355 (session 5).",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
       "id": "BG-A5-001",
       "title": "Hans (admin) saved-language preference (en) not honored — UI renders in a different locale than his persisted preference; saved-language preference not read/applied on load.",
-      "desc": "🟡 i18n bug. Filed 2026-05-25 (session 4, Axis 5). Open.",
+      "desc": "🟡 i18n bug. Filed 2026-05-25 (session 4, Axis 5). Open — code fix shipped in D-355 (setLocaleCookie + window.location.reload() after a successful language write); awaiting Will's MCP verification on production.",
       "tag": "admin",
       "added": "2026-05-25"
     }
   ],
   "done": [
+    {
+      "id": "D-355",
+      "title": "BG-A5-001 + BG-A5-002 — agent profile language save end-to-end fix",
+      "desc": "Two bugs in src/features/agent-profile/hooks/useAgentProfile.ts found live via Chrome MCP (Hans Müller @ Zürich Premium Realty, Claude.ai web session 5). (1) BG-A5-002 🔴 (NEW): the PATCH body sent empty-string preferences (currency:\"\", voice_language:\"\") → DB returned HTTP 400 (CHECK violation) → the if (!error) branch swallowed it → UI showed \"saved\" while the DB was unchanged (silent data-loss). Fix: empty-string→null normalization in both updateProfile() + updatePreferences() PATCH payloads + console.error('[useAgentProfile] … save failed', error) surfacing. (2) BG-A5-001 🟡: even after a successful write, NEXT_LOCALE cookie + \u003chtml lang\u003e stayed stale because the save path never wrote the cookie or reloaded. Fix: setLocaleCookie(patch.language) + window.location.reload() after a successful language write (matches LocaleDetector.tsx cookie-write convention; full reload per BL-120 — a soft nav keeps the stale \u003chtml lang\u003e). LocaleDetector.tsx + /api/auth/sync-locale/route.ts unchanged (login-time path). No schema change (no migration). Verification: npx tsc --noEmit clean; ESLint 0 errors (1 pre-existing @/lib/supabase import warning, not from this change); npm run build succeeded. BG-A5-002 closed; BG-A5-001 code fix shipped, awaiting Will's MCP verification on production. package.json 2.6.16 → 2.6.17.",
+      "completed": "src/features/agent-profile/hooks/useAgentProfile.ts, ROADMAP.md (BG-A5-002 filed+closed + BG-A5-001 update + D-355 row), CHANGELOG.md, FEATURE-MAP.md, package.json (2.6.16 → 2.6.17)",
+      "tag": "admin"
+    },
     {
       "id": "D-354",
       "title": "Phase 4 RLS hardening batch — 8 Axis 7 BGs closed in one migration (BG-A7-004..009 + 013 + 014)",
