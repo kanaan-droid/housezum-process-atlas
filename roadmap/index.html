@@ -3233,6 +3233,13 @@ const DATA = {
       "added": "2026-05-25"
     },
     {
+      "id": "~~BG-A5-004~~",
+      "title": "~~Profile page (settings/profile/page.tsx) hardcoded currency:'AED', units:'sqft', language/voice_language:'en' as form defaults — when agent_profiles.\u003ccolumn\u003e is NULL (the BL-120 \"inherit from org\" sentinel), the UI displayed UAE values instead of the org's actual settings. Live evidence (2026-05-25, session 5): Hans Müller (CH org) has currency=NULL, measurement_unit='sqft', language='fr'; org has currency='CHF', measurement_unit='sqm'; profile UI showed AED/Sqft/English while listings + deals correctly showed CHF (they read organizations.settings directly). Violated the codebase rule at src/app/devtools/page.tsx:69 (\"never hardcode 'AED'/'CHF'/'EUR'/'USD'; use orgCurrency from useOrg()\") and FEATURE-MAP L581's \"no 'AED' defaults anywhere\" promise.~~ RESOLVED 2026-05-25 → D-357. Both the prefForm useState initializer and the post-load reset effect now fall back through useOrg() (org currency/unit/language) before the UAE floor; the reset effect gained org + dbLanguage deps so it re-resolves once org context loads. Data was correct (NULL = inherit) — only the display was wrong.",
+      "desc": "🟡 UI bug (data correct, display wrong). Filed + closed in D-357 (session 5).",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
       "id": "~~BG-A5-003~~",
       "title": "~~agent_profiles.preferences ghost-column write. Post-D-355 MCP verification (Hans @ ZH Premium Realty) caught PGRST204: Could not find the 'preferences' column of 'agent_profiles' in the schema cache — the hook was PATCHing a preferences jsonb column that does not exist (per DB-SCHEMA.md: agent_profiles has top-level language/currency/measurement_unit, no preferences). D-355's console.error exposed it (swallowed before). Cause unclear (BL-122 partial work or environment drift) — fix is hook-side, not schema-side; *every* agent-profile save was failing.~~ RESOLVED 2026-05-25 → D-356. Removed preferences: from updatePreferences() PATCH body (top-level columns only); mapped patch.units → measurement_unit column; defensive preferences strip in updateProfile(). voice_language kept in local React state for the voice-test UI but no longer persisted (TD-VOICE-LANGUAGE-NO-COLUMN filed).",
       "desc": "🔴 Critical (all agent-profile saves failing). Filed + closed in D-356 (session 5, post-D-355 MCP verification).",
@@ -3255,6 +3262,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-357",
+      "title": "BG-A5-004 — Profile page fallback chain rewired to org settings",
+      "desc": "Replaced the hardcoded 'AED'/'sqft'/'en' form fallbacks in src/app/settings/profile/page.tsx (both the prefForm useState initializer and the post-load reset useEffect) with useOrg()-derived values — orgCurrency ?? 'AED', orgMeasurementUnit ?? 'sqft', orgLanguage ?? 'en'. Live MCP evidence (Hans @ Zürich Premium Realty, session 5, post-D-356): DB had currency=NULL (BL-120 \"inherit from org\" sentinel) but the UI showed AED because the reset effect coalesced the always-null jsonb mirror to ''/'sqft', so the currency \u003cselect\u003e fell back to its first option (AED). Now a Swiss org renders CHF/sqm. The effect's dependency array was extended with the org values + dbLanguage so the form re-resolves when org context finishes loading. UAE literals retained as the ultimate floor (consistent with the `orgCurrency",
+      "completed": "'AED' pattern documented at devtools/page.tsx:69). No DB migration / no data change — the underlying agent_profiles row was correct, only the display was wrong. useAgentProfile.ts / OrgProvider.tsx / LocaleDetector.tsx untouched. Verification: npx tsc --noEmit clean; ESLint 0 errors (3 pre-existing warnings, none from this change — incl. no new exhaustive-deps); npm run build succeeded. Sibling cleanup flagged (Will-side, not in commit): Hans's measurement_unit='sqft' in DB is genuinely wrong (org is sqm) — likely a pre-BG-A5-003 broken save; Will decides whether to SQL-fix to NULL/'sqm' or audit all CH-org agents. package.json` 2.6.18 → 2.6.19.",
+      "tag": "admin"
+    },
     {
       "id": "D-356",
       "title": "BG-A5-003 hotfix — drop write to non-existent agent_profiles.preferences column (+ BG-A5-001 closure via reachability)",
