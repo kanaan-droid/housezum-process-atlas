@@ -1801,6 +1801,14 @@ const DATA = {
   ],
   "techDebt": [
     {
+      "id": "🟢 TD-VOICE-LANGUAGE-NO-COLUMN",
+      "title": "voice_language referenced by the AgentPreferences interface + voice-test UI but has no DB column",
+      "desc": "Surfaced 2026-05-25 (session 5) during the BG-A5-003 hotfix. agent_profiles has no preferences jsonb column and no voice_language column, so the field can't be persisted. As of D-356 it lives in React state only (lost on reload). Decide: (a) add a top-level voice_language column (migration); (b) keep it as a session-only preference (document as intentional); (c) remove it from the AgentPreferences interface + voice-test UI entirely. Low priority — the voice test still works in-session. (Filed in Tech Debt per the repo's TD-ledger convention; the BG-A5-003 prompt named \"Backlog\".)",
+      "files": "src/features/agent-profile/hooks/useAgentProfile.ts (AgentPreferences.voice_language); voice-test UI consumer",
+      "tag": "infra",
+      "added": "2026-05-25"
+    },
+    {
       "id": "~~🔴 TD-PHASE-3-AXIS-LABEL-DRIFT-ACROSS-NINE-DOCS~~",
       "title": "~~D-340 axis prompts used numbers 6/2/5 with labels that don't match the canonical tracker § Pillar 1 Detail § Section 3~~",
       "desc": "CLOSED 2026-05-22 → D-347. Resolved via (b)+(c): (b) cross-ref table lives in docs/dd-hardening/phase-3-coverage-audit.md § Drift reconciliation (NEW section, top of audit doc) — single canonical reconciliation point with canonical-vs-drifted axis label mapping + drift origin + cross-references; Master Tracker r19 Notes gains one-line pointer to it. (c) D-340..D-343 reclassified as \"Phase 3 pre-work\"; formal Phase 3 sweep starts next session using canonical 10-axis labels. Historical docs (D-340 prompts, D-341 findings, SOSes, ROADMAP/CHANGELOG D-341/342/343 rows) FROZEN — not retroactively edited per (b). Coverage audit at docs/dd-hardening/phase-3-coverage-audit.md (322 lines) establishes substantive coverage per canonical axis; informs Phase 3 axis prompt scoping next session. Headline finding: ALL 10 canonical axes have substantive code coverage; none are zero-coverage. Original notes: Surfaced 2026-05-22 during session-start audit. D-340 drafted Phase 3 axis prompts for axes 6/2/5 using labels \"Friction States\" / \"Compliance Gating\" / \"Multi-Agent Ownership\" — but the canonical 10-axis DD checklist in dd-hardening-tracker.xlsx § Pillar 1 Detail § Section 3 has different names for those numbers: Axis 6 = Transaction checklist, Axis 2 = Deal stages, Axis 5 = Signing — recipient. The labels D-340 used were derived from BL-144 spec § 5.4 friction taxonomy / compliance distribution / 8-agent distribution (likely sourced from the missing housezoom-dd-hardening-plan-v0.2.docx — see sibling TD), NOT from the tracker. Drift compounded through D-341 + D-342 + D-343 — 23 BG tickets (BG-90..104 + BG-105..114) filed under wrong axis labels in ROADMAP, findings doc, CHANGELOG, SOS, tracker. 9 files affected: docs/dd-hardening/phase3-prompt-axis-{6,2,5}-*.md (3); docs/dd-hardening/phase-3-axis-6-findings.md (1); docs/sessions/SOS-2026-05-19.md (1); docs/sessions/SOS-2026-05-21.md (1); ROADMAP.md D-341/342/343 Done rows (1); CHANGELOG.md D-340/341/342/343 entries (1); docs/dd-hardening/dd-hardening-tracker.xlsx Master Tracker Phase 3 row (1). Substantive impact: bugs filed remain VALID (only the axis labels are wrong); under canonical numbering, actual Phase 3 coverage is partial Axis 2 (D-341) + Axis 7 (D-342/D-343) — axes 1/3/4/5/6/8/9/10 have no coverage (STANDING-OBLIGATIONS row 7 lists the wrong-scheme axes 1/3/4/7/8/9/10). Blocks Phase 3 completion until reconciled. Recovery options under consideration: (a) rename prompts/findings/ROADMAP entries to match canonical numbers — preserves history with corrected labels; (b) add cross-reference table to tracker mapping D-340 labels → canonical labels — lowest cost; (c) treat D-340..D-343 as \"Phase 3 pre-work\" and the formal 10-axis sweep starts fresh — cleanest semantically. Decision deferred to next session (after Phase 3 coverage audit completes). See docs/audits/drift-report-2026-05-22-manual.md § Finding 1 for full diagnosis.",
@@ -3225,21 +3233,35 @@ const DATA = {
       "added": "2026-05-25"
     },
     {
+      "id": "~~BG-A5-003~~",
+      "title": "~~agent_profiles.preferences ghost-column write. Post-D-355 MCP verification (Hans @ ZH Premium Realty) caught PGRST204: Could not find the 'preferences' column of 'agent_profiles' in the schema cache — the hook was PATCHing a preferences jsonb column that does not exist (per DB-SCHEMA.md: agent_profiles has top-level language/currency/measurement_unit, no preferences). D-355's console.error exposed it (swallowed before). Cause unclear (BL-122 partial work or environment drift) — fix is hook-side, not schema-side; *every* agent-profile save was failing.~~ RESOLVED 2026-05-25 → D-356. Removed preferences: from updatePreferences() PATCH body (top-level columns only); mapped patch.units → measurement_unit column; defensive preferences strip in updateProfile(). voice_language kept in local React state for the voice-test UI but no longer persisted (TD-VOICE-LANGUAGE-NO-COLUMN filed).",
+      "desc": "🔴 Critical (all agent-profile saves failing). Filed + closed in D-356 (session 5, post-D-355 MCP verification).",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
       "id": "~~BG-A5-002~~",
-      "title": "~~Silent HTTP 400 on agent profile save — empty-string preferences violate DB CHECK constraint. Captured live via Chrome MCP (Hans @ ZH Premium Realty, session 5): PATCH body sent currency:\"\", voice_language:\"\" (empty strings) which the DB rejected (HTTP 400); the if (!error) branch in updatePreferences() swallowed the failure so the UI showed \"saved\" while the DB row was unchanged — silent data-loss. Discovered while investigating BG-A5-001 (cookie staleness).~~ RESOLVED 2026-05-25 → D-355. Empty-string→null normalization added to the PATCH payload of both updateProfile() + updatePreferences(); console.error now surfaces save failures instead of swallowing them.",
+      "title": "~~Silent HTTP 400 on agent profile save — empty-string preferences violate DB CHECK constraint. Captured live via Chrome MCP (Hans @ ZH Premium Realty, session 5): PATCH body sent currency:\"\", voice_language:\"\" (empty strings) which the DB rejected (HTTP 400); the if (!error) branch in updatePreferences() swallowed the failure so the UI showed \"saved\" while the DB row was unchanged — silent data-loss. Discovered while investigating BG-A5-001 (cookie staleness).~~ RESOLVED 2026-05-25 → D-355. Empty-string→null normalization added to the PATCH payload of both updateProfile() + updatePreferences(); console.error now surfaces save failures instead of swallowing them. Footnote (D-356): the normalization fix stands on its own, but the PATCH still failed afterward for a *different* reason — BG-A5-003 (schema-cache miss on the non-existent preferences column). BG-A5-002 (empty-string→null) and BG-A5-003 (ghost column) are separate bugs; both fixed.",
       "desc": "🔴 Critical (silent data-loss class). Filed + closed in D-355 (session 5).",
       "tag": "admin",
       "added": "2026-05-25"
     },
     {
-      "id": "BG-A5-001",
-      "title": "Hans (admin) saved-language preference (en) not honored — UI renders in a different locale than his persisted preference; saved-language preference not read/applied on load.",
-      "desc": "🟡 i18n bug. Filed 2026-05-25 (session 4, Axis 5). Open — code fix shipped in D-355 (setLocaleCookie + window.location.reload() after a successful language write); awaiting Will's MCP verification on production.",
+      "id": "~~BG-A5-001~~",
+      "title": "~~Hans (admin) saved-language preference (en) not honored — UI renders in a different locale than his persisted preference; saved-language preference not read/applied on load.~~ RESOLVED 2026-05-25 → D-356. The D-355 cookie+reload fix is now *reachable* because the save no longer errors out — BG-A5-003 (PGRST204 on the ghost preferences column) was blocking the whole PATCH, so the cookie write + reload never fired. With BG-A5-003 hotfixed, a successful language write now runs setLocaleCookie(patch.language) + window.location.reload(). (Final live confirmation rides on Will's post-deploy MCP re-check, same as BG-A5-003.)",
+      "desc": "🟡 i18n bug. Filed session 4; code fix D-355; closed via D-356 once the save path was unblocked.",
       "tag": "admin",
       "added": "2026-05-25"
     }
   ],
   "done": [
+    {
+      "id": "D-356",
+      "title": "BG-A5-003 hotfix — drop write to non-existent agent_profiles.preferences column (+ BG-A5-001 closure via reachability)",
+      "desc": "Post-D-355 MCP verification on production (Hans Müller @ ZH Premium Realty) surfaced a third bug that D-355's console.error exposed: a PATCH to agent_profiles returned PGRST204: Could not find the 'preferences' column ... in the schema cache. The preferences jsonb column does not exist on the live schema (per DB-SCHEMA.md — top-level language/currency/measurement_unit are the source of truth; jsonb mirror retired per BL-120/BL-122), so the hook was writing to a ghost column and *every* agent-profile save was failing. Fix (hook-side, no schema change): removed preferences: from the updatePreferences() PATCH body (top-level columns only); mapped patch.units → measurement_unit column; added a defensive preferences strip in updateProfile() so a stray caller can't re-introduce it. voice_language retained in local React state for the voice-test UI but no longer persisted → TD-VOICE-LANGUAGE-NO-COLUMN 🟢 filed. With the save succeeding, D-355's cookie+reload flow becomes reachable → BG-A5-001 closes. LocaleDetector.tsx / /api/auth/sync-locale / locale-utils.ts untouched; no migration (column intentionally retired per BL-122). Verification: npx tsc --noEmit clean; npm run build succeeded. Final live confirmation rides on Will's post-deploy MCP re-check. package.json 2.6.17 → 2.6.18.",
+      "completed": "src/features/agent-profile/hooks/useAgentProfile.ts, ROADMAP.md (BG-A5-003 filed+closed, BG-A5-001 closed, BG-A5-002 footnote, D-356 row, TD-VOICE-LANGUAGE-NO-COLUMN), CHANGELOG.md, FEATURE-MAP.md, DB-SCHEMA.md (agent_profiles schema-reality note), package.json (2.6.17 → 2.6.18)",
+      "tag": "admin"
+    },
     {
       "id": "D-355",
       "title": "BG-A5-001 + BG-A5-002 — agent profile language save end-to-end fix",
