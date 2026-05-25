@@ -1801,6 +1801,22 @@ const DATA = {
   ],
   "techDebt": [
     {
+      "id": "🟡 TD-ORG-SETTINGS-INCOMPLETE-GULF-HORIZON",
+      "title": "Gulf Horizon Realty org settings jsonb lacks measurement_unit + default_language keys (legacy pre-BL-EU-SEED state)",
+      "desc": "Session-5 audit (2026-05-25): the org's settings has currency='AED' but measurement_unit + default_language are NULL/absent (created pre-BL-EU-SEED settings discipline). Affects D-357's fallback chain on src/app/settings/profile/page.tsx — orgMeasurementUnit ?? 'sqft' lands on the hardcoded 'sqft' floor (accidentally correct for UAE but for the wrong reason; should resolve via org settings). Fix: backfill via SQL — `UPDATE organizations SET settings = settings",
+      "files": "",
+      "tag": "admin",
+      "added": "'{\"measurement_unit\":\"sqft\",\"default_language\":\"en\"}'::jsonb WHERE id = '\u003cgulf-horizon-id\u003e' (verify ID via SELECT id, name FROM organizations WHERE name = 'Gulf Horizon Realty'`). Cost-of-fix: ~30 min (migration + verify). Cost-of-not-fixing: if the D-357 floors ever change away from UAE defaults, every Gulf Horizon agent breaks."
+    },
+    {
+      "id": "🟢 TD-AGENT-PROFILE-ORG-DIVERGENCE-AUDIT",
+      "title": "No periodic check for agent_profiles rows that diverge from their org's settings jsonb",
+      "desc": "Session 5 (2026-05-25) caught Hans's measurement_unit='sqft' drift only by manually running an audit query mid-investigation. Fix: add a runbook with the canonical audit query + decide cadence (manual at session start / CI / scheduled cron). The query distinguishes intended overrides (language='fr' on a de-default org = BL-120 user preference) from drift (measurement_unit='sqft' on a sqm-default org = corruption) — include that distinguishing logic so audits don't false-positive on intentional overrides. Already proven useful (caught Hans + surfaced TD-ORG-SETTINGS-INCOMPLETE-GULF-HORIZON). Canonical audit SQL: SELECT ap.email, o.name AS org, o.country_code, ap.currency, o.settings-\u003e\u003e'currency' AS org_currency, ap.measurement_unit, o.settings-\u003e\u003e'measurement_unit' AS org_unit, ap.language, o.settings-\u003e\u003e'default_language' AS org_lang, ap.updated_at FROM agent_profiles ap JOIN org_members om ON om.user_id = ap.user_id JOIN organizations o ON o.id = om.org_id ORDER BY o.name, ap.email; — then per row: NULL on agent = correct (inherit sentinel); non-NULL diverging from org = user override (OK) or drift (investigate). Cost-of-fix: ~30-60 min (runbook + cadence decision).",
+      "files": "new docs/runbooks/agent-profile-org-divergence-audit.md (TBD); WAYS-OF-WORKING.md cross-ref",
+      "tag": "comms",
+      "added": "2026-05-25"
+    },
+    {
       "id": "🟢 TD-VOICE-LANGUAGE-NO-COLUMN",
       "title": "voice_language referenced by the AgentPreferences interface + voice-test UI but has no DB column",
       "desc": "Surfaced 2026-05-25 (session 5) during the BG-A5-003 hotfix. agent_profiles has no preferences jsonb column and no voice_language column, so the field can't be persisted. As of D-356 it lives in React state only (lost on reload). Decide: (a) add a top-level voice_language column (migration); (b) keep it as a session-only preference (document as intentional); (c) remove it from the AgentPreferences interface + voice-test UI entirely. Low priority — the voice test still works in-session. (Filed in Tech Debt per the repo's TD-ledger convention; the BG-A5-003 prompt named \"Backlog\".)",
@@ -3230,6 +3246,13 @@ const DATA = {
       "title": "Locale inconsistency on /admin — ?locale=en only partially applied (some strings stay in the default locale). Partial i18n coverage on the admin surface.",
       "desc": "🟡 i18n bug. Filed 2026-05-25 (session 4). Open.",
       "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "~~BG-A5-005~~",
+      "title": "~~Hans Müller agent_profiles row drifted to measurement_unit='sqft' during pre-D-355 testing (Hans was the test subject across the BG-A5-001/002/003/004 arc; updated_at=2026-05-25 16:05:37). Org is sqm. Currency NULL (correct inherit-from-org sentinel) and language 'fr' (intentional BL-120 override) are NOT drift — only measurement_unit is.~~ RESOLVED 2026-05-25 → closed-by-data-fix (session-5 closure). Corruption source (broken useAgentProfile.ts save handler) already closed in D-355/356/357; the row itself restored via a one-off Will-side SQL fix. Sibling reproduction test (Daniel, untouched ZH agent seeded 2026-04-21) saved with no form changes → row unchanged → active code path clean; Hans is a historical artifact (1/42 agents divergent). Data-fix SQL (Will-side, NOT in any commit): UPDATE agent_profiles SET measurement_unit = 'sqm' WHERE email = 'will+ag-ch-hans@housezoom.ai' AND measurement_unit = 'sqft'; (expected 1 row).",
+      "desc": "🟢 Historical artifact, single row. Filed + closed 2026-05-25 via Will-side UPDATE + documented for traceability.",
+      "tag": "comms",
       "added": "2026-05-25"
     },
     {
