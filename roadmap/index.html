@@ -145,7 +145,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-24';
+const LAST_UPDATED = '2026-05-25';
 const DATA = {
   "inProgress": [
     {
@@ -1809,6 +1809,54 @@ const DATA = {
       "added": "2026-05-22"
     },
     {
+      "id": "🟢 TD-DOCS-NO-UPDATE-POLICY",
+      "title": "documents table has no UPDATE policy under Phase 2 org family",
+      "desc": "Surfaced 2026-05-25 (session 4) during D-354 Phase 4 RLS hardening migration review. After dropping the Phase 1 {authenticated} legacy family (BG-A7-006), the Phase 2 org-scoped family covers SELECT + INSERT + (new) admin DELETE — but no UPDATE policy exists. Likely safe today because UPDATE paths flow through service-role API routes (e.g. /api/documents/[id]/route.ts, signing flow services). Confirm via codebase audit that no client-side .from('documents').update(...) calls exist; if any do, they're already silently failing under the dropped Phase 1 family. Cost-of-fix: ~30 min audit + add documents_org_update policy if any legitimate authenticated-tier UPDATE path is found. Cost-of-not-fixing: zero today (service-role-only UPDATE works). Risk: future contributor adds .from('documents').update(...) from client, ships silently broken. Not in D-354 batch — separate ticket.",
+      "files": "documents RLS surface; src/app/api/documents/* + src/features/signing/services/* UPDATE paths to audit",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "🟢 TD-RLS-PUBLIC-TO-AUTHENTICATED-SWEEP",
+      "title": "60+ tables still grant policies to the {public} role; D-351's TO authenticated discipline not propagated",
+      "desc": "Surfaced 2026-05-25 (session 4) in the D-354 B.9 sanity scan. D-351 (Axis 7) established that anon should hold no policy on app tables — policies should be TO authenticated (service_role bypasses RLS by design). 60+ tables predate that discipline and still attach policies to {public} (which includes the anon role). Mostly low-risk where the USING/WITH CHECK quals already gate per-row (anon can't satisfy org_id = get_user_org_id()), but it's defense-in-depth debt + cross-table inconsistency. Cost-of-fix: ~1h bulk migration (ALTER POLICY ... TO authenticated sweep with table-by-table verification). Cost-of-not-fixing: latent — a future policy with a weak/true qual added to a {public} table becomes anon-exploitable (the BG-A7-001/002/003 class).",
+      "files": "RLS policy roles across ~60 tables; bulk migration",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "🟢 TD-RLS-ALL-POLICY-STACKING",
+      "title": "entity_parties carries both a FOR ALL policy and per-command policies (stacking)",
+      "desc": "Surfaced 2026-05-25 (session 4) in the D-354 B.9 sanity scan. entity_parties has a FOR ALL policy coexisting with per-command policies — same stacking class as BG-A7-005 (agent_profiles). RLS OR-combines, so the effective gate is the most-permissive policy, making intended scope hard to reason about and prone to drift. Cost-of-fix: audit live pg_policies for entity_parties (and grep for other ALL+per-cmd stackers), collapse to a canonical per-command set. Cost-of-not-fixing: small today; reasoning hazard + future drift risk.",
+      "files": "RLS policies on entity_parties (audit + collapse)",
+      "tag": "infra",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "🟡 TD-DISCLOSURE-REQUESTS-PUBLIC-INSERT",
+      "title": "disclosure_requests still has a {public}-role INSERT policy — same gap class as BG-A7-001/002/003",
+      "desc": "Surfaced 2026-05-25 (session 4) in the D-354 B.9 sanity scan. D-351 dropped the anon-public SELECT/UPDATE policies on disclosure_requests and moved owner-submit to the service-role API route, but a {public} INSERT policy remains. Investigate the write path: agent-side creation flows through SendEnrichmentModal/tools/list-property (authenticated, gated by \"Agents can create disclosure requests\") — if nothing relies on anon INSERT, the {public} INSERT is dead weight to drop; if a browser-anon path does, it's an open anon write surface (row pollution). Cost-of-fix: ~30 min grep audit + drop-or-narrow migration. Cost-of-not-fixing: potential anon-exploitable INSERT.",
+      "files": "RLS INSERT policy on disclosure_requests; src/features/properties/components/SendEnrichmentModal.tsx, tools/list-property write paths",
+      "tag": "ai",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "🟡 TD-PHASE3-PROMPT-AXIS5-SCHEMA-DRIFT",
+      "title": "Phase 3 Axis 5 prompt referenced 3 fictitious schema entities (tables document_recipients, signature_accumulations; column documents.execution_status)",
+      "desc": "Surfaced 2026-05-25 (session 4) via WoW#11 schema scan before Section A. CC reconciled prompt against DB-SCHEMA.md + docs/architecture/signing.md + live DB (raw PostgREST probe). Verdict (c): arch doc + DB-SCHEMA correct, prompt wrong. Rewritten same session — canonical names substituted throughout (document_signature_requests, document_signatures, documents.is_signed + fully_executed_at), schema vocabulary table added at top, SQL fallback updated to use access_token. Companion: addendum § 3 in dispatch file also rewritten (delivered to /tmp/axis5-dispatch-addendum-3-rewrite.md for Will to apply manually due to TCC sandbox on ~/Downloads/claude/). Lesson: future axis prompts must cite DB-SCHEMA.md table/column names verbatim, not paraphrase from memory or prior session context. Recommend a pre-flight schema-token grep against DB-SCHEMA.md for every new axis prompt before dispatch. Cost-of-fix today: zero marginal (rewrite done in same session). Cost-of-not-fixing: drift in remaining axis prompts (axes 2, 6, 7, 8 prompts in ~/Downloads/claude/ per session 1-2 carryover) — recommend same pre-flight scan before walking each.",
+      "files": "docs/dd-hardening/phase3-prompt-axis-5-signing-recipient.md (rewritten), ~/Downloads/claude/phase3-axis-5-signing-recipient-DISPATCH.md (Will to apply addendum § 3 rewrite from /tmp/axis5-dispatch-addendum-3-rewrite.md)",
+      "tag": "ai",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "🟡 TD-DB-SCHEMA-AUDIT-TABLES-DRIFT",
+      "title": "DB-SCHEMA.md nullability + defaults stale on activity_events, activity_log, audit_log",
+      "desc": "Surfaced 2026-05-24 (session 3) in BG-108 Section 1 inventory — column nullability + DEFAULT values in DB-SCHEMA.md for the 3 audit-class tables don't match live DB state observed during the audit-pipeline architecture session. Same root pattern as BG-83 (constraint-drift audit script): manual DB-SCHEMA maintenance lags real DB changes. Will be covered by BG-83 audit-script when shipped — that script will auto-detect schema drift across all tables, including these. No dedicated fix needed before then; this TD is filed primarily so the drift is visible in the ledger. Cost-of-fix when BG-83 ships: zero marginal (BG-83 sweep catches it). Cost-of-not-fixing today: small — DB-SCHEMA.md is reference doc, not enforcement; consumers who care (CC / future Claude.ai web sessions) cross-check live DB via MCP.",
+      "files": "DB-SCHEMA.md (3 tables), covered by BG-83 future audit script",
+      "tag": "ai",
+      "added": "2026-05-24"
+    },
+    {
       "id": "🟢 TD-ORCHESTRATOR-TASK-SIGNAL-FIELD-DROPPED",
       "title": "signal field set in orchestratorScoringEngine.ts doesn't appear on tasks returned to callers",
       "desc": "Surfaced 2026-05-23 during BL-154 verification harness. The scoring engine sets signal: '${daysInStage}d in ${stage}, ${daysSinceActivity}d since last activity' on stale_deal candidates (line ~218) and similar strings on other task types, but the field is undefined in the JSON returned to consumers (verified via direct generateDailyPlan() call). Either (a) a downstream transformer drops/renames it, (b) the consumer expects a different key (e.g., rationale / description), or (c) the field never makes it through type coercion at the API boundary. Cosmetic — tasks render fine via title; signal text would add useful context (days in stage + activity recency) to the agent's UI. Cost-of-fix: ~30 min trace through src/features/orchestrator/services/orchestratorScoringEngine.ts → src/app/api/orchestrator/* → useOrchestratorPlan.ts (or wherever the consumer is). Cost-of-not-fixing: signal context not visible to agents; harmless.",
@@ -3003,9 +3051,9 @@ const DATA = {
     },
     {
       "id": "BG-108",
-      "title": "Audit infrastructure exists across 7 tables (audit_log, activity_log, activity_events, media_events, external_events, lead_source_events, deal_stage_history) but audit_log, activity_log, activity_events are ENTIRELY EMPTY. No reassignment, no ownership change, no admin action writes to any of them.",
-      "desc": "🔴 Critical. Filed in Phase 3 Axis 5 (D-342).",
-      "tag": "admin",
+      "title": "Audit infrastructure exists across 7 tables (audit_log, activity_log, activity_events, media_events, external_events, lead_source_events, deal_stage_history) but audit_log, activity_log, activity_events are ENTIRELY EMPTY. No reassignment, no ownership change, no admin action writes to any of them. DESIGNED, DEFERRED (2026-05-24 session 3). Section 1 inventory complete: 4 audit-class tables surveyed, only audit_log is audit-shaped + never wired (0 app writes, 0 DB triggers, 150 historical rows from deprecated path). activity_log / activity_events / deal_stage_history serve operational/comms/stage-history purposes — not competing audit tables. Section 4 design sketch captured (20-event taxonomy + hybrid DB triggers + app-side wrapper + Supabase Auth Hooks). Implementation parked until post-V1 / first enterprise DD ask / SOC 2 kickoff. Design doc: docs/architecture/audit-pipeline-deferred.md. 2 new 🔴 RLS findings (BG-A7-013/014) folded into Phase 4 batch.",
+      "desc": "🔴 Critical. Filed in Phase 3 Axis 5 (D-342). DESIGNED, DEFERRED in session 3 (2026-05-24).",
+      "tag": "comms",
       "added": "2026-05-21"
     },
     {
@@ -3077,9 +3125,121 @@ const DATA = {
       "desc": "🔴 Critical (auth-exploitable). Filed + closed in Phase 3 Axis 7 (Section F SECDEF function exercise) 2026-05-24.",
       "tag": "admin",
       "added": "2026-05-24"
+    },
+    {
+      "id": "~~BG-A7-013~~",
+      "title": "~~activity_events table has a single ALL RLS policy permitting agent UPDATE/DELETE on audit rows — anti-tamper broken on a table consumed by orchestrator scoring + UI timelines. An agent with the anon key + their JWT can modify/delete activity rows attributed to other agents in the same org.~~ RESOLVED 2026-05-25 → D-354 (Phase 4 batch). ALL policy dropped; replaced with append-only activity_events_org_select (SELECT, org_id = get_user_org_id()) + activity_events_org_insert (INSERT, same WITH CHECK) — no UPDATE/DELETE policy → RLS-denied to all authenticated callers (service_role bypasses for ops). Anti-tamper restored.",
+      "desc": "🔴 Critical (anti-tamper). Filed in BG-108 architecture session (2026-05-24); closed in Phase 4 batch (D-354).",
+      "tag": "admin",
+      "added": "2026-05-24"
+    },
+    {
+      "id": "~~BG-A7-014~~",
+      "title": "~~activity_log table has a single ALL RLS policy permitting agent UPDATE/DELETE on audit rows + no org_id scoping clause. Worse than BG-A7-013 — agents could in principle see + modify rows from other orgs (data point not confirmed in walkthrough; defense-in-depth fix shipped regardless).~~ RESOLVED 2026-05-25 → D-354 (Phase 4 batch, Option A). ALL policy dropped; replaced with append-only activity_log_user_select (SELECT, auth.uid() = user_id) + activity_log_user_insert (INSERT, same WITH CHECK) — no UPDATE/DELETE → RLS-denied. Option A = no org_id backfill (cross-user-in-org visibility deferred to Option B if needed). Anti-tamper restored.",
+      "desc": "🔴 Critical (anti-tamper). Filed in BG-108 architecture session (2026-05-24); closed in Phase 4 batch (D-354).",
+      "tag": "admin",
+      "added": "2026-05-24"
+    },
+    {
+      "id": "~~BG-A7-004~~",
+      "title": "~~5× *_backup_20260505 tables (agent_profiles / compliance_rules / market_profiles / qa_knowledge_base / workflow_templates) had no RLS — cross-org readable to any authenticated user via PostgREST.~~ RESOLVED 2026-05-25 → D-354. ENABLE ROW LEVEL SECURITY on all 5 + documenting COMMENT (RLS-on/no-policies = service_role-only; backups preserved for forensics, not dropped).",
+      "desc": "🟡 Multi-tenancy drift. Filed (Axis 7 session 2) + closed in Phase 4 batch (D-354).",
+      "tag": "compliance",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "~~BG-A7-005~~",
+      "title": "~~agent_profiles policy stacking — 4 overlapping policies; one (auth.uid() = user_id) lacked an org_id constraint (bites once multi-org membership ships).~~ RESOLVED 2026-05-25 → D-354. Subsumed policies dropped; recreated canonical 3 — agent_profiles_org_select (org read), agent_profiles_self_insert, agent_profiles_self_update (both auth.uid()=user_id AND org_id=get_user_org_id()). DELETE = service_role only (admin offboarding).",
+      "desc": "🟡 Multi-tenancy drift. Filed (Axis 7 session 2) + closed in Phase 4 batch (D-354).",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "~~BG-A7-006~~",
+      "title": "~~documents dual-policy drift — Phase 1 {authenticated} family coexisted with Phase 2 {public} org-scoped family; effective gate was the most-permissive path, and the Phase 2 family had no admin DELETE.~~ RESOLVED 2026-05-25 → D-354. Phase 1 legacy {authenticated} family DROPPED (drift cleanup); org-scoped admin/manager DELETE (documents_admin_delete) added; Phase 2 SELECT/INSERT/UPDATE preserved. Severity DE-ESCALATED 🔴→🟡 (Will, 2026-05-25): the Phase 1 family was property-scoped via EXISTS-on-properties (not auth-only, contrary to the draft migration header's escalation note), so this was multi-tenancy drift cleanup — not a cross-org SELECT escalation. Companion follow-up: TD-DOCS-NO-UPDATE-POLICY 🟢 (no UPDATE policy exists under the Phase 2 family post-drop).",
+      "desc": "🟡 Multi-tenancy drift (de-escalated from 🔴). Filed (Axis 7 session 2) + closed in Phase 4 batch (D-354).",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "~~BG-A7-007~~",
+      "title": "~~document_embeddings + inbound_sources had RLS enabled with zero policies and no documented intent.~~ RESOLVED 2026-05-25 → D-354. Documenting COMMENT added to both (service_role-only: document_embeddings = RAG index populated by AI ingest cron; inbound_sources = inbound email/SMS routing config). RLS-on/no-policies denies all non-service-role access; intent now explicit (optional admin-read SELECT left commented for future ops use).",
+      "desc": "🟡 Multi-tenancy drift (documentation). Filed (Axis 7 session 2) + closed in Phase 4 batch (D-354).",
+      "tag": "comms",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "~~BG-A7-008~~",
+      "title": "~~media_events + listing_outcomes had open INSERT (any authenticated user could write events attributed to other orgs — pollution vector); SELECT was already org-scoped.~~ RESOLVED 2026-05-25 → D-354. Open INSERT policies dropped; replaced with org-scoped media_events_org_insert + listing_outcomes_org_insert (WITH CHECK (org_id = get_user_org_id())). Existing org-scoped SELECT preserved.",
+      "desc": "🟡 Multi-tenancy drift (promoted from 🟢). Filed (Axis 7 session 2) + closed in Phase 4 batch (D-354).",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "~~BG-A7-009~~",
+      "title": "~~ai_action_cards SELECT was agent-personal only (agent_user_id = auth.uid()) — org admin/manager saw 0 of 3 ZH org action cards.~~ RESOLVED 2026-05-25 → D-354. Added \"Admins and managers see all org action cards\" SELECT policy (org-scoped, user_has_role('admin') OR user_has_role('manager')); existing agent-personal SELECT preserved (RLS OR-combines).",
+      "desc": "🟡 Multi-tenancy drift (under-visibility). Filed (Axis 7 session 2) + closed in Phase 4 batch (D-354).",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "F1 (session 4)",
+      "title": "Nina email mismatch in the Axis 5 prompt — prompt used +ag-ch-nina but the live DB row is +ag-ch-junior. Doc-vs-DB drift, no runtime impact.",
+      "desc": "🟢 Polish (doc). Filed 2026-05-25 (session 4, Axis 5 walk). Open. Source: docs/dd-hardening/phase-3-axis-5-signing-recipient-findings.md.",
+      "tag": "comms",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "F2 (session 4)",
+      "title": "properties.market = 'ae-dubai' on ALL ZH-org properties (seed bug) — Swiss/Zürich-org properties carry the UAE market code. Skews market-conditioned logic (channel/tone/SLA) for the CH org in seeded environments.",
+      "desc": "🟡 Data/seed bug. Filed 2026-05-25 (session 4). Open.",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "F3 (session 4)",
+      "title": "0 Romandie (French-speaking CH) deals in the BL-144 seed — seed coverage gap; no deals in the Romandie sub-market. Same class as BG-111 (seed coverage).",
+      "desc": "🟢 Polish / seed gap. Filed 2026-05-25 (session 4). Open.",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "F4 (session 4)",
+      "title": "Fictitious app.housezoom.ai URL referenced in old (FROZEN D-340) axis prompts — non-canonical host; production is housezoom.ai. Doc-only.",
+      "desc": "🟢 Polish (doc). Filed 2026-05-25 (session 4). Open.",
+      "tag": "ai",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "F5 (session 4)",
+      "title": "Axis 5 prompt assigned Nina (agent) as the signing-request sender — but signing/send is admin-only in the app, so the prompt scenario contradicts the permission model.",
+      "desc": "🟢 Polish (doc). Filed 2026-05-25 (session 4). Open.",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "F6 (session 4)",
+      "title": "Locale inconsistency on /admin — ?locale=en only partially applied (some strings stay in the default locale). Partial i18n coverage on the admin surface.",
+      "desc": "🟡 i18n bug. Filed 2026-05-25 (session 4). Open.",
+      "tag": "admin",
+      "added": "2026-05-25"
+    },
+    {
+      "id": "BG-A5-001",
+      "title": "Hans (admin) saved-language preference (en) not honored — UI renders in a different locale than his persisted preference; saved-language preference not read/applied on load.",
+      "desc": "🟡 i18n bug. Filed 2026-05-25 (session 4, Axis 5). Open.",
+      "tag": "admin",
+      "added": "2026-05-25"
     }
   ],
   "done": [
+    {
+      "id": "D-354",
+      "title": "Phase 4 RLS hardening batch — 8 Axis 7 BGs closed in one migration (BG-A7-004..009 + 013 + 014)",
+      "desc": "Single idempotent migration (20260525120254_phase4_rls_hardening.sql, wrapped in BEGIN/COMMIT) closing 8 Axis-7 RLS findings, applied by Will in the Supabase SQL Editor per WoW; verification queries embedded as trailing comments. 2 🔴 anti-tamper: BG-A7-013 activity_events + BG-A7-014 activity_log — single ALL policy dropped → append-only SELECT+INSERT only (UPDATE/DELETE RLS-denied; service_role bypasses). BG-A7-014 = Option A (no org_id backfill; cross-user-in-org visibility deferred to Option B). 6 🟡 multi-tenancy drift: BG-A7-004 (5× *_backup_20260505 tables → ENABLE RLS + service_role-only COMMENT); BG-A7-005 (agent_profiles stacking → canonical 3: org_select / self_insert / self_update); BG-A7-006 (documents Phase 1 {authenticated} legacy family dropped + admin/manager documents_admin_delete added — severity DE-ESCALATED 🔴→🟡: the Phase 1 family was property-scoped via EXISTS-on-properties, not auth-only as the draft migration header asserted, so drift cleanup, not a cross-org SELECT escalation); BG-A7-007 (document_embeddings + inbound_sources → documenting service_role-only COMMENT); BG-A7-008 (media_events + listing_outcomes open INSERT → org-scoped WITH CHECK; promoted from 🟢); BG-A7-009 (ai_action_cards → added admin/manager org SELECT). Note: the committed migration file retains its draft 🔴 (ESCALATED) / DRAFT — NOT APPLIED header annotations (kept as the as-landed artifact; the de-escalation + applied status are corrected here + in CHANGELOG/DB-SCHEMA). 10 follow-ups filed: 3 TDs (TD-RLS-PUBLIC-TO-AUTHENTICATED-SWEEP, TD-RLS-ALL-POLICY-STACKING, TD-DISCLOSURE-REQUESTS-PUBLIC-INSERT) from the B.9 sanity scan + 7 session-4 findings (F1–F6 + BG-A5-001). package.json 2.6.15 → 2.6.16.",
+      "completed": "supabase/migrations/20260525120254_phase4_rls_hardening.sql, ROADMAP.md (8 BG closures + 10 follow-ups + D-354 row + BG-A7-006 de-escalation note), CHANGELOG.md, DB-SCHEMA.md (RLS on 9 tables), PROJECT-STRUCTURE.md (migration listing), package.json (2.6.15 → 2.6.16)",
+      "tag": "admin"
+    },
     {
       "id": "D-352",
       "title": "Lock purge_expired_external_events() SECDEF function to service_role (BG-A7-012)",
