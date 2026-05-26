@@ -1811,8 +1811,8 @@ const DATA = {
     {
       "id": "🟡 TD-WORKFLOWSTAGE-TYPE-DRIFT",
       "title": "WorkflowStage interface (types/index.ts:740) is stale vs the live workflow_templates.stages JSONB",
-      "desc": "Surfaced 2026-05-26 during BL-155 (D-358). The WorkflowStage interface has { id, name, order, required_documents, is_locked, canonical? }, but BL-130/131/132/138 shipped the JSONB as { key, locked, canonical, label_{en,fr,de,it} } (verified live). WorkflowTemplate.stages is typed WorkflowStage[] — so the type lies about the real shape. BL-155 worked around it by adding a NEW WorkflowTemplateStage type and casting at the hook's query boundary (did NOT touch WorkflowStage, to avoid breaking other consumers). Affects src/app/admin/workflows/page.tsx if it reads .name/.order/.is_locked off template stages. Fix: reconcile WorkflowStage → actual JSONB shape (or fold into WorkflowTemplateStage) + audit the admin workflows page. Cost-of-fix: ~1–2h. Not blocking BL-155.",
-      "files": "src/types/index.ts:740 (WorkflowStage), src/app/admin/workflows/page.tsx (audit)",
+      "desc": "Surfaced 2026-05-26 during BL-155 (D-358). The WorkflowStage interface has { id, name, order, required_documents, is_locked, canonical? }, but BL-130/131/132/138 shipped the JSONB as { key, locked, canonical, label_{en,fr,de,it} } (verified live). WorkflowTemplate.stages is typed WorkflowStage[] — so the type lies about the real shape. BL-155 worked around it by adding a NEW WorkflowTemplateStage type and casting at the hook's query boundary (did NOT touch WorkflowStage, to avoid breaking other consumers). Affects src/app/admin/workflows/page.tsx if it reads .name/.order/.is_locked off template stages. Fix: reconcile WorkflowStage → actual JSONB shape (or fold into WorkflowTemplateStage) + audit the admin workflows page. Cost-of-fix: ~1–2h. Not blocking BL-155. Partial retirement 2026-05-26 → D-360: field reads on src/app/admin/deals/[id]/page.tsx lines 462–516 corrected to the live JSONB shape via useWorkflowTemplate. Remaining stale surface: the WorkflowStage interface itself + any admin/workflows/page.tsx consumer. Status stays 🟡 OPEN (full reconciliation deferred). 2026-05-26 → D-361: the workflows-catalog StageStepper + instances display also corrected. Pre-flight confirmed 5 remaining WorkflowStage consumers — type def + WorkflowTemplate.stages, the /admin/workflows editor form, useWorkflows.ts (TemplateRow), useDeals.ts, workflowService.ts — so the type was NOT deleted; TD stays OPEN for full reconciliation (reconcile WorkflowStage to the JSONB shape or fold into WorkflowTemplateStage).",
+      "files": "src/types/index.ts:740 (WorkflowStage); consumers: WorkflowTemplate.stages, admin/workflows/page.tsx editor, useWorkflows.ts, useDeals.ts, workflowService.ts",
       "tag": "admin",
       "added": "2026-05-26"
     },
@@ -3139,11 +3139,18 @@ const DATA = {
       "added": "2026-05-21"
     },
     {
-      "id": "BG-115",
-      "title": "/admin/deals/[id] page stepper hardcoded — same bug class as BG-92 in different file",
-      "desc": "🟡 Significant. Filed 2026-05-26 during BL-155 MCP verification. The admin deal detail page (src/app/admin/deals/[id]/page.tsx, also re-exported at /deals/[id] per BL-38b) renders its own stage stepper as numbered circles 1-8 with no labels, no lock icons, no locale support, and the \"Changer l'étape\" advance button remains visible regardless of workflow_instance_id. BL-155 (D-358) fixed the sibling bug in DealDetailPanel.tsx; this page was not in BL-155 scope because it uses a different rendering mechanism (numbered circles, not the STAGE_KEYS const that BL-155's pre-flight grep targeted). Reachability: linked from 5 sites — aiInsightsService.ts ×5 (lockedStageRisk, deal alerts, intel card linkPath), admin/leads/[id] (post-conversion redirect), admin/leads (lead detail jump), admin/workflows (instance detail), ConvertLeadModal (post-conversion). NOT reachable from kanban tap (that opens the panel). Fix path: reuse useWorkflowTemplate hook + WorkflowTemplateStage type already shipped by BL-155 (D-358). Apply the same template-driven render + locked-stage indicator + advance-button-hide pattern. Estimate ~2-3h.",
+      "id": "~~BG-116~~",
+      "title": "~~/admin/workflows template-catalog expansion shows empty numbered circles (1-N) with no labels — third sibling of BG-92/BG-115, same field-name drift.~~ CLOSED 2026-05-26 → D-361. The catalog StageStepper (and the instances section) read stale WorkflowStage fields (.id/.name/.order/.is_locked) vs live JSONB (.key/.label_\u003clocale\u003e/.locked) → all undefined → blank circles. Fixed via field-name correction + WorkflowTemplateStage type + useLocale() labels (Option B — no hook; templates have no workflow_instance_id). WorkflowStage type KEPT (5 consumers) → TD-WORKFLOWSTAGE-TYPE-DRIFT stays 🟡 partial.",
+      "desc": "🟡 Significant. Filed + closed 2026-05-26 (BG-115 follow-up).",
       "tag": "admin",
       "added": "2026-05-26"
+    },
+    {
+      "id": "~~BG-115~~",
+      "title": "~~/admin/deals/[id] page stepper hardcoded — same bug class as BG-92 in different file~~ CLOSED 2026-05-26 → D-360. Root cause refined during the fix: the page ALREADY rendered a template-driven pipeline (lines 462–516) but read the stale WorkflowStage field names (.id/.name/.order/.is_locked) against the live JSONB (.key/.label_\u003clocale\u003e/.locked) → all undefined → numbered circles with blank labels, no lock icons, no current-stage highlight (TD-WORKFLOWSTAGE-TYPE-DRIFT manifesting). Fixed by sourcing stages from useWorkflowTemplate (WorkflowTemplateStage[]) + correcting the field reads. Per Will's v0.2 decisions, the global StageProgress bar + \"Change stage\" button were KEPT (global deal.stage control, not a template-advance). Original (pre-fix) framing: 🟡 Significant. Filed 2026-05-26 during BL-155 MCP verification. The admin deal detail page (src/app/admin/deals/[id]/page.tsx, also re-exported at /deals/[id] per BL-38b) renders its own stage stepper as numbered circles 1-8 with no labels, no lock icons, no locale support, and the \"Changer l'étape\" advance button remains visible regardless of workflow_instance_id. BL-155 (D-358) fixed the sibling bug in DealDetailPanel.tsx; this page was not in BL-155 scope because it uses a different rendering mechanism (numbered circles, not the STAGE_KEYS const that BL-155's pre-flight grep targeted). Reachability: linked from 5 sites — aiInsightsService.ts ×5 (lockedStageRisk, deal alerts, intel card linkPath), admin/leads/[id] (post-conversion redirect), admin/leads (lead detail jump), admin/workflows (instance detail), ConvertLeadModal (post-conversion). NOT reachable from kanban tap (that opens the panel). Fix path: reuse useWorkflowTemplate hook + WorkflowTemplateStage type already shipped by BL-155 (D-358). Apply the same template-driven render + locked-stage indicator + advance-button-hide pattern. Estimate ~2-3h.",
+      "desc": "src/app/admin/deals/[id]/page.tsx",
+      "tag": "admin",
+      "added": ""
     },
     {
       "id": "~~BG-A7-001~~",
@@ -3308,6 +3315,20 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-361",
+      "title": "BG-116 — workflows catalog stepper field-name drift fix (3rd sibling of BG-92/BL-155)",
+      "desc": "/admin/workflows template-card expansion rendered N empty numbered circles (no labels/locks) — the catalog StageStepper read the stale WorkflowStage shape (.id/.name/.order/.is_locked) against the live JSONB (.key/.label_\u003clocale\u003e/.locked). Fix (Option B — no hook; templates have no workflow_instance_id): corrected field reads in StageStepper and the instances section — key, `label_\u003clocale\u003e",
+      "completed": "label_en",
+      "tag": "admin"
+    },
+    {
+      "id": "D-360",
+      "title": "BG-115 — admin deal page workflow-pipeline field-name drift fix (sibling of BG-92/BL-155)",
+      "desc": "src/app/admin/deals/[id]/page.tsx lines 462–516 already rendered a template-driven \"Workflow Pipeline\", but read the stale WorkflowStage shape (.id/.name/.order/.is_locked) against the live JSONB (.key/.label_\u003clocale\u003e/.locked) — every field undefined → blank-label numbered circles, no lock icons, no current-stage highlight (= TD-WORKFLOWSTAGE-TYPE-DRIFT manifesting on this surface). Fix: sourced stages from the existing useWorkflowTemplate hook (WorkflowTemplateStage[] + current_stage_id) and corrected the field reads — key, label_\u003clocale\u003e→label_en→key (via useLocale()), locked, current-stage match by key, dropped the .order sort (array already ordered). Per Will's 4 v0.2 decisions: fix via hook (no new branch); KEEP the \"Change stage\" button (it changes global deal.stage, not a template stage — no LK-bypass risk); KEEP both stage UIs (global StageProgress bar + template pipeline); CC ships, Will MCP-verifies post-deploy. UNCHANGED: DealDetailPanel.tsx, dealService.moveStage(), WorkflowStage interface, messages/*.json (no new/used i18n key — button kept, so no muted note). Out-of-462–516 edits = 5 dispatch-mandated wiring lines (3 imports + useLocale + hook call). Verification: npx tsc --noEmit clean; npm run build clean (/admin/deals/[id] compiled); ESLint 0 errors (2 pre-existing warnings). NEW spec docs/specs/BG-115-Spec-Admin-Deal-Page-Hardcoded-Stepper.md v0.2 LOCKED. Partially retires TD-WORKFLOWSTAGE-TYPE-DRIFT for this surface. package.json 2.6.20 → 2.6.21. Pending Will MCP (CH Hans 8-stage + UAE Fatima).",
+      "completed": "MODIFIED src/app/admin/deals/[id]/page.tsx, NEW docs/specs/BG-115-Spec-Admin-Deal-Page-Hardcoded-Stepper.md, ROADMAP.md, CHANGELOG.md, FEATURE-MAP.md, PROJECT-STRUCTURE.md, docs/dd-hardening/dd-hardening-tracker.xlsx, docs/sessions/STANDING-OBLIGATIONS.md, package.json (2.6.20 → 2.6.21)",
+      "tag": "admin"
+    },
     {
       "id": "D-359",
       "title": "BL-155 follow-up — commit spec doc + PROJECT-STRUCTURE entry",
