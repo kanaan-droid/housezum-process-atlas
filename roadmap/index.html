@@ -1801,6 +1801,22 @@ const DATA = {
   ],
   "techDebt": [
     {
+      "id": "🟢 TD-WORKFLOW-STAGE-REQUIRED-DOCS-NOT-IN-LIVE-JSONB",
+      "title": "Editor has a required_documents input per stage, but the field is not present in the live workflow_templates.stages JSONB (canonical seeds = {key,label_\u003clocale\u003e,locked,canonical})",
+      "desc": "Surfaced 2026-05-26 (BG-117). Kept in the editor via a typed cast (EditorStage = WorkflowTemplateStage & {required_documents?}) so the UI doesn't regress, but it writes a field nothing else reads. Investigate: (a) persisted/consumed somewhere unaudited, (b) dead UI to remove, or (c) a planned future field (extend WorkflowTemplateStage + a reader). Not BG-117's problem.",
+      "files": "src/app/admin/workflows/page.tsx editor; WorkflowTemplateStage",
+      "tag": "admin",
+      "added": "2026-05-26"
+    },
+    {
+      "id": "🟢 TD-WORKFLOW-STAGE-CATEGORY-I18N-KEYS",
+      "title": "No i18n keys for the 9 canonical stage-category enum values; the editor \u003cselect\u003e shows raw values (pre_offer, etc.)",
+      "desc": "Surfaced 2026-05-26 (BG-117). The canonical-category dropdown (BL-129 routing) needs localized labels in messages/{en,fr,de,it}.json (e.g. workflowStageCategory.pre_offer). Interim: raw enum shown. Fix: add the 9 keys ×4 locales + wire the \u003cselect\u003e options through t().",
+      "files": "src/app/admin/workflows/page.tsx (canonical \u003cselect\u003e); messages/{en,fr,de,it}.json",
+      "tag": "admin",
+      "added": "2026-05-26"
+    },
+    {
       "id": "🟢 TD-PROCESS-BG-NUMBER-COLLISION-PRECHECK",
       "title": "The BL-collision precheck script (scripts/check-bl-collision.mjs, D-337) only validates BL- integers; BG-/TD- numbers have no automated check",
       "desc": "Filed 2026-05-26 after a near-miss during BG-115 filing (BL-155 follow-up): the dispatch grep `^",
@@ -1811,8 +1827,8 @@ const DATA = {
     {
       "id": "🟡 TD-WORKFLOWSTAGE-TYPE-DRIFT",
       "title": "WorkflowStage interface (types/index.ts:740) is stale vs the live workflow_templates.stages JSONB",
-      "desc": "Surfaced 2026-05-26 during BL-155 (D-358). The WorkflowStage interface has { id, name, order, required_documents, is_locked, canonical? }, but BL-130/131/132/138 shipped the JSONB as { key, locked, canonical, label_{en,fr,de,it} } (verified live). WorkflowTemplate.stages is typed WorkflowStage[] — so the type lies about the real shape. BL-155 worked around it by adding a NEW WorkflowTemplateStage type and casting at the hook's query boundary (did NOT touch WorkflowStage, to avoid breaking other consumers). Affects src/app/admin/workflows/page.tsx if it reads .name/.order/.is_locked off template stages. Fix: reconcile WorkflowStage → actual JSONB shape (or fold into WorkflowTemplateStage) + audit the admin workflows page. Cost-of-fix: ~1–2h. Not blocking BL-155. Partial retirement 2026-05-26 → D-360: field reads on src/app/admin/deals/[id]/page.tsx lines 462–516 corrected to the live JSONB shape via useWorkflowTemplate. Remaining stale surface: the WorkflowStage interface itself + any admin/workflows/page.tsx consumer. Status stays 🟡 OPEN (full reconciliation deferred). 2026-05-26 → D-361: the workflows-catalog StageStepper + instances display also corrected. Pre-flight confirmed 5 remaining WorkflowStage consumers — type def + WorkflowTemplate.stages, the /admin/workflows editor form, useWorkflows.ts (TemplateRow), useDeals.ts, workflowService.ts — so the type was NOT deleted; TD stays OPEN for full reconciliation (reconcile WorkflowStage to the JSONB shape or fold into WorkflowTemplateStage).",
-      "files": "src/types/index.ts:740 (WorkflowStage); consumers: WorkflowTemplate.stages, admin/workflows/page.tsx editor, useWorkflows.ts, useDeals.ts, workflowService.ts",
+      "desc": "Surfaced 2026-05-26 during BL-155 (D-358). The WorkflowStage interface has { id, name, order, required_documents, is_locked, canonical? }, but BL-130/131/132/138 shipped the JSONB as { key, locked, canonical, label_{en,fr,de,it} } (verified live). WorkflowTemplate.stages is typed WorkflowStage[] — so the type lies about the real shape. BL-155 worked around it by adding a NEW WorkflowTemplateStage type and casting at the hook's query boundary (did NOT touch WorkflowStage, to avoid breaking other consumers). Affects src/app/admin/workflows/page.tsx if it reads .name/.order/.is_locked off template stages. Fix: reconcile WorkflowStage → actual JSONB shape (or fold into WorkflowTemplateStage) + audit the admin workflows page. Cost-of-fix: ~1–2h. Not blocking BL-155. Partial retirement 2026-05-26 → D-360: field reads on src/app/admin/deals/[id]/page.tsx lines 462–516 corrected to the live JSONB shape via useWorkflowTemplate. Remaining stale surface: the WorkflowStage interface itself + any admin/workflows/page.tsx consumer. Status stays 🟡 OPEN (full reconciliation deferred). 2026-05-26 → D-361: the workflows-catalog StageStepper + instances display also corrected. Pre-flight confirmed 5 remaining WorkflowStage consumers — type def + WorkflowTemplate.stages, the /admin/workflows editor form, useWorkflows.ts (TemplateRow), useDeals.ts, workflowService.ts — so the type was NOT deleted; TD stays OPEN for full reconciliation (reconcile WorkflowStage to the JSONB shape or fold into WorkflowTemplateStage). 2026-05-26 → D-362: the workflows editor (write path) reworked to the live shape (BG-117) — 4 surfaces retired now (BG-92/115/116/117). The editor no longer reads stale fields (uses EditorStage + a boundary cast at save). WorkflowStage still has 5 type-level consumers; full retirement remains a future ~1-2h pass.",
+      "files": "src/types/index.ts:740 (WorkflowStage); consumers: WorkflowTemplate.stages, useWorkflows.ts (TemplateRow), useDeals.ts, workflowService.ts (+ editor now via cast)",
       "tag": "admin",
       "added": "2026-05-26"
     },
@@ -3139,6 +3155,13 @@ const DATA = {
       "added": "2026-05-21"
     },
     {
+      "id": "~~BG-117~~",
+      "title": "~~Workflows editor form (TemplateFormModal in /admin/workflows) is the mutation-side WorkflowStage drift: stages state + addStage/updateStage used {id,name,order,is_locked}, sent raw to create/update → templates persisted in the stale shape; cloning a canonical template errored on save (!s.name.trim() on label-only stages).~~ CLOSED 2026-05-26 → D-362. Editor reworked to the live JSONB shape (key/label_\u003clocale\u003e/locked/canonical): single-locale label edit (preserves other 3), per-stage canonical-category \u003cselect\u003e (BL-129 routing; raw enum — TD-WORKFLOW-STAGE-CATEGORY-I18N-KEYS), slugify-on-blur keys (nanoid placeholder + uniqueness check), required_documents kept via typed cast (TD-WORKFLOW-STAGE-REQUIRED-DOCS-NOT-IN-LIVE-JSONB), boundary cast at onSave (service untouched). Also closed a latent 🔴-class data-corruption path (clone-save wrote stale-shape stages) + a usability blocker (cloning a canonical template errored before save).",
+      "desc": "🟡 Significant (latent 🔴 data path). Filed + closed 2026-05-26 (BG-116 follow-up).",
+      "tag": "admin",
+      "added": "2026-05-26"
+    },
+    {
       "id": "~~BG-116~~",
       "title": "~~/admin/workflows template-catalog expansion shows empty numbered circles (1-N) with no labels — third sibling of BG-92/BG-115, same field-name drift.~~ CLOSED 2026-05-26 → D-361. The catalog StageStepper (and the instances section) read stale WorkflowStage fields (.id/.name/.order/.is_locked) vs live JSONB (.key/.label_\u003clocale\u003e/.locked) → all undefined → blank circles. Fixed via field-name correction + WorkflowTemplateStage type + useLocale() labels (Option B — no hook; templates have no workflow_instance_id). WorkflowStage type KEPT (5 consumers) → TD-WORKFLOWSTAGE-TYPE-DRIFT stays 🟡 partial.",
       "desc": "🟡 Significant. Filed + closed 2026-05-26 (BG-115 follow-up).",
@@ -3315,6 +3338,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-362",
+      "title": "BG-117 — workflows editor form WorkflowStage drift fix (mutation-side; 4th sibling)",
+      "desc": "The /admin/workflows template editor (TemplateFormModal) held stages as WorkflowStage[] ({id,name,order,is_locked}) and sent it raw to createTemplate/updateTemplate (which write raw, no transform) → new/edited templates persisted in the stale shape (latent 🔴 data-corruption); and handleSubmit's !s.name.trim() errored when cloning a canonical template (live stages have label_\u003clocale\u003e, not .name). Fix (Will's 5 locked decisions): reworked the editor to the live JSONB shape via EditorStage = WorkflowTemplateStage & {required_documents?} — (1) per-stage canonical-category \u003cselect\u003e over the 9 BL-129 enum values (default pre_offer, preserve on clone; raw enum, no i18n keys yet); (2) required_documents kept via typed cast; (3) boundary cast stages as unknown as WorkflowStage[] at onSave — workflowService/cloneTemplate/WorkflowTemplate.stages untouched; (4) single-locale label edit (label_\u003ccurrentLocale\u003e, other 3 preserved untouched; locale badge); (5) slugify-on-blur keys (stage_${nanoid(6)} placeholder, save-time finalize, in-template uniqueness check). Folded in: validator → active-locale-label, lockedSteps→s.key, React keys→s.key, dropped order. UNCHANGED: WorkflowStage type (5 consumers), cloneTemplate, useDeals.ts, schema, messages/*.json (duplicate-key error uses a plain string like the existing fallback). 2 TDs filed: TD-WORKFLOW-STAGE-REQUIRED-DOCS-NOT-IN-LIVE-JSONB 🟢, TD-WORKFLOW-STAGE-CATEGORY-I18N-KEYS 🟢. Verification: tsc --noEmit clean; npm run build clean (/admin/workflows compiled); ESLint clean. NEW spec docs/specs/BG-117-Spec-Workflows-Editor-WorkflowStage-Drift.md v0.2 LOCKED. package.json 2.6.22 → 2.6.23. Pending Will MCP (Scenarios A/B/C + locale-preservation SQL probe + Fatima empty-state).",
+      "completed": "MODIFIED src/app/admin/workflows/page.tsx, NEW docs/specs/BG-117-Spec-Workflows-Editor-WorkflowStage-Drift.md, ROADMAP.md, CHANGELOG.md, FEATURE-MAP.md, PROJECT-STRUCTURE.md, docs/dd-hardening/dd-hardening-tracker.xlsx, package.json (2.6.22 → 2.6.23)",
+      "tag": "admin"
+    },
     {
       "id": "D-361",
       "title": "BG-116 — workflows catalog stepper field-name drift fix (3rd sibling of BG-92/BL-155)",
