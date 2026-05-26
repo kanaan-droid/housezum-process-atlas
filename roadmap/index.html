@@ -145,7 +145,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-25';
+const LAST_UPDATED = '2026-05-26';
 const DATA = {
   "inProgress": [
     {
@@ -3293,6 +3293,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-359",
+      "title": "BL-155 follow-up — commit spec doc + PROJECT-STRUCTURE entry",
+      "desc": "Paper-trail follow-up to D-358. Committed the v0.2 LOCKED spec docs/specs/BL-155-Spec-Stepper-From-Workflow-Template.md (was a local-only working copy from ~/Downloads/claude/) + added its one-line PROJECT-STRUCTURE.md entry under docs/specs/ (BL-153/BL-154 row format). Also tagged the D-358 ship as v2.6.20 (lightweight tag on 5d67219; CI green — ci.yml runs on push/PR to main, not tags, and the 5d67219 run was already green). No code change, no package.json bump (stays v2.6.20), no new behavior.",
+      "completed": "NEW (committed) docs/specs/BL-155-Spec-Stepper-From-Workflow-Template.md, MODIFIED PROJECT-STRUCTURE.md, ROADMAP.md, CHANGELOG.md",
+      "tag": "admin"
+    },
     {
       "id": "D-358",
       "title": "BL-155 — Deal stepper sources from workflow_template (closes BG-92)",
