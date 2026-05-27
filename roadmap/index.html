@@ -118,6 +118,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal & Compliance</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/functional-guide/">Functional Guide</a>
   </div>
 </nav>
 <div class="header">
@@ -891,7 +892,7 @@ const DATA = {
     {
       "id": "BL-142",
       "title": "CH Compliance End-to-End Activation (aggregator)",
-      "desc": "Aggregator for the remaining work to close CH compliance end-to-end. References 6 TDs + BL-126: TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE 🟡 (~4-6h, primary D-325/D-327 consumer — hydrates entityData.buyer_lex_koller_residency_statuses[] from deal_participants; without this, all 5 conditional LK rules are inert) + TD-CRM-UI-LEX-KOLLER-RESIDENCY 🟡 (~4-6h, agent UI to capture residency status) + TD-COMPLIANCE-LEX-KOLLER-ENUM-EXPANSION 🟡 (~3-4h, 4→5+ value enum per ChatGPT/Gemini cross-val) + TD-COMPLIANCE-LEX-KOLLER-LEGAL-ENTITIES 🟡 (~4-6h, controlling-interest look-through for LLC/foundation buyers) + TD-COMPLIANCE-SNAPSHOT-ON-DEAL-CLOSE 🟡 (~3-5h, Swiss audit retention) + TD-COMPLIANCE-METADATA-COLUMN 🟡 (~1h, cross-cutting unblock for staleness alerts) + BL-126 🟢 (federal Lex Koller 2026 consultation, external Q4 2026 timeline). Total effort excluding BL-126: ~19-28h. Closes when end-to-end demo flow (BL-142 spec § 3) is MCP-verified. Today (D-325 + D-327) made the engine + rules theoretically correct; BL-142 closes the production loop.",
+      "desc": "Aggregator for the remaining work to close CH compliance end-to-end. References 6 TDs + BL-126: TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE 🟡 (~4-6h, primary D-325/D-327 consumer — hydrates entityData.buyer_lex_koller_residency_statuses[] from deal_participants; without this, all 5 conditional LK rules are inert) + TD-CRM-UI-LEX-KOLLER-RESIDENCY 🟡 (~4-6h, agent UI to capture residency status) + TD-COMPLIANCE-LEX-KOLLER-ENUM-EXPANSION 🟡 (~3-4h, 4→5+ value enum per ChatGPT/Gemini cross-val) + TD-COMPLIANCE-LEX-KOLLER-LEGAL-ENTITIES 🟡 (~4-6h, controlling-interest look-through for LLC/foundation buyers) + TD-COMPLIANCE-SNAPSHOT-ON-DEAL-CLOSE 🟡 (~3-5h, Swiss audit retention) + TD-COMPLIANCE-METADATA-COLUMN 🟡 (~1h, cross-cutting unblock for staleness alerts) + BL-126 🟢 (federal Lex Koller 2026 consultation, external Q4 2026 timeline). Total effort excluding BL-126: ~19-28h. Closes when end-to-end demo flow (BL-142 spec § 3) is MCP-verified. Today (D-325 + D-327) made the engine + rules theoretically correct; BL-142 closes the production loop. 2026-05-27 partial closure (D-366): 1 of 6 constituent TDs closed — TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE ships the hydration adapter + evaluateComplianceForDeal() service function. CH conditional LK rules now fire correctly end-to-end when called. Remaining 5 TDs still open.",
       "tag": "compliance",
       "added": "docs/specs/BL-142-Spec-CH-Compliance-End-to-End-Activation.md"
     },
@@ -1985,8 +1986,8 @@ const DATA = {
       "added": ""
     },
     {
-      "id": "🟡 TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE",
-      "title": "Build the missing evaluateComplianceForDeal() service. Filed 2026-05-14 (D-325). The engine NOW supports ConditionalRuleResolution (D-325) and CH-FR-LEX-KOLLER-AUTH ships with the new shape, but NO caller hydrates entityData.buyer_lex_koller_residency_statuses from deal_participants.lex_koller_residency_status — the rule will fall through to when_unevaluable (or when_unmatched) on every deal because the data is never populated. Build a service that: (a) queries deal_participants for the deal's buyers, (b) hydrates entityData.buyer_lex_koller_residency_statuses (array of non-NULL, non-'unknown' status values), (c) hydrates entityData.buyer_lex_koller_residency_statuses_have_missing (true if any participant has NULL or 'unknown'), (d) calls evaluateCompliance() with entityType='deal', trigger='deal.stage_change'. Hydration contract specified in D-325 spec § 4.2. Wires into a UI surface (likely a DealComplianceBanner component or admin dashboard). Includes the wave 2A spec § 9 step 5 end-to-end MCP verification that wave 2A could not complete. Cost-of-fix: ~4-6h.",
+      "id": "~~TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE~~ (D-366)",
+      "title": "~~Build the missing evaluateComplianceForDeal() service.~~ CLOSED 2026-05-27 → D-366. Shipped src/features/admin/services/dealComplianceService.ts (hydrateDealComplianceContext() + evaluateComplianceForDeal()) per D-325 §4.2 contract; 15 Jest tests green (8 hydration + 7 outcome). Closes 1 of 6 BL-142 constituent TDs. No production caller yet — BG-90's /advance-stage route is the future first caller; until then the service is dormant. Original: Filed 2026-05-14 (D-325). The engine NOW supports ConditionalRuleResolution (D-325) and CH-FR-LEX-KOLLER-AUTH ships with the new shape, but NO caller hydrates entityData.buyer_lex_koller_residency_statuses from deal_participants.lex_koller_residency_status — the rule will fall through to when_unevaluable (or when_unmatched) on every deal because the data is never populated. Build a service that: (a) queries deal_participants for the deal's buyers, (b) hydrates entityData.buyer_lex_koller_residency_statuses (array of non-NULL, non-'unknown' status values), (c) hydrates entityData.buyer_lex_koller_residency_statuses_have_missing (true if any participant has NULL or 'unknown'), (d) calls evaluateCompliance() with entityType='deal', trigger='deal.stage_change'. Hydration contract specified in D-325 spec § 4.2. Wires into a UI surface (likely a DealComplianceBanner component or admin dashboard). Includes the wave 2A spec § 9 step 5 end-to-end MCP verification that wave 2A could not complete. Cost-of-fix: ~4-6h.",
       "desc": "new file in src/features/deals/services/ (TBD), src/components/shared/DealComplianceBanner.tsx (TBD), MCP re-test of CH-FR-LEX-KOLLER-AUTH end-to-end",
       "files": "2026-05-14",
       "tag": "compliance",
@@ -3017,9 +3018,9 @@ const DATA = {
     },
     {
       "id": "BG-94",
-      "title": "Schema dual-column drift: deals.stage vs deals.current_stage_key (both populated identically by seed; UI PATCH updates only current_stage_key causing drift). Same pattern in deal_stage_history.from_stage/from_stage_key/to_stage/to_stage_key.",
+      "title": "Schema dual-column drift: deals.stage vs deals.current_stage_key (both populated identically by seed; UI PATCH updates only current_stage_key causing drift). Same pattern in deal_stage_history.from_stage/from_stage_key/to_stage/to_stage_key. 2026-05-27 partial cleanup (D-365): one-shot Will-side SQL UPDATE realigned deals.stage with deals.current_stage_key for 37 drifted rows (49% of 75 total); post-run verification confirmed 75/75 aligned. Forward prevention NOT addressed by D-365 — owned by BG-90 (server-side stage-advance enforcement + atomic dual-write) and BL-151 (compliance architecture absorption). The deal_stage_history.from_stage/to_stage legacy-column drift is also NOT addressed by D-365 (separate cleanup).",
       "desc": "🟡 Significant. Filed in Phase 3 Axis 6 (D-341). Spec § 5.3 said \"Use current_stage_key (v2). Legacy stage filled in parallel.\" — not DB-enforced.",
-      "tag": "admin",
+      "tag": "compliance",
       "added": "2026-05-19"
     },
     {
@@ -3346,6 +3347,27 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-366",
+      "title": "TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE — evaluateComplianceForDeal() service",
+      "desc": "Closes the keystone TD under BL-142 (CH Compliance End-to-End Activation). NEW service src/features/admin/services/dealComplianceService.ts ships two exported functions: hydrateDealComplianceContext() (pure hydration per D-325 §4.2 contract — builds buyer_lex_koller_residency_statuses[] + _have_missing flag from deal_participants where role=buyer, with .trim() normalization and zero-buyer⇒missing semantics per cross-val) and evaluateComplianceForDeal() (orchestrates hydrate → engine). Distinct DealNotFoundError + HydrationError classes for clean 404 vs 500 BG-90 handling. Server-side only; supabaseAdmin parameter runtime-checked (structural). After this ship the 5 D-325/D-327 conditional CH LK rules (CH-FR / 2×CH-VS / 2×CH-GR) fire correctly end-to-end when called — no CH-ZH conditional rule exists, that's separate scope. Verification: 15 unit tests green (8 hydration contract + 7 outcome); tsc --noEmit clean; npm run build clean; ESLint 0 errors. v0.2 LOCKED spec at docs/specs/TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE-Spec-v0.2.md (cross-validated by ChatGPT + Gemini; 9 reconciled changes). No UI shipped here — DealComplianceBanner is separate scope. No production caller yet — BG-90's /advance-stage route will be the first; until then this service is dormant. package.json 2.6.24 → 2.6.25. Pending Will MCP (post-BG-90: confirm compliance_evaluations audit rows at trigger='deal.stage_change').",
+      "completed": "NEW src/features/admin/services/dealComplianceService.ts, NEW tests/unit/dealComplianceService.test.ts, NEW docs/specs/TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE-Spec-v0.2.md, MODIFIED ROADMAP.md, CHANGELOG.md, FEATURE-MAP.md, PROJECT-STRUCTURE.md, docs/sessions/STANDING-OBLIGATIONS.md, docs/dd-hardening/dd-hardening-tracker.xlsx, package.json (2.6.24 → 2.6.25)",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-365",
+      "title": "TD-BG94-BACKFILL — one-shot deals.stage realignment",
+      "desc": "Will-side SQL UPDATE (run 2026-05-27 via Supabase SQL Editor) realigned the legacy deals.stage column with v2 deals.current_stage_key for 37 of 75 drifted rows. Surfaced during BG-90 pre-flight evidence pass (Probe B). Root cause: dual write-path bypass between src/features/deals/services/dealService.ts (moveDealStage writes current_stage_key only) and src/features/admin/services/dealService.ts (moveStage writes stage only) — every mixed-surface session widened the drift. Scope: data realignment + a one-line tooling fix. No app code change; no package.json bump; no tag. Tooling fix (in-scope): added a NEW ABSORBER_TICKETS set to scripts/docs-check.mjs excluding absorber tickets (BL-151 / BL-152) from the debt-ceiling count — naming BL-151 as the forward-prevention owner in this Done row pushed the count 7→8 (the hard ceiling, DEBT_FAIL), but an absorber ticket is pending architecture work, not shipped debt. Forward prevention NOT in scope — owned by BG-90 (atomic dual-write in the new /api/deals/[id]/advance-stage route) and BL-151 (compliance architecture). deal_stage_history legacy-column drift NOT addressed here. SQL: UPDATE deals SET stage = current_stage_key, updated_at = now() WHERE stage IS DISTINCT FROM current_stage_key; Verification: post-run probe returned 75 aligned / 0 drifted.",
+      "completed": "MODIFIED ROADMAP.md (BG-94 row append + D-365 row), CHANGELOG.md, docs/sessions/STANDING-OBLIGATIONS.md (rows 4/5/6 current + History entry), docs/dd-hardening/dd-hardening-tracker.xlsx (README v0.2.17 + Known Bugs Mirror BG-94 row added, OPEN), scripts/docs-check.mjs (NEW ABSORBER_TICKETS exclusion)",
+      "tag": "compliance"
+    },
+    {
+      "id": "D-364",
+      "title": "BL-160 — Atlas Functional Guide section",
+      "desc": "NEW Process Atlas section (7th): Functional Guide — living, plain-English reference docs (one per functional area) capturing how features work, edge cases, and gotchas, for agents/support/sales/investors + engineering reference. Config-driven addition (D-345/BL-153d generator): one entry appended to scripts/lib/atlas-section-config.mjs (multi-page layout, sourceDir: docs/functional-guide) + a matching docs:html:functional-guide npm script — no generator code change. First entry: docs/functional-guide/compliance.md v0.2 (Will-drafted, committed in the prior session-8 paper-trail commit 2ff4be8; covers the 3 badge surfaces, colour vocabulary, §6b Edge Case Catalog / 12 open questions). Single-source lonely-landing: compliance.md renders directly as functional-guide/index.html (a dedicated compliance.html + index list appears once a 2nd guide lands). NEW Standing Obligation #8 (Functional Guide maintenance) filed. Atlas root regenerated → 7 cards. Verification: generator emitted \"7 sections rendered\"; cross-links rewritten; docs:check clean. No package.json bump / no tag (doc-infra only; bump held for the next app code change per dispatch).",
+      "completed": "MODIFIED scripts/lib/atlas-section-config.mjs, package.json (npm script only — no version bump), ROADMAP.md, CHANGELOG.md, docs/sessions/STANDING-OBLIGATIONS.md, docs/dd-hardening/dd-hardening-tracker.xlsx; Atlas repo: index.html + NEW functional-guide/index.html (commit 2d7e0d0)",
+      "tag": "compliance"
+    },
     {
       "id": "D-363",
       "title": "BG-91 — kanban deal cards now show a compliance-status badge",
