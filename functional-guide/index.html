@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Functional Guide — Compliance</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/functional-guide/" class="active">Functional Guide</a>
+  </div>
+</nav>
+<main>
+  
+  
+  <div class="content"><h1>Functional Guide — Compliance</h1>
+<p><strong>Status:</strong> Living document. Updated end-of-session whenever compliance behavior changes. <strong>Version:</strong> v0.2 <strong>Last updated:</strong> 2026-05-27 (session 8, post BG-91 / D-363) <strong>Maintainer:</strong> Will + Claude</p>
+<hr/>
+<h2>0. How to use this guide</h2>
+<p>This guide is the <strong>single source of truth</strong> for how compliance works in HouseZoom today. It is written for non-engineers (agents, agency admins, support, sales, investors) as well as engineers needing quick reference.</p>
+<p><strong>If you ask "what happens when X?" and the answer isn't in this guide, that's a documentation gap.</strong> Add a row to §6b (Edge Case Catalog) when you discover one. The catalog grows by discovery, not by speculation.</p>
+<p><strong>Maintenance rule:</strong> any session that ships user-visible behavior change updates this file. See Standing Obligations.</p>
+<hr/>
+<h2>1. What it does (plain English)</h2>
+<p>HouseZoom's compliance engine tells agents — at a glance and in real time — whether a deal is safe to keep moving or whether it's missing something the law requires. Every market HouseZoom operates in (Switzerland, France, UAE, Italy) has its own rules: cantonal Lex Koller in Switzerland, Loi Alur / Hoguet in France, DLD / RERA in the UAE, mediation laws in Italy. Instead of asking agents to memorize the rules, HouseZoom encodes them into the workflow and continuously evaluates each deal against them. The result is a single, colour-coded signal — green, yellow, red — visible on every screen where deals appear.</p>
+<p>In short: agents focus on the deal; HouseZoom watches the rulebook.</p>
+<hr/>
+<h2>2. Where you see it</h2>
+<p>The compliance status appears as a <strong>coloured badge</strong> on three screens:</p>
+<table><thead><tr><th>Surface</th><th>What renders</th><th>Ticket</th></tr></thead><tbody><tr><td><strong>Kanban board</strong> (<code>/admin/deals</code>)</td><td>Small badge on each deal card next to the deal type</td><td>BG-91 (this session)</td></tr><tr><td><strong>Deal detail page</strong> (<code>/admin/deals/[id]</code>)</td><td>Larger badge near the deal header</td><td>BG-115</td></tr><tr><td><strong>Workflows admin</strong> (<code>/admin/workflows</code>)</td><td>Badge on each workflow instance row</td><td>BG-116</td></tr></tbody></table>
+<p>Badge colour vocabulary is consistent across all three surfaces:</p>
+<ul><li>🟢 <strong>OK (green)</strong> — nothing blocking. Deal is moving as expected.</li><li>🟡 <strong>WARN (yellow)</strong> — something needs attention soon, but the deal isn't blocked yet.</li><li>🔴 <strong>BLOCK (red)</strong> — the deal cannot legally advance until the issue is resolved. (Note: enforcement is visual today; server-side enforcement tracked as BG-90.)</li><li><em>(no badge)</em> — this deal has no workflow attached (e.g. legacy or UAE deals predating template assignment). Compliance is not being evaluated.</li></ul>
+<hr/>
+<h2>3. How it works (user-facing flow)</h2>
+<p>When an agent creates or works on a deal, HouseZoom checks the deal against the rules attached to the agent's market. The rules live inside the <strong>workflow template</strong> assigned to the deal (one template per canton in Switzerland, one per region elsewhere). Each step of the workflow can be tagged with a compliance category — for example "this step requires KYC complete" or "this step requires Lex Koller authorization before continuing."</p>
+<p>As the agent moves the deal through stages, fills in fields, uploads documents, or adds parties, the compliance engine re-evaluates and updates the badge. The agent does nothing special — the signal just appears.</p>
+<p><strong>Example walkthrough (live in Zürich Premium Realty seed):</strong></p>
+<ul><li><strong>P1 Kilchberg Villa — Brunner</strong> → 🟢 OK — KYC complete, parties confirmed, no Lex Koller trigger, deal can move freely.</li><li><strong>P5 Bellerive Penthouse — Rinaldi</strong> → 🟡 WARN — likely a soft warning (missing GEAK or near-deadline document); deal can still move, but the agent should resolve it before the next stage.</li><li><strong>P4 Zollikon Townhouse — Sutherland (person-abroad)</strong> → 🔴 BLOCK — Sutherland is a buyer abroad; Swiss Lex Koller requires cantonal authorization before the sale to a foreign buyer can proceed. The badge tells the agent to stop and resolve before doing anything else.</li><li><strong>Aktiv – Manuel Kaufmann</strong> → no badge — this is a lead-stage deal not yet attached to a workflow; nothing to evaluate.</li></ul>
+<hr/>
+<h2>4. What drives it (data sources)</h2>
+<p>The badge data comes from one place: a field called <code>compliance_status</code> on the deal's attached <strong>workflow instance</strong> (one workflow instance per deal that's running on a template).</p>
+<ul><li>The field has exactly three possible values: <code>ok</code>, <code>warn</code>, <code>block</code>.</li><li>A deal with no workflow instance attached returns no value — the badge simply doesn't render.</li><li>The agent never edits this field directly. It's set by the compliance engine when: - The deal is created against a market template - A workflow stage advances - A document is uploaded, signed, or expires - A party is added, removed, or has KYC status changed - A nightly re-evaluation pass runs (planned for BL-153a)</li></ul>
+<p>The badge UI itself is purely visual — it reads <code>compliance_status</code> and picks the colour. No logic on the kanban card or the detail page makes its own compliance judgement.</p>
+<hr/>
+<h2>5. Markets &amp; locale variance</h2>
+<p>Compliance rules vary by market, but the badge surface is uniform — same colours, same placement, same meaning everywhere. What differs is what <em>causes</em> a badge to go yellow or red.</p>
+<table><thead><tr><th>Market</th><th>Triggers that move a badge to WARN or BLOCK</th></tr></thead><tbody><tr><td><strong>Switzerland (CH)</strong></td><td>Lex Koller person-abroad authorization; GEAK energy certificate missing; cantonal-specific document deadlines; notary appointment confirmation; BL-129 stage-category gates</td></tr><tr><td><strong>France (FR)</strong></td><td>Loi Alur diagnostic bundle (DPE, ERP, etc.); Hoguet card validity for mandate; mandate notice period; compromis-to-acte timing</td></tr><tr><td><strong>UAE</strong></td><td>DLD / RERA registration; broker permit validity; Form A/B/F status; trustee assignment</td></tr><tr><td><strong>Italy</strong></td><td>Mediator authorization (legge sulla mediazione); preliminary contract registration; AML checks</td></tr></tbody></table>
+<p>When the agent's locale is French, the badge labels currently still render as raw English (<code>OK</code> / <code>WARN</code> / <code>BLOCK</code>) — this is intentional consistency with the other two badge surfaces. Full localization (with <code>compliance.status.ok</code>, <code>.warn</code>, <code>.block</code> keys) is planned as a single-pass update across all three surfaces (filed as TD-COMPLIANCE-BADGE-I18N 2026-05-27).</p>
+<hr/>
+<h2>6. Known limitations &amp; gotchas</h2>
+<p>These are intentional behaviors or known shortcomings of the current implementation. They're stable enough to document upfront. Use this section to set expectations with new users; use §6b for cases discovered in the wild.</p>
+<ul><li><strong>No workflow attached → no badge.</strong> Correct behavior. Common for legacy deals migrated before template assignment, lead-stage deals not yet promoted, and UAE deals predating template rollout.</li><li><strong>Workflow attached but evaluation hasn't run yet → defaults to <code>ok</code>.</strong> The database default. Agents will see green until the first evaluation finds something. This is an acceptable optimistic default; a future enhancement may render a neutral "pending" badge instead (not yet scoped).</li><li><strong>Block state never enforces server-side today.</strong> A red badge tells agents "stop" but doesn't yet prevent stage advance at the server. Server-side enforcement is tracked as BG-90.</li><li><strong>Workflow templates without compliance categories on stages → behaves as <code>ok</code>.</strong> Stages without a <code>canonical</code> category contribute nothing to evaluation. Currently relevant for any non-CH template until BL-129-style categorization is extended market by market.</li><li><strong>Badge labels render in raw uppercase English even on FR/DE/IT locales.</strong> Intentional cross-surface consistency until TD-COMPLIANCE-BADGE-I18N ships.</li></ul>
+<hr/>
+<h2>6b. Edge case catalog</h2>
+<p>A growing list of non-obvious behaviors discovered in the wild. Add a row whenever a "what happens when X?" question comes up and the answer wasn't already documented. Mark unknowns honestly — "needs investigation" is a valid answer that triggers a follow-up.</p>
+<table><thead><tr><th>Scenario</th><th>Current behavior</th><th>Status</th><th>Source</th></tr></thead><tbody><tr><td>Stage advance attempted while badge is 🔴 BLOCK</td><td>Advance succeeds; badge remains red; no server-side block. Visual deterrent only today.</td><td>Confirmed</td><td>BG-90 ticket scope</td></tr><tr><td>Multiple participants with different KYC states (e.g. one buyer KYC-complete, one pending)</td><td><strong>Needs investigation.</strong> Suspected: any participant in <code>warn</code> lifts deal to <code>warn</code>; any in <code>block</code> lifts deal to <code>block</code>. Not verified.</td><td>Open question</td><td>2026-05-27 session 8</td></tr><tr><td>Document expires after upload (e.g. Hoguet card expires mid-deal)</td><td><strong>Needs investigation.</strong> Today the badge likely does NOT auto-update on expiry — re-evaluation is triggered by deal mutations, not by clock events. Nightly background re-eval (BL-153a) will close this.</td><td>Open question</td><td>2026-05-27 session 8</td></tr><tr><td>Workflow template swapped mid-deal (e.g. canton changed)</td><td><strong>Needs investigation.</strong> Likely re-evaluates against the new template on next mutation, but historical state on the previous template is not preserved.</td><td>Open question</td><td>2026-05-27 session 8</td></tr><tr><td>Workflow instance exists but template was deleted</td><td><strong>Needs investigation.</strong> Likely renders last-known <code>compliance_status</code> value, but evaluation can no longer re-run. Should probably surface a warn/error state.</td><td>Open question</td><td>2026-05-27 session 8</td></tr><tr><td>Compliance evaluation throws an error (malformed rule, missing data)</td><td><strong>Needs investigation.</strong> Today probably leaves <code>compliance_status</code> at its previous value. No error-state badge exists.</td><td>Open question</td><td>2026-05-27 session 8</td></tr><tr><td>Manager attempts to override a block</td><td><strong>Likely not possible today</strong> — no override UI exists. All overrides would require direct DB intervention. Worth confirming whether this is desired product behavior or a gap.</td><td>Open question / product decision</td><td>2026-05-27 session 8</td></tr><tr><td>Deal with no participants yet</td><td><strong>Needs investigation.</strong> KYC checks can't run; badge probably stays at <code>ok</code> default. May be misleading.</td><td>Open question</td><td>2026-05-27 session 8</td></tr><tr><td>Lex Koller buyer becomes resident mid-deal (residency status changes)</td><td><strong>Needs investigation.</strong> Buyer-side data update should re-trigger evaluation, but unclear whether residency-status changes propagate to compliance recomputation today.</td><td>Open question</td><td>2026-05-27 session 8</td></tr><tr><td>Deal closed (won/lost) while badge is 🔴 BLOCK</td><td><strong>Needs investigation.</strong> Closing likely terminates evaluation; final badge state may be frozen. Audit implication: closed deals show their last-known compliance state forever.</td><td>Open question</td><td>2026-05-27 session 8</td></tr><tr><td>UAE deal with no workflow but Form A/B/F still required by RERA</td><td><strong>Known gap.</strong> UAE deals without templates fall outside the engine entirely; compliance is on the agent's shoulders for these. Template rollout in UAE will close this.</td><td>Known gap</td><td>2026-05-27 session 8</td></tr><tr><td>Deal moved between organizations</td><td><strong>Almost certainly does not happen today</strong> — there's no UI for it. If forced via DB, workflow instance's <code>org_id</code> and the deal's <code>org_id</code> could desync, breaking RLS and badge visibility. Out of scope for now.</td><td>Out of scope</td><td>2026-05-27 session 8</td></tr></tbody></table>
+<p><strong>How to triage an "open question" row:</strong></p>
+<ul><li>If a customer or investor asks → answer with "we'd need to verify; here's the suspected behavior" and file a BG to confirm.</li><li>If you hit it in testing → confirm behavior, update the row, change status to "Confirmed."</li><li>If the answer reveals a bug → file a BG and link it from the row.</li></ul>
+<hr/>
+<h2>7. Related tickets</h2>
+<table><thead><tr><th>Ticket</th><th>What it shipped</th><th>Status</th></tr></thead><tbody><tr><td>BL-129</td><td>Stage <code>canonical</code> compliance category enum (8 values: <code>listing</code> / <code>pre_offer</code> / <code>offer</code> / <code>pre_contract</code> / <code>cooling_off</code> / <code>pre_transfer</code> / <code>transfer</code> / <code>post_transfer</code>) — the routing layer the engine uses to know which stage requires what</td><td>✅ shipped</td></tr><tr><td>BG-92 / BG-115 / BG-116 / BG-117</td><td>The four-surface arc that introduced consistent <code>WorkflowStage</code> typing across read and write paths. Without this work, the badge data couldn't be reliably read or written.</td><td>✅ all shipped</td></tr><tr><td>BG-115</td><td>Compliance badge on deal detail page (<code>/admin/deals/[id]</code>)</td><td>✅ shipped</td></tr><tr><td>BG-116</td><td>Compliance badge on workflow instances admin page (<code>/admin/workflows</code>)</td><td>✅ shipped</td></tr><tr><td><strong>BG-91 / D-363</strong></td><td><strong>Compliance badge on kanban deal card (<code>/admin/deals</code>) — this session</strong></td><td>✅ shipped 2026-05-27</td></tr><tr><td>BL-151</td><td>Compliance architecture document (will absorb the BG-92/115/116/117 arc into a single canonical doc)</td><td>🟡 planned</td></tr><tr><td>BG-90</td><td>Server-side stage-advance enforcement when <code>compliance_status = 'block'</code> (prevents bypass)</td><td>🟡 planned</td></tr><tr><td>BG-104</td><td>Companion to BG-90 (stage advance validation)</td><td>🟡 planned</td></tr><tr><td>BL-153a</td><td>Nightly background compliance re-evaluation agent</td><td>🟡 planned</td></tr><tr><td>TD-COMPLIANCE-BADGE-I18N</td><td>Localized badge labels (<code>OK</code> / <code>WARN</code> / <code>BLOCK</code> → translated across en/fr/de/it for all 3 surfaces in one pass)</td><td>🟢 deferred</td></tr></tbody></table>
+<hr/>
+<h2>8. Glossary (jargon-free)</h2>
+<ul><li><strong>Workflow template</strong> — a market-specific recipe of stages, document requirements, and rules. One per canton in Switzerland; one per region elsewhere.</li><li><strong>Workflow instance</strong> — the live copy of a template attached to a specific deal. Holds the deal's current stage, document statuses, and compliance state.</li><li><strong>Stage</strong> — a discrete step in the deal lifecycle (e.g. <code>Qualification</code>, <code>Mandat</code>, <code>Promesse</code>, <code>Acte authentique</code>).</li><li><strong>Canonical category</strong> — the compliance bucket a stage belongs to (e.g. <code>pre_offer</code>, <code>transfer</code>). Determines which rules apply at which stage.</li><li><strong>Compliance engine</strong> — the code that reads the deal + workflow instance + rules and outputs <code>ok</code> / <code>warn</code> / <code>block</code>. Today: synchronous on deal mutations. Future: also nightly background pass.</li><li><strong>Lex Koller</strong> — Swiss federal law restricting real estate sales to non-residents; requires cantonal authorization for certain buyer profiles.</li><li><strong>Loi Alur / Hoguet</strong> — French laws governing real estate transactions and the agent profession (mandate, diagnostics, agent licensing).</li><li><strong>DLD / RERA</strong> — Dubai Land Department / Real Estate Regulatory Agency. UAE regulators.</li><li><strong>KYC</strong> — Know Your Customer. The identity-verification process for parties in a transaction. Mandatory under AML laws.</li><li><strong>AML</strong> — Anti-Money Laundering. The regulatory framework KYC sits inside.</li></ul>
+<hr/>
+<p><strong>Change log</strong></p>
+<table><thead><tr><th>Date</th><th>Version</th><th>Session</th><th>Change</th></tr></thead><tbody><tr><td>2026-05-27</td><td>v0.1</td><td>Session 8</td><td>Initial version, post BG-91 / D-363. Three-surface badge arc complete (kanban + detail + workflows).</td></tr><tr><td>2026-05-27</td><td>v0.2</td><td>Session 8</td><td>§0 maintenance policy added. §6 renamed to "Known limitations &amp; gotchas." New §6b "Edge Case Catalog" seeded with 12 open questions. Glossary extended with KYC, AML.</td></tr></tbody></table></div>
+</main>
+<footer>
+  HouseZoom.ai Functional Guide · Auto-generated from <code>docs/functional-guide/compliance.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>
