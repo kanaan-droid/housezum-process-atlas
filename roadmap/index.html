@@ -145,7 +145,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-26';
+const LAST_UPDATED = '2026-05-27';
 const DATA = {
   "inProgress": [
     {
@@ -1817,6 +1817,14 @@ const DATA = {
       "added": "2026-05-26"
     },
     {
+      "id": "🟢 TD-COMPLIANCE-BADGE-I18N",
+      "title": "The kanban deal-card compliance badge (BG-91) renders the raw uppercased enum (OK/WARN/BLOCK), not a localized string",
+      "desc": "Surfaced 2026-05-27 (BG-91). Matches the existing deals/[id] + /admin/workflows instance badges (same raw-uppercase pattern; zero new i18n keys per Will's locked decision). A compliance namespace exists in messages/*.json but only partially (block in some locales). Fix: add compliance.ok/warn/block ×4 locales + wire all three badge sites (kanban card, deals/[id], workflows instances) through t() for a consistent localized label. Low priority — cosmetic, English-readable.",
+      "files": "src/app/admin/deals/page.tsx (kanban badge); messages/{en,fr,de,it}.json",
+      "tag": "compliance",
+      "added": "2026-05-27"
+    },
+    {
       "id": "🟢 TD-PROCESS-BG-NUMBER-COLLISION-PRECHECK",
       "title": "The BL-collision precheck script (scripts/check-bl-collision.mjs, D-337) only validates BL- integers; BG-/TD- numbers have no automated check",
       "desc": "Filed 2026-05-26 after a near-miss during BG-115 filing (BL-155 follow-up): the dispatch grep `^",
@@ -2987,9 +2995,9 @@ const DATA = {
       "added": "2026-05-19"
     },
     {
-      "id": "BG-91",
-      "title": "Kanban deal-list query omits compliance_status from workflow_instances select — UI cannot render block indicator because the data isn't fetched",
-      "desc": "🔴 Critical (trivial fix; large visual impact). Filed in Phase 3 Axis 6 (D-341).",
+      "id": "~~BG-91~~",
+      "title": "~~Kanban deal-list query omits compliance_status from workflow_instances select — UI cannot render block indicator because the data isn't fetched~~ CLOSED 2026-05-27 → D-363. Kanban fetchDeals (src/features/deals/services/dealService.ts) now embeds workflow_instance:workflow_instances!fk_deals_workflow_instance(compliance_status) and flattens it onto each DealV2.compliance_status (null when no workflow_instance_id → badge hidden); the kanban card (src/app/admin/deals/page.tsx) renders a colored compliance badge (ok=green / warn=yellow / block=red, raw uppercase). 1 TD filed (TD-COMPLIANCE-BADGE-I18N 🟢). Spec-file note: the dispatch + prior pre-flight named src/features/admin/services/dealService.ts, but the kanban consumes useDealsV2 → src/features/deals/services/dealService.ts; retargeted to the correct file after a pre-flight STOP (Will confirmed).",
+      "desc": "🔴 Critical (trivial fix; large visual impact). Filed in Phase 3 Axis 6 (D-341). Closed 2026-05-27.",
       "tag": "compliance",
       "added": "2026-05-19"
     },
@@ -3338,6 +3346,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-363",
+      "title": "BG-91 — kanban deal cards now show a compliance-status badge",
+      "desc": "The /admin/deals kanban omitted any compliance indicator on deal cards (State C — no render code existed): the card showed title/health/type/price/probability/agent but nothing for workflow_instances.compliance_status, and the kanban fetchDeals never fetched it. Fix (Will's 4 locked decisions — GO; all 3 states; embed+flatten; raw-uppercase, zero new i18n keys): (1) added `compliance_status?: 'ok'",
+      "completed": "'warn'",
+      "tag": "compliance"
+    },
     {
       "id": "D-362",
       "title": "BG-117 — workflows editor form WorkflowStage drift fix (mutation-side; 4th sibling)",
