@@ -146,7 +146,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-27';
+const LAST_UPDATED = '2026-05-28';
 const DATA = {
   "inProgress": [
     {
@@ -892,7 +892,7 @@ const DATA = {
     {
       "id": "BL-142",
       "title": "CH Compliance End-to-End Activation (aggregator)",
-      "desc": "Aggregator for the remaining work to close CH compliance end-to-end. References 6 TDs + BL-126: TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE 🟡 (~4-6h, primary D-325/D-327 consumer — hydrates entityData.buyer_lex_koller_residency_statuses[] from deal_participants; without this, all 5 conditional LK rules are inert) + TD-CRM-UI-LEX-KOLLER-RESIDENCY 🟡 (~4-6h, agent UI to capture residency status) + TD-COMPLIANCE-LEX-KOLLER-ENUM-EXPANSION 🟡 (~3-4h, 4→5+ value enum per ChatGPT/Gemini cross-val) + TD-COMPLIANCE-LEX-KOLLER-LEGAL-ENTITIES 🟡 (~4-6h, controlling-interest look-through for LLC/foundation buyers) + TD-COMPLIANCE-SNAPSHOT-ON-DEAL-CLOSE 🟡 (~3-5h, Swiss audit retention) + TD-COMPLIANCE-METADATA-COLUMN 🟡 (~1h, cross-cutting unblock for staleness alerts) + BL-126 🟢 (federal Lex Koller 2026 consultation, external Q4 2026 timeline). Total effort excluding BL-126: ~19-28h. Closes when end-to-end demo flow (BL-142 spec § 3) is MCP-verified. Today (D-325 + D-327) made the engine + rules theoretically correct; BL-142 closes the production loop. 2026-05-27 partial closure (D-366): 1 of 6 constituent TDs closed — TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE ships the hydration adapter + evaluateComplianceForDeal() service function. CH conditional LK rules now fire correctly end-to-end when called. Remaining 5 TDs still open.",
+      "desc": "Aggregator for the remaining work to close CH compliance end-to-end. References 6 TDs + BL-126: TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE 🟡 (~4-6h, primary D-325/D-327 consumer — hydrates entityData.buyer_lex_koller_residency_statuses[] from deal_participants; without this, all 5 conditional LK rules are inert) + TD-CRM-UI-LEX-KOLLER-RESIDENCY 🟡 (~4-6h, agent UI to capture residency status) + TD-COMPLIANCE-LEX-KOLLER-ENUM-EXPANSION 🟡 (~3-4h, 4→5+ value enum per ChatGPT/Gemini cross-val) + TD-COMPLIANCE-LEX-KOLLER-LEGAL-ENTITIES 🟡 (~4-6h, controlling-interest look-through for LLC/foundation buyers) + TD-COMPLIANCE-SNAPSHOT-ON-DEAL-CLOSE 🟡 (~3-5h, Swiss audit retention) + TD-COMPLIANCE-METADATA-COLUMN 🟡 (~1h, cross-cutting unblock for staleness alerts) + BL-126 🟢 (federal Lex Koller 2026 consultation, external Q4 2026 timeline). Total effort excluding BL-126: ~19-28h. Closes when end-to-end demo flow (BL-142 spec § 3) is MCP-verified. Today (D-325 + D-327) made the engine + rules theoretically correct; BL-142 closes the production loop. 2026-05-27 partial closure (D-366): 1 of 6 constituent TDs closed — TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE ships the hydration adapter + evaluateComplianceForDeal() service function. CH conditional LK rules now fire correctly end-to-end when called. Remaining 5 TDs still open. 2026-05-28 partial closure (D-367): 2 of 6 closed — TD-CRM-UI-LEX-KOLLER-RESIDENCY ships the agent UI (per-row LK select + Save on existing buyer/seller, + LK on add-participant form, CH-only) + POST /api/deals/[id]/recompute-compliance endpoint + data-only migration wiring the 3 federal LK rules (CH-SALE-LEX-KOLLER-AUTHORIZATION/EXEMPTION/STATUS-DECLARATION-001) to the conditional-resolution shape. The end-to-end loop (set residency → recompute → block fires) is now real. Remaining 4 TDs still open.",
       "tag": "compliance",
       "added": "docs/specs/BL-142-Spec-CH-Compliance-End-to-End-Activation.md"
     },
@@ -1802,6 +1802,14 @@ const DATA = {
   ],
   "techDebt": [
     {
+      "id": "🔴 TD-COMPLIANCE-ENGINE-CONDITIONAL-RESOLUTION",
+      "title": "D-366 engine does NOT apply conditional_rule_resolution from compliance_rules.conditions — when_matched.blocking=true never flips rule outcomes",
+      "desc": "Surfaced 2026-05-28 during D-367 Phase 12 walkthrough on Sutherland D11. Verified via 4 successive recomputes with buyer LK toggled across all 4 enum values + NULL: overall_status stayed warn every time, rules_failed = 0, the AUTHORIZATION rule (which the D-367 migration explicitly wired to when_matched.blocking=true on person_abroad) returned status:warned, blocking:null, severity:null despite context_snapshot.buyer_lex_koller_residency_statuses = [\"person_abroad\"]. Engine reads input correctly (input aggregation is fine) but the conditional-resolution evaluator never flips outcomes. Affects ALL rules using the conditional_rule_resolution shape — the 5 cantonal LK rules from D-325/D-327 (CH-FR, CH-VS×2, CH-GR×2) + the 3 federal LK rules just landed in D-367. Pillar 2's blocking promise is silent until fixed. Fix path: debug complianceEngine.ts modifier-resolution path; likely a missing branch where when_matched.blocking overrides the rule's base blocking value before the aggregate. Cost-of-fix: ~1-2h debug + fix. P1 — highest-priority compliance fix; blocks BL-142 production loop.",
+      "files": "src/features/admin/services/complianceEngine.ts (modifier resolution / effective-rule build); regression: tests/unit/complianceEngine-d325.test.ts + tests/unit/dealComplianceService.test.ts may already pass in isolation but live engine diverges — investigate test-vs-runtime gap",
+      "tag": "compliance",
+      "added": "2026-05-28"
+    },
+    {
       "id": "🟢 TD-WORKFLOW-STAGE-REQUIRED-DOCS-NOT-IN-LIVE-JSONB",
       "title": "Editor has a required_documents input per stage, but the field is not present in the live workflow_templates.stages JSONB (canonical seeds = {key,label_\u003clocale\u003e,locked,canonical})",
       "desc": "Surfaced 2026-05-26 (BG-117). Kept in the editor via a typed cast (EditorStage = WorkflowTemplateStage & {required_documents?}) so the UI doesn't regress, but it writes a field nothing else reads. Investigate: (a) persisted/consumed somewhere unaudited, (b) dead UI to remove, or (c) a planned future field (extend WorkflowTemplateStage + a reader). Not BG-117's problem.",
@@ -2026,8 +2034,8 @@ const DATA = {
       "added": ""
     },
     {
-      "id": "🟡 TD-CRM-UI-LEX-KOLLER-RESIDENCY",
-      "title": "Agent UI to capture lex_koller_residency_status on deal participants. Filed 2026-05-14 (D-325). The column exists in DB (D-325 migration) but no UI writes to it. Need: modal or inline field on participant card / deal flow that prompts the agent to classify each buyer. Should also future-proof for external_party_info buyers (legal entities — TBD JSONB shape per TD-COMPLIANCE-LEX-KOLLER-LEGAL-ENTITIES). Wire into the deal stage progression UI; can be a side panel or required-field prompt at the appropriate workflow stage. Cost-of-fix: ~4-6h.",
+      "id": "~~TD-CRM-UI-LEX-KOLLER-RESIDENCY~~ (D-367)",
+      "title": "~~Agent UI to capture lex_koller_residency_status on deal participants.~~ CLOSED 2026-05-28 → D-367. Shipped LexKollerResidencySelect component + per-row LK Save on each existing buyer/seller (CH deals) + LK on the add-participant form; new scoped service updateParticipantLexKoller + endpoint POST /api/deals/[id]/recompute-compliance; data-only migration wiring 3 federal LK rules (AUTHORIZATION blocks person_abroad; EXEMPTION + STATUS-DECLARATION stay flag); seed parity patch. 2 of 6 BL-142 constituent TDs now closed. Original: Filed 2026-05-14 (D-325). The column exists in DB (D-325 migration) but no UI writes to it. Need: modal or inline field on participant card / deal flow that prompts the agent to classify each buyer. Should also future-proof for external_party_info buyers (legal entities — TBD JSONB shape per TD-COMPLIANCE-LEX-KOLLER-LEGAL-ENTITIES). Wire into the deal stage progression UI; can be a side panel or required-field prompt at the appropriate workflow stage. Cost-of-fix: ~4-6h.",
       "desc": "src/features/deals/ UI components, agent_profiles routing",
       "files": "2026-05-14",
       "tag": "compliance",
@@ -3171,6 +3179,20 @@ const DATA = {
       "added": "2026-05-26"
     },
     {
+      "id": "BG-118",
+      "title": "DealDetailPanel — LK select doesn't re-hydrate from server after Save (panel local state stale)",
+      "desc": "After clicking the per-row Save on LexKollerResidencySelect, the dropdown's local state (lkEdits map + the lkValue fallback to p.lex_koller_residency_status) doesn't re-sync from the persisted server value on the next interaction. Saving unknown causes the dropdown to render empty next time it's opened, even though the DB has the correct value. Verified during D-367 Phase 12 walkthrough on Sutherland D11. Risk: agents may accidentally double-save with the wrong value because the UI appears empty after a successful save. Likely fix: ensure loadDeal() after Save fully refreshes the participant rows + clears stale lkEdits[participantId] (D-367's setLkEdits delete already does this; the remaining gap may be in how the LexKollerResidencySelect's value prop reads from the saved row when the controlled-state edit returns to undefined). 🟡 P2. Filed 2026-05-28 (D-367 Phase 12).",
+      "tag": "admin",
+      "added": "2026-05-28"
+    },
+    {
+      "id": "BG-119",
+      "title": "DB-SCHEMA.md migrations chronology missing 20260525120254_phase4_rls_hardening.sql (D-354)",
+      "desc": "Pre-existing drift, surfaced during D-367 paper-trail audit. The D-354 Phase 4 RLS hardening batch (8 BG-A7 closures) was shipped but its migration row never landed in DB-SCHEMA.md's chronology section. No functional impact; documentation completeness only. 🟢 P3. Filed 2026-05-28 (D-367 paper trail). Fix: backfill the D-354 row using its CHANGELOG / ROADMAP D-354 description; audit chronology for any other gaps. ~15min.",
+      "tag": "ai",
+      "added": "2026-05-28"
+    },
+    {
       "id": "~~BG-116~~",
       "title": "~~/admin/workflows template-catalog expansion shows empty numbered circles (1-N) with no labels — third sibling of BG-92/BG-115, same field-name drift.~~ CLOSED 2026-05-26 → D-361. The catalog StageStepper (and the instances section) read stale WorkflowStage fields (.id/.name/.order/.is_locked) vs live JSONB (.key/.label_\u003clocale\u003e/.locked) → all undefined → blank circles. Fixed via field-name correction + WorkflowTemplateStage type + useLocale() labels (Option B — no hook; templates have no workflow_instance_id). WorkflowStage type KEPT (5 consumers) → TD-WORKFLOWSTAGE-TYPE-DRIFT stays 🟡 partial.",
       "desc": "🟡 Significant. Filed + closed 2026-05-26 (BG-115 follow-up).",
@@ -3347,6 +3369,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-367",
+      "title": "TD-CRM-UI-LEX-KOLLER-RESIDENCY — Lex Koller residency UI on deal participants + 3 federal rule conditions",
+      "desc": "Closes the 2nd of 6 BL-142 constituent TDs. Ships the agent-facing capture path so D-366's evaluateComplianceForDeal actually has data to evaluate, plus the data-only migration wiring the 3 federal LK rules to the conditional_rule_resolution shape. UI: NEW src/features/deals/components/LexKollerResidencySelect.tsx (4-value enum + \"not specified\"); DealDetailPanel.tsx renders a per-row LK select + scoped Save under each existing buyer/seller on CH deals (state-managed dirty-edit tracking), and a CH-only LK select in the add-participant form. Service: NEW scoped updateParticipantLexKoller(participantId, status) in src/features/deals/services/dealService.ts — touches only lex_koller_residency_status, no other field. addParticipant extended to accept the field at creation. Endpoint: NEW POST /api/deals/[id]/recompute-compliance — mirrors deals/[id]/delete/route.ts (Bearer-token auth via anon supabase.auth.getUser + service-role supabaseAdmin via createClient(URL, SERVICE_ROLE_KEY) for the engine call; org-membership gate). Calls evaluateComplianceForDeal({dealId, userId, supabaseAdmin}) and returns the fresh evaluation; engine auto-logs to compliance_evaluations (append-only audit, no double-insert). DealNotFoundError → 404; other errors → 500. Migration: NEW supabase/migrations/20260528_td_crm_ui_lex_koller_federal_conditions.sql — data-only (3 idempotent UPDATEs); CH-SALE-LEX-KOLLER-AUTHORIZATION-001 flips to block/critical/blocking=true on person_abroad match; EXEMPTION + STATUS-DECLARATION stay flag/warning/non-blocking. Cantonal LK rules untouched (owned by TD-COMPLIANCE-CH-LEX-KOLLER-CANTONAL-CONDITIONS). Seed parity: scripts/seed-ch-compliance.mjs patched — buildRow now uses rule.conditions ?? [], and the 3 federal rule objects gained matching conditions:. Types: NEW LexKollerResidencyStatus 4-value union; `DealParticipant.lex_koller_residency_status?: LexKollerResidencyStatus",
+      "completed": "null (optional for backward-compat with existing inserts). i18n: admin.deals.lexKoller namespace added to all 4 locales (en/de/fr/it) + glossary entries (de/fr/it). Tests: 7 new Jest tests (5 AUTHORIZATION + 1 EXEMPTION + 1 STATUS-DECLARATION) — total dealComplianceService.test.ts now 22. (Component tests deferred — no @testing-library/react in project; out-of-scope #10 forbids new deps.) Verification: tsc --noEmit clean; npm run build clean; ESLint 0 errors (2 pre-existing warnings); docs:check clean. Phase 0 inventory gaps resolved: Gap A market_country_code (you confirmed); Gap B no recompute endpoint existed → created (with 2 corrections to the dispatch skeleton: real route pattern + correct D-366 args-object signature with service-role client); Gap C append-only audit, no double-insert (you confirmed); Gap D no participant update path existed at all → built scoped updateParticipantLexKoller. v0.2 LOCKED spec at docs/specs/TD-CRM-UI-LEX-KOLLER-RESIDENCY-Spec-v0.2.md. package.json 2.6.25 → 2.6.26. Phase 12 MCP outcome (Sutherland D11, 4-cycle test across all 4 enum values + NULL): ✅ UI persists + Save → recompute chain fires + engine aggregates input correctly (verified via compliance_evaluations.context_snapshot.buyer_lex_koller_residency_statuses); ❌ engine does NOT apply when_matched.blocking=true from conditional_rule_resolution — overall_status stayed warn across all 4 LK values + NULL, AUTHORIZATION rule returned status:warned, blocking:null, severity:null despite person_abroad input → filed TD-COMPLIANCE-ENGINE-CONDITIONAL-RESOLUTION (🔴 P1); ⚠️ panel local state doesn't re-sync from server after Save (saving unknown` shows empty next interaction) → filed as a 🟡 P2 bug in the Known Bugs section below. Pillar 2's blocking promise stays silent until the engine fix lands.",
+      "tag": "compliance"
+    },
     {
       "id": "D-366",
       "title": "TD-COMPLIANCE-DEAL-EVALUATION-PIPELINE — evaluateComplianceForDeal() service",
