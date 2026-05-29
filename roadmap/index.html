@@ -328,12 +328,12 @@ const DATA = {
       "added": "src/components/shared/ComplianceBanner.tsx, possibly new src/features/admin/components/ComplianceReferenceRules.tsx depending on direction"
     },
     {
-      "id": "TD-COMPLIANCE-RULES-ARCHIVE-PUBLISH (D-296)",
-      "title": "Restore Archive/Publish toggle in admin compliance side panel",
-      "desc": "Behavior regression introduced by BL-135. The pre-BL-135 inline-detail had a Publish ↔ Archive toggle button on company-layer rules. The BL-135 spec listed only \"Delete\" as the panel's footer action; CC followed the spec literally and dropped the toggle. The hook useComplianceRules.toggleStatus is still exposed (a void toggleStatus line in src/app/admin/compliance/page.tsx suppresses the unused-warning) — so the underlying mutation infrastructure is intact and only the UI binding was lost. Scope: re-add the Publish/Archive toggle to the side panel footer, alongside Delete. Same gating rules apply (company-layer non-statutory only). Severity: LOW (admins can still manage via DB; no data loss; recoverable in a small follow-up).",
-      "files": "src/features/admin/components/ComplianceRuleDetailPanel.tsx, src/app/admin/compliance/page.tsx",
+      "id": "~~TD-COMPLIANCE-RULES-ARCHIVE-PUBLISH~~ (filed D-296)",
+      "title": "~~Restore Archive/Publish toggle in admin compliance side panel~~ — CLOSED 2026-05-29 → D-371. Re-bound the Publish↔Archive toggle dropped from the side panel in BL-135's inline→panel refactor (mutation toggleStatus survived; only the UI binding was lost). ComplianceRuleDetailPanel gains optional onToggleStatus; footer renders Publish/Archive beside Delete under the unchanged layer==='company' && !statutory_lock gate, label flipping on status (published→Archive, draft",
+      "desc": "archived→Publish — Option B, matches the existing flip, no hook change). Page drops void toggleStatus, adds handleToggleStatus + a useEffect([rules]) re-sync that re-points selectedRule at the refetched row (also closes the BG-118-class stale-panel trap). 2 new toast i18n keys × 4 locales. MCP-verified live (Hans Müller/ZH) against 2 throwaway CH company-layer fixtures (deleted after): label correctness, published↔archived flip, panel+list re-sync, toast render, statutory→no toggle/no delete. package.json 2.6.28→2.6.30 (v2.6.29 already taken by D-370 EOS). 3 follow-up TDs filed: TD-DBSCHEMA-COMPLIANCE-TRIGGER-NOT-NULL 🟢, TD-NPM-LINT-NEXT16-DEPRECATED 🟢, TD-AUTH-TOKEN-REFRESH-FETCH-FAIL 🟡.",
+      "files": "src/features/admin/components/ComplianceRuleDetailPanel.tsx, src/app/admin/compliance/page.tsx, messages/{en,fr,de,it}.json",
       "tag": "compliance",
-      "added": "2026-05-02"
+      "added": "2026-05-29"
     },
     {
       "id": "~~TD-26~~",
@@ -886,6 +886,30 @@ const DATA = {
       "files": "2026-03-15",
       "tag": "admin",
       "added": ""
+    },
+    {
+      "id": "🟢 TD-DBSCHEMA-COMPLIANCE-TRIGGER-NOT-NULL",
+      "title": "DB-SCHEMA.md lists compliance_rules.trigger nullable; live DB is NOT NULL",
+      "desc": "Surfaced D-371: a fixture INSERT omitting trigger failed with null value in column \"trigger\" violates not-null constraint. DB-SCHEMA.md shows `trigger",
+      "files": "text",
+      "tag": "compliance",
+      "added": "YES. Doc-vs-DB drift (BG-83 class). Fix: correct nullability in DB-SCHEMA.md; audit the rest of the compliance_rules` row while there."
+    },
+    {
+      "id": "🟢 TD-NPM-LINT-NEXT16-DEPRECATED",
+      "title": "npm run lint invokes next lint, removed in Next.js 16",
+      "desc": "npm run lint fails on clean HEAD with Invalid project directory provided, no such directory: .../lint (reproduced D-371). Pre-existing; direct npx eslint passes. Fix: repoint the lint script at eslint directly so SO #5 / CI lint works.",
+      "files": "package.json (scripts.lint), possibly eslint.config.*",
+      "tag": "ai",
+      "added": "2026-05-29"
+    },
+    {
+      "id": "🟡 TD-AUTH-TOKEN-REFRESH-FETCH-FAIL",
+      "title": "Supabase GoTrue token-refresh Failed to fetch flooding console",
+      "desc": "D-371 MCP verification saw 107 console errors: TypeError: Failed to fetch / AuthRetryableFetchError from the Supabase client _refreshAccessToken/_recoverAndRefresh path on prod. DB writes still succeeded (token valid) → currently cosmetic/log-noise, but a failing refresh path is a latent session-expiry risk. Likely related to TD-AUTH-GETSESSION-EMPTY-TOKEN-AUDIT 🟡. Scope: is the refresh endpoint unreachable (CORS/network/env) or is the client mid-retry on a stale token; prod vs this-browser-only.",
+      "files": "Supabase client init / auth config; xref TD-AUTH-GETSESSION-EMPTY-TOKEN-AUDIT",
+      "tag": "ai",
+      "added": "2026-05-29"
     }
   ],
   "backlog": [
