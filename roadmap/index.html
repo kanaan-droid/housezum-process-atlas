@@ -146,7 +146,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-28';
+const LAST_UPDATED = '2026-05-29';
 const DATA = {
   "inProgress": [
     {
@@ -3391,6 +3391,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-369",
+      "title": "BL-161 — Compliance rules scope-to-org-jurisdiction (country + canton)",
+      "desc": "Presentation-layer filter on /admin/compliance that defaults the rule list to the org's own jurisdiction (country + canton when applicable), with an \"All jurisdictions\" escape hatch. Backend rationale: the compliance engine already region-scopes (a ZH deal evaluates 36 federal + 5 CH-ZH rules; zero cross-jurisdiction), and compliance_rules RLS does NOT scope by country, so a ZH admin landing on /admin/compliance was seeing all 309 rules (CH 144 + FR 61 + IT 56 + AE 38 + 10 base/null) under the default Pending acceptance filter. After BL-161 the default shows ~54 rules (CH federal + CH-ZH cantonal) for a ZH admin; the \"All jurisdictions\" toggle restores the full 309 when needed for cross-org review. Pure UX declutter — no correctness implication; engine, acceptance flow, API routes, migrations all untouched. Implementation: (1) OrgProvider.tsx — additive `country_code: string",
+      "completed": "null + canton: string",
+      "tag": "compliance"
+    },
     {
       "id": "D-368",
       "title": "Compliance acceptance + recompute UI refresh after mutation — 2 UI bugs closed (BL-142 production loop end-to-end UX gap)",
