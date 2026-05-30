@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Functional Guide — Platform Admin (Superadmin)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/functional-guide/" class="active">Functional Guide</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Functional Guide</a> / platform-admin.md</div>
+  
+  <div class="content"><h1>Functional Guide — Platform Admin (Superadmin)</h1>
+<p><strong>Status:</strong> Living document. Updated end-of-session whenever platform-admin behavior or scope changes. <strong>Version:</strong> v0.1 <strong>Last updated:</strong> 2026-05-29 (BL-162 Unit 1 / D-373) <strong>Maintainer:</strong> Will + Claude</p>
+<hr/>
+<h2>0. How to use this guide</h2>
+<p>This guide is the <strong>single source of truth</strong> for what a HouseZoom <strong>platform admin</strong> is, what it can do today, and what it deliberately can't do. It's written for non-engineers (support, sales, investors) as well as engineers needing quick reference.</p>
+<p><strong>Pair this guide with <a href="compliance.html"><a href="compliance.html"><code>compliance.md</code></a></a>.</strong> The two are tightly coupled: the platform-admin role exists <em>because</em> of how compliance rules are layered, and changing one without the other is a recipe for drift.</p>
+<p><strong>Maintenance rule:</strong> any session that ships user-visible behavior change to the platform-admin role updates this file. See Standing Obligations.</p>
+<hr/>
+<h2>1. What it is (plain English)</h2>
+<p>A <strong>platform admin</strong> (also called <em>superadmin</em> in some specs) is a HouseZoom-internal role for legal and operations staff. It sits <strong>above</strong> the per-agency role hierarchy and is <strong>cross-organization</strong> — a platform admin is not a member of any single agency. There is exactly one platform admin today: the founder.</p>
+<p>The role exists for exactly one purpose at this time: <strong>authoring the statutory compliance rules</strong> (the <code>base</code>, <code>country</code>, and <code>region</code> layers) that are shared across every agency on the platform.</p>
+<p>If an agency owner is the "CEO of one agency's account on HouseZoom," a platform admin is "the person at HouseZoom who keeps the rulebook for <em>all</em> agencies up to date with the law."</p>
+<hr/>
+<h2>2. Why it exists</h2>
+<p>HouseZoom's compliance engine works on a 4-layer rule hierarchy (see <a href="compliance.html"><a href="compliance.html"><code>compliance.md</code></a></a> for the full picture):</p>
+<pre><code>base       → applies to every market
+country    → applies to all orgs in a country (e.g. CH, FR, IT, AE)
+region     → applies to all orgs in a region/canton (e.g. CH-ZH)
+company    → applies only to one agency</code></pre>
+<p>The first three layers are <strong>statutory</strong> — they encode law. Their rows live in <code>compliance_rules</code> with <code>org_id IS NULL</code>, meaning they're not owned by any agency. Editing one of those rows changes the rule for <em>every</em> agency on the platform. So no org-level admin — even an agency owner — may write them. Only a platform admin can.</p>
+<p>The fourth layer (<code>company</code>) is the opposite: each row is owned by exactly one agency, scoped via <code>org_id</code>. Agency owners and admins author their own company rules within their own org. They cannot touch any other agency's company rules, and they cannot touch any statutory rule.</p>
+<p>This split is what the platform-admin role enforces.</p>
+<hr/>
+<h2>3. Who can author what</h2>
+<p>This is the rule readers most need to find quickly.</p>
+<table><thead><tr><th>Rule layer</th><th>Scope</th><th>Who can write</th></tr></thead><tbody><tr><td><strong>base / country / region</strong> <em>(statutory)</em></td><td>shared across all orgs (<code>org_id IS NULL</code>)</td><td><strong>Platform admin only</strong></td></tr><tr><td><strong>company</strong></td><td>one agency (<code>org_id = that org</code>)</td><td>That org's <strong>owner or admin</strong> only</td></tr></tbody></table>
+<p>A few corollaries that matter in practice:</p>
+<ul><li>An agency owner or admin <strong>cannot</strong> create, edit, or delete a statutory rule. Attempting it fails at the database with <code>42501</code> (row-level security denial).</li><li>An agency owner or admin <strong>cannot</strong> write a row with <code>statutory_lock = true</code> — the gate is enforced even on the company-layer write path.</li><li>A platform admin <strong>can</strong> set <code>statutory_lock = true</code> on statutory rules they author. This is the marker used elsewhere (engine, future UI) to flag a rule as legally non-overridable.</li><li>An agency admin from one org <strong>cannot</strong> write any rule belonging to another agency. They can only write their own org's company rules.</li><li>The database read view is wider than the write view: every agency can <strong>read</strong> the statutory rules that apply to them (this is intentional — source-attribution UX, agent transparency). Read scope and write scope are independent.</li></ul>
+<hr/>
+<h2>4. How someone becomes a platform admin</h2>
+<p>Provisioning is <strong>manual SQL only</strong>, by Will or ops, inserting a row into the <code>platform_admins</code> table.</p>
+<p>There is deliberately:</p>
+<ul><li><strong>No sign-up flow.</strong> No one self-promotes.</li><li><strong>No invitation UI.</strong> The system has no screen for granting this privilege.</li><li><strong>No org admin path.</strong> Org owners and admins cannot grant it; the role is outside the per-org hierarchy entirely.</li><li><strong>No public discovery.</strong> The <code>platform_admins</code> table is invisible to every authenticated app user (it's row-level-security-locked with no policies — the table simply doesn't appear in SELECTs from any normal client). Only the database's <code>service_role</code> and the <code>is_platform_admin()</code> function can see it.</li></ul>
+<p>The intent of these constraints is simple: a privilege that affects every tenant on the platform should be ungrantable through the platform's own UI.</p>
+<hr/>
+<h2>5. Current state (2026-05-29)</h2>
+<p><strong>Live and verified:</strong></p>
+<ul><li>The <code>platform_admins</code> table exists and is provisioned with the founder, <code>will@housezoom.ai</code>. (Granted 2026-05-29 22:15 UTC.)</li><li>The database function <code>is_platform_admin()</code> returns <code>true</code> for that user and <code>false</code> for everyone else.</li><li>The three statutory write policies on <code>compliance_rules</code> are active. An org admin attempting a statutory write is denied; a platform admin attempting one succeeds. Both directions verified live the day of ship.</li></ul>
+<p><strong>Not yet built:</strong></p>
+<ul><li><strong>No authoring UI exists.</strong> A platform admin cannot today open a screen and edit a statutory rule. Statutory rules are still created and edited only via SQL (seed scripts, migrations, manual statements). The DB enforces who can write — but there is no app surface that exposes the privilege.</li><li>The planned screen is <code>/superadmin/compliance</code>, gated on <code>is_platform_admin()</code>. It depends on the BL-163 rule-authoring form. Both are in the backlog (see §7).</li></ul>
+<p>Until the UI lands, the practical impact of the role is <strong>purely a security boundary</strong>: it lets HouseZoom apply legal updates via the database with a single authorized actor, and it blocks every agency from accidentally (or deliberately) editing shared statutory rules.</p>
+<hr/>
+<h2>6. Known limitations &amp; gotchas</h2>
+<ul><li><strong>No app surface today.</strong> Repeated for emphasis: "platform admin" is not a screen. If someone asks "where do I log in as platform admin?" the honest answer is: you already log in as yourself; the privilege is attached to your user, the role is invisible in the UI today, and the only place you can use it is via direct DB writes.</li><li><strong>Single platform admin.</strong> Only the founder is provisioned. There's no operational reason this couldn't grow — the table is built for <code>N</code> rows — but it's intentionally kept at one until there's a real need.</li><li><strong>Revocation is also manual SQL.</strong> Removing a platform admin is a <code>DELETE FROM platform_admins WHERE user_id = …</code> by ops. No UI, no audit trail beyond the <code>granted_by</code> / <code>granted_at</code> columns on the original grant.</li><li><strong>Audit of statutory writes is not yet append-only.</strong> Until BL-162 Unit 2 ships the API route, statutory writes go through ad-hoc SQL. An audit log of statutory edits is part of Unit 2's scope, not this commit's.</li></ul>
+<hr/>
+<h2>6b. Edge case catalog</h2>
+<p>Add a row whenever a "what happens when X?" question comes up.</p>
+<table><thead><tr><th>Scenario</th><th>Current behavior</th><th>Status</th><th>Source</th></tr></thead><tbody><tr><td>Founder loses access to their account</td><td>Platform admin role is tied to a single <code>user_id</code>. Recovering the account (Supabase password reset) recovers the role; deleting the user (auth.users CASCADE) silently removes them from <code>platform_admins</code>. No automatic re-provisioning.</td><td>Confirmed (RLS schema)</td><td>2026-05-29</td></tr><tr><td>Two platform admins edit the same statutory rule</td><td>Standard last-write-wins on the rule row. No conflict detection. (Only one platform admin exists today, so untested in practice.)</td><td>Open question</td><td>2026-05-29</td></tr><tr><td>A platform admin's user is deleted from <code>auth.users</code></td><td>The <code>platform_admins</code> row is removed via <code>ON DELETE CASCADE</code> on <code>user_id</code>. No orphaned grants.</td><td>Confirmed (schema)</td><td>2026-05-29</td></tr><tr><td>Org admin tries to inspect the <code>platform_admins</code> table</td><td><code>SELECT</code> returns <code>[]</code> (RLS-enabled with no policies → invisible to all <code>authenticated</code>/<code>anon</code> users). Verified live 2026-05-29 (Hans Müller / ZH).</td><td>Confirmed</td><td>2026-05-29</td></tr><tr><td>Platform admin writes a <code>company</code>-layer rule (instead of statutory)</td><td>The statutory write policies don't apply (those gate on <code>org_id IS NULL</code>). The company write policies do, but only if the platform admin is also a member of the target org with admin role. In practice today: the founder is not an org admin, so company-layer writes by the platform admin would fail.</td><td>Confirmed (policy schema)</td><td>2026-05-29</td></tr></tbody></table>
+<hr/>
+<h2>7. Related tickets</h2>
+<table><thead><tr><th>Ticket</th><th>What it shipped / will ship</th><th>Status</th></tr></thead><tbody><tr><td><strong>BG-122 / D-372</strong></td><td>Closed the cross-tenant statutory write hole on <code>compliance_rules</code>. Drops the <code>(org_id IS NULL AND user_has_role('admin'))</code> branch from INSERT/UPDATE/DELETE; clamps authenticated writes to own-org <code>company</code> layer only. Statutory writes go through <code>service_role</code> until BL-162 Unit 1 adds the platform-admin path.</td><td>✅ shipped 2026-05-29</td></tr><tr><td><strong>BL-162 Unit 1 / D-373</strong></td><td>Platform-admin role + statutory write path. <code>platform_admins</code> table + <code>is_platform_admin()</code> SECURITY DEFINER function + three additive statutory write policies on <code>compliance_rules</code> (<code>*_insert_statutory</code>, <code>*_update_statutory</code>, <code>*_delete_statutory</code>), each gated <code>org_id IS NULL AND is_platform_admin()</code>. Founder provisioned. Verified live both directions.</td><td>✅ shipped 2026-05-29</td></tr><tr><td>BL-162 Unit 2</td><td><code>/api/superadmin/compliance/rules</code> service-role API route with server-side <code>is_platform_admin()</code> check + append-only audit. Mirrors BL-136 acceptance-service precedent (never write via anon client).</td><td>🟡 planned</td></tr><tr><td>BL-162 Unit 3</td><td><code>/superadmin/compliance</code> UI gated on <code>is_platform_admin()</code>, reusing BL-163's <code>RuleForm</code> in statutory mode (<code>org_id</code> forced NULL; layer base/country/region; <code>statutory_lock</code> settable; source attribution required).</td><td>🟡 planned (depends on BL-163)</td></tr><tr><td>BL-163</td><td>Compliance rule authoring UI — reusable <code>RuleForm</code> for create/edit, configurable via a <code>capabilities</code> prop so BL-162 Unit 3 reuses it for statutory mode.</td><td>🟡 planned</td></tr></tbody></table>
+<hr/>
+<h2>8. Glossary (jargon-free)</h2>
+<ul><li><strong>Platform admin / superadmin</strong> — a HouseZoom-internal role authorized to author statutory compliance rules across all agencies. Distinct from any agency's owner or admin. Stored in the <code>platform_admins</code> table.</li><li><strong>Statutory rule</strong> — a compliance rule encoding law, applied to all agencies (the <code>base</code>, <code>country</code>, and <code>region</code> layers). Marked with <code>org_id IS NULL</code>.</li><li><strong>Company rule</strong> — a compliance rule specific to one agency (the <code>company</code> layer). Marked with <code>org_id = &amp;lt;that agency's id&amp;gt;</code>.</li><li><strong><code>statutory_lock</code></strong> — a boolean flag on a compliance rule. When <code>true</code>, the rule is treated as legally non-overridable. Only a platform admin can set it.</li><li><strong>Row-level security (RLS)</strong> — a Postgres feature that constrains which rows a given user can read or write at the database level, independent of application code. The platform-admin trust boundary is enforced via RLS.</li><li><strong><code>is_platform_admin()</code></strong> — a SQL function that returns <code>true</code> if the current user has a row in <code>platform_admins</code>, <code>false</code> otherwise. Used inside RLS policies to gate statutory writes.</li><li><strong>service_role</strong> — the privileged Supabase database role that bypasses all RLS. Used by server-side API routes for trusted operations. Seed scripts and migrations run as this role.</li></ul>
+<hr/>
+<p><strong>Change log</strong></p>
+<table><thead><tr><th>Date</th><th>Version</th><th>Session</th><th>Change</th></tr></thead><tbody><tr><td>2026-05-29</td><td>v0.1</td><td>BL-162 Unit 1 ship (D-373)</td><td>Initial version. Documents the platform-admin role as a security boundary (no UI yet). Cross-links to <a href="compliance.html"><code>compliance.md</code></a>. Seeds edge-case catalog with 5 confirmed/open rows.</td></tr></tbody></table></div>
+</main>
+<footer>
+  HouseZoom.ai Functional Guide · Auto-generated from <code>docs/functional-guide/platform-admin.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>
