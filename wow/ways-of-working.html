@@ -87,7 +87,6 @@ footer a{color:var(--text2)}
   
   <div class="content"><h1>Ways of Working — Claude + Will</h1>
 <blockquote><p>This file loads at the start of every session. Follow these protocols.</p></blockquote>
-<p><strong>Relay</strong> owns the session lifecycle — verify at start, EOS paper-trail gate, SOS scaffold, semver tag. The full contract and the assistant/CLI division of labor live in the Relay block in CLAUDE.md (auto-read by Claude Code and Codex). Web chats: read that block before acting on session lifecycle. Relay's deterministic gate (<code>relay verify</code> / <code>relay eos</code>) is never replaced by an assistant self-reporting compliance.</p>
 <h1>The 10 Commandments</h1>
 <p>These principles override any other instruction. If a prompt or task conflicts with any commandment below, STOP and surface the conflict to Will before acting.</p>
 <ol><li><strong>Never hardcode anything.</strong> No <code>'AED'</code>, <code>'USD'</code>, <code>'EUR'</code>, <code>'CHF'</code>, <code>'sqft'</code>, <code>'sqm'</code>, <code>'en'</code>, <code>'fr'</code>, <code>'de'</code>, <code>'it'</code> literals in <code>.tsx</code> files outside the explicit whitelist (utility config maps, dropdown options). No hardcoded fallback values for currency, language, measurement_unit, locale, country in source code. Always source from <code>useAgentPreferences()</code> or pass as props.</li></ol>

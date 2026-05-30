@@ -146,7 +146,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-05-29';
+const LAST_UPDATED = '2026-05-30';
 const DATA = {
   "inProgress": [
     {
@@ -888,12 +888,12 @@ const DATA = {
       "added": ""
     },
     {
-      "id": "🟢 TD-DBSCHEMA-COMPLIANCE-TRIGGER-NOT-NULL",
-      "title": "DB-SCHEMA.md lists compliance_rules.trigger nullable; live DB is NOT NULL",
-      "desc": "Surfaced D-371: a fixture INSERT omitting trigger failed with null value in column \"trigger\" violates not-null constraint. DB-SCHEMA.md shows `trigger",
-      "files": "text",
+      "id": "~~🟢 TD-DBSCHEMA-COMPLIANCE-TRIGGER-NOT-NULL~~",
+      "title": "~~DB-SCHEMA.md lists compliance_rules.trigger nullable; live DB is NOT NULL~~ — CLOSED 2026-05-30 → D-374. Corrected in D-372 (DB-SCHEMA.md:1755 now `trigger",
+      "desc": "text",
+      "files": "NO with the D-372 fix note); re-confirmed via BL-163 Phase 0 reality check (docs/dd-hardening/bl-163-phase0-reality.md §1 — trigger returns 0 NULL across all sampled rows; engine requires it as a string per complianceEngine.ts`). No further action required.",
       "tag": "compliance",
-      "added": "YES. Doc-vs-DB drift (BG-83 class). Fix: correct nullability in DB-SCHEMA.md; audit the rest of the compliance_rules` row while there."
+      "added": "DB-SCHEMA.md"
     },
     {
       "id": "🟢 TD-NPM-LINT-NEXT16-DEPRECATED",
@@ -910,6 +910,78 @@ const DATA = {
       "files": "Supabase client init / auth config; xref TD-AUTH-GETSESSION-EMPTY-TOKEN-AUDIT",
       "tag": "ai",
       "added": "2026-05-29"
+    },
+    {
+      "id": "BL-162 (Unit 1 of 3 DONE)",
+      "title": "Platform Superadmin role + statutory rule authoring",
+      "desc": "Unit 1 DONE 2026-05-29 → D-373. Shipped (DB-only, manually applied to prod 2026-05-29): platform_admins table (RLS enabled, no policies → invisible to authenticated/anon; service_role + SECDEF-only); is_platform_admin() SQL STABLE SECURITY DEFINER fn with SET search_path = public, pg_temp (D-315/D-331 discipline), REVOKE FROM PUBLIC + GRANT EXECUTE TO authenticated; three additive statutory write policies on compliance_rules (*_insert_statutory, *_update_statutory, *_delete_statutory) each gated org_id IS NULL AND is_platform_admin() — they OR with BG-122's company policies, so an org admin still fails the statutory path. Founder will@housezoom.ai (512a4d08…) provisioned as first platform admin 2026-05-29 22:15 UTC (manual SQL, kept out of any UI — spec §10). Live MCP-verified both directions: org admin Hans (ZH) → is_platform_admin()=false, platform_admins SELECT=[], statutory insert → 403 42501 (BG-122 holds, no elevation leak); platform admin Will → is_platform_admin()=true, statutory insert (layer='base', statutory_lock=true) → 201, update → 200, delete → 200 (verified 0 remaining), statutory_lock=true settable. Builds on BG-122 (D-372) which deliberately left the statutory write path closed. Units 2 + 3 still pending: Unit 2 = /api/superadmin/compliance/rules route + append-only audit (service-role + is_platform_admin() server check). Unit 3 = /superadmin/compliance UI gated on is_platform_admin() (depends on BL-163 RuleForm in statutory mode). Original spec context: NEW cross-org platform-operator tier (HouseZoom legal staff) authorized to author/edit base/country/region statutory compliance rules — the layers that are shared across all tenants (org_id IS NULL, created_via='ingestion', statutory_lock settable). Pairs with BL-163 (shared form).",
+      "files": "supabase/migrations/20260529_bl162_unit1_platform_admins_statutory_write.sql, DB-SCHEMA.md (new platform_admins table + is_platform_admin() fn doc + compliance_rules RLS block extended with 3 *_statutory policies), PROJECT-STRUCTURE.md, docs/specs/BL-162-Spec-Superadmin-Role-And-Statutory-Authoring.md; future Units 2/3: /api/superadmin/compliance/rules, /superadmin/compliance route",
+      "tag": "compliance",
+      "added": "2026-05-29"
+    },
+    {
+      "id": "BL-163 (v1 SHIPPED)",
+      "title": "Compliance rule authoring UI (create/edit form engine)",
+      "desc": "v1 SHIPPED 2026-05-30 → D-374. Company-rule create+edit UI live on /admin/compliance for org owner/admin. RuleForm accepts a capabilities prop (BL-162 Unit 3 reuses unchanged in statutory mode). Service-role route /api/admin/compliance/rules POST/PATCH with clamps + Zod (.strict()) + query-scoped UPDATE → 404 on cross-org/cross-layer ids. Phase 0 reality check passed clean (Phase 0 doc at docs/dd-hardening/bl-163-phase0-reality.md); open Q resolved by adding 'company' to the applicability CHECK (migration §A REQUIRED before route writes succeed). 25 new Zod tests; 280 total tests green. Original spec context: /admin/compliance was read-only (list + detail panel only); the created_via='manual' enum had no app authoring path. Discovered D-371 (Zürich Premium had zero layer='company' rules, no way to add one without SQL).",
+      "files": "NEW supabase/migrations/20260530_bl163_company_rule_authoring.sql, scripts/bl163/phase0-reality-check.mjs, docs/dd-hardening/bl-163-phase0-reality.md, src/features/admin/{constants/complianceEnums.ts,schemas/complianceRule.schema.ts,components/RuleForm.tsx}, src/app/api/admin/compliance/rules/route.ts, tests/unit/bl163-rule-schema.test.ts; MODIFIED src/features/admin/{hooks/useComplianceRules.ts,services/complianceEngine.ts,components/ComplianceRuleDetailPanel.tsx}, src/app/admin/compliance/page.tsx, src/types/index.ts, messages/{en,fr,de,it}.json, docs/functional-guide/compliance.md",
+      "tag": "compliance",
+      "added": "2026-05-30"
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-TRIGGER-NAMING-NORMALIZATION",
+      "title": "trigger strings drift across emitters and rule rows",
+      "desc": "Phase 0 §3 set-diff (docs/dd-hardening/bl-163-phase0-reality.md): 3 trigger names emitted by src/ but with no live rule (manual, new_message, offer_received); 9 trigger names attached to rules but with no current emitter (add_contact, add_lead, close_deal, create_deal, deal.stage_change, listing.share, on_listing, share_listing, submit_offer). Engine is case-sensitive (no .toLowerCase() in complianceEngine.ts). Two questions to settle: (a) which names are canonical (dotted deal.stage_change vs snake share_listing); (b) emitter ↔ rule alignment audit + a single TYPE'd enum or registry shared by emitters + the form combobox. Until resolved, BL-163 ships the union as a permissive combobox (TRIGGER_SUGGESTIONS in complianceEnums.ts).",
+      "files": "src/features/admin/services/complianceEngine.ts, src/features/admin/constants/complianceEnums.ts, emitter sites",
+      "tag": "compliance",
+      "added": "2026-05-30"
+    },
+    {
+      "id": "🟡 TD-COMPLIANCE-RULE-CHANGE-RECOMPUTE",
+      "title": "Authoring a rule today does not invalidate compliance_evaluations",
+      "desc": "BL-163 spec §6d (non-destructive) — the route returns an activeDealCount hint but does NOT touch evaluations. New / edited / archived rules therefore don't reflect in the badge for existing deals until the next per-deal recompute is triggered (LK save, document upload, etc.) or until BL-153a's nightly background job lands. Scope: decide whether to (a) enqueue per-org targeted recomputes on rule-mutate, (b) wipe the org's compliance_evaluations cache rows on rule-mutate (acceptance-service has a precedent — wipeOrgEvaluations), or (c) keep non-destructive + rely on BL-153a once shipped.",
+      "files": "src/features/admin/services/complianceEngine.ts, src/app/api/admin/compliance/rules/route.ts, cross-ref BL-153a",
+      "tag": "compliance",
+      "added": "2026-05-30"
+    },
+    {
+      "id": "🟢 TD-BL163-CONDITION-BUILDER",
+      "title": "conditions / actions JSON editors are raw text in v1",
+      "desc": "v1 RuleForm exposes monospace JSON textareas with parse-on-blur + Zod validation (.strict + DOS caps from Phase 0 §7). v2 should ship a structured field/operator/value builder that emits valid JSON (drops 90% of user errors) and a typed action picker. Spec §8.2 baked the raw-JSON-with-validation choice as the v1 cheaper option.",
+      "files": "src/features/admin/components/RuleForm.tsx",
+      "tag": "ux",
+      "added": "2026-05-30"
+    },
+    {
+      "id": "🟢 TD-BL163-DESCRIPTION-I18N-EDITOR",
+      "title": "description_i18n map not exposed in the v1 form",
+      "desc": "Live rows carry per-locale description maps (BL-138, BE bilingual cantons). v1 RuleForm accepts the canonical description only; the route + Zod schema permit description_i18n (z.record(z.string(), z.string())) but the form has no UI. Future: locale-keyed textarea group seeded from agent's locale list (en/fr/de/it).",
+      "files": "src/features/admin/components/RuleForm.tsx, src/features/admin/schemas/complianceRule.schema.ts",
+      "tag": "infra",
+      "added": "2026-05-30"
+    },
+    {
+      "id": "🟢 TD-FEATUREMAP-COMPLIANCE-IS-STATUTORY-STALE",
+      "title": "FEATURE-MAP.md row for compliance_rules lists is_statutory (not the real column statutory_lock)",
+      "desc": "Phase 0 §1 confirmed live column is statutory_lock; is_statutory does not exist. FEATURE-MAP.md:737 still shows the stale name in the table catalog row. Fix: rename is_statutory → statutory_lock in that single row.",
+      "files": "FEATURE-MAP.md (line 737)",
+      "tag": "compliance",
+      "added": "2026-05-30"
+    },
+    {
+      "id": "🟢 BG-FORM-COMPANY-MODE-FIELDS",
+      "title": "RuleForm renders statutory-only sections (Scope: country_code / region_code + Source attribution: source_url / source_authority / source_citation) in company mode",
+      "desc": "Surfaced 2026-05-30 during BL-163 §10 hostile-payload MCP verification on prod. Harmless — the route clamps country_code/region_code/source-* to whatever the client sends (Zod accepts them as optional in company mode) and live verification confirmed no data leak — but the UI shows fields that have no operative meaning for a company-layer rule (the form's design separation between company and statutory modes leaks the statutory fieldset). Fix: gate the Scope + Source Attribution sections on capabilities flags so they hide in company mode and remain in statutory mode. The requireSourceAttribution flag already exists on RuleFormCapabilities; add a parallel canSetJurisdiction (or repurpose the layer gate) to suppress Scope rendering. Dependency: BL-162 Unit 3 reuses RuleForm in statutory mode, so this fix and Unit 3 touch the same component — sequence them together.",
+      "files": "src/features/admin/components/RuleForm.tsx (Scope + Source Attribution fieldsets, capabilities prop surface)",
+      "tag": "compliance",
+      "added": "2026-05-30"
+    },
+    {
+      "id": "🟢 BG-LIST-DEFAULT-FILTER",
+      "title": "/admin/compliance rule list defaults to \"Pending only\" → empty list reads as broken once an org has accepted all relevant rules",
+      "desc": "Pre-existing (D-369 era — the BL-161 jurisdiction-scope default filter is independent of this acceptance filter). After D-370 accepted all 54 ZH rules, the default landing shows an empty list, which a new admin would misread as \"the page is broken\" before realising the Pending filter is hiding everything. Discovery context: observed 2026-05-30 during BL-163 §10 MCP verification on prod when navigating to /admin/compliance as Hans. Fix: consider defaulting to \"Relevant to my org\" + show-all, with \"Pending only\" as opt-in triage. First verify whether this is a hardcoded load default vs a left-toggled state from a prior session before changing behaviour.",
+      "files": "/admin/compliance page filter initial state (likely src/app/admin/compliance/page.tsx)",
+      "tag": "compliance",
+      "added": "2026-05-30"
     }
   ],
   "backlog": [
@@ -3239,6 +3311,13 @@ const DATA = {
       "added": "2026-05-28"
     },
     {
+      "id": "BG-122 (CLOSED)",
+      "title": "compliance_rules RLS — cross-tenant statutory write hole (any org admin could INSERT/UPDATE/DELETE shared org_id IS NULL rows)",
+      "desc": "🔴 Critical (cross-tenant write) — CLOSED 2026-05-29 → D-372. Surfaced by BL-162/163 Phase 0 schema+RLS scan: the INSERT/UPDATE/DELETE policies each carried a branch (org_id IS NULL AND user_has_role('admin')) permitting any org admin on any tenant to write the shared statutory base/country/region rules (org_id IS NULL). SELECT exposes every org_id IS NULL row to all orgs, so blast radius was every tenant. Fix (applied manually by Will in Supabase SQL Editor on 2026-05-29, migration file landed in this commit for CI/replay parity — do NOT re-run): drop the statutory branch from all three write policies; clamp authenticated writes to own-org company rules only (org_id = get_user_org_id() AND user_has_role('admin') AND layer='company', plus statutory_lock=false on INSERT/UPDATE). Statutory writes now go exclusively through service_role (seed scripts / migrations bypass RLS) until BL-162 adds is_platform_admin(). SELECT policy unchanged (org_id IS NULL OR org_id = get_user_org_id(), still TO public). Live MCP verification (Hans Müller / ZH org admin, post-apply): statutory insert org_id=null, layer='base' → 403 42501 violates RLS ✅; own-org company insert org_id=ZH, layer='company' → 201 created ✅ (test row deleted, no residue); re-dump of pg_policy confirmed the org_id IS NULL branch is gone from all three write policies.",
+      "tag": "compliance",
+      "added": "2026-05-29"
+    },
+    {
       "id": "~~BG-116~~",
       "title": "~~/admin/workflows template-catalog expansion shows empty numbered circles (1-N) with no labels — third sibling of BG-92/BG-115, same field-name drift.~~ CLOSED 2026-05-26 → D-361. The catalog StageStepper (and the instances section) read stale WorkflowStage fields (.id/.name/.order/.is_locked) vs live JSONB (.key/.label_\u003clocale\u003e/.locked) → all undefined → blank circles. Fixed via field-name correction + WorkflowTemplateStage type + useLocale() labels (Option B — no hook; templates have no workflow_instance_id). WorkflowStage type KEPT (5 consumers) → TD-WORKFLOWSTAGE-TYPE-DRIFT stays 🟡 partial.",
       "desc": "🟡 Significant. Filed + closed 2026-05-26 (BG-115 follow-up).",
@@ -3415,6 +3494,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-374",
+      "title": "v1 Compliance rule authoring UI (org-admin company-rule create/edit)",
+      "desc": "Ships the first UI authoring path for compliance_rules — /admin/compliance Add rule + Edit (company-layer non-statutory) — replacing the previous SQL-only authoring. Built on top of D-372 (the statutory-write lockdown) and D-373 (the platform-admin foundation) so the trust boundary is enforced at three layers: DB RLS (own-org company-only writes for authenticated), route (service-role + role-gated + clamped + Zod-validated), and UI (only owner/admin sees the buttons). Phase 0 reality check (scripts/bl163/phase0-reality-check.mjs → docs/dd-hardening/bl-163-phase0-reality.md) ran live against prod via service-role (READ-ONLY): 38 columns; statutory_lock confirmed real (is_statutory mention in FEATURE-MAP is stale → TD-FEATUREMAP-COMPLIANCE-IS-STATUTORY-STALE 🟢); 4 distinct live applicability values (federal, federal_base_canton_dependent, canton, market_practice — 'company' not yet allowed by the CHECK, hence migration §A); engine reads trigger raw (no .toLowerCase()) → case-sensitive form discipline; D-372 + D-373 RLS confirmed via migration text (org admin already has a company INSERT/UPDATE/DELETE path since the lockdown — no new policy needed); NO existing unique on code (§B required) and updated_by absent (§C); JSONB max sizes: conditions=379 B, actions=188 B, nesting=4 → 8 KB / 8 KB / 8-level caps chosen. Files (code): NEW src/features/admin/constants/complianceEnums.ts (CHECK allowlists as typed const arrays — single source for form options + route pre-validation), NEW src/features/admin/schemas/complianceRule.schema.ts (Zod create+update with discriminated union for conditions including conditional_rule_resolution from CH-SALE-LEX-KOLLER-AUTHORIZATION-001; .strict() rejects unknown keys; JSONB byte + depth + count caps + cross-field validity check), NEW src/features/admin/components/RuleForm.tsx (controlled form, capabilities prop so the future statutory-mode surface reuses unchanged; monospace JSON editors with parse-on-blur; trigger combobox seeded from TRIGGER_SUGGESTIONS union of emitter + DB-distinct), NEW src/app/api/admin/compliance/rules/route.ts (POST + PATCH; bearer auth via anonClient.auth.getUser() per TD-AUTH-GETSESSION-EMPTY-TOKEN-AUDIT discipline; service-role write; clamps org_id/layer='company'/statutory_lock=false/created_via='manual' regardless of client input; immutable-field rejection 400; query-scoped UPDATE .eq('id',id).eq('org_id',callerOrg).eq('layer','company') → 404 on 0 rows so a crafted id at an org-scoped or statutory rule never escalates; stable error codes INVALID_BODY/INVALID_QUERY/UNAUTHORIZED/FORBIDDEN_ROLE/NOT_FOUND/CODE_CONFLICT/SCHEMA_CONSTRAINT/SERVER_ERROR; non-destructive activeDealCount hint per spec §6d). Files (modified): src/features/admin/hooks/useComplianceRules.ts (createRule/updateRule rewritten to call the new route via bearer token from localStorage('housezoom-auth') — discontinues the anon-client INSERT/UPDATE path; toggleStatus + deleteRule stay anon as RLS-gated), src/app/admin/compliance/page.tsx (admin/owner-gated \"Add rule\" button in header + form modal; onEdit callback wired to detail panel; success toasts re-open the panel on the saved rule), src/features/admin/components/ComplianceRuleDetailPanel.tsx (new onEdit? prop; \"Edit\" button renders beside Publish/Archive + Delete for layer==='company' && !statutory_lock), src/types/index.ts (widened applicability union to include 'company'; added created_by/updated_by/published_at/metadata/description_i18n fields), src/features/admin/services/complianceEngine.ts (widened the engine's internal applicability union — 'company' NOT in APPLICABILITY_ALWAYS_INFO so company rules fire at their declared severity). i18n: new admin.compliance.ruleForm.* namespace + addRule/edit/ruleCreated/ruleUpdated keys × 4 locales = 200+ strings. Migration (authored, NOT run by CC): supabase/migrations/20260530_bl163_company_rule_authoring.sql with three idempotent sections — §A REQUIRED (DROP+ADD compliance_rules_applicability_check with 'company' appended — without §A the route's applicability='company' defaults fail at the DB CHECK), §B REQUIRED (ADD UNIQUE (org_id, code) WHERE layer='company' AND code IS NOT NULL), §C RECOMMENDED (ADD updated_by uuid REFERENCES auth.users(id)). Closed-set assumption files re-reviewed per Phase 0 §8 — src/types/index.ts + complianceEngine.ts type unions widened in this commit; ComplianceRuleDetailPanel badge eq-checks safe (default branch fall-through); src/app/admin/settings/page.tsx is i18n namespace-only (no eq-check) and safe. Tests: 25 new Zod schema tests (tests/unit/bl163-rule-schema.test.ts) covering happy path + every rejection path (.strict() unknown-key rejection, layer/statutory_lock/created_via immutability, missing trigger per TD-DBSCHEMA-COMPLIANCE-TRIGGER-NOT-NULL, invalid severity / country / region / valid_to-before-valid_from, oversize conditions, conditions overflow \u003e50, unknown action.type, canton-without-region cross-field). 280 total tests green. Phase 0 STOP gate: PASSED — zero divergences from spec. Run order constraint: the route's company-rule writes will fail at the DB CHECK until Will runs migration §A. package.json 2.6.32 → 2.6.33. Functional Guide (docs/functional-guide/compliance.md) updated with a §4b authoring section. 5 follow-up TDs filed (see Next Up): TD-COMPLIANCE-TRIGGER-NAMING-NORMALIZATION 🟡, TD-COMPLIANCE-RULE-CHANGE-RECOMPUTE 🟡, TD-BL163-CONDITION-BUILDER 🟢, TD-BL163-DESCRIPTION-I18N-EDITOR 🟢, TD-FEATUREMAP-COMPLIANCE-IS-STATUTORY-STALE 🟢. Closes TD-DBSCHEMA-COMPLIANCE-TRIGGER-NOT-NULL (DB-SCHEMA was corrected in D-372; Phase 0 re-confirmed trigger is NOT NULL in prod). *(Cross-references to the related tickets remain accessible via the In Progress / Known Bugs sections and via the D-372 / D-373 paper-trail entries.)*",
+      "completed": "NEW scripts/bl163/phase0-reality-check.mjs, docs/dd-hardening/bl-163-phase0-reality.md, supabase/migrations/20260530_bl163_company_rule_authoring.sql, src/features/admin/constants/complianceEnums.ts, src/features/admin/schemas/complianceRule.schema.ts, src/features/admin/components/RuleForm.tsx, src/app/api/admin/compliance/rules/route.ts, tests/unit/bl163-rule-schema.test.ts; MODIFIED src/features/admin/hooks/useComplianceRules.ts, src/app/admin/compliance/page.tsx, src/features/admin/components/ComplianceRuleDetailPanel.tsx, src/types/index.ts, src/features/admin/services/complianceEngine.ts, messages/{en,fr,de,it}.json, docs/functional-guide/compliance.md, package.json (2.6.32 → 2.6.33), ROADMAP.md, CHANGELOG.md, FEATURE-MAP.md, DB-SCHEMA.md, PROJECT-STRUCTURE.md",
+      "tag": "compliance"
+    },
     {
       "id": "D-370",
       "title": "CH compliance Level-1 acceptance + verification (operational; no code, no version bump)",
