@@ -1032,6 +1032,13 @@ const DATA = {
       "added": "src/features/admin/services/workflowService.ts, src/features/admin/hooks/useDeals.ts"
     },
     {
+      "id": "BL-167",
+      "title": "Test-policy enforcement gate",
+      "desc": "🟢. Mechanical check (extend docs:check or a CI step) that fails a commit when a new logic-bearing source file (src//*.ts(x), scripts/seed-*.mjs) has neither a sibling/companion test nor a declared no-test: \u003creason\u003e exemption marker. Crude-but-checkable file-level rule (the script can't judge \"has logic\" — gate on presence of a test OR an exemption marker; the human still decides test-vs-exempt but must declare it). Build deliberately to avoid false-failure churn that trains bypasses. Surfaced from the BL-164 seed-de-agency.mjs untested-seed slip + the WoW testing-policy formalization (WAYS-OF-WORKING.md § Testing policy).",
+      "tag": "admin",
+      "added": "scripts/docs-check.mjs (or new CI step), WAYS-OF-WORKING.md § Testing policy"
+    },
+    {
       "id": "BL-PROPERTIES-ISO-CANONICALIZATION",
       "title": "Store ISO jurisdiction codes on properties (sibling of BL-137)",
       "desc": "🟡. properties.country/region store display names (\"Switzerland\", \"Kanton Zürich\") not ISO codes (CH, CH-ZH); there is no country_code/canton-code column. D-378 normalizes at the compliance layer as a band-aid (display name → ISO inside evaluateCompliance); the real fix is a country_code (+ canton code) column + backfill + write-path canonicalization + display refactor, so ALL consumers read canonical codes (matching what BL-137 did for organizations). Scope: migration + backfill of existing rows + property create/edit write path + any display/consumer that assumed the name field (listing cards, detail header, PDFs, portal feeds, search/match) + remove the D-378 band-aid. Pairs with TD-COMPLIANCE-REGION-NAME-TO-ISO 🟡 (the canton name→code map needed for backfill). Out of scope for the BG-97 bug fix. Reopen triggers: new market onboarding, any second consumer hitting the same mismatch.",
