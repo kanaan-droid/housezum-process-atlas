@@ -146,7 +146,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-06-03';
+const LAST_UPDATED = '2026-06-05';
 const DATA = {
   "inProgress": [
     {
@@ -1017,13 +1017,6 @@ const DATA = {
     }
   ],
   "backlog": [
-    {
-      "id": "BL-165",
-      "title": "Agency onboarding / creation flow",
-      "desc": "No agency-creation product flow exists; demo orgs are hand-seeded (Gulf Horizon / Zürich Premium / Hauptstadt Immobilien). Build org provisioning + country_code-at-creation (binds the country-scoped compliance rules + workflow templates — Option-A attachment) + first-admin invite + member invite/role assignment + agent locale (agent_profiles.language). Surfaced during the DE market build (Hauptstadt seed). Reference when scoping: scripts/seed-eu-agencies/seed-de-agency.mjs is the manual equivalent of this flow (org → first admin → membership → agent_profiles, with country_code/default_locale/currency/timezone/measurement_unit set). Open question for spec: single vs multi-market orgs (country_code is singular today; intersects BL-166 + the \"Import my data\" backlog item).",
-      "tag": "compliance",
-      "added": "scripts/seed-eu-agencies/seed-de-agency.mjs (manual equivalent)"
-    },
     {
       "id": "BL-166",
       "title": "Country-filter system workflow templates in the deal picker",
@@ -1958,6 +1951,38 @@ const DATA = {
   ],
   "techDebt": [
     {
+      "id": "🟡 TD-ORG-CANTON-TO-REGION-CODE-CALLERS",
+      "title": "Migrate the remaining canton consumers to region_code",
+      "desc": "BL-165 (D-388) added the generic organizations.region_code and dual-writes canton = region_code for CH during the deprecation window, but the existing BL-119 canton machinery still reads canton: the admin canton dropdown + change-listener, cantonLanguageSync, /api/admin/organization/canton, and OrgProvider's canton context field. Migrate each to region_code (keep getCantonDefaultLanguage — the locale map is still valid for CH-* codes). Precedes TD-ORG-CANTON-DROP.",
+      "files": "src/features/agencies/services/cantonLanguageSync.ts, /api/admin/organization/canton, src/shared/providers/OrgProvider.tsx (canton field), BL-119 canton UI",
+      "tag": "admin",
+      "added": "2026-06-04"
+    },
+    {
+      "id": "🟢 TD-ORG-CANTON-DROP",
+      "title": "Drop organizations.canton after one release",
+      "desc": "BL-165 (D-388) deprecated canton in favor of region_code (dual-write window). After one release and once TD-ORG-CANTON-TO-REGION-CODE-CALLERS lands (no reader left), drop the column + the dual-write in the onboarding route. Mirrors the BL-137 country_default deprecation pattern.",
+      "files": "organizations.canton, src/app/api/onboarding/route.ts (canton dual-write)",
+      "tag": "admin",
+      "added": "2026-06-04"
+    },
+    {
+      "id": "🟢 TD-ORG-CONFIG-JSONB-DROP",
+      "title": "Stop dual-writing org settings.{currency,measurement_unit}; drop the OrgProvider settings-fallback",
+      "desc": "BL-168 (D-387) ships a dual-write window (column + settings jsonb) per the BL-137 playbook. After one release (once all orgs carry the columns and nothing reads useOrg().orgSettings.currency/.measurement_unit): stop writing settings.currency/settings.measurement_unit in the onboarding API / orgService / 3 seeds, drop the resolveOrgMarketConfig settings-fallback branch (column becomes the sole source), and leave settings holding only branding / feature-flags / deal_permissions. Grep orgSettings consumers first.",
+      "files": "src/lib/marketDefaults.ts (resolveOrgMarketConfig), src/shared/providers/OrgProvider.tsx, src/app/api/onboarding/route.ts, src/features/admin/services/orgService.ts, the 3 seed scripts",
+      "tag": "admin",
+      "added": "2026-06-04"
+    },
+    {
+      "id": "🟢 TD-ORG-LOCALE-CONSOLIDATION",
+      "title": "Consolidate org language onto default_locale; retire settings.default_language / dead settings.language read",
+      "desc": "Split out of BL-168 (D-387) because the consolidation gate failed: 7 CH orgs carry a stale default_locale='en' that disagrees with their settings.default_language. Until reconciled, OrgProvider's language read stays on settings.language (BL-168 scoped to currency + measurement_unit only). Fix: reconcile the 7 (and any others) so default_locale = the org's true language, then switch the OrgProvider read to org.default_locale ?? settings.language, stop seeds writing settings.default_language, and grep default_language / settings.language consumers. Mirrors BL-120/BL-137 column-promotion discipline.",
+      "files": "src/shared/providers/OrgProvider.tsx, seed scripts, organizations.default_locale (data reconciliation)",
+      "tag": "admin",
+      "added": "2026-06-04"
+    },
+    {
       "id": "🟢 TD-COMPLIANCE-DE-REGIONS",
       "title": "DE Bundesland (region-layer) compliance not seeded",
       "desc": "The DE country corpus (D-386) states obligations at the federal level only. Two items vary by Land and belong in a region-layer pass: Grunderwerbsteuer rate per Bundesland (3,5–6,5 %; the country rule states the obligation, not the per-Land rate) and Mietpreisbremse area designations (per-Land Rechtsverordnung; BBSR Jan-2026 ≈ 814 municipalities). Mirrors TD-COMPLIANCE-IT-REGIONS. Seed as region-layer rows (region_code='DE-…') when a DE org needs Land-specific accuracy.",
@@ -2040,7 +2065,7 @@ const DATA = {
     {
       "id": "🟢 TD-AGENT-PROFILE-ORG-DIVERGENCE-AUDIT",
       "title": "No periodic check for agent_profiles rows that diverge from their org's settings jsonb",
-      "desc": "Session 5 (2026-05-25) caught Hans's measurement_unit='sqft' drift only by manually running an audit query mid-investigation. Fix: add a runbook with the canonical audit query + decide cadence (manual at session start / CI / scheduled cron). The query distinguishes intended overrides (language='fr' on a de-default org = BL-120 user preference) from drift (measurement_unit='sqft' on a sqm-default org = corruption) — include that distinguishing logic so audits don't false-positive on intentional overrides. Already proven useful (caught Hans + surfaced TD-ORG-SETTINGS-INCOMPLETE-GULF-HORIZON). Canonical audit SQL: SELECT ap.email, o.name AS org, o.country_code, ap.currency, o.settings-\u003e\u003e'currency' AS org_currency, ap.measurement_unit, o.settings-\u003e\u003e'measurement_unit' AS org_unit, ap.language, o.settings-\u003e\u003e'default_language' AS org_lang, ap.updated_at FROM agent_profiles ap JOIN org_members om ON om.user_id = ap.user_id JOIN organizations o ON o.id = om.org_id ORDER BY o.name, ap.email; — then per row: NULL on agent = correct (inherit sentinel); non-NULL diverging from org = user override (OK) or drift (investigate). Cost-of-fix: ~30-60 min (runbook + cadence decision).",
+      "desc": "Session 5 (2026-05-25) caught Hans's measurement_unit='sqft' drift only by manually running an audit query mid-investigation. Fix: add a runbook with the canonical audit query + decide cadence (manual at session start / CI / scheduled cron). The query distinguishes intended overrides (language='fr' on a de-default org = BL-120 user preference) from drift (measurement_unit='sqft' on a sqm-default org = corruption) — include that distinguishing logic so audits don't false-positive on intentional overrides. Already proven useful (caught Hans + surfaced TD-ORG-SETTINGS-INCOMPLETE-GULF-HORIZON). Canonical audit SQL: SELECT ap.email, o.name AS org, o.country_code, ap.currency, o.currency AS org_currency, ap.measurement_unit, o.measurement_unit AS org_unit, ap.language, o.settings-\u003e\u003e'default_language' AS org_lang, ap.updated_at FROM agent_profiles ap JOIN org_members om ON om.user_id = ap.user_id JOIN organizations o ON o.id = om.org_id ORDER BY o.name, ap.email; — then per row: NULL on agent = correct (inherit sentinel); non-NULL diverging from org = user override (OK) or drift (investigate). Cost-of-fix: ~30-60 min (runbook + cadence decision).",
       "files": "new docs/runbooks/agent-profile-org-divergence-audit.md (TBD); WAYS-OF-WORKING.md cross-ref",
       "tag": "comms",
       "added": "2026-05-25"
@@ -2791,6 +2816,20 @@ const DATA = {
     }
   ],
   "bugs": [
+    {
+      "id": "BG-123",
+      "title": "Self-serve agency founder can't enter the app after onboarding",
+      "desc": "🔴. Surfaced in BL-165 (D-388) live testing. A fresh signup never gets an agent_profiles row — migration 003 dropped the handle_new_user trigger, and the signup-page client insert always fails the agent_profiles_self_insert RLS (WITH CHECK org_id = get_user_org_id() is unsatisfiable pre-org). Onboarding's profile link was update-only → no-op'd on the missing row → founder stayed profile-less → the login gate (profile?.approved false) routed them to /pending-approval, where no one can approve their own org. Fixed: service-role ensureProfile upsert (founder auto-approved), onboarding link update→upsert (self-healing), login routes no-membership→/onboarding.",
+      "tag": "admin",
+      "added": "2026-06-05"
+    },
+    {
+      "id": "BG-124",
+      "title": "Signup-page session hygiene (BG-B)",
+      "desc": "🟡. /auth/signup does not signOut() an existing session before signUp (signing up while logged in as another user leaves the prior session active → lands on the old user's pages); it branches on data.user (truthy even when email-confirm makes data.session === null) so it never shows a \"check your email\" state; and there's no authed-user guard on the page. Also remove the dead client-side agent_profiles insert at signup/page.tsx:43 (always RLS-fails — provisioning is now service-role via BG-123). Split from BG-123 (same family, different surface).",
+      "tag": "comms",
+      "added": "2026-06-05"
+    },
     {
       "id": "~~BG-MARKET-ANALYSIS-HYDRATION-AND-LOCALE~~",
       "title": "/tools/market-analysis — launching from a property prefilled almost nothing on a CH property (only the property label + Type), and the empty-state placeholders were hardcoded UAE (Dubai Marina/Cayan Tower/1200/25/2,300,000) shown to Swiss agents.",
@@ -3598,6 +3637,27 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-389",
+      "title": "Profile provisioning + founder auto-approval (self-serve onboarding unblock)",
+      "desc": "🔴 fix surfaced in agency-onboarding live testing: a fresh self-serve founder created the org but landed on /pending-approval because no agent_profiles row existed (the legacy handle_new_user trigger was dropped in migration 003; the signup-page client insert always fails the self-insert RLS pre-org; onboarding's profile link was update-only → no-op on the missing row). Fix (no migration — existing columns + service-role): new src/lib/ensureProfile.ts (service-role upsert on user_id, caller-supplied approved) + src/lib/postLoginRoute.ts (pure routing decision). Onboarding's profile link changed update-only → ensureProfile (founder auto-approved — they own the org; self-heals a missing signup-time profile), covering both agency + solo plans. Login routing fixed: a user with no active membership → /onboarding (not /pending-approval, which is now reserved for an invited agent with a membership awaiting admin sign-off). 9 unit tests (helper upsert shape + all routing branches). Signup-page session hygiene split to a separate follow-up ticket.",
+      "completed": "2026-06-05",
+      "tag": "admin"
+    },
+    {
+      "id": "D-388",
+      "title": "Agency onboarding: region picker + dormant multi-market hedge",
+      "desc": "Builds on the org-config columns work. Generic organizations.region_code (ISO 3166-2) replaces CH-specific canton (dual-write window; cross-field CHECK region ⊂ country); canton deprecated. New organization_markets table (dormant — written at onboarding, read by nothing yet; org.country_code stays the canonical primary-market read) as the cheap multi-market hedge both cross-val reviewers flagged. New src/lib/constants/market-regions.ts: REGIONS[country] data-driven subdivision picker (CH cantons required, reusing SWISS_CANTONS + authored labels; AE 7 / DE 16 / IT 20 optional; FR none) + pure helpers validateOnboardingRegion / resolveOnboardingMarket (locale = subdivision locale if the country maps one — CH via the BL-119 canton map — else the market default; generic, no country branch), 13 unit tests. Onboarding form extended (one generic flow, no if (CH)): added Germany to the country list; region \u003cselect\u003e renders only when the country has subdivisions, required iff CH; market config stays derived + locked (from the columns work). Onboarding API validates region server-side, writes region_code + dual-writes canton for CH, sets default_locale via the resolver (fixes a latent gap — onboarding-created orgs previously always got 'en'; the first owner profile now inherits the correct market/canton locale), and inserts one primary organization_markets row. i18n ×4 (region/regionSelect). Migration authored — Will runs it. Follow-ups: TD-ORG-CANTON-TO-REGION-CODE-CALLERS, TD-ORG-CANTON-DROP.",
+      "completed": "2026-06-04",
+      "tag": "admin"
+    },
+    {
+      "id": "D-387",
+      "title": "Org market config: jsonb → typed columns (currency + measurement_unit)",
+      "desc": "Promotes organizations.currency + organizations.measurement_unit from the settings jsonb to top-level CHECK-constrained columns, harmonizing with agent_profiles (already columns). Language excluded — the consolidation gate failed (7 CH orgs carry stale default_locale='en') → split to TD-ORG-LOCALE-CONSOLIDATION; OrgProvider's language read left on settings. New market_defaults DB table (canonical per-country defaults: CH/FR/IT/DE→sqm, AE→sqft locked; CHF/EUR/AED; RLS read-all) — adding a market later is one INSERT, no code change. Three pure helpers in src/lib/marketDefaults.ts (getMarketDefaults cached table read / buildOrgMarketConfig org-create payload / resolveOrgMarketConfig column→settings read precedence), 12 unit tests. OrgProvider reads the new columns (falls back to settings during the dual-write window) with context shape unchanged → 83 consumers untouched. Write paths fixed: the onboarding API + orgService.createOrganization (both previously wrote no market config — every product-created org was config-less) now derive from country_code via market_defaults and dual-write columns + settings; 3 seeds add the columns alongside their settings jsonb. Migration authored — Will runs it statement-by-statement (§ 2.0 audit first). Closes TD-ORG-SETTINGS-INCOMPLETE-GULF-HORIZON; shortens the BG-A5 fallback chain. Follow-ups: TD-ORG-CONFIG-JSONB-DROP, TD-ORG-LOCALE-CONSOLIDATION. Sequenced first; unblocks the agency-onboarding flow.",
+      "completed": "2026-06-04",
+      "tag": "admin"
+    },
     {
       "id": "D-386",
       "title": "DE (Germany) market: compliance ingestion + workflow templates + Hauptstadt demo org",
