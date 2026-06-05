@@ -1951,6 +1951,22 @@ const DATA = {
   ],
   "techDebt": [
     {
+      "id": "🔴 TD-TEST-DB-INTEGRATION-HARNESS",
+      "title": "No real-DB test path → CHECK/constraint failures are invisible to the suite",
+      "desc": "Surfaced by BG-125 (D-390): a column DEFAULT that violated its own CHECK (agent_profiles.operating_country DEFAULT 'UAE' vs the ISO ^[A-Z]{2}$ CHECK) rejected every profile insert with 23514 — and the BG-123 unit tests mocked the Supabase client, so they never observed the rejection. The lesson: mocked-client tests cannot catch DB constraint failures (CHECK / FK / NOT NULL / unique); that whole bug class is invisible to the current suite. Fix: stand up a real-DB integration tier (local Supabase / a test project) that runs representative inserts (ensureProfile upsert, onboarding org+profile create, seed payloads) against the actual schema + constraints, in CI. Until it exists, constraint-sensitive changes carry a residual blind spot (BG-125 ships a payload-shape guard as a stopgap, explicitly not real coverage).",
+      "files": "NEW tests/integration/ + a local-Supabase / test-DB harness + CI wiring",
+      "tag": "admin",
+      "added": "2026-06-05"
+    },
+    {
+      "id": "🟢 TD-ONBOARDING-PROFILE-ROLLBACK",
+      "title": "Onboarding has no rollback if owner-profile provisioning fails",
+      "desc": "BG-125 (D-390) made the onboarding profile step fatal (returns 500 instead of silently succeeding profile-less). But the org + owner membership + organization_markets row are already created at that point, so a failure now leaves an orphaned org with no owner profile. Add cleanup/rollback (delete the just-created org/membership/markets, FK-safe order) or a retry path so a failed profile provision doesn't strand a half-created org. Low frequency (the BG-125 default fix removes the only known trigger), hence 🟢.",
+      "files": "src/app/api/onboarding/route.ts",
+      "tag": "admin",
+      "added": "2026-06-05"
+    },
+    {
       "id": "🟡 TD-ORG-CANTON-TO-REGION-CODE-CALLERS",
       "title": "Migrate the remaining canton consumers to region_code",
       "desc": "BL-165 (D-388) added the generic organizations.region_code and dual-writes canton = region_code for CH during the deprecation window, but the existing BL-119 canton machinery still reads canton: the admin canton dropdown + change-listener, cantonLanguageSync, /api/admin/organization/canton, and OrgProvider's canton context field. Migrate each to region_code (keep getCantonDefaultLanguage — the locale map is still valid for CH-* codes). Precedes TD-ORG-CANTON-DROP.",
@@ -2353,7 +2369,7 @@ const DATA = {
     {
       "id": "🟡 TD-DATA-COUNTRY-CODE-COLLISION",
       "title": "Country code data integrity issues — value-collision half closed by BL-133 (2026-05-05); format-collision half remains open",
-      "desc": "(1) Format collision (REMAINS OPEN, filed 2026-04-30): agent_profiles.country_code stores PHONE country codes (33, 41, 39) while every other column system-wide named country_code stores ISO alpha-2 (FR, CH, IT). Workaround at MCP time: query email LIKE 'will+ag-fr%' to find FR admins. Likely fix: rename agent_profiles.country_code → phone_country_code (or agent_profiles.contact_country_code) to disambiguate. Worth filing as its own ticket once BL-133 is bedded in. (2) ~~Value collision in compliance_rules (escalated 2026-05-01):~~ CLOSED 2026-05-05 by BL-133. Migration 20260505_bl133_country_code_canonicalization.sql rewrote 'UAE' → 'AE' across compliance_rules, workflow_templates, qa_knowledge_base, market_profiles, agent_profiles.operating_country, and added schema-layer ISO-format CHECK constraints to prevent recurrence. Seed script (scripts/bl60/seed-qa-knowledge-base.mjs:168) patched at source. Severity downgraded 🔴 → 🟡 (format-collision half is still real but lower-impact than the production-correctness value-collision was).",
+      "desc": "(1) Format collision (REMAINS OPEN, filed 2026-04-30): agent_profiles.country_code stores PHONE country codes (33, 41, 39) while every other column system-wide named country_code stores ISO alpha-2 (FR, CH, IT). Workaround at MCP time: query email LIKE 'will+ag-fr%' to find FR admins. Likely fix: rename agent_profiles.country_code → phone_country_code (or agent_profiles.contact_country_code) to disambiguate. Worth filing as its own ticket once BL-133 is bedded in. BG-125 note (2026-06-05): this column also carries a live DEFAULT '+1' (a phone prefix). Unlike operating_country it is NOT CHECK-violating (the column is deliberately excluded from BL-133's ISO format CHECK), so BG-125 left it untouched — the smelly '+1' default folds into this TD's rename/disambiguation work. (2) ~~Value collision in compliance_rules (escalated 2026-05-01):~~ CLOSED 2026-05-05 by BL-133. Migration 20260505_bl133_country_code_canonicalization.sql rewrote 'UAE' → 'AE' across compliance_rules, workflow_templates, qa_knowledge_base, market_profiles, agent_profiles.operating_country, and added schema-layer ISO-format CHECK constraints to prevent recurrence. Seed script (scripts/bl60/seed-qa-knowledge-base.mjs:168) patched at source. Severity downgraded 🔴 → 🟡 (format-collision half is still real but lower-impact than the production-correctness value-collision was).",
       "files": "agent_profiles schema, all .from('agent_profiles') queries, DB-SCHEMA.md",
       "tag": "comms",
       "added": "2026-04-30 (value half closed 2026-05-05)"
@@ -2816,6 +2832,13 @@ const DATA = {
     }
   ],
   "bugs": [
+    {
+      "id": "BG-125",
+      "title": "agent_profiles.operating_country DEFAULT 'UAE' violates its own ISO CHECK → every profile insert rejected (23514)",
+      "desc": "🔴. Dashboard-era DEFAULT 'UAE' (3 chars) predates BL-133, which added the CHECK operating_country ~ '^[A-Z]{2}$' + rewrote rows UAE→AE but never dropped the column default → the default self-violates the CHECK; any insert omitting the column 23514's. This is the real root under BG-123/BL-165: ensureProfile/onboarding/invite-signup all omit the column → profile creation failed → /api/onboarding 400'd after creating org+membership → founder stuck on /pending-approval. Fixed: migration drops the default on operating_country (and the latent sibling qa_knowledge_base.country_code, same class); onboarding profile error now fatal (500, no silent profile-less success). Test harness gap → TD-TEST-DB-INTEGRATION-HARNESS.",
+      "tag": "admin",
+      "added": "2026-06-05"
+    },
     {
       "id": "BG-123",
       "title": "Self-serve agency founder can't enter the app after onboarding",
@@ -3637,6 +3660,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-390",
+      "title": "Fix self-violating column default ('UAE' vs ISO CHECK) — the true root of the founder-stuck-on-pending-approval bug",
+      "desc": "A dashboard-era agent_profiles.operating_country DEFAULT 'UAE' (3 chars) survived BL-133's ISO-format CHECK (operating_country ~ '^[A-Z]{2}$') — BL-133 rewrote rows UAE→AE and added the CHECK but missed the column default → the default violated its own CHECK, rejecting every profile insert that omitted the column with 23514. That, not the prior D-389 provisioning logic, is why self-serve founders couldn't get a profile (ensureProfile/onboarding/invite-signup all omit the column) → /api/onboarding 400'd post-org-creation → /pending-approval. Fix: migration (Will runs) ALTER COLUMN … DROP DEFAULT on operating_country and the latent same-class sibling qa_knowledge_base.country_code (also DEFAULT 'UAE' + ISO CHECK) — no backfill (the bad default only ever blocked new inserts). The CHECK already permits NULL; no country is assumed. Onboarding's profile step changed from silent \"non-fatal\" to fatal 500 (a founder with an org but no profile must not pass as success). ensureProfile documented to leave operating_country to the DB. Test-harness lesson filed: the D-389 unit tests mocked the client → blind to the 23514; → TD-TEST-DB-INTEGRATION-HARNESS (mocked clients can't catch CHECK/constraint failures) + a payload-shape guard as a stopgap. country_code '+1' noted under TD-DATA-COUNTRY-CODE-COLLISION (not CHECK-violating; left). Follow-up: TD-ONBOARDING-PROFILE-ROLLBACK.",
+      "completed": "2026-06-05",
+      "tag": "admin"
+    },
     {
       "id": "D-389",
       "title": "Profile provisioning + founder auto-approval (self-serve onboarding unblock)",
