@@ -2369,7 +2369,7 @@ const DATA = {
     {
       "id": "🟡 TD-DATA-COUNTRY-CODE-COLLISION",
       "title": "Country code data integrity issues — value-collision half closed by BL-133 (2026-05-05); format-collision half remains open",
-      "desc": "(1) Format collision (REMAINS OPEN, filed 2026-04-30): agent_profiles.country_code stores PHONE country codes (33, 41, 39) while every other column system-wide named country_code stores ISO alpha-2 (FR, CH, IT). Workaround at MCP time: query email LIKE 'will+ag-fr%' to find FR admins. Likely fix: rename agent_profiles.country_code → phone_country_code (or agent_profiles.contact_country_code) to disambiguate. Worth filing as its own ticket once BL-133 is bedded in. BG-125 note (2026-06-05): this column also carries a live DEFAULT '+1' (a phone prefix). Unlike operating_country it is NOT CHECK-violating (the column is deliberately excluded from BL-133's ISO format CHECK), so BG-125 left it untouched — the smelly '+1' default folds into this TD's rename/disambiguation work. (2) ~~Value collision in compliance_rules (escalated 2026-05-01):~~ CLOSED 2026-05-05 by BL-133. Migration 20260505_bl133_country_code_canonicalization.sql rewrote 'UAE' → 'AE' across compliance_rules, workflow_templates, qa_knowledge_base, market_profiles, agent_profiles.operating_country, and added schema-layer ISO-format CHECK constraints to prevent recurrence. Seed script (scripts/bl60/seed-qa-knowledge-base.mjs:168) patched at source. Severity downgraded 🔴 → 🟡 (format-collision half is still real but lower-impact than the production-correctness value-collision was).",
+      "desc": "(1) Format collision (REMAINS OPEN, filed 2026-04-30): agent_profiles.country_code stores PHONE country codes (33, 41, 39) while every other column system-wide named country_code stores ISO alpha-2 (FR, CH, IT). Workaround at MCP time: query email LIKE 'will+ag-fr%' to find FR admins. Likely fix: rename agent_profiles.country_code → phone_country_code (or agent_profiles.contact_country_code) to disambiguate. Worth filing as its own ticket once BL-133 is bedded in. BG-125 note (2026-06-05): this column also carries a live DEFAULT '+1' (a phone prefix). Unlike operating_country it is NOT CHECK-violating (the column is deliberately excluded from BL-133's ISO format CHECK), so BG-125 left it untouched — the smelly '+1' default folds into this TD's rename/disambiguation work. BG-128 note (2026-06-06): the user-visible +1 symptom is mitigated at the provisioning layer — ensureProfile/onboarding/invite-signup now set phone_country_code from the org's dial code (resolveDialCode), and the profile UI falls back to the org dial code. The DB DEFAULT '+1' and the country_code-vs-phone_country_code naming/rename remain this TD's open scope. (2) ~~Value collision in compliance_rules (escalated 2026-05-01):~~ CLOSED 2026-05-05 by BL-133. Migration 20260505_bl133_country_code_canonicalization.sql rewrote 'UAE' → 'AE' across compliance_rules, workflow_templates, qa_knowledge_base, market_profiles, agent_profiles.operating_country, and added schema-layer ISO-format CHECK constraints to prevent recurrence. Seed script (scripts/bl60/seed-qa-knowledge-base.mjs:168) patched at source. Severity downgraded 🔴 → 🟡 (format-collision half is still real but lower-impact than the production-correctness value-collision was).",
       "files": "agent_profiles schema, all .from('agent_profiles') queries, DB-SCHEMA.md",
       "tag": "comms",
       "added": "2026-04-30 (value half closed 2026-05-05)"
@@ -2832,6 +2832,13 @@ const DATA = {
     }
   ],
   "bugs": [
+    {
+      "id": "BG-128",
+      "title": "After creating an agency the user must manually refresh to enter the app + Swiss agent's phone defaults to +1",
+      "desc": "🟡. From the will+test5 live re-test. (1) Post-onboarding nav race: OrgProvider re-resolves only on mount / onAuthStateChange, never after a membership is created — so after router.replace, needsOnboarding is stale-true and its redirect effect bounces the user back to /onboarding until a manual refresh. Fix: expose refresh() from OrgProvider; onboarding await refresh() (via finishOnboarding) before navigating. (2) Phone phone_country_code defaulted to '+1' (US) for a Swiss founder — the dashboard-era column default applied because provisioning never set it. Fix: src/lib/dialCode.ts (resolveDialCode: CH→+41/FR→+33/IT→+39/DE→+49/AE→+971; unknown→'', never +1); ensureProfile gained phoneCountryCode?; onboarding + invite-signup pass resolveDialCode(org country); profile UI fallback → org dial code (+ DE in the dropdown). No migration.",
+      "tag": "admin",
+      "added": "2026-06-06"
+    },
     {
       "id": "BG-127",
       "title": "Founder-flow polish: callback refresh race + NULL operating_country + profile UI shows UAE",
@@ -3674,6 +3681,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-393",
+      "title": "Founder-flow polish: onboarding nav re-resolve + phone dial-code inheritance",
+      "desc": "Two fixes from a CH live re-test. (1) Onboarding nav race: OrgProvider only re-resolved on mount / onAuthStateChange, so after agency creation it still had stale needsOnboarding=true/orgId=null → its redirect effect bounced the user from /admin back to /onboarding until a manual refresh. Added a refresh() to OrgContextValue (= resolve, additive — the 83 consumers ignore it); both onboarding success handlers now await refresh() before navigating, via the testable finishOnboarding(refresh, navigate, target) helper. (2) Phone dial code: a founder's phone_country_code fell to the dashboard-era '+1' (US) default because provisioning never set it → a Swiss agent saw +1. Added src/lib/dialCode.ts (resolveDialCode: CH→+41 / FR→+33 / IT→+39 / DE→+49 / AE→+971; unknown→'', never a silent +1); ensureProfile gained phoneCountryCode?; onboarding + invite-signup pass resolveDialCode(org country); the profile-settings phone fallback now derives from the org dial code (+ DE added to the dropdown). 6 new unit tests. No migration. Mitigates the +1 symptom of TD-DATA-COUNTRY-CODE-COLLISION at the provisioning layer (the column rename remains the open follow-up).",
+      "completed": "2026-06-06",
+      "tag": "admin"
+    },
     {
       "id": "D-392",
       "title": "Founder-flow polish: callback soft-nav + operating_country inheritance + profile UI ISO fix",
