@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Functional Guide — Self-Serve Onboarding &amp; Auth</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/functional-guide/" class="active">Functional Guide</a>
+  </div>
+</nav>
+<main>
+  <div class="breadcrumb"><a href="index.html">Functional Guide</a> / onboarding.md</div>
+  
+  <div class="content"><h1>Functional Guide — Self-Serve Onboarding &amp; Auth</h1>
+<p><strong>Status:</strong> Living document. Updated end-of-session whenever signup, auth, or onboarding behavior changes. <strong>Version:</strong> v0.1 <strong>Last updated:</strong> 2026-06-06 (initial — BL-165/168 + BG-123→128 founder-flow chain) <strong>Maintainer:</strong> Will + Claude</p>
+<hr/>
+<h2>0. How to use this guide</h2>
+<p>This guide is the <strong>single source of truth</strong> for how a new user gets <em>into</em> HouseZoom today: from the signup form, through email confirmation and auto-login, to the onboarding choice (solo vs. agency), agency creation, profile provisioning, and the first landing screen inside the app. It is written for non-engineers (support, sales, investors) as well as engineers needing quick reference.</p>
+<p><strong>Pair this guide with <a href="platform-admin.html"><a href="platform-admin.html"><code>platform-admin.md</code></a></a> and <a href="compliance.html"><a href="compliance.html"><code>compliance.md</code></a></a>.</strong> This guide covers how an <em>agency</em> user self-onboards. The platform-admin role is provisioned by a completely different (manual, SQL-only) path — see <a href="platform-admin.html"><code>platform-admin.md</code></a> §4. There is deliberately no overlap: nothing in self-serve onboarding can grant platform-admin.</p>
+<p><strong>If you ask "what happens when X during signup/onboarding?" and the answer isn't here, that's a documentation gap.</strong> Add a row to §8 (Edge Case Catalog) when you discover one.</p>
+<p><strong>Maintenance rule:</strong> any session that ships user-visible behavior change to signup, the auth callback, or onboarding updates this file. See Standing Obligations.</p>
+<hr/>
+<h2>1. What it is (plain English)</h2>
+<p><strong>Self-serve onboarding</strong> is how a brand-new person turns "I have an email address" into "I'm working inside a HouseZoom agency account" without anyone at HouseZoom touching a database.</p>
+<p>The journey has five stages:</p>
+<pre><code>1. Sign up        →  email + password, then "check your email"
+2. Confirm        →  click the email link → /auth/callback → logged in
+3. Choose         →  "Just me" (solo)  or  "I'm setting up for my agency"
+4. Create         →  (agency path) name + country + region → org + market config
+5. Land           →  profile provisioned, dropped into the app (no manual refresh)</code></pre>
+<p>The person who completes the agency path is the <strong>founder</strong> of that agency: the first user, the owner, auto-approved. Everyone they invite afterwards goes through the separate invite flow (not covered here — see the invite-signup path).</p>
+<hr/>
+<h2>2. Why it works the way it does</h2>
+<p>Two hard constraints shape this whole flow. Knowing them explains every design decision below.</p>
+<p><strong>A. Sessions live in the browser, not in a cookie.</strong> HouseZoom uses Supabase's <em>implicit</em> auth flow: after a successful login the access/refresh tokens arrive in the URL hash and are persisted to <code>localStorage</code> (<code>storageKey: 'housezoom-auth'</code>), <strong>not</strong> to a cookie. The practical consequence: the <strong>server cannot see who you are</strong> on a normal navigation. Any routing decision that depends on "am I logged in / approved / a member of an org" has to happen <strong>client-side</strong>, after the browser has read its own session. This is why the auth callback is a client page that <em>waits</em> for the session before routing, and why post-onboarding navigation is a soft client-side <code>router.replace</code>, not a server redirect.</p>
+<p><strong>B. A fresh user cannot create their own profile.</strong> The <code>agent_profiles</code> table is row-level-security-locked. The self-insert policy (<code>agent_profiles_self_insert</code>) requires <code>WITH CHECK (auth.uid() = user_id AND org_id = get_user_org_id())</code> — i.e. you may only insert your own profile row <em>if it already points at the org you already belong to</em>. A brand-new user belongs to no org yet, so that check can <strong>never</strong> be satisfied from the browser. (The legacy database trigger that used to auto-create a profile row, <code>handle_new_user</code>, was dropped in migration <code>003_drop_legacy_users.sql</code>.) The consequence: profile creation <strong>must</strong> run server-side with the privileged <code>service_role</code>, which bypasses RLS. That's exactly what <code>ensureProfile</code> does (§6).</p>
+<p>Everything else in this guide is downstream of those two facts.</p>
+<hr/>
+<h2>3. Stage 1 — Signup (<code>/auth/signup</code>)</h2>
+<p>The user enters an <strong>email and password</strong>. On submit:</p>
+<ul><li>The page <strong>signs out first.</strong> If someone is already authenticated and lands on signup, we clear that session before creating the new one, so a stale session can't leak into the new account. (There's also a mount guard: an already-authenticated user arriving at <code>/auth/signup</code> is handled rather than silently double-signed-up.)</li><li>We call Supabase signup with <code>emailRedirectTo: ${origin}/auth/callback</code> — this is what makes the confirmation email's link point back into our app at the callback route (§4), regardless of which environment (preview/prod/local) the user signed up from.</li><li>We then read the <strong>signup outcome</strong> (<code>resolveSignupOutcome</code>) and branch on it:</li></ul>
+<table><thead><tr><th>Outcome</th><th>When</th><th>What the user sees</th></tr></thead><tbody><tr><td><code>check-email</code></td><td>Supabase returns <strong>no session</strong> (email confirmation required)</td><td>A "<strong>check your email</strong>" confirmation state (<code>confirmSent</code>). The user is told to click the link in their inbox. Nothing else happens until they do.</td></tr><tr><td><code>proceed</code></td><td>A session already exists (confirmation not required in this environment)</td><td>Straight through to routing.</td></tr><tr><td><code>none</code></td><td>No user came back at all</td><td>Treated as an error state, not a silent success.</td></tr></tbody></table>
+<p>The <code>check-email</code> state is the common one in production: signups require email confirmation, so <code>session</code> is <code>null</code> immediately after submit. The page must handle that <code>null</code> gracefully (it does) rather than assuming a logged-in user.</p>
+<blockquote><p><strong>Why signOut-first matters:</strong> without it, a returning visitor with a half-alive session could submit signup and end up with the <em>old</em> identity attached to the <em>new</em> form action — a confusing cross-account state. Clearing first makes signup deterministic.</p></blockquote>
+<hr/>
+<h2>4. Stage 2 — Email confirm → auto-login (<code>/auth/callback</code>)</h2>
+<p>The confirmation email link lands the user on <strong><code>/auth/callback</code></strong>, a <strong>client</strong> page (it has to be — see §2A). Its only job is: <em>establish the session, then route the user to the right next screen.</em></p>
+<p>It waits for the session to materialize rather than assuming it's there:</p>
+<ul><li>It subscribes to <code>onAuthStateChange</code> <strong>and</strong> calls <code>getSession()</code> — whichever resolves the session first wins. (Implicit-flow tokens come in via the URL hash and are parsed asynchronously, so the session isn't guaranteed to exist on first render.)</li><li>If no session appears within an <strong>8-second fallback</strong>, it gives up and sends the user to <code>/auth/login</code> rather than hanging forever.</li><li>Once the session exists, it routes via <strong><code>resolvePostLoginRoute</code></strong> using a <strong>soft</strong> <code>router.replace(target)</code> — a client navigation, never a server redirect (again, §2A: the server can't see the session).</li></ul>
+<h3><code>resolvePostLoginRoute</code> — the routing brain</h3>
+<p>This one pure function decides where <em>any</em> logged-in user goes, and it's reused beyond the callback (onboarding success, login). Inputs: <code>{ activeInvite, approved, hasActiveMembership, role, isDesktop }</code>.</p>
+<table><thead><tr><th>Condition (checked in order)</th><th>Destination</th><th>Meaning</th></tr></thead><tbody><tr><td><code>activeInvite</code> present</td><td><code>/invite/${token}</code></td><td>User has a pending invite → finish accepting it.</td></tr><tr><td><code>approved</code> <strong>and</strong> admin/owner role <strong>and</strong> desktop</td><td><code>/admin</code></td><td>An approved owner on desktop goes to the admin console.</td></tr><tr><td><code>approved</code></td><td><code>/dashboard</code></td><td>An approved user goes to the app.</td></tr><tr><td>no active membership</td><td><code>/onboarding</code></td><td><strong>Fresh founder</strong> — belongs to no org yet → go build one.</td></tr><tr><td>otherwise</td><td><code>/pending-approval</code></td><td>Member of an org but not yet approved → wait.</td></tr></tbody></table>
+<p>For a brand-new founder who just confirmed their email, the path is: no membership → <strong><code>/onboarding</code></strong>.</p>
+<hr/>
+<h2>5. Stage 3 — The onboarding choice (<code>/onboarding</code>)</h2>
+<p>The onboarding screen asks one question with two answers:</p>
+<table><thead><tr><th>Choice</th><th>What it means</th><th>Where it goes</th></tr></thead><tbody><tr><td><strong>"Just me"</strong></td><td>A solo agent, no agency setup.</td><td>Solo path → <strong><code>/dashboard</code></strong> (no org is created; the user works as an individual).</td></tr><tr><td><strong>"I'm setting up for my agency"</strong></td><td>This person is the founder of an agency on HouseZoom.</td><td>Agency-creation path (§6).</td></tr></tbody></table>
+<blockquote><p><strong>Solo routing is deliberate.</strong> A "just me" user lands on <strong><code>/dashboard</code></strong>, <em>not</em> <code>/admin</code>. (This was an explicit correction during BG-126: solo users are not org admins and have no admin console to see.)</p></blockquote>
+<p>Both success handlers run through <strong><code>finishOnboarding</code></strong> (§7), which guarantees the app's org state is refreshed <em>before</em> the user is navigated anywhere.</p>
+<hr/>
+<h2>6. Stage 4 — Agency creation (<code>POST /api/onboarding</code>)</h2>
+<p>When the founder chooses the agency path and fills the form, the server route creates everything an agency needs in one shot. Inputs from the form: <strong>org name</strong>, <strong>country</strong>, and a <strong>region</strong> selection.</p>
+<h3>6.1 Country &amp; region (data-driven)</h3>
+<ul><li><strong>Country</strong> is one of the five live markets: <strong>CH, FR, IT, DE, AE.</strong></li><li>The <strong>region picker is data-driven</strong> from <code>src/lib/constants/market-regions.ts</code> — the UI renders whatever regions that config declares for the chosen country. The rules per market:</li></ul>
+<table><thead><tr><th>Country</th><th>Regions</th><th>Required?</th></tr></thead><tbody><tr><td><strong>CH</strong> (Switzerland)</td><td><strong>26 cantons</strong></td><td><strong>Required</strong> — a Swiss org must pick its canton (reuses the canonical <code>SWISS_CANTONS</code> list with authored labels).</td></tr><tr><td><strong>AE</strong> (UAE)</td><td>7 emirates</td><td>Optional</td></tr><tr><td><strong>DE</strong> (Germany)</td><td>16 Länder</td><td>Optional</td></tr><tr><td><strong>IT</strong> (Italy)</td><td>20 regions</td><td>Optional</td></tr><tr><td><strong>FR</strong> (France)</td><td>—</td><td>None (no region layer)</td></tr></tbody></table>
+<ul><li><strong>Timezone is derived</strong> from the country/region rather than asked.</li></ul>
+<h3>6.2 Market configuration (from <code>market_defaults</code>)</h3>
+<p>The org's operating defaults are looked up from the <strong><code>market_defaults</code></strong> table by country (via <code>src/lib/marketDefaults.ts</code>) and written onto the org. The three configured dimensions are:</p>
+<ul><li><strong>currency</strong> (e.g. CHF, EUR, AED)</li><li><strong>measurement_unit</strong> — metric for CH/FR/IT/DE; <strong>AE = sqft</strong> (the one imperial market)</li><li><strong>default_locale</strong> — the org's starting language</li></ul>
+<p>The <strong>locale resolver</strong> maps the chosen market to a sensible default language — e.g. a <strong>Geneva</strong> (canton GE) org resolves to <strong><code>fr</code></strong>, not German — so a founder isn't dropped into the wrong language because of a country-level default.</p>
+<h3>6.3 Region dual-write + the primary market row</h3>
+<ul><li>The selected region is written as <strong><code>region_code</code></strong> and, for Switzerland, <strong>also</strong> to the <code>canton</code> column (a dual-write so both the generic region model and the Swiss-specific canton model stay consistent — BL-165).</li><li>Exactly <strong>one primary <code>organization_markets</code> row</strong> is created for the org's home market. (The schema supports an org operating in multiple markets later; onboarding seeds the single primary one.)</li></ul>
+<h3>6.4 Profile provisioning (the critical step)</h3>
+<p>This is where §2B is paid off. The route calls <strong><code>ensureProfile</code></strong> with the <strong><code>service_role</code></strong> client (bypassing RLS, because the browser physically cannot do this insert):</p>
+<ul><li>It <strong>upserts</strong> the <code>agent_profiles</code> row (<code>onConflict: 'user_id'</code>), so the call is idempotent — a retry can't create a duplicate.</li><li><strong>The founder is auto-approved</strong> (<code>approved: true</code>). The person who creates the agency doesn't wait in a pending queue — they're the owner.</li><li><strong><code>operating_country</code></strong> is inherited from the org's country (the ISO code, e.g. <code>CH</code>). It is <strong>never</strong> hardcoded — see the BG-125/127 history in §9 for why a stray <code>'UAE'</code> default was a live blocker.</li><li><strong><code>phone_country_code</code></strong> (the phone dial code) is inherited from the org country via <code>resolveDialCode</code> — CH→<code>+41</code>, FR→<code>+33</code>, IT→<code>+39</code>, DE→<code>+49</code>, AE→<code>+971</code>. It is <strong>never</strong> silently <code>+1</code>.</li><li>If profile provisioning <strong>fails</strong>, the route treats it as <strong>fatal (HTTP 500)</strong> rather than swallowing the error and leaving the user in a half-created state (BG-125). A founder with an org but no profile is a broken account, so we'd rather fail loudly.</li></ul>
+<hr/>
+<h2>7. Stage 5 — Landing in the app (<code>finishOnboarding</code> + <code>OrgProvider.refresh</code>)</h2>
+<p>The last hazard is a <strong>navigation race</strong>: the app's org state (<code>OrgProvider</code>) is loaded once on mount and on auth-state change — it does <strong>not</strong> automatically notice that the user just created a brand-new membership. If we navigated immediately after creating the org, the app would still believe the user has <em>no</em> org and bounce them right back to <code>/onboarding</code> (the BG-128 bug).</p>
+<p>The fix is <strong><code>finishOnboarding(refresh, navigate, target)</code></strong>, which enforces the order:</p>
+<pre><code>await refresh()      // re-resolve org/membership state first
+navigate(target)     // only then move the user</code></pre>
+<ul><li><strong><code>refresh</code></strong> is <code>OrgProvider.refresh()</code> — exposed on the org context specifically so onboarding can force a re-resolve after creating a membership.</li><li>Only <strong>after</strong> the refresh resolves does the user get navigated, so they land in the app with correct state and <strong>no manual page refresh</strong> required.</li><li><strong>Final destination:</strong> an <strong>owner on desktop → <code>/admin</code></strong>; everyone else → <strong><code>/dashboard</code></strong> (computed via <code>resolvePostLoginRoute</code>, the same brain from §4).</li></ul>
+<hr/>
+<h2>8. Edge case catalog</h2>
+<p>Add a row whenever a "what happens when X?" question comes up.</p>
+<table><thead><tr><th>Scenario</th><th>Current behavior</th><th>Status</th><th>Source</th></tr></thead><tbody><tr><td>Signup returns no session (email confirmation required)</td><td>Page shows the <code>check-email</code> confirmation state and waits; nothing is created until the link is clicked.</td><td>Confirmed</td><td>BG-124</td></tr><tr><td>Already-authenticated user opens <code>/auth/signup</code></td><td>Signup signs out first; a mount guard handles the authed user rather than double-signing-up.</td><td>Confirmed</td><td>BG-124</td></tr><tr><td>Session never materializes on <code>/auth/callback</code></td><td>8-second fallback → redirect to <code>/auth/login</code> rather than hanging.</td><td>Confirmed</td><td>BG-127</td></tr><tr><td>Fresh founder confirms email</td><td>No membership → routed to <code>/onboarding</code>.</td><td>Confirmed</td><td>BG-123/124</td></tr><tr><td>Solo "just me" user finishes onboarding</td><td>Routed to <code>/dashboard</code> (no org created, not <code>/admin</code>).</td><td>Confirmed</td><td>BG-126</td></tr><tr><td>Profile insert attempted from the browser</td><td>Fails — <code>agent_profiles_self_insert</code> RLS check (<code>org_id = get_user_org_id()</code>) is unsatisfiable pre-org. Provisioning must be <code>service_role</code>.</td><td>Confirmed (RLS schema)</td><td>BG-123</td></tr><tr><td>Profile provisioning fails during agency create</td><td>Route returns fatal <strong>500</strong>; no half-created account is silently left behind.</td><td>Confirmed</td><td>BG-125</td></tr><tr><td><code>operating_country</code> omitted on insert</td><td>Inherited from org country (ISO). The old <code>DEFAULT 'UAE'</code> violated the ISO-2 CHECK and <code>23514</code>-errored every omitting insert — default dropped.</td><td>Confirmed</td><td>BG-125/127</td></tr><tr><td>Phone dial code unknown</td><td><code>resolveDialCode</code> returns <code>''</code>, never a silent <code>+1</code>.</td><td>Confirmed</td><td>BG-128</td></tr><tr><td>Org created but app bounces back to <code>/onboarding</code></td><td>Fixed: <code>OrgProvider.refresh()</code> is awaited <em>before</em> navigation so membership state is fresh.</td><td>Confirmed</td><td>BG-128</td></tr><tr><td>Geneva (canton GE) org default language</td><td>Locale resolver → <code>fr</code>, not a country-level German default.</td><td>Confirmed</td><td>BL-165</td></tr></tbody></table>
+<hr/>
+<h2>9. Known limitations &amp; follow-ups (do not assume fixed)</h2>
+<ul><li><strong><code>TD-DATA-COUNTRY-CODE-COLLISION</code> 🟡</strong> — <code>agent_profiles</code> has <em>two</em> country-ish columns that mean different things: <code>operating_country</code> (ISO-2, the market the agent works in, ISO-checked) and <code>country_code</code>/<code>phone_country_code</code> (the <strong>phone dial</strong> prefix, e.g. <code>+41</code>, with <strong>no</strong> ISO check and a legacy <code>'+1'</code> default). The names invite confusion. Tracked rename pending.</li><li><strong><code>TD-ONBOARDING-PROFILE-ROLLBACK</code> 🟡</strong> — agency creation writes several rows (org, <code>organization_markets</code>, profile) without a single enclosing transaction. A partial failure mid-sequence can leave an inconsistent set. Profile failure is at least surfaced as a fatal 500 (BG-125), but a true all-or-nothing rollback is not yet in place.</li><li><strong><code>TD-TEST-DB-INTEGRATION-HARNESS</code> 🟡</strong> — the onboarding/auth tests exercise <strong>pure helpers</strong> (<code>resolvePostLoginRoute</code>, <code>resolveSignupOutcome</code>, <code>ensureProfile</code> payload shape, <code>resolveDialCode</code>, <code>resolveOperatingCountry</code>, <code>finishOnboarding</code> ordering) rather than real DB calls, because the shared mocked Supabase client can't reproduce RLS, CHECK constraints, or <code>.insert().select().single()</code> chaining. Constraint-level regressions (like the <code>operating_country</code> default) therefore <strong>cannot</strong> be caught by unit tests today — they need a real-DB integration harness.</li><li><strong><code>next lint</code> removed under Next 16</strong> — the repo's <code>"lint": "next lint"</code> script is dead (Next 16.1.6 removed the <code>next lint</code> subcommand). Lint runs via <code>npx eslint</code> directly until the script is repointed to <code>eslint .</code>. Not specific to onboarding, flagged here because it surfaced during this work.</li></ul>
+<hr/>
+<h2>10. Separate doc-debt (flagged, not fixed here)</h2>
+<ul><li><strong><a href="compliance.html"><code>compliance.md</code></a> predates the BL-164 Germany work.</strong> It currently names only Switzerland, France, UAE, and Italy as markets (the engine, Lex Koller, Loi Alur, DLD/RERA, IT mediation) and does <strong>not</strong> describe <strong>Germany</strong> as a live compliance market, despite the DE statutory corpus + workflow templates ingested in BL-164 and the Hauptstadt Immobilien DE demo agency. Onboarding now lets a founder pick <strong>DE</strong> as their country — so a user can create a German agency whose compliance guide doesn't yet mention Germany. <strong>Action (separate ticket):</strong> update <a href="compliance.html"><code>compliance.md</code></a> for the DE market. Out of scope for this doc.</li></ul>
+<hr/>
+<h2>11. Glossary (jargon-free)</h2>
+<ul><li><strong>Founder</strong> — the first user of an agency; the one who completes the agency-creation path. Owner role, auto-approved.</li><li><strong>Solo / "just me"</strong> — a user who onboards without creating an agency; works as an individual, lands on <code>/dashboard</code>.</li><li><strong>Implicit auth flow</strong> — the Supabase login mode HouseZoom uses: tokens arrive in the URL hash and live in <code>localStorage</code>, not a cookie. The server can't read the session, so login-dependent routing happens in the browser.</li><li><strong><code>/auth/callback</code></strong> — the client page the email-confirmation link lands on; it waits for the session, then routes via <code>resolvePostLoginRoute</code>.</li><li><strong><code>resolvePostLoginRoute</code></strong> — the pure function that decides where a logged-in user goes (invite / admin / dashboard / onboarding / pending-approval).</li><li><strong><code>ensureProfile</code></strong> — the server-side, <code>service_role</code> upsert that creates the <code>agent_profiles</code> row. The only way a profile can be created, because RLS blocks the browser from doing it.</li><li><strong><code>service_role</code></strong> — the privileged Supabase database role that bypasses row-level security. Used by trusted server routes (and seed scripts/migrations).</li><li><strong><code>organization_markets</code></strong> — the table holding an org's market(s). Onboarding seeds exactly one primary row for the home market.</li><li><strong><code>market_defaults</code></strong> — the table mapping a country to its currency / measurement unit / default locale; read during agency creation.</li><li><strong><code>resolveDialCode</code></strong> — maps an org country to its phone dial prefix (<code>CH→+41</code> … <code>AE→+971</code>), never <code>+1</code>.</li><li><strong><code>OrgProvider.refresh()</code></strong> — re-resolves the user's org/membership state on demand; awaited after agency creation so the app sees the new membership before navigating.</li></ul>
+<hr/>
+<p><strong>Change log</strong></p>
+<table><thead><tr><th>Date</th><th>Version</th><th>Session</th><th>Change</th></tr></thead><tbody><tr><td>2026-06-06</td><td>v0.1</td><td>BL-165/168 + BG-123→128</td><td>Initial version. Documents the self-serve onboarding &amp; auth flow as built: signup + check-email (BG-124), <code>/auth/callback</code> auto-login + <code>resolvePostLoginRoute</code> (BG-123/127), the solo-vs-agency choice (BG-126), agency creation with data-driven region picker + market config + <code>organization_markets</code> (BL-165/168), <code>service_role</code> profile provisioning + founder auto-approval + <code>operating_country</code>/dial-code inheritance (BG-123/125/127/128), and <code>OrgProvider.refresh()</code>-before-nav (BG-128). Edge-case catalog seeded (§8), TDs catalogued (§9). Flags <a href="compliance.html"><code>compliance.md</code></a> Germany doc-debt as a separate item (§10).</td></tr></tbody></table></div>
+</main>
+<footer>
+  HouseZoom.ai Functional Guide · Auto-generated from <code>docs/functional-guide/onboarding.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>
