@@ -1020,7 +1020,7 @@ const DATA = {
     {
       "id": "BL-166",
       "title": "Country-filter system workflow templates in the deal picker",
-      "desc": "🟢. fetchTemplates(orgId) (src/features/admin/services/workflowService.ts) returns all org_id IS NULL system templates regardless of org country (.or('org_id.is.null,org_id.eq.\u003corgId\u003e')), so every org's deal-creation template picker shows every market's templates (CH/FR/IT/AE/DE). Filter the deal picker to the org's country_code + country-agnostic (country_code IS NULL) templates + the org's own templates, consistent with how compliance rules attach by org.country_code. Phase 0 (2026-06-03, READ-ONLY) done: useOrg() already exposes country_code; live system templates today are FR:2/IT:2/AE:1/CH:8/DE:2 with 0 country-agnostic (NULL) rows (NULL branch is forward-compat); useWorkflows instance-name resolution is a separate by-id query (a picker filter won't break it). Proposed fix (not built): add optional orgCountryCode? param to fetchTemplates (JS-filter when truthy; unfiltered fallback) + pass country_code from useOrg() in useDeals.loadTemplateOptions; leave the admin /workflows management list unfiltered (open decision: also filter it). Pre-existing; surfaced during BL-164 DE verification.",
+      "desc": "🟢 ⚠️ PARKED (2026-06-06). Code shipped but on the dead legacy features/admin/hooks/useDeals stack (zero importers) — the live deal-create path is V2 (useDealsV2) and has no template picker at all, so the filter is correct code on an unreachable surface (BL-169 backward trace). The real gap it pointed at (V2 deals created with null market_country_code + null workflow_instance_id) was fixed by BL-169 (D-394) instead. This picker filter stays parked (not reverted) until/unless a V2 template picker is built. Original analysis: fetchTemplates(orgId) (src/features/admin/services/workflowService.ts) returns all org_id IS NULL system templates regardless of org country (.or('org_id.is.null,org_id.eq.\u003corgId\u003e')), so every org's deal-creation template picker shows every market's templates (CH/FR/IT/AE/DE). Filter the deal picker to the org's country_code + country-agnostic (country_code IS NULL) templates + the org's own templates, consistent with how compliance rules attach by org.country_code. Phase 0 (2026-06-03, READ-ONLY) done: useOrg() already exposes country_code; live system templates today are FR:2/IT:2/AE:1/CH:8/DE:2 with 0 country-agnostic (NULL) rows (NULL branch is forward-compat); useWorkflows instance-name resolution is a separate by-id query (a picker filter won't break it). Proposed fix (not built): add optional orgCountryCode? param to fetchTemplates (JS-filter when truthy; unfiltered fallback) + pass country_code from useOrg() in useDeals.loadTemplateOptions; leave the admin /workflows management list unfiltered (open decision: also filter it). Pre-existing; surfaced during BL-164 DE verification.",
       "tag": "compliance",
       "added": "src/features/admin/services/workflowService.ts, src/features/admin/hooks/useDeals.ts"
     },
@@ -1030,6 +1030,27 @@ const DATA = {
       "desc": "🟢. Mechanical check (extend docs:check or a CI step) that fails a commit when a new logic-bearing source file (src//*.ts(x), scripts/seed-*.mjs) has neither a sibling/companion test nor a declared no-test: \u003creason\u003e exemption marker. Crude-but-checkable file-level rule (the script can't judge \"has logic\" — gate on presence of a test OR an exemption marker; the human still decides test-vs-exempt but must declare it). Build deliberately to avoid false-failure churn that trains bypasses. Surfaced from the BL-164 seed-de-agency.mjs untested-seed slip + the WoW testing-policy formalization (WAYS-OF-WORKING.md § Testing policy).",
       "tag": "admin",
       "added": "scripts/docs-check.mjs (or new CI step), WAYS-OF-WORKING.md § Testing policy"
+    },
+    {
+      "id": "BL-170",
+      "title": "Deal region binding — postal→canton resolver (BL-169 Fix 1 fast-follow)",
+      "desc": "🟡. BL-169 (D-394) bound the deal's market_country_code but deferred market_region_code (left null) for a structural reason: properties has no postal column (the postal code lives inside free-text address, e.g. \"Bellerivestrasse 220, 8008 Zürich\") and src/lib/constants/market-regions.ts holds only the 26-canton *list* — there is no postal→canton mapping. Region rules (cantonal) therefore can't match on UI-created deals. Scope: (1) a structured postal source on properties (new postal_code column + backfill by parsing address, or pairs with BL-PROPERTIES-ISO-CANONICALIZATION); (2) a country-aware postal→region resolver — CH first (deterministic ranges, e.g. 8000–8099→CH-ZH; web-verified 2026-06-06), stub DE PLZ / IT CAP / FR INSEE; (3) wire it into dealService.createDeal to set market_region_code (pure helper, unit-tested like resolveMarketCountry). Country alone already restored compliance, so this is additive precision, not a blocker.",
+      "tag": "compliance",
+      "added": "src/features/deals/services/dealService.ts, src/features/deals/services/dealMarketBinding.ts, src/lib/constants/market-regions.ts, properties schema"
+    },
+    {
+      "id": "BL-171",
+      "title": "Seed DE (Germany) workflow templates — unblock DE deal auto-attach",
+      "desc": "🟢. BL-169 Fix 2 auto-attaches the federal workflow template by (country, deal_type), but no Germany workflow template exists — BL-164 seeded the DE compliance *corpus* (rules) only, not pipeline rows. So a Hauptstadt (DE) deal created in the UI gets market_country_code='DE' (compliance fires) but no workflow_instance (graceful skip + console.warn), and the generic stage bar. Scope (seed-data, no app code): author Germany Property Sale (8-stage, Abstraktionsprinzip split per the BL-164 spec — Beurkundung→contract, Grundbuch→transfer) + Germany Property Rental (5-stage) system templates (country_code='DE', region_code NULL, status='active'), mirroring the CH/FR/IT seeds (supabase/migrations/20260508_bl132_ch_workflow_templates.sql pattern). Verify a DE deal then auto-attaches (Scenario A variant). Also note: Create-Template UI lacks DE (admin/workflows/page.tsx:55 COUNTRIES=[AE,CH,FR,IT]) — add DE there so the templates are also authorable in-app.",
+      "tag": "compliance",
+      "added": "supabase/migrations/ (new DE template seed, Will runs), src/app/admin/workflows/page.tsx (DE in COUNTRIES/flags/badges)"
+    },
+    {
+      "id": "BL-172",
+      "title": "Fix 3 — compliance stage/close gating (enforcement, not display)",
+      "desc": "🟡. Greenfield, briefed in docs/specs/BL-169-…Auto-Attach.md §8. Today compliance is computed and shown but never enforced: moveDealStage / closeDeal (src/features/deals/services/dealService.ts) have zero compliance precondition, and get_applicable_rules ignores compliance_rules.workflow_stage_canonical (it matches trigger + country/region/org; the canonical column is authored but dead/advisory) — so even after BL-169, all of a deal's country rules are selectable regardless of current stage. Two gate modes required (Will, 2026-06-06), neither exists today: (a) stage-gate — block a specific stage transition (moveStage/\"Advance to…\") until a rule pertaining to that workflow_stage_canonical clears; (b) closing-gate — let the deal flow freely but block \"Mark as Closed\"/final stage until a deal-wide rule clears. Scope: the rule→(stage",
+      "tag": "compliance",
+      "added": "deal-wide)→gate-mode contract (new field/convention — rule_type='block'+severity exist but no mode distinction), get_applicable_rules change to filter by the deal's current-stage canonical, engine call-site to pass it, and enforcement at the moveDealStage/closeDeal boundaries. Depends on BL-169 (a deal needs a country + a stage-bearing instance first). Full WoW Commandment #11 schema scan before touching the RPC."
     },
     {
       "id": "BL-PROPERTIES-ISO-CANONICALIZATION",
@@ -3681,6 +3702,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-394",
+      "title": "Deal market binding + federal workflow auto-attach (V2 create path)",
+      "desc": "Delivers the ticket surfaced by the workflow-template-picker backward trace; confirmed live: deals created through the V2 UI came out with market_country_code = null and workflow_instance_id = null, so country/region compliance never fired (the engine matches rules by market_country_code) and deals fell back to the generic hardcoded stage bar. Fix 1 (market binding): dealService.createDeal now derives the deal's ISO-2 market country server-side — the linked property's country (display name) → ISO via legacyCountryNameToCode, else the org's country_code; null if unresolvable (never a display name — deals.market_country_code has no CHECK, so a name write would silently match zero rules). Fix 2 (workflow auto-attach): after insert, selectFederalTemplate(country, deal_type, …) picks the federal (region_code IS NULL) active template whose name matches Sale/Rental, then workflowService.createInstance (first stage = stages[0].key) and links workflow_instance_id — no picker. Best-effort: no federal template (DE has none; IT/UAE have no rental) or any failure → deal kept with a null instance + console.warn (never a swallowed catch, never rolled back). Region (market_region_code) deferred — properties has no postal column (postal is in free-text address) and no postal→canton resolver exists. Pure helpers (resolveMarketCountry, selectFederalTemplate) in src/features/deals/services/dealMarketBinding.ts (no DB import); 13 unit tests. NewDealModal untouched. Live Scenario A (CH Sale on an 8008 Zürich property): A2=CH, A4 instance set, A5 federal *Switzerland Property Sale*, A6 CH stepper, A7 36 rules selectable (vs 0 baseline). No migration. Follow-ups (filed, not built): region resolver + DE workflow templates (seed) + Fix-3 stage/close gating (no enforcement today).",
+      "completed": "2026-06-06",
+      "tag": "compliance"
+    },
     {
       "id": "D-393",
       "title": "Founder-flow polish: onboarding nav re-resolve + phone dial-code inheritance",
