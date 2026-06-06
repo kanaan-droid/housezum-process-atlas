@@ -2833,6 +2833,13 @@ const DATA = {
   ],
   "bugs": [
     {
+      "id": "BG-127",
+      "title": "Founder-flow polish: callback refresh race + NULL operating_country + profile UI shows UAE",
+      "desc": "🟡. Three issues from live test (CH/Neuchâtel agency). (1) After email-confirm the user had to manually refresh — the /auth/callback used a hard window.location.replace, which SSRs the destination without the localStorage-only implicit session. Fix: soft router.replace (stays in the SPA; OrgProvider's onAuthStateChange already resolved). (2) operating_country left NULL at onboarding. Fix: ensureProfile gained operatingCountry?; onboarding + invite-signup pass the org's country_code (ISO) → a CH founder's profile gets operating_country='CH'. (3) Profile settings showed \"UAE\" for a Swiss agency — the OPERATING_COUNTRIES dropdown used display-name codes ('Switzerland'…) not ISO (couldn't show the ISO value, and 23514'd on save), and null fell back to 'UAE'. Fix: ISO-ified the dropdown (+DE) + re-keyed LICENSE_META to ISO; null fallback → org country via the pure resolveOperatingCountry (never UAE). No migration.",
+      "tag": "comms",
+      "added": "2026-06-06"
+    },
+    {
       "id": "BG-125",
       "title": "agent_profiles.operating_country DEFAULT 'UAE' violates its own ISO CHECK → every profile insert rejected (23514)",
       "desc": "🔴. Dashboard-era DEFAULT 'UAE' (3 chars) predates BL-133, which added the CHECK operating_country ~ '^[A-Z]{2}$' + rewrote rows UAE→AE but never dropped the column default → the default self-violates the CHECK; any insert omitting the column 23514's. This is the real root under BG-123/BL-165: ensureProfile/onboarding/invite-signup all omit the column → profile creation failed → /api/onboarding 400'd after creating org+membership → founder stuck on /pending-approval. Fixed: migration drops the default on operating_country (and the latent sibling qa_knowledge_base.country_code, same class); onboarding profile error now fatal (500, no silent profile-less success). Test harness gap → TD-TEST-DB-INTEGRATION-HARNESS.",
@@ -3667,6 +3674,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-392",
+      "title": "Founder-flow polish: callback soft-nav + operating_country inheritance + profile UI ISO fix",
+      "desc": "Three fixes from a CH/Neuchâtel live test. (1) Callback refresh race: /auth/callback switched from a hard window.location.replace to a soft router.replace — the email-confirm (implicit-flow) session is localStorage-only, so a hard reload SSR'd the destination without it (→ \"had to refresh\"); soft nav keeps the SPA's in-memory session (OrgProvider already re-resolves on onAuthStateChange). (2) operating_country inheritance: ensureProfile gained operatingCountry?; the onboarding route + invite-signup now pass the org's country_code (ISO alpha-2 → satisfies the CHECK) → a CH founder's profile gets operating_country='CH' instead of NULL. (3) Profile-settings UI: the operating-country dropdown was name-coded ('Switzerland'…) — it couldn't display the ISO column value and 23514'd on save; re-coded to ISO (AE/FR/CH/IT + DE), LICENSE_META re-keyed to ISO, and the null fallback changed from hardcoded 'UAE' to the org country via the pure resolveOperatingCountry (src/lib/operatingCountry.ts). 6 new unit tests. No migration (only recent test-user rows are NULL; seeds set ISO).",
+      "completed": "2026-06-06",
+      "tag": "comms"
+    },
     {
       "id": "D-391",
       "title": "Signup UX + email-confirm auto-login + harmonized onboarding redirect",
