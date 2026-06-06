@@ -146,7 +146,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-06-05';
+const LAST_UPDATED = '2026-06-06';
 const DATA = {
   "inProgress": [
     {
@@ -2848,10 +2848,17 @@ const DATA = {
     },
     {
       "id": "BG-124",
-      "title": "Signup-page session hygiene (BG-B)",
-      "desc": "🟡. /auth/signup does not signOut() an existing session before signUp (signing up while logged in as another user leaves the prior session active → lands on the old user's pages); it branches on data.user (truthy even when email-confirm makes data.session === null) so it never shows a \"check your email\" state; and there's no authed-user guard on the page. Also remove the dead client-side agent_profiles insert at signup/page.tsx:43 (always RLS-fails — provisioning is now service-role via BG-123). Split from BG-123 (same family, different surface).",
+      "title": "Signup-page session hygiene + email-confirm auto-login",
+      "desc": "🟡→✅. /auth/signup didn't signOut() first (signing up while logged in as another user kept the prior session), branched on data.user (never showed a \"check your email\" state when data.session === null), had no authed-user guard, and kept a dead RLS-failing agent_profiles insert at :43. Fixed: signOut-first; authed-user mount guard (routes via resolvePostLoginRoute); data.session-based \"check your email\" state (resolveSignupOutcome); dead insert removed; emailRedirectTo → /auth/callback + a new callback route that awaits the session (implicit flow + detectSessionInUrl) and routes via resolvePostLoginRoute → auto-login on confirm (lands logged-in on /onboarding).",
       "tag": "comms",
       "added": "2026-06-05"
+    },
+    {
+      "id": "BG-126",
+      "title": "Onboarding success doesn't land the founder in the app",
+      "desc": "🟡→✅. Reported as \"founder creates org → thinks it failed → bounce to choice screen.\" Phase 0 found the redirect already existed (both onboarding branches router.replace on success only; callOnboardingApi throws on non-2xx → no redirect on failure) — the symptom was the downstream of BG-123/BG-125 (no profile → /admin bounced to /pending-approval), now fixed. This ticket: agency owner routes through resolvePostLoginRoute (owner+desktop→/admin, else→/dashboard); solo \"just me\" stays on /dashboard (agent experience). Closed as resolved-by-BG-123/125 + harmonization (no new redirect built).",
+      "tag": "admin",
+      "added": "2026-06-06"
     },
     {
       "id": "~~BG-MARKET-ANALYSIS-HYDRATION-AND-LOCALE~~",
@@ -3660,6 +3667,13 @@ const DATA = {
     }
   ],
   "done": [
+    {
+      "id": "D-391",
+      "title": "Signup UX + email-confirm auto-login + harmonized onboarding redirect",
+      "desc": "Completes the self-serve founder journey (sign up → \"check your email\" → confirm-link auto-login → onboarding → land in the app). Signup page: signOut() first (kills the \"signed up but still the previous user\" bug); authed-user mount guard; a data.session-based \"check your email\" screen (no more bounce to sign-in) driven by the pure resolveSignupOutcome; removed the dead client-side agent_profiles insert (always RLS-failed pre-org; provisioning is service-role now); set emailRedirectTo → /auth/callback. NEW /auth/callback route: awaits session establishment (implicit flow + detectSessionInUrl, via onAuthStateChange/getSession with an 8s fallback to login) then routes via the shared resolvePostLoginRoute → a fresh-confirmed founder lands logged-in on /onboarding. Onboarding redirect: agency owner now routes through resolvePostLoginRoute (owner+desktop→/admin, else→/dashboard); solo \"just me\" stays on /dashboard (agent experience). Redirect already fired on success only; the prior \"thinks it failed\" symptom was the downstream of the profile-provisioning bugs, now fixed. i18n ×4 (confirmEmailTitle/confirmEmailBody). 6 new unit tests (resolveSignupOutcome + harmonized routing). No migration. Will: allow-list …/auth/callback in Supabase → Auth → Redirect URLs + set Site URL, else auto-login silently falls back to Site URL.",
+      "completed": "2026-06-06",
+      "tag": "comms"
+    },
     {
       "id": "D-390",
       "title": "Fix self-violating column default ('UAE' vs ISO CHECK) — the true root of the founder-stuck-on-pending-approval bug",
