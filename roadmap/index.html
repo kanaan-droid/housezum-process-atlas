@@ -146,7 +146,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-06-06';
+const LAST_UPDATED = '2026-06-07';
 const DATA = {
   "inProgress": [
     {
@@ -1040,10 +1040,10 @@ const DATA = {
     },
     {
       "id": "BL-171",
-      "title": "Seed DE (Germany) workflow templates — unblock DE deal auto-attach",
-      "desc": "🟢. BL-169 Fix 2 auto-attaches the federal workflow template by (country, deal_type), but no Germany workflow template exists — BL-164 seeded the DE compliance *corpus* (rules) only, not pipeline rows. So a Hauptstadt (DE) deal created in the UI gets market_country_code='DE' (compliance fires) but no workflow_instance (graceful skip + console.warn), and the generic stage bar. Scope (seed-data, no app code): author Germany Property Sale (8-stage, Abstraktionsprinzip split per the BL-164 spec — Beurkundung→contract, Grundbuch→transfer) + Germany Property Rental (5-stage) system templates (country_code='DE', region_code NULL, status='active'), mirroring the CH/FR/IT seeds (supabase/migrations/20260508_bl132_ch_workflow_templates.sql pattern). Verify a DE deal then auto-attaches (Scenario A variant). Also note: Create-Template UI lacks DE (admin/workflows/page.tsx:55 COUNTRIES=[AE,CH,FR,IT]) — add DE there so the templates are also authorable in-app.",
-      "tag": "compliance",
-      "added": "supabase/migrations/ (new DE template seed, Will runs), src/app/admin/workflows/page.tsx (DE in COUNTRIES/flags/badges)"
+      "title": "Add DE to the Create-Template dropdown (in-app DE template authoring)",
+      "desc": "🟢 RESCOPED 2026-06-07 — the seed portion is void. ~~Seed DE workflow templates~~: the DE federal templates already exist and are active — Germany Sale (BL-164) + Germany Rental (BL-164) (country_code='DE', region_code=NULL, status='active', v1), created by the bl164 seed. Verified live 2026-06-07 (SQL + MCP): a Hauptstadt DE Sale deal binds market_country_code='DE', auto-attaches Germany Sale (BL-164), and fires 18 DE rules (vs 0 baseline) — DE deals work end-to-end today. (The original \"no DE template\" premise came from BL-169 Phase 0 Q5 reading only bl130/bl132 and missing the bl164 seed — see docs/findings/FINDING-2026-06-06-deal-market-binding.md Correction + WAYS-OF-WORKING \"Live DB is truth.\") Remaining scope (small code ticket, no seed): add DE to the Create-Template UI dropdown — src/app/admin/workflows/page.tsx COUNTRIES=[AE,CH,FR,IT] (default 'AE') + the missing DE entries in COUNTRY_FLAG / COUNTRY_BADGE — so admins can author/clone a DE template in-app (does not block deals, which already auto-attach the existing DE templates).",
+      "tag": "admin",
+      "added": "src/app/admin/workflows/page.tsx (COUNTRIES / COUNTRY_FLAG / COUNTRY_BADGE)"
     },
     {
       "id": "BL-172",
