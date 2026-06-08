@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HouseZoom.ai — Geo &amp; Locations — Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f11;--bg2:#17171a;--bg3:#1e1e22;--bg4:#26262c;
+  --border:#2e2e36;--border2:#3a3a44;
+  --text:#e8e8ee;--text2:#9999aa;--text3:#666677;
+  --purple:#7c6af7;--purple2:#5b52cc;--purple3:#2a2550;
+  --teal:#1fb885;--teal2:#178f66;--teal3:#0d3d2a;
+  --coral:#e8643a;--coral2:#b54d2a;--coral3:#3d1f12;
+  --amber:#e09a2a;--amber2:#b07820;--amber3:#3a2c0a;
+  --blue:#4a90d9;--blue2:#2d6aaa;--blue3:#112233;
+  --green:#5aac44;--green2:#3d8030;--green3:#162310;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --r:8px;--r2:12px;--r3:16px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.65}
+a{color:var(--purple);text-decoration:none}
+a:hover{text-decoration:underline}
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;gap:32px;height:52px;position:sticky;top:0;z-index:100}
+.nav-brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-0.3px}
+.nav-brand span{color:var(--purple)}
+.nav-links{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:13px;color:var(--text2);padding:6px 12px;border-radius:var(--r);transition:all .15s}
+.nav-links a:hover{color:var(--text);background:var(--bg3);text-decoration:none}
+.nav-links a.active{color:var(--purple);background:var(--purple3)}
+main{max-width:880px;margin:0 auto;padding:32px}
+.breadcrumb{font-size:12px;color:var(--text3);font-family:var(--mono);margin-bottom:16px}
+.breadcrumb a{color:var(--text2)}
+.breadcrumb a:hover{color:var(--purple)}
+.meta-banner{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 24px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);font-family:var(--mono);font-size:11px;color:var(--text2)}
+.meta-pill{padding:3px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.meta-status-stable{color:var(--green);border-color:var(--green2);background:var(--green3)}
+.meta-status-skeleton{color:var(--amber);border-color:var(--amber2);background:var(--amber3)}
+.meta-status-living{color:var(--teal);border-color:var(--teal2);background:var(--teal3)}
+.content h1{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin:0 0 16px;color:var(--text)}
+.content h2{font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+.content h3{font-size:16px;font-weight:600;margin:24px 0 10px;color:var(--text)}
+.content h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--text)}
+.content p{margin:12px 0;color:var(--text);font-size:14px}
+.content ul,.content ol{margin:12px 0 12px 24px;color:var(--text);font-size:14px}
+.content li{margin:6px 0}
+.content li>p{margin:6px 0}
+.content blockquote{margin:16px 0;padding:12px 16px;border-left:3px solid var(--purple);background:var(--bg2);border-radius:0 var(--r) var(--r) 0;color:var(--text2)}
+.content blockquote p{margin:6px 0;font-size:13px}
+.content code{font-family:var(--mono);font-size:12px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--coral);border:1px solid var(--border)}
+.content pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;overflow-x:auto;margin:14px 0}
+.content pre code{background:transparent;padding:0;border:none;color:var(--text);font-size:12px;line-height:1.6}
+.content table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.content thead{background:var(--bg2)}
+.content th,.content td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.content th{font-weight:600;color:var(--text);font-size:12px;letter-spacing:0.04em}
+.content td{color:var(--text);vertical-align:top}
+.content tr:last-child td{border-bottom:none}
+.content hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+.content strong{color:var(--text);font-weight:600}
+.content em{color:var(--text2)}
+.content a code{color:var(--purple)}
+.arch-diagram{display:block;width:100%;max-width:680px;height:auto;margin:0 auto 8px;background:#fafaf7;border-radius:var(--r);padding:8px}
+.arch-diagram-caption{font-size:13px;color:var(--text2);text-align:center;margin:0 auto 32px;max-width:680px;line-height:1.5}
+footer{border-top:1px solid var(--border);padding:24px 32px;font-size:11px;color:var(--text3);text-align:center;margin-top:48px}
+footer a{color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <span class="nav-brand">House<span>Zoom</span>.ai</span>
+  <div class="nav-links">
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/geo/" class="active">Geo &amp; Locations</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/functional-guide/">Functional Guide</a>
+  </div>
+</nav>
+<main>
+  
+  
+  <div class="content"><h1>Geo &amp; Locations — Architecture</h1>
+<p><strong>Status:</strong> Living document. Updated when geo-resolution architecture changes. <strong>Version:</strong> v0.1 <strong>Last updated:</strong> 2026-06-08 (BL-POSTAL-TO-REGION — CH live, UI-verified) <strong>Maintainer:</strong> Will + Claude</p>
+<hr/>
+<h2>1. Purpose</h2>
+<p>Many HouseZoom compliance rules are <strong>sub-national</strong>: Swiss rules vary by canton, German rules by Bundesland. The compliance engine matches rules on a precise region identifier. Geo-resolution is the cross-cutting capability that turns the location data an agent naturally provides into that identifier — <strong>without</strong> asking the agent to understand jurisdictions.</p>
+<p>This is a <strong>capability</strong>, not a country feature. The mechanism is identical for every market; only the underlying data differs per country. Per-country data coverage is tracked separately under <strong>Data Environments → Geo Data Seeding</strong>.</p>
+<hr/>
+<h2>2. The field taxonomy (foundational)</h2>
+<p>Four location fields exist on a property. Conflating them is the single most common source of confusion.</p>
+<table><thead><tr><th>Field</th><th>Type</th><th>Role</th><th>Set by</th><th>Example</th></tr></thead><tbody><tr><td><code>address</code></td><td>free text</td><td>Human-readable street line</td><td>Agent</td><td><code>Limmatquai 56, 8001 Zürich</code></td></tr><tr><td><code>postal_code</code></td><td>text</td><td>Structured agent input; the derivation key</td><td>Agent</td><td><code>8001</code></td></tr><tr><td><code>region</code></td><td>free text</td><td>Cosmetic display label</td><td>Agent</td><td><code>Kanton Zürich</code></td></tr><tr><td><code>region_code</code></td><td>text (ISO 3166-2)</td><td><strong>Engine value</strong> rules match on</td><td><strong>Derived</strong></td><td><code>CH-ZH</code></td></tr></tbody></table>
+<p>Plus, at the country level: the property's <code>country</code> (name, e.g. <code>Switzerland</code>) resolves to an ISO-2 code (<code>CH</code>) at call-time via <code>legacyCountryNameToCode</code>. (Storing ISO <code>country_code</code> on the property is a planned canonicalization — see §7.)</p>
+<p>The load-bearing relationship is <code>postal_code</code> → <code>region_code</code>: the agent supplies the first, the system derives the second. <code>region</code> is ignored by the engine.</p>
+<hr/>
+<h2>3. The data asset — <code>postal_regions</code></h2>
+<p>A seeded reference table mapping postal codes to ISO 3166-2 regions.</p>
+<table><thead><tr><th>Column</th><th>Meaning</th></tr></thead><tbody><tr><td><code>country_code</code></td><td>ISO-2 (e.g. <code>CH</code>)</td></tr><tr><td><code>postal_code</code></td><td>Full postal code (CH 4-digit, DE 5-digit), stored as text (preserves leading zeros)</td></tr><tr><td><code>region_code</code></td><td>ISO 3166-2 region (e.g. <code>CH-ZH</code>)</td></tr><tr><td><code>is_ambiguous</code></td><td><code>true</code> when the postal code spans more than one region; <code>region_code</code> holds the cross-validated <strong>primary</strong></td></tr></tbody></table>
+<p>Primary key <code>(country_code, postal_code)</code> — one row per postal code, primary region only. Read-only reference data: RLS permits read for authenticated users; writes go via service role (seed scripts).</p>
+<p><strong>Ambiguity handling:</strong> a small number of postal codes straddle regional borders. Rather than store multiple rows, the table stores the primary region and flags the row <code>is_ambiguous</code>. The primary is chosen from official data and, for genuine border cases, cross-validated. Resolution never blocks a transaction; the region can always be overridden.</p>
+<hr/>
+<h2>4. The resolver — <code>resolvePostalToRegion</code></h2>
+<p><code>resolvePostalToRegion(countryCode, postalCode) → region_code | null</code></p>
+<ol><li><strong>Normalize</strong> the postal code (trim; pad to the country's expected width).</li><li><strong>Exact lookup</strong> against <code>postal_regions</code> on <code>(country_code, postal_code)</code>.</li><li><strong>Validate</strong> the resolved code is a real subdivision for that country (guards against a bad seed row).</li><li><strong>Match → ISO region. No match → <code>null</code>.</strong> The resolver <strong>never guesses.</strong></li></ol>
+<p>Null is a valid, safe outcome: the property keeps its postal code, no region is derived, and the deal runs on national rules only — correct degradation.</p>
+<hr/>
+<h2>5. The derivation flow (end to end)</h2>
+<pre><code>Agent types postal_code on Edit Property → Save
+        │
+        ▼
+country (name) ──legacyCountryNameToCode──▶ ISO-2 (e.g. CH)
+        │
+        ▼
+resolvePostalToRegion(ISO, postal_code) ──▶ region_code (e.g. CH-ZH) | null
+        │
+        ▼
+properties.region_code written (postal_code always persisted)
+        │
+        ▼  (when a deal is created on the property)
+createDeal copies → deals.market_region_code
+        │
+        ▼
+get_applicable_rules fires the region's rules; the matching workflow template attaches</code></pre>
+<p><strong>Verification record (this session, live on Zürich Premium Realty):</strong> setting <code>postal_code = 1201</code> flipped <code>region_code</code> to <code>CH-GE</code>; restoring <code>8001</code> returned it to <code>CH-ZH</code>; a deal created on the property bound <code>market_country_code = CH</code>, <code>market_region_code = CH-ZH</code>, and attached the Swiss Sale workflow. The postal input — not the address text — drove the region, confirming the full chain.</p>
+<hr/>
+<h2>6. Extending to a new country</h2>
+<p>The capability is country-agnostic. Bringing a country online is a <strong>data</strong> task, not a code task:</p>
+<ol><li>Source an authoritative postal→region dataset (official directory; reuse-licensed).</li><li>Cross-validate genuinely ambiguous (border-straddling) codes.</li><li>Seed <code>postal_regions</code> for that <code>country_code</code> (idempotent seed script; Will runs).</li><li>Derivation switches on immediately — no code change.</li></ol>
+<p>Note: regional <strong>rule authoring</strong> (e.g. German Bundesland rules) is a separate content track. Derivation can be live for a country before that country has any regional rules to fire — the wiring is harmless ahead of the rules.</p>
+<p>Live coverage is tracked under <strong>Data Environments → Geo Data Seeding</strong>.</p>
+<hr/>
+<h2>7. Related architecture / tickets</h2>
+<ul><li><strong>BL-PROPERTIES-ISO-CANONICALIZATION</strong> — store ISO <code>country_code</code> on <code>properties</code> (today derived at read-time via <code>legacyCountryNameToCode</code>), with cross-field integrity check. Closes the region/country ISO-native loop at source.</li><li><strong>BL-UX-ADD-SCREEN-LOCATION-FIELDS</strong> — capture postal/city/country at property creation (today Edit-only).</li><li><strong>BL-UX-ADDRESS-POSTAL-CONSISTENCY</strong> — reconcile free-text address vs. structured postal; candidate to make address street-only.</li><li><strong>BL-UX-PORTAL-POSTAL-MAPPING</strong> — map postal code into portal exports (Bayut / Property Finder).</li><li><strong>BL-GEO-SEED-{DE,FR,IT,AE}</strong> — per-country postal data seeding.</li></ul></div>
+</main>
+<footer>
+  HouseZoom.ai Geo &amp; Locations · Auto-generated from <code>docs/geo/geo-architecture.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+</footer>
+</body>
+</html>

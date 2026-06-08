@@ -150,6 +150,22 @@ const LAST_UPDATED = '2026-06-07';
 const DATA = {
   "inProgress": [
     {
+      "id": "~~BL-170~~",
+      "title": "~~Property region_code + deal region plumbing~~",
+      "desc": "CLOSED 2026-06-07 → D-396 (v2.6.54). properties.region_code (ISO 3166-2, format-CHECK only) + resolveMarketRegion (ISO-or-null, no org fallback) wired into createDeal via deriveMarket. Completes BL-169's deferred region half. Engine path traced live: deal.market_region_code → get_applicable_rules region branch (exact ISO + published gate). Verified end-to-end on prod (CH): deal bound market_region_code='CH-ZH', RPC fired 36 country + 5 region = 41 (vs 36+0 for NULL region). Postal_code (the UI input that derives region_code) is the next ticket (spec to be authored).",
+      "files": "supabase/migrations/20260607_bl170_properties_region_code.sql, src/features/deals/services/{dealMarketBinding,dealService}.ts, tests/unit/dealMarketBinding.test.ts",
+      "tag": "admin",
+      "added": "2026-06-07"
+    },
+    {
+      "id": "~~BL-171~~",
+      "title": "~~Germany (DE) in admin Workflows UI~~",
+      "desc": "CLOSED 2026-06-07 → D-395 (v2.6.53). Added DE to COUNTRY_FLAG/COUNTRY_BADGE/COUNTRIES + countryLabel.DE i18n (en/fr/de/it). UI/i18n only — DE system templates already worked. MCP-verified on prod (dropdown shows Deutschland; DE cards 🇩🇪 + slate badge).",
+      "files": "src/app/admin/workflows/page.tsx, messages/{en,fr,de,it}.json",
+      "tag": "admin",
+      "added": "2026-06-07"
+    },
+    {
       "id": "~~BL-131~~",
       "title": "~~Italy Sale + Rental compliance ingestion~~",
       "desc": "CLOSED 2026-05-08 → D-311 (cuts v2.0.4). 55 country-layer IT compliance rules (created_via='ingestion', country_code='IT') seeded from Agenzia delle Entrate / Notariato / Normattiva / MIMIT — 28 sale (12 doc + 4 fee + 4 tax + 6 legal + 2 agent) + 27 rental (8 doc + 3 fee + 8 legal + 3 deposit + 2 registration + 3 agent). New IT Sale (8 stages, locked: compromesso/rogito/post_rogito) + IT Rental (5 stages, locked: dossier_conduttore/contratto_locazione/registrazione) workflow templates with name/canonical-stage encoding (no deal_type column on this schema). Idempotency marker [seed:it-compliance-v1] in description; --dry-run / --force / --rollback / --scope=sale",
@@ -1032,16 +1048,16 @@ const DATA = {
       "added": "scripts/docs-check.mjs (or new CI step), WAYS-OF-WORKING.md § Testing policy"
     },
     {
-      "id": "BL-170",
-      "title": "Deal region binding — postal→canton resolver (BL-169 Fix 1 fast-follow)",
-      "desc": "🟡. BL-169 (D-394) bound the deal's market_country_code but deferred market_region_code (left null) for a structural reason: properties has no postal column (the postal code lives inside free-text address, e.g. \"Bellerivestrasse 220, 8008 Zürich\") and src/lib/constants/market-regions.ts holds only the 26-canton *list* — there is no postal→canton mapping. Region rules (cantonal) therefore can't match on UI-created deals. Scope: (1) a structured postal source on properties (new postal_code column + backfill by parsing address, or pairs with BL-PROPERTIES-ISO-CANONICALIZATION); (2) a country-aware postal→region resolver — CH first (deterministic ranges, e.g. 8000–8099→CH-ZH; web-verified 2026-06-06), stub DE PLZ / IT CAP / FR INSEE; (3) wire it into dealService.createDeal to set market_region_code (pure helper, unit-tested like resolveMarketCountry). Country alone already restored compliance, so this is additive precision, not a blocker.",
+      "id": "~~BL-170~~",
+      "title": "~~Deal region binding — postal→canton resolver (BL-169 Fix 1 fast-follow)~~",
+      "desc": "MOVED to In Progress → CLOSED 2026-06-07 → D-396 (v2.6.54): the region_code half shipped (property→deal region plumbing). The postal_code source + postal→region resolver are re-filed as BL-17x follow-ups (Tech Debt). See In Progress. _Original scope:_ 🟡. BL-169 (D-394) bound the deal's market_country_code but deferred market_region_code (left null) for a structural reason: properties has no postal column (the postal code lives inside free-text address, e.g. \"Bellerivestrasse 220, 8008 Zürich\") and src/lib/constants/market-regions.ts holds only the 26-canton *list* — there is no postal→canton mapping. Region rules (cantonal) therefore can't match on UI-created deals. Scope: (1) a structured postal source on properties (new postal_code column + backfill by parsing address, or pairs with BL-PROPERTIES-ISO-CANONICALIZATION); (2) a country-aware postal→region resolver — CH first (deterministic ranges, e.g. 8000–8099→CH-ZH; web-verified 2026-06-06), stub DE PLZ / IT CAP / FR INSEE; (3) wire it into dealService.createDeal to set market_region_code (pure helper, unit-tested like resolveMarketCountry). Country alone already restored compliance, so this is additive precision, not a blocker.",
       "tag": "compliance",
       "added": "src/features/deals/services/dealService.ts, src/features/deals/services/dealMarketBinding.ts, src/lib/constants/market-regions.ts, properties schema"
     },
     {
-      "id": "BL-171",
-      "title": "Add DE to the Create-Template dropdown (in-app DE template authoring)",
-      "desc": "🟢 RESCOPED 2026-06-07 — the seed portion is void. ~~Seed DE workflow templates~~: the DE federal templates already exist and are active — Germany Sale (BL-164) + Germany Rental (BL-164) (country_code='DE', region_code=NULL, status='active', v1), created by the bl164 seed. Verified live 2026-06-07 (SQL + MCP): a Hauptstadt DE Sale deal binds market_country_code='DE', auto-attaches Germany Sale (BL-164), and fires 18 DE rules (vs 0 baseline) — DE deals work end-to-end today. (The original \"no DE template\" premise came from BL-169 Phase 0 Q5 reading only bl130/bl132 and missing the bl164 seed — see docs/findings/FINDING-2026-06-06-deal-market-binding.md Correction + WAYS-OF-WORKING \"Live DB is truth.\") Remaining scope (small code ticket, no seed): add DE to the Create-Template UI dropdown — src/app/admin/workflows/page.tsx COUNTRIES=[AE,CH,FR,IT] (default 'AE') + the missing DE entries in COUNTRY_FLAG / COUNTRY_BADGE — so admins can author/clone a DE template in-app (does not block deals, which already auto-attach the existing DE templates).",
+      "id": "~~BL-171~~",
+      "title": "~~Add DE to the Create-Template dropdown (in-app DE template authoring)~~",
+      "desc": "MOVED to In Progress → CLOSED 2026-06-07 → D-395 (v2.6.53). See In Progress. 🟢 RESCOPED 2026-06-07 — the seed portion is void. ~~Seed DE workflow templates~~: the DE federal templates already exist and are active — Germany Sale (BL-164) + Germany Rental (BL-164) (country_code='DE', region_code=NULL, status='active', v1), created by the bl164 seed. Verified live 2026-06-07 (SQL + MCP): a Hauptstadt DE Sale deal binds market_country_code='DE', auto-attaches Germany Sale (BL-164), and fires 18 DE rules (vs 0 baseline) — DE deals work end-to-end today. (The original \"no DE template\" premise came from BL-169 Phase 0 Q5 reading only bl130/bl132 and missing the bl164 seed — see docs/findings/FINDING-2026-06-06-deal-market-binding.md Correction + WAYS-OF-WORKING \"Live DB is truth.\") Remaining scope (small code ticket, no seed): add DE to the Create-Template UI dropdown — src/app/admin/workflows/page.tsx COUNTRIES=[AE,CH,FR,IT] (default 'AE') + the missing DE entries in COUNTRY_FLAG / COUNTRY_BADGE — so admins can author/clone a DE template in-app (does not block deals, which already auto-attach the existing DE templates).",
       "tag": "admin",
       "added": "src/app/admin/workflows/page.tsx (COUNTRIES / COUNTRY_FLAG / COUNTRY_BADGE)"
     },
@@ -1051,6 +1067,27 @@ const DATA = {
       "desc": "🟡. Greenfield, briefed in docs/specs/BL-169-…Auto-Attach.md §8. Today compliance is computed and shown but never enforced: moveDealStage / closeDeal (src/features/deals/services/dealService.ts) have zero compliance precondition, and get_applicable_rules ignores compliance_rules.workflow_stage_canonical (it matches trigger + country/region/org; the canonical column is authored but dead/advisory) — so even after BL-169, all of a deal's country rules are selectable regardless of current stage. Two gate modes required (Will, 2026-06-06), neither exists today: (a) stage-gate — block a specific stage transition (moveStage/\"Advance to…\") until a rule pertaining to that workflow_stage_canonical clears; (b) closing-gate — let the deal flow freely but block \"Mark as Closed\"/final stage until a deal-wide rule clears. Scope: the rule→(stage",
       "tag": "compliance",
       "added": "deal-wide)→gate-mode contract (new field/convention — rule_type='block'+severity exist but no mode distinction), get_applicable_rules change to filter by the deal's current-stage canonical, engine call-site to pass it, and enforcement at the moveDealStage/closeDeal boundaries. Depends on BL-169 (a deal needs a country + a stage-bearing instance first). Full WoW Commandment #11 schema scan before touching the RPC."
+    },
+    {
+      "id": "BL-PROPERTIES-POSTAL-CODE",
+      "title": "postal_code on properties (UI surface — BL-170 follow-up)",
+      "desc": "🟢. BL-170 (D-396) shipped engine-facing properties.region_code but no input feeds it yet. Add an agent-entered postal_code column + property create/edit UI (PLZ/NPA/CAP). Permanent companion to region_code (input vs engine-facing — not a duplicate). Spec to be authored.",
+      "tag": "ux",
+      "added": "properties schema, property create/edit UI"
+    },
+    {
+      "id": "BL-POSTAL-TO-REGION",
+      "title": "postal_code → ISO region_code derivation (BL-170 follow-up)",
+      "desc": "🟢. Country-aware resolver: CH NPA → canton (8000–8099 → CH-ZH; web-verified), stub DE PLZ / IT CAP / FR INSEE. Writes the derived ISO into properties.region_code (which createDeal already plumbs to deals.market_region_code). Reuse src/lib/constants/market-regions.ts (holds the 26-canton list). Depends on BL-PROPERTIES-POSTAL-CODE.",
+      "tag": "admin",
+      "added": "src/lib/constants/market-regions.ts, properties write path"
+    },
+    {
+      "id": "BL-DE-BUNDESLAND-RULES",
+      "title": "DE Bundesland (region-layer) compliance rules — CONTENT",
+      "desc": "🟢. The region plumbing (BL-170) gives Germany no win until region-layer DE rules exist — DE currently has 0 region rules (only the BL-164 federal corpus). Author Bundesland-level rules so a DE deal's market_region_code has something to match. Content/ingestion ticket, no plumbing.",
+      "tag": "compliance",
+      "added": "compliance_rules (DE region-layer seed)"
     },
     {
       "id": "BL-PROPERTIES-ISO-CANONICALIZATION",
@@ -1971,6 +2008,14 @@ const DATA = {
     }
   ],
   "techDebt": [
+    {
+      "id": "🔴 TD-COMPLIANCE-RPC-NO-MIGRATION",
+      "title": "Core compliance RPC get_applicable_rules lives only in the live DB (not in version control)",
+      "desc": "Filed 2026-06-07 (BL-170 Phase 0). get_applicable_rules(p_trigger, p_country, p_region, p_org_id) — the function the compliance engine calls (complianceEngine.ts:~570) to select applicable rules — has no defining migration; it exists only in the live database (schema-in-VC drift on a core compliance fn). Region branch: layer='region' AND country_code=p_country AND region_code=p_region; gates status='published'. Fix: capture the live definition (pg_get_functiondef) as a migration so the schema is reproducible from version control.",
+      "files": "supabase/migrations/ (new — capture), get_applicable_rules (live DB only), DB-SCHEMA.md",
+      "tag": "compliance",
+      "added": "2026-06-07"
+    },
     {
       "id": "🔴 TD-TEST-DB-INTEGRATION-HARNESS",
       "title": "No real-DB test path → CHECK/constraint failures are invisible to the suite",
@@ -6175,6 +6220,11 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-06-07",
+      "title": "BL-171 + BL-170 shipped & live-verified. DE added to Workflows UI (constants + countryLabel i18n). Property region_code + deal region plumbing — createDeal now binds market_region_code from the linked property; CH cantonal rules fire (41 vs 36 on prod). Investigation corrected 3 carry-over assumptions (DE has 0 region rules → CH is the demo target; engine resolves region via deal.market_region_code + the get_applicable_rules RPC; that RPC isn't in version control).",
+      "decisions": "dropdown label is i18n not the const array; region has NO org fallback (agency spans regions) — property-only, NULL → federal-only is correct; get_applicable_rules region branch is exact-ISO + published-gated; postal_code ≠ region_code (input vs engine-facing, both permanent); core compliance RPC living only in live DB = schema-in-VC drift"
+    },
     {
       "date": "2026-05-16",
       "title": "D-331 SECURITY DEFINER audit pass (TD-AUTH-SECDEF-SEARCHPATH 🟡 closed) + D-332 EOS paper trail. D-331: 11 SECURITY DEFINER functions audited in non-system schemas; 4 hardened (get_user_org_id, get_user_role, purge_expired_external_events, user_has_role) via single migration 20260516_d331_secdef_searchpath_audit_pass.sql with SET search_path = public, pg_temp + schema-qualified table refs + COMMENT ON FUNCTION D-331 provenance. 4 already compliant pre-D-331 (D-315 sync_agent_profile_email + Supabase-managed pgbouncer.get_auth + vault.create_secret/vault.update_secret). 3 PostGIS st_estimatedextent overloads in public excluded as extension-managed (forking would break next ALTER EXTENSION postgis UPDATE); permanent exclusion rule #4 added to WAYS-OF-WORKING § SECDEF Discipline generalizing to any extension-owned SECURITY DEFINER function (pg_depend deptype='e'). 4-phase execution: Phase 0 audit (Will) → Phase 1 migration (CC, file staged only) → Phase 2 verification (Will applied + MCP RPC runtime smoke test as Fatima admin@gulf-horizon-realty: all 4 RPCs returned 200 OK with expected payloads, user_has_role('owner')=false confirmed hierarchy direction intact post-edit) → Phase 3 doc backfill + commit 53ab5cf + v2.6.1 tag (CC, after CI run 25939242147 green) → Phase 4 live deployment verification (MCP HEAD /admin confirmed Vercel routing + DOM smoke on /admin/deals as Fatima confirmed \"Gulf Horizon Realty\" + \"20 active deals · AED 30,051,964 pipeline value\" rendering through full Vercel → Next.js → PostgREST → RLS path). purge_expired_external_events not exercised end-to-end (pg_cron-only path; risk surface zero per audit confirmation). Sidebar commit c810269: SOS-15-5-2026-1.md → SOS-2026-05-15-1.md rename (canonical YYYY-MM-DD); git mv failed on untracked source, recovered via plain mv + git add -A. D-332 (this commit): EOS doc + SOS-2026-05-17-1 staged. 1 TD closed (TD-AUTH-SECDEF-SEARCHPATH); 1 TD filed (TD-EOS-LIVE-DEPLOYMENT-VERIFICATION 🟡 — codify Phase 4 as standing post-tag step in WOW).",

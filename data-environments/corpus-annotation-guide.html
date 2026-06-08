@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HouseZoom.ai — Functional Guide</title>
+<title>HouseZoom.ai — Geo Data Seeding — Coverage</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -75,26 +75,36 @@ footer a{color:var(--text2)}
   <div class="nav-links">
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/">Roadmap</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
-    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/" class="active">Data Environments</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/geo/">Geo &amp; Locations</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal &amp; Compliance</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
-    <a href="https://kanaan-droid.github.io/housezum-process-atlas/functional-guide/" class="active">Functional Guide</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/functional-guide/">Functional Guide</a>
   </div>
 </nav>
 <main>
+  <div class="breadcrumb"><a href="index.html">Data Environments</a> / CORPUS-ANNOTATION-GUIDE.md</div>
   
-  
-  <div class="content"><h1>Functional Guide</h1>
-<p>Plain-English reference for how each functional area of HouseZoom works today — what it does, where you see it, market variance, edge cases, and known gotchas. Living docs (one per area), updated whenever behavior changes. For agents, support, sales, investors, and engineering reference. Auto-generated from docs/functional-guide/.</p>
-<h2>Documents</h2>
-<ul><li><a href="agency-setup-switzerland.html">agency-setup-switzerland.md</a></li><li><a href="compliance.html">compliance.md</a></li><li><a href="deal-lifecycle.html">deal-lifecycle.md</a></li><li><a href="onboarding.html">onboarding.md</a></li><li><a href="platform-admin.html">platform-admin.md</a></li><li><a href="postal-region-derivation.html">postal-region-derivation.md</a></li></ul>
+  <div class="content"><h1>Geo Data Seeding — Coverage</h1>
+<p><strong>Status:</strong> Living document. Updated whenever postal→region data is seeded for a country. <strong>Version:</strong> v0.1 <strong>Last updated:</strong> 2026-06-08 (CH seeded — BL-POSTAL-TO-REGION / D-397) <strong>Maintainer:</strong> Will + Claude</p>
 <hr/>
-<p>Last regenerated: 2026-06-08</p></div>
+<h2>1. What this tracks</h2>
+<p>The geo-resolution capability (postal code → ISO 3166-2 region) is <strong>country-agnostic</strong> — see <strong>Geo &amp; Locations</strong> for how it works. This page tracks the other half: <strong>which countries actually have postal data loaded</strong> into the <code>postal_regions</code> table on the live environment.</p>
+<p>A country with no seeded data degrades safely — postal codes are still captured, but no region is derived, so deals run on national rules only. Derivation switches on for a country the moment its data lands here.</p>
+<hr/>
+<h2>2. Coverage matrix</h2>
+<table><thead><tr><th>Country</th><th><code>postal_regions</code></th><th>Rows</th><th>Regions covered</th><th>Source</th><th>Ambiguous</th><th>Cross-validated</th><th>Regional rules exist?</th></tr></thead><tbody><tr><td><strong>Switzerland (CH)</strong></td><td>✅ Seeded</td><td>3,362</td><td>26 / 26 cantons</td><td>swisstopo official directory (via zauberware, CC-BY 4.0)</td><td>21 flagged</td><td>✅ (ChatGPT + Gemini); 5 pending official-perimeter check</td><td>✅ 97 rules (8 cantons)</td></tr><tr><td>Germany (DE)</td><td>⬜ Not seeded</td><td>—</td><td>— (16 Bundesländer)</td><td>TBD</td><td>—</td><td>—</td><td>⬜ (Bundesland rules = separate content ticket)</td></tr><tr><td>France (FR)</td><td>⬜ Not seeded</td><td>—</td><td>—</td><td>TBD</td><td>—</td><td>—</td><td>⬜</td></tr><tr><td>Italy (IT)</td><td>⬜ Not seeded</td><td>—</td><td>—</td><td>TBD</td><td>—</td><td>—</td><td>⬜</td></tr><tr><td>UAE (AE)</td><td>⬜ Not seeded</td><td>—</td><td>—</td><td>TBD</td><td>—</td><td>—</td><td>✅ 22 rules (AE-DU)</td></tr></tbody></table>
+<hr/>
+<h2>3. Switzerland — detail (seeded)</h2>
+<ul><li><strong>Source:</strong> swisstopo <em>Official Directory of Towns and Cities</em> (canton per NPA), obtained via the zauberware <code>postal-codes-json-xml-csv</code> mirror (CC-BY 4.0, GeoNames-derived).</li><li><strong>Shape:</strong> 3,362 distinct 4-digit NPAs, all 26 cantons, 0 blank cantons.</li><li><strong>Ambiguous:</strong> 21 multi-canton NPAs flagged <code>is_ambiguous = true</code>; primary canton cross-validated against ChatGPT + Gemini.</li><li><strong>Pending:</strong> 5 NPAs (<code>1534, 1565, 1595, 2333, 9532</code>) carry best-effort primaries awaiting verification against the official Swiss Post PLZ perimeter dataset. All flagged ambiguous; safe degradation.</li><li><strong>Seed files:</strong> <code>supabase/seeds/postal_regions_ch.sql</code> (base) + ambiguous primary patch. Generated by <code>scripts/generate-postal-regions-seed.mjs</code> (reproducible from source).</li></ul>
+<hr/>
+<h2>4. Bringing a country online</h2>
+<ol><li>Source an authoritative, reuse-licensed postal→region dataset.</li><li>Cross-validate border-straddling codes; flag <code>is_ambiguous</code>.</li><li>Generate + run an idempotent seed for that <code>country_code</code> (Will runs).</li><li>Verify shape (row count, region coverage, 0 blanks) before marking seeded.</li><li>Update this matrix.</li></ol>
+<p>Tracked per country as <strong>BL-GEO-SEED-{DE,FR,IT,AE}</strong>.</p></div>
 </main>
 <footer>
-  HouseZoom.ai Functional Guide · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
+  HouseZoom.ai Data Environments · Auto-generated from <code>docs/data-environments/CORPUS-ANNOTATION-GUIDE.md</code> · <a href="https://kanaan-droid.github.io/housezum-process-atlas/">← Process Atlas</a>
 </footer>
 </body>
 </html>
