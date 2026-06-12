@@ -115,6 +115,7 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/roadmap/" class="active">Roadmap</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/architecture/">Architecture</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/data-environments/">Data Environments</a>
+    <a href="https://kanaan-droid.github.io/housezum-process-atlas/geo/">Geo & Locations</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/legal-compliance/">Legal & Compliance</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/wow/">Ways of working</a>
     <a href="https://kanaan-droid.github.io/housezum-process-atlas/tech-stack/">Tech Stack</a>
@@ -146,9 +147,17 @@ a.card-tag:hover{opacity:0.8;text-decoration:none}
   <p style="margin-top:4px">Auto-generated from ROADMAP.md · <a href="https://kanaan-droid.github.io/housezum-process-atlas/" style="color:var(--indigo);text-decoration:none">← Back to Atlas</a></p>
 </div>
 <script>
-const LAST_UPDATED = '2026-06-07';
+const LAST_UPDATED = '2026-06-12';
 const DATA = {
   "inProgress": [
+    {
+      "id": "~~SEED-DE-HAUPTSTADT~~",
+      "title": "~~5 demo properties + photos → Hauptstadt Immobilien (DE)~~",
+      "desc": "✅ DONE 2026-06-08 → D-400. Seeded 5 DE properties (org f5f37e12-…, 0→5) + 64 photos into the public property-photos bucket ({org_id}/{property_id}/NN.webp, 1-based; photo_source='agent'; first is_primary; sharp→webp), one per active DE agent via properties.user_id: Felix Wagner→Frohnau villa+bungalow (villa, €2,198,700, energy C) d4ea1838…; Greta Schäfer→Dahlem Einfamilienhaus (house, €1,495,000, energy NULL*) efbad7b2…; Jonas Keller→Tegel mit Pool (house, €595,000, energy D) a0892801…; Mia Richter→Pankow 4-Zimmer (apartment, €749,000, energy NULL) d16da40e…; Tobias Neumann→Schlachtensee Doppelhaushälfte (house, €1,350,000, energy B) c7a6678d…. Decisions: *Dahlem energy_class H→NULL (column CHECK A–G; true figure kept in energy_efficiency_index=418 → BL-ENERGY-CLASS-DE-SCALE); optimized_url NULL (matches real agent rows); property_type no CHECK → house/villa/apartment valid; region_code NULL on all 5 (DE postal not seeded → BL-GEO-SEED-DE). Verified live: DB SELECT (5 props / 5 distinct agents / 1 primary each / 0 optimized_url / 0 missing storage_path / energy C·NULL·D·NULL·B) + public-URL fetch 200 image/webp on all 5 + visual as DE admin.",
+      "files": "scripts/seed-eu-agencies/seed-de-hauptstadt-properties.mjs (4af1694)",
+      "tag": "admin",
+      "added": "2026-06-08"
+    },
     {
       "id": "~~BL-170~~",
       "title": "~~Property region_code + deal region plumbing~~",
@@ -1034,6 +1043,41 @@ const DATA = {
   ],
   "backlog": [
     {
+      "id": "BL-VIEWING-ROOM-LABEL-I18N",
+      "title": "i18n the Viewing Mode room-card labels (item-room names + synthesized labels)",
+      "desc": "🟢. Viewing Mode room-card labels are un-i18n'd German literals — both the existing category:'room' item names (seed data: Wohnzimmer/Küche/Hauptschlafzimmer…) and the D-404 synthesized labels (Master / Schlafzimmer N / Badezimmer N / Gäste-WC). They render German regardless of UI locale. Proper fix: a localized room-label system (canonical room → localized label per locale) covering both synthesized labels and a display mapping for item-room names, so a FR/EN/IT agent sees localized cards. Likely a roomNormalize + i18n-keys addition. Surfaced during BG-VIEWING-ROOM-CARDS-FROM-COUNTS (D-404). Not built.",
+      "tag": "infra",
+      "added": "src/components/shared/ViewingMode.tsx, src/lib/roomNormalize.ts, messages/{en,fr,de,it}.json"
+    },
+    {
+      "id": "BL-VIEWING-SYNTH-ROOM-NOTE-PERSISTENCE",
+      "title": "Persist synthesized Viewing Mode rooms so their notes re-merge on reload",
+      "desc": "🟢. A note saved in a D-404 synthesized room writes a property_items row with room_name='synth-…' (category note), but synthesized cards aren't category:'room' rows, so on reload the note doesn't re-attach to the re-derived card (the card's grouping key never matches synth-…). The note persists in the DB but disappears from the card's chip list. Proper fix: materialize a synthesized room as a real category:'room' item on first write (or key synthesized cards to a stable canonical room_name the re-derive reuses) so notes/features re-merge. Backend-touching. Surfaced during BG-VIEWING-ROOM-CARDS-FROM-COUNTS (D-404). Not built.",
+      "tag": "ux",
+      "added": "src/components/shared/ViewingMode.tsx, property_items write path"
+    },
+    {
+      "id": "BL-ROOM-MODEL",
+      "title": "Canonical room model — unify room vocab across detect-room / Viewing Mode / seed / i18n",
+      "desc": "🔴. Next-session-ready (spec docs/specs/BL-ROOM-MODEL-spec.md, authored Claude.ai-side — marked next-session-ready, D3 resolved, provisional baseline recs locked: confirm + cross-validate before Phase 1). Consolidates the room-vocabulary fragmentation surfaced across D-402/D-403/D-404 + BG-SEED-BATHROOM-FEATURE-ROOM: detect-room VALID_ROOM_TYPES (14) vs photo-evaluation.ts RoomType vs seed LOCALE_VOCAB vs enums.photo.roomType i18n vs ViewingMode synthesized labels. Starts at Phase 0: Commandment #11 full schema scan + dump the live VALID_ROOM_TYPES before any design lock. ⚠️ Spec file not yet in the repo — place under docs/specs/ before the session.",
+      "tag": "ai",
+      "added": "docs/specs/BL-ROOM-MODEL-spec.md (pending placement)"
+    },
+    {
+      "id": "BL-VIEWING-HELPER-ROOM-CARD",
+      "title": "Helper Room card from maid_rooms (HZ term \"Helper Room\")",
+      "desc": "🟢. Fast-follow on BG-VIEWING-ROOM-PHOTOS. Surface a dedicated Helper Room card in Viewing Mode (and room derivation), sourced from the property's maid/helper-room data (maid_rooms — confirm the live source field at build, per SO-LIVE-DB-TRUTH). Canonical HZ user-facing term is \"Helper Room\"; \"maid room\" is an inbound _portal_ alias only (normalize on ingest, never display). Scope: room-card synthesis for properties with a helper room, an i18n key (en/fr/de/it), and a canonical mapping so the portal alias resolves to \"Helper Room\" (likely a roomNormalize addition). Not built.",
+      "tag": "ai",
+      "added": "src/components/shared/ViewingMode.tsx, src/lib/roomNormalize.ts, messages/{en,fr,de,it}.json"
+    },
+    {
+      "id": "BL-ENERGY-CLASS-DE-SCALE",
+      "title": "Widen energy_class CHECK to the full German scale + backfill",
+      "desc": "🟢. Live properties_energy_class_check allows only A–G (CHECK (energy_class = ANY (ARRAY['A','B','C','D','E','F','G']))). The German GEG/EnEV scale also includes H (and A+). Real DE listing hits this: SEED-DE-HAUPTSTADT property \"Einfamilienhaus in Dahlem-Bestlage\" (efbad7b2-a6c4-442b-906e-92c7e27f318f, org Hauptstadt f5f37e12-00eb-4bcd-99bd-527e78a2df6c) is true class H — stored NULL to pass the CHECK; real figure preserved in energy_efficiency_index=418. Fix: (a) decide allowlist (min add H; recommend the full German scale incl. A+); (b) ALTER the CHECK; (c) backfill energy_class='H' on efbad7b2…; (d) audit FR/IT/other orgs for rows already coerced/NULLed for the same reason. DB-only (constraint + backfill), no app code.",
+      "tag": "admin",
+      "added": "properties_energy_class_check, properties.energy_class, property efbad7b2…"
+    },
+    {
       "id": "BL-166",
       "title": "Country-filter system workflow templates in the deal picker",
       "desc": "🟢 ⚠️ PARKED (2026-06-06). Code shipped but on the dead legacy features/admin/hooks/useDeals stack (zero importers) — the live deal-create path is V2 (useDealsV2) and has no template picker at all, so the filter is correct code on an unreachable surface (BL-169 backward trace). The real gap it pointed at (V2 deals created with null market_country_code + null workflow_instance_id) was fixed by BL-169 (D-394) instead. This picker filter stays parked (not reverted) until/unless a V2 template picker is built. Original analysis: fetchTemplates(orgId) (src/features/admin/services/workflowService.ts) returns all org_id IS NULL system templates regardless of org country (.or('org_id.is.null,org_id.eq.\u003corgId\u003e')), so every org's deal-creation template picker shows every market's templates (CH/FR/IT/AE/DE). Filter the deal picker to the org's country_code + country-agnostic (country_code IS NULL) templates + the org's own templates, consistent with how compliance rules attach by org.country_code. Phase 0 (2026-06-03, READ-ONLY) done: useOrg() already exposes country_code; live system templates today are FR:2/IT:2/AE:1/CH:8/DE:2 with 0 country-agnostic (NULL) rows (NULL branch is forward-compat); useWorkflows instance-name resolution is a separate by-id query (a picker filter won't break it). Proposed fix (not built): add optional orgCountryCode? param to fetchTemplates (JS-filter when truthy; unfiltered fallback) + pass country_code from useOrg() in useDeals.loadTemplateOptions; leave the admin /workflows management list unfiltered (open decision: also filter it). Pre-existing; surfaced during BL-164 DE verification.",
@@ -1076,11 +1120,11 @@ const DATA = {
       "added": "properties schema, property create/edit UI"
     },
     {
-      "id": "BL-POSTAL-TO-REGION",
-      "title": "postal_code → ISO region_code derivation (BL-170 follow-up)",
-      "desc": "🟢. Country-aware resolver: CH NPA → canton (8000–8099 → CH-ZH; web-verified), stub DE PLZ / IT CAP / FR INSEE. Writes the derived ISO into properties.region_code (which createDeal already plumbs to deals.market_region_code). Reuse src/lib/constants/market-regions.ts (holds the 26-canton list). Depends on BL-PROPERTIES-POSTAL-CODE.",
+      "id": "~~BL-POSTAL-TO-REGION~~",
+      "title": "~~postal_code → ISO region_code derivation (BL-170 follow-up)~~",
+      "desc": "✅ DONE 2026-06-08 — CH live, UI-verified. D-397 (postal_regions data asset) + D-398 (resolver + EditPropertyModal wire-in) + D-399 (Atlas Geo & Locations section 🌍 + geo docs). UI proof passed: Zürich property postal 8008 → region_code='CH-ZH' → deal market_region_code='CH-ZH' → CH-ZH cantonal rules fire. Per-country postal seeding (DE/FR/IT/AE) + postal in the Add flow tracked as BL-GEO-SEED-* / BL-UX-* below; 5 CH NPAs (1534/1565/1595/2333/9532) pending official Swiss Post perimeter verification. _Prior progress:_ Resolver + wire-in staged 2026-06-08 → D-398 (UI proof pending): postalRegionService.resolvePostalToRegion(iso, postal) (exact postal_regions lookup, validated vs market-regions.ts, null-never-guess) + properties.postal_code migration + EditPropertyModal capture (postal Field → derives region_code on save; country_code derived at call-time, NOT stored — deferred to BL-PROPERTIES-ISO-CANONICALIZATION). tsc/eslint clean. NOT done until live UI proof on CH org (8008 → region_code='CH-ZH' → deal market_region_code='CH-ZH' → cantonal rules fire); migration NOT run (Will). Data asset shipped 2026-06-08 → D-397: new postal_regions lookup table (migration) + reproducible generator (scripts/generate-postal-regions-seed.mjs, zauberware CC-BY 4.0 source) → idempotent CH seed (3,362 NPAs, 26 cantons, 21 ambiguous flagged w/ review CSV). Migration + seed NOT executed (Will runs). Remaining: the resolver service (postal → postal_regions lookup → write properties.region_code) + write-path wire-in — a separate prompt. Spec docs/specs/BL-postal-code-spec.md. _Original plan:_ country-aware resolver (CH NPA → canton; stub DE PLZ / IT CAP / FR INSEE); reuse src/lib/constants/market-regions.ts (26-canton list). Depends on BL-PROPERTIES-POSTAL-CODE.",
       "tag": "admin",
-      "added": "src/lib/constants/market-regions.ts, properties write path"
+      "added": "supabase/migrations/20260607_create_postal_regions.sql, scripts/generate-postal-regions-seed.mjs, supabase/seeds/postal_regions_ch.sql, properties write path"
     },
     {
       "id": "BL-DE-BUNDESLAND-RULES",
@@ -1090,11 +1134,60 @@ const DATA = {
       "added": "compliance_rules (DE region-layer seed)"
     },
     {
+      "id": "BL-UX-ADD-SCREEN-LOCATION-FIELDS",
+      "title": "Move postal/city/country into the Add-property flow",
+      "desc": "🟢. BL-POSTAL-TO-REGION wired the capture into EditPropertyModal only; the Add flow (AddListingFlow) still lacks postal_code (+ city/country structuring), so a brand-new property gets no region derivation until it's edited. Add the location fields (incl. postal → region derivation) to the Add screen.",
+      "tag": "admin",
+      "added": "AddListingFlow, postalRegionService"
+    },
+    {
+      "id": "BL-UX-ADDRESS-POSTAL-CONSISTENCY",
+      "title": "Reconcile free-text address vs structured postal_code",
+      "desc": "🟢. properties.address is free-text and often contains the postal code + city inline (e.g. \"Bellerivestrasse 220, 8008 Zürich\"), now duplicated by the structured postal_code. Decide the canonical model (candidate: address = street-only; postal/city/region structured) + a migration/backfill to split existing rows.",
+      "tag": "ai",
+      "added": "properties schema, property forms"
+    },
+    {
+      "id": "BL-UX-PORTAL-POSTAL-MAPPING",
+      "title": "Map postal_code → portal exports (Bayut / PF)",
+      "desc": "🟢. Portal feeds (Bayut / Property Finder, and EU portals) expect structured location incl. postal code / community. Wire postal_code (+ derived region) into the portal-publishing payloads.",
+      "tag": "integrations",
+      "added": "portal export adapters"
+    },
+    {
+      "id": "BL-GEO-SEED-DE",
+      "title": "Seed DE postal→region (PLZ → Bundesland) into postal_regions",
+      "desc": "🟢. Extend the D-397 generator / a sibling to seed Germany (PLZ → DE-\u003cLand\u003e). Pairs with BL-DE-BUNDESLAND-RULES (DE has 0 region rules today, so DE seeding gives no compliance win until those land). Sequencing note (2026-06-08, decision deferred): prefer seed-first over BL-DE-BUNDESLAND-RULES. A DE region rule fires only if the deal carries market_region_code='DE-\u003cLand\u003e', produced solely by postal→region derivation = this seed → the seed is the prerequisite, not the rules; authoring rules first leaves them dormant until the seed lands. Seed is low-risk (CH pattern proven 2026-06-08, D-397/398) and now demonstrable against the 5 DE properties from SEED-DE-HAUPTSTADT. Earlier \"rules-first\" lean superseded. Start order parked — Will to call.",
+      "tag": "compliance",
+      "added": "scripts/generate-postal-regions-seed.mjs, postal_regions (DE)"
+    },
+    {
+      "id": "BL-GEO-SEED-FR",
+      "title": "Seed FR postal→region (code postal → région/département) into postal_regions",
+      "desc": "🟢. France postal → ISO 3166-2 (INSEE). Country-aware seed extension.",
+      "tag": "infra",
+      "added": "postal_regions (FR)"
+    },
+    {
+      "id": "BL-GEO-SEED-IT",
+      "title": "Seed IT postal→region (CAP → regione) into postal_regions",
+      "desc": "🟢. Italy CAP → ISO 3166-2 (note IT province granularity — TD-COMPLIANCE-IT-REGIONS).",
+      "tag": "compliance",
+      "added": "postal_regions (IT)"
+    },
+    {
+      "id": "BL-GEO-SEED-AE",
+      "title": "Seed AE postal→region (PO box / area → emirate) into postal_regions",
+      "desc": "🟢. UAE has no conventional postal codes — needs an area/emirate mapping (AE-DU etc.); design the AE source before seeding.",
+      "tag": "infra",
+      "added": "postal_regions (AE)"
+    },
+    {
       "id": "BL-PROPERTIES-ISO-CANONICALIZATION",
       "title": "Store ISO jurisdiction codes on properties (sibling of BL-137)",
-      "desc": "🟡. properties.country/region store display names (\"Switzerland\", \"Kanton Zürich\") not ISO codes (CH, CH-ZH); there is no country_code/canton-code column. D-378 normalizes at the compliance layer as a band-aid (display name → ISO inside evaluateCompliance); the real fix is a country_code (+ canton code) column + backfill + write-path canonicalization + display refactor, so ALL consumers read canonical codes (matching what BL-137 did for organizations). Scope: migration + backfill of existing rows + property create/edit write path + any display/consumer that assumed the name field (listing cards, detail header, PDFs, portal feeds, search/match) + remove the D-378 band-aid. Pairs with TD-COMPLIANCE-REGION-NAME-TO-ISO 🟡 (the canton name→code map needed for backfill). Out of scope for the BG-97 bug fix. Reopen triggers: new market onboarding, any second consumer hitting the same mismatch.",
-      "tag": "compliance",
-      "added": "docs/specs/BL-PROPERTIES-ISO-CANONICALIZATION.md (stub)"
+      "desc": "🟡. + now owns the deferred properties.country_code (ISO) column — BL-POSTAL-TO-REGION (D-398) chose NOT to add it (the wire-in derives ISO at call-time via legacyCountryNameToCode, doesn't store it); the ISO column + backfill-from-country + cross-field CHECK (`region_code LIKE country_code",
+      "tag": "core",
+      "added": "'-%') land here. properties.country/region store display names (\"Switzerland\", \"Kanton Zürich\") not ISO codes (CH, CH-ZH); there is no country_code/canton-code column. D-378 normalizes at the compliance layer as a band-aid (display name → ISO inside evaluateCompliance); the real fix is a country_code (+ canton code) column + backfill + write-path canonicalization + display refactor, so ALL consumers read canonical codes (matching what BL-137 did for organizations). Scope: migration + backfill of existing rows + property create/edit write path + any display/consumer that assumed the name field (listing cards, detail header, PDFs, portal feeds, search/match) + remove the D-378 band-aid. Pairs with TD-COMPLIANCE-REGION-NAME-TO-ISO` 🟡 (the canton name→code map needed for backfill). Out of scope for the BG-97 bug fix. Reopen triggers: new market onboarding, any second consumer hitting the same mismatch."
     },
     {
       "id": "BL-142",
@@ -2898,6 +2991,41 @@ const DATA = {
     }
   ],
   "bugs": [
+    {
+      "id": "BG-VIEWING-SYNTH-CARD-FEATURE-MERGE",
+      "title": "D-404 synthesized room cards (items:[]) don't absorb features → after the D-406 backfill, bath features with room_name='Badezimmer' on props with no Badezimmer room item orphan (shown on no card)",
+      "desc": "🟢→✅. buildRoomCards §1b collects orphan features (linkedFeatures whose room_name matches no existing room-item key) bucketed by toCanonicalRoom; pushSynth absorbs the bucket for its canonical type — first synth card of a type takes its orphans (absorbedCanon guard), later ones stay empty. Hard guard: real-room features stay on their room (excluded from orphans) → at most one card per feature. Interim — BL-ROOM-MODEL Phase 3 retires the synthesis path + deletes this. Preserves D-402/D-403/D-404 verbatim (only adds item absorption). Pure frontend, no schema/data. tsc/eslint/build clean; sim over live Affoltern (post-D-406 state) → 3 bath features land on Badezimmer 1, Wohnzimmer cleaned, no double-attach. Live MCP verify is Claude.ai's post-backfill---run.",
+      "tag": "ai",
+      "added": "2026-06-12"
+    },
+    {
+      "id": "BG-SEED-BATHROOM-FEATURE-ROOM",
+      "title": "Seed mis-attaches bathroom features to the living room",
+      "desc": "🟢→✅. The bl128 seed (seed-eu-property-items.mjs) attached bath features to the living room (core[0]) via findRoom's ?? roomList[0] fallback when no Badezimmer/Salle de bain/Bagno category='room' item was in roomList — which happens on 3-bed / small-sqm properties where the bath is sliced off at targetRoomCount=5 (line 306). Live root cause confirmed (read-only): 6 rows / 2 props / DE-only (0cd3e789, 36ce8f53; FR Salle de bain ×15 + IT Bagno ×15 all correct — their props keep the bath room). D-405 (seed fix): bath features derive room_name from the line-300 vocab bath label directly (bain = bathLabel), never findRoom's core[0] fallback; line 355 only — an audit found every other findRoom targets a core room (living/kitchen/master, never sliced). D-406 (backfill): new scripts/backfill-bath-feature-rooms.mjs (dry-run default, --org, idempotent) targets category='feature' AND seed_marker AND item_type IN ('bathroom_fixture','bathroom_feature') AND room_name IN ('Wohnzimmer','Salon','Soggiorno') → sets the canonical bath label. item_type discriminator (not a name catalog) catches the 2 bathroom_feature rows (Thermostat-Armatur, Naturstein-Fliesen) a named list would miss + excludes legit living-room features. Dry-run verified: 6 rows. No schema change (Commandment #11 not triggered). Backfill --run is Will's; Claude.ai MCP-verifies bath features render under the Badezimmer card on 0cd3e789/36ce8f53 post-run.",
+      "tag": "admin",
+      "added": "2026-06-12"
+    },
+    {
+      "id": "BG-VIEWING-ROOM-CARDS-FROM-COUNTS",
+      "title": "Viewing Mode room cards derived only from property_items — the property's structured bed/bath counts were ignored, so un-seeded bedrooms/bathrooms had no card (Affoltern: 3 bed / 2.0 bath, 0 Badezimmer items → no bathroom cards; bathroom photo orphaned)",
+      "desc": "🟡→✅. buildRoomCards now derives the card set from properties.bedrooms/bathrooms (signature widened from the call site; live-confirmed bedrooms int, bathrooms numeric w/ .5). Order: Wohnzimmer → Küche → bedrooms (Master/Schlafzimmer N) → floor(bathrooms) (Badezimmer N) + Gäste-WC on a .5 → other category:'room' items → Building & Exterior. Match-by-name reconciliation: each slot fills from an existing item-room first (canonical via toCanonicalRoom, features preserved); only the shortfall is synthesized as empty (items:[]) cards w/ stable unique id/name (room-synth-…, safe React keys + otherRooms identity). Count is a floor not a cap (all existing item-rooms render); null/0 → item-derived for that dimension. Photos: distinct-only pickPhoto — bedroom/bath are distinct-or-empty (D-403 reuse removed); living/kitchen/other keep D-402 primary fallback; B&E keeps D-403. Pure frontend (ViewingMode.tsx), no schema/migration/seed. Prod-verified on Affoltern (full 8-card set, bedroom A/B distinct + 3rd empty, Badezimmer 1 photo'd + 2 empty, synth tap-through \"No items yet\" clean); Gäste-WC branch logic-verified (no CH .5 property live). Filed BL-VIEWING-ROOM-LABEL-I18N + BL-VIEWING-SYNTH-ROOM-NOTE-PERSISTENCE.",
+      "tag": "infra",
+      "added": "2026-06-10"
+    },
+    {
+      "id": "BG-VIEWING-ROOM-PHOTOS",
+      "title": "Viewing Mode room cards show no photos; walkthrough editor shows raw i18n keys; same-type cards duplicate one thumbnail",
+      "desc": "🟡→🟢. Root (D-402): seeded property_photos.room NULL (photos seeded directly, bypassing /api/photos/upload's fire-and-forget detect-room) + German card names (property_items.name, e.g. \"Wohnzimmer\") never equalled the English canonical room (living_room). Fixes: new src/lib/roomNormalize.ts (VALID_ROOM_TYPES + toCanonicalRoom DE/FR/IT/EN + humanizeRoom; detect-room imports the vocabulary — no inline copy); ViewingMode.buildRoomCards normalizes both sides + never-blank primary/first fallback; added enums.photo.roomType keys entrance/dining/view/amenity in all 4 locales (pool_outdoor/rooftop already present); defense-in-depth tRoomType.has(v)?…:humanizeRoom(v) in annotate + a translateRoom guard fix in WalkthroughReorderGrid (next-intl returns the full key path, not the bare code, on a miss → !== code leaked it; now a dot-containing result = missing → humanize); backfill scripts/backfill-photo-rooms.mjs (--org/throttle/429-retry) — live backfill ran: 343 photos, all orgs, 0 failures. Follow-up (D-403): distinct thumbnail assignment across same-type cards (usedPhotoIds first-unused; Affoltern 3 bedroom cards → A·B·A, no longer 3 identical) + Building & Exterior outdoor/common catch-all ({exterior,garden,entrance,balcony_view,rooftop,pool_outdoor,amenity}, garden/entrance no longer orphaned). 2nd-bathroom orphan = room-setup gap, out of scope → BG-SEED-BATHROOM-FEATURE-ROOM + BL-VIEWING-HELPER-ROOM-CARD. No migration.",
+      "tag": "admin",
+      "added": "2026-06-10"
+    },
+    {
+      "id": "BG-QA-SLOW-ATTR",
+      "title": "Q&A attribute questions (\"what's the price\") slow (~8–10s, LLM) and never cache",
+      "desc": "🟡. Three root causes (found via a temporary _debug-in-response diagnostic, since stripped): (1) no deterministic fast path — trivial properties.price/etc. read routed through the Sonnet intent-matcher + Haiku polish. Fix: src/services/ai/attribute-fast-path.ts resolves price/bedrooms/bathrooms/size/address/floor/property_type with no LLM (after cache read, before the matcher; property_id-gated; conservative no-shadow patterns; RLS-safe single-col read; locale-aware formatCurrency; new match_source: 'attribute_fast_path'; write-through). (2) property id never reached the engine — the UI posts propertyId/dealId (camelCase) but the route read only snake_case → undefined → no property context (broke the fast path and the long-standing attribute deflection). Fix: route accepts both (?? body.propertyId); eval harness updated to post camelCase (was masking the bug at 50/50). (3) cache never landed — wrong cred names + fire-and-forget writes frozen by Vercel serverless. Fix: new Redis({KV_REST_API_URL,KV_REST_API_TOKEN}), after() for all 3 writes, 200ms Promise.race read timeout. No migration. Op note: Upstash free DB auto-deletes after 14 days idle → keep-warm ping or paid tier (200ms timeout degrades gracefully meanwhile).",
+      "tag": "admin",
+      "added": "2026-06-09"
+    },
     {
       "id": "BG-128",
       "title": "After creating an agency the user must manually refresh to enter the app + Swiss agent's phone defaults to +1",
@@ -6220,6 +6348,51 @@ const DATA = {
     }
   ],
   "sessions": [
+    {
+      "date": "2026-06-12",
+      "title": "BG-VIEWING-SYNTH-CARD-FEATURE-MERGE fixed (D-407). D-404 synth cards (items:[]) never absorbed features, so the D-405/D-406 bath-feature backfill (room_name→Badezimmer on props with no Badezimmer room item) would orphan them. buildRoomCards §1b now buckets orphan features (room_name matching no real room item) by canonical type; the first synth card of each type absorbs its bucket (hard guard: real-room features excluded → ≤1 card per feature). Sim over live Affoltern (post-backfill state): 3 bath features → Badezimmer 1, Wohnzimmer cleaned. Interim until BL-ROOM-MODEL Phase 3.",
+      "decisions": "the D-406 data fix was correct but invisible until the display path absorbed orphans — caught by tracing D-404 against the live \"no Badezimmer room item\" reality before --run; absorb on the FIRST synth card of a type (multi-bath distribution out of scope); the at-most-one-card guard falls out of defining orphans as features whose room_name matches no real room key (real-room features are already attached, never double-pulled)"
+    },
+    {
+      "date": "2026-06-12",
+      "title": "BG-SEED-BATHROOM-FEATURE-ROOM fixed (D-405) + backfill written (D-406, dry-run verified). The bl128 seed attached bath features to the living room via findRoom's core[0] fallback when the Badezimmer room was sliced out of roomList (3-bed / small-sqm, targetRoomCount=5). D-405: bath features derive room_name from the vocab bath label directly (bain = bathLabel), line 355 only. D-406: scripts/backfill-bath-feature-rooms.mjs — item_type discriminator (bathroom_fixture/bathroom_feature), dry-run verified 6 rows / 2 props / DE-only. Filed BL-ROOM-MODEL 🔴 (next-session canonical room model).",
+      "decisions": "live DB corrected the ticket twice (SO-LIVE-DB-TRUTH): it's 6 rows not 4 (the 2 bathroom_feature rows — Thermostat-Armatur / Naturstein-Fliesen — were omitted from the ticket's named list) and DE-only (FR/IT clean, not \"same pattern\"); item_type is a cleaner discriminator than a name catalog (catches the 2 missed rows, immune to the Naturstein-Fliesen/Naturstein collision, locale-agnostic); only line 355 was buggy — every other findRoom targets a core room that's never sliced; backfill keyed on source room_name resolves the target per-locale without importing the self-executing seed"
+    },
+    {
+      "date": "2026-06-10",
+      "title": "BG-VIEWING-ROOM-CARDS-FROM-COUNTS fixed & prod-verified (D-404). Viewing Mode room cards now derive from the property's structured bedrooms/bathrooms counts, not only property_items. buildRoomCards (signature widened to receive the counts) emits Wohnzimmer → Küche → bedrooms (Master/Schlafzimmer N) → floor(bathrooms) Badezimmer + Gäste-WC on a .5 → other item-rooms → Building & Exterior; match-by-name fills each slot from an existing item-room first (features preserved), synthesizing only the shortfall as empty cards w/ stable unique ids. Affoltern (3/2.0) now shows 2 Badezimmer cards that didn't exist before. Filed BL-VIEWING-ROOM-LABEL-I18N + BL-VIEWING-SYNTH-ROOM-NOTE-PERSISTENCE.",
+      "decisions": "counts live in properties.bedrooms(int)/bathrooms(numeric, holds .5) — cross-checked live before building (SO-LIVE-DB-TRUTH); count is a floor not a cap so existing item-rooms beyond the count still render, and null/0 degrades to item-derived (never synthesize phantom cards from a missing count); countable bed/bath cards are distinct-or-empty (no D-403 reuse, no primary fallback) so an unmatched slot reads as genuinely empty, not a misleading reused photo; synthesized cards need stable unique id/name to be safe React keys; Gäste-WC branch couldn't be exercised live (no CH .5 property) — logic-verified only"
+    },
+    {
+      "date": "2026-06-10",
+      "title": "BG-VIEWING-ROOM-PHOTOS fixed & prod-verified (D-402 + D-403). Viewing Mode room cards now show correct per-room photos and the walkthrough editor shows real labels. D-402: new src/lib/roomNormalize.ts canonical normalizer (toCanonicalRoom DE/FR/IT/EN + humanizeRoom; detect-room imports VALID_ROOM_TYPES), ViewingMode matcher + never-blank fallback, 4 missing enums.photo.roomType keys × 4 locales, a translateRoom guard fix, and scripts/backfill-photo-rooms.mjs (--org/throttle/429-retry) — live backfill ran: 343 photos / all orgs / 0 failures. D-403: distinct thumbnail assignment across same-type cards (usedPhotoIds first-unused) + Building & Exterior outdoor/common catch-all. Filed BG-SEED-BATHROOM-FEATURE-ROOM + BL-VIEWING-HELPER-ROOM-CARD.",
+      "decisions": "room vocab has one source now (detect-room's 14 VALID_ROOM_TYPES) — normalize both sides, keep caption as a secondary signal; the never-blank fallback must NOT be marked used (shared last resort); next-intl returns the full key path on a miss, not the bare code, so translated !== code guards leak the raw key → treat a dot-containing result as missing; photos arrive .order('sort_order') so a usedPhotoIds accumulator gives deterministic first-unused; D-401 paper trail rode in on this combined i18n commit (de8755f), noted in its CHANGELOG entry"
+    },
+    {
+      "date": "2026-06-09",
+      "title": "BG-QA-SLOW-ATTR fixed & prod-verified (D-401). Q&A attribute questions now answer \u003c 800ms with no LLM (attribute_fast_path), identical repeats land on cache. Three root causes: no fast path (added deterministic resolver), property id never reaching the engine (UI posts camelCase propertyId, route read snake property_id → undefined → no property context — broke fast path + the long-standing attribute deflection; route now accepts both), cache never landing (wrong cred names + serverless-frozen fire-and-forget writes; fixed via KV_REST_API_* + after() + 200ms read timeout). Diagnosed with a temporary _debug-in-response object (verifier reads API JSON via MCP, not server logs), since stripped.",
+      "decisions": "live observation beat the code read (snake threaded correctly in-repo, but the deployed UI posted camelCase) — confirm the wire, not the source; eval harness was masking the bug by posting snake-case (50/50 green while UI broken) → post the real UI shape; after() is the Next-native waitUntil (non-blocking keep-alive) — bare await blocks, fire-and-forget gets frozen; Upstash free DB auto-deletes after 14 days idle → keep-warm/paid to prevent recurrence; ship the fast path regardless of cache health (it alone restores \u003c 800ms)"
+    },
+    {
+      "date": "2026-06-08",
+      "title": "SEED-DE-HAUPTSTADT (D-400) + CH demo cleanup. Seeded 5 DE demo properties + 64 photos into Hauptstadt Immobilien (org f5f37e12-…, 0→5), one per active DE agent, mirroring the CH/FR/IT seed (public property-photos bucket, sharp→webp, photo_source='agent'). Filed BL-ENERGY-CLASS-DE-SCALE (DE class H hit the A–G CHECK). Also: deleted 5 zero-photo CH test properties + 11 deals + children from Zürich Premium Realty (5a895dc4…), FK-ordered.",
+      "decisions": "Dahlem energy_class H→NULL (figure kept in energy_efficiency_index=418) — column CHECK is A–G; optimized_url NULL matches real agent rows (DB-SCHEMA \"optimized_url==public_url\" note is stale); property_type has no CHECK; region_code NULL on all 5 (DE postal not seeded → BL-GEO-SEED-DE); CH cleanup ordered to clear the FK chain + the deals↔workflow_instances cycle (deal_stage_history / compliance_evaluations / workflow_instances / portal_listing_simulations), post-delete 0 orphans; data-ops cleanup has no D-number; no version bump (demo data)"
+    },
+    {
+      "date": "2026-06-08",
+      "title": "BL-POSTAL-TO-REGION DONE (D-399) + new Atlas Geo section. UI proof passed on CH org (8008 → region_code='CH-ZH' → deal market_region_code='CH-ZH' → cantonal rules fire). Registered the geo 🌍 Atlas section (multi-page, docs/geo/, renderable 6→7) + docs:html:geo script; placed geo-architecture.md (docs/geo/) + postal-region-derivation.md (docs/functional-guide/). Filed BL-UX-* + BL-GEO-SEED-* follow-ups.",
+      "decisions": "geo is a country-agnostic *capability* (geo section) vs per-country *data coverage* (Data Environments) — keep them separate; Atlas config change is mechanical (section registry + npm script), regen + atlas-repo push stays Will's; geo-data-seeding.md not provided → flagged, not fabricated; no version bump (tag is Will's call)"
+    },
+    {
+      "date": "2026-06-08",
+      "title": "postal resolver + capture wire-in (D-398, UI proof pending). resolvePostalToRegion service + properties.postal_code migration + EditPropertyModal postal Field that derives region_code on save. Phase 0 live-confirmed properties has region_code only (country_code/postal_code absent) → added postal_code, skipped region_code, deferred country_code (own ticket). Held functional/compliance/Atlas docs + version bump until the live UI proof passes.",
+      "decisions": "live information_schema beat the stale VC baseline (region_code present live, absent in snapshot) — SO-LIVE-DB-TRUTH; country_code NOT written to the deal/property payload (derived at call-time via legacyCountryNameToCode; stored-column + backfill = BL-PROPERTIES-ISO-CANONICALIZATION); no manual region picker — one field (postal) in, region derived; resolver validates resolved code vs market-regions subdivisions (defends bad seed row); EditPropertyModal only (AddListingFlow untouched)"
+    },
+    {
+      "date": "2026-06-08",
+      "title": "postal_regions data asset (D-397). New postal_regions table migration + reproducible generator (scripts/generate-postal-regions-seed.mjs) → idempotent CH seed: 3,362 NPAs, 26/26 cantons, 21 ambiguous (multi-canton) NPAs flagged with a review CSV. Migration + seed authored, NOT executed (Will runs). Resolver + properties.country_code + write-path wire-in deferred to a later prompt.",
+      "decisions": "source pinned to zauberware/postal-codes-json-xml-csv (CC-BY 4.0) via codeload tarball (avoids API rate limits); primary canton = highest NPA row count, tie-break alphabetical (deterministic); 21 ambiguous primaries are placeholders pending ChatGPT/Gemini cross-check (review CSV is the worksheet); generator asserts 3000+ NPAs / 26 cantons / 0 blank or fails loudly; data-asset-only scope kept separate from the resolver service"
+    },
     {
       "date": "2026-06-07",
       "title": "BL-171 + BL-170 shipped & live-verified. DE added to Workflows UI (constants + countryLabel i18n). Property region_code + deal region plumbing — createDeal now binds market_region_code from the linked property; CH cantonal rules fire (41 vs 36 on prod). Investigation corrected 3 carry-over assumptions (DE has 0 region rules → CH is the demo target; engine resolves region via deal.market_region_code + the get_applicable_rules RPC; that RPC isn't in version control).",
